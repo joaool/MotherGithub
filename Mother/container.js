@@ -60,14 +60,14 @@ define([
         },
         topAreaUnderMouse: function(mouseEvent){
 
-        },    
+        },
         topWidgetUnderMouse: function(mouseEvent){
             var topChild = null;
             for(var i = 0; i < this.children.length; i++){
                 if(this.children[i].isUnderMouse(mouseEvent))
-                    if(this.children[i].zIndex > topChild.zIndex) 
+                    if(this.children[i].zIndex > topChild.zIndex)
                         topChild = this.children[i];
-            };
+            }
             if(topChild.isContainer)
                 return topChild.topWidgetUnderMouse();
         },
@@ -75,6 +75,6 @@ define([
             var x = e.pageX;
             var y = e.pageY;
             // code here
-        }    
+        }
     });
 }); //end of  module  
