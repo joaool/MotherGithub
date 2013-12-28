@@ -1,0 +1,161 @@
+<!--
+* http://download.dojotoolkit.org/release-1.2.3/dojo-release-1.2.3/dojox/form/tests/test_BusyButton.html
+* http://www.sitepen.com/blog/2008/10/17/dojo-building-blocks-of-the-web/
+*
+* <!DOCTYPE html>
+-->
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<!--
+		<meta http-equiv="X-UA-Compatible" content="IE=8" />
+		<script type="text/javascript" src="Dojo Toolkit/dojo-release-1.7.1/dojo/dojo.js" djconfig="parseOnLoad: true, isDebug: true" >
+		</script> 
+		<link href="Dojo Toolkit/dojo-release-1.7.1/dijit/themes/claro/claro.css" rel="stylesheet">
+
+	<meta http-equiv="Content-Type" content="text/html;charset=utf-8" /> 
+-->	
+	<!-- -->
+    <!-- -->
+    <title>Test container v1.0</title>
+    <style type="text/css" media="all">
+		.claro.Mother .thumbNail .hoverThumbNail{/*not showing coz of DomStyle.set(this.thumbNail, "border", "red"); inside thumbNail.js*/
+			border:3px solid #87AF06;
+		}
+		.claro.Mother .thumbNail .placeHolder{
+			border:1px solid red;
+		}		
+	</style>
+    <style type="text/css">
+        #wrapper {
+            height:200px;
+            width:200px;
+            background:#ededed;
+            color:#000;
+        }
+        #wrapper p {
+            padding:20px;
+        } 
+    </style>	
+	<!--
+	<link href="../dojo1.9.2/dijit/themes/claro/claro.css" rel="stylesheet"> -->
+	<!--<link type="text/css" rel="stylesheet" href="Mother/bootstrap.css" />--> <!-- efeito de halo -->
+	<!--<link rel="stylesheet" href="Mother/font-awesome.css">	-->
+	<!--<script type="text/javascript" src="../dojo1.9.2/dojo/dojo.js" djconfig="parseOnLoad: true, isDebug: true" ></script> -->
+    <script> 
+    	dojoConfig= {
+	        has: {
+	            "dojo-firebug": true
+	        },
+	        parseOnLoad: false,
+	        foo: "bar",
+	        async: true
+    	};
+    </script> 
+   	<script type="text/javascript" src="../dojo1.9.2/dojo/dojo.js"></script> 
+ 
+	<!--<script src="Mother/jquery-1.8.1.min.js"></script> -->
+	<!--<script src="Mother/bootstrap.js"></script>-->	
+	<link href="../dojo1.9.2/dijit/themes/claro/claro.css" rel="stylesheet"> 
+	<link rel="stylesheet" type="text/css" href="Mother/Mother.css"/>
+	
+	<style type="text/css" media="all">
+		.claro.Mother {/*prevents text selection highlighting outside current div */
+			-webkit-touch-callout: none;
+			-webkit-user-select: none;
+			-khtml-user-select: none;
+			-moz-user-select: none;
+			-ms-user-select: none;
+			user-select: none;
+		}
+	</style>
+	
+	<!--<link href="Dojo Toolkit/dojo-release-1.7.1/dojox/layout/resources/ResizeHandle.css " rel="stylesheet">-->
+	<!--<link rel="stylesheet" href="../dgrid/css/dgrid.css">  -->
+	<!------ Mother CSS ----------------------------------------------------------------- -->
+		<!--- For Mother Builder --->
+		<link rel="stylesheet" type="text/css" href="Mother/MotherBuilder.css" /> 
+		<!--- For Mother Forms  A -BlueHills, B-Simple Green C- Tree D-Chess E-light blue F(A+C)=>(fz,f0)-->
+		<!--<link rel="stylesheet" type="text/css" href="Mother/MotherF.css"/> -->
+		<!--
+		<link rel="stylesheet" type="text/css" href="Mother/Mother.css"/>
+		-->
+	<!-- ----------------------------------------------------------------------------------- -->
+	<!-- <link href="Dojo Toolkit/dojo-release-1.7.1/dijit/themes/claro/claro.css" rel="stylesheet"> -->
+	<!--<script type="text/javascript" src="//api.filepicker.io/v1/filepicker.js"></script>-->
+<script>
+oDbg=null;//so that we can use "this" inside this html with embedded script
+require([
+	"Mother/areasFactory.js",
+	"Mother/textbox.js",
+	"Mother/numberbox.js",
+	"Mother/container.js",
+	], 
+	function(areasFactory,textbox,numberbox,container){ 
+		//
+		//
+		//num1 = new numberbox({left:500, top:50, width:340, height:100, value:129.2, borderColor:"purple"});
+		//num2 = new numberbox({left:1000, top:50, width:340, height:50, value:123});
+		//txt1 = new textbox({left:100, top:50, width:340, height:300, value:"Pukas"});
+		console.log("Inicio");
+		var af=new areasFactory();
+		var num1 = af.createNumberbox({left:320, top:50, width:200, height:50, value:129.2, borderColor:"purple"});
+		var num2 = af.createNumberbox({left:1000, top:50, width:340, height:50, value:123});
+		num1.toggleItalic(true);
+		num2.toggleItalic(false);
+		var txt1 = af.createTextbox({left:100, top:50, width:200, height:100, value:"junkas"});
+
+		num1.setFontSize(20);
+		num1.setBorder({borderThickness:40});
+		txt1.setBorder({borderThickness:5, borderColor:"blue"});
+		txt1.toggleBold(true);
+		num1.toggleItalic(true);
+
+		console.log("------------------------------------------------- summary.... -----------------------------------------------");		
+		console.log("totalAreas = "+af.lastAreaOrder+"  TotalTextboxes = "+af.lastTextboxOrder+"  TotalNumberboxes = "+af.lastNumberboxOrder+"  TotalContainers = "+af.lastContainerOrder);
+
+		console.log("------------------------------------------------- now the container.... -----------------------------------------------");		
+		//c1 = new container("c1", {left:500, top:100, height:40, border:{color:"red"}});
+		// c1 = new container({left:500, top:100, width:500, height:40, borderThickness:10, borderColor:"red"});
+		var c1 = af.createContainer({left: 80, top: 40, width: 500, height: 150,borderColor: "red"});
+		c1.setBorder({borderThickness: 10, borderColor: "green"});
+		c1.addExistingChild([num1,txt1]);
+		//c1.resizeViewPort({l:800});
+		c1.moveTo({left: 800, top: 200});
+
+		console.log("------------------------------------------------- container done.... -----------------------------------------------");		
+
+		//txt1.moveTo({left: 1000,top: 200});
+		/*
+		console.log("-----------------------------------------------------------------------------------------------------------------------");
+		console.log("Container name -->"+c1.name+"  viewPort l="+c1.viewPort.l+" t="+c1.viewPort.t+" w="+c1.viewPort.w+" h="+c1.viewPort.h);
+		console.log("widget num1 -->  num1.id="+num1.id+" mType="+num1.obj.mType+" name="+num1.obj.name+" left="+num1.left+" top="+num1.top+" width="+num1.width+" height="+num1.height);
+		console.log("widget num2 -->  num2.id="+num2.id+" mType="+num2.obj.mType+" name="+num2.obj.name+" left="+num2.left+" top="+num2.top+" width="+num2.width+" height="+num2.height);
+		console.log("widget txt1 -->  txt1.id="+txt1.id+" mType="+txt1.obj.mType+" name="+txt1.obj.name+" left="+txt1.left+" top="+txt1.top+" width="+txt1.width+" height="+txt1.height);
+
+		c1.resizeViewPort({l:800});
+		*/
+
+		//var viewPortX2 ={l:500,t:100,w:200,h:40}
+		//var f0=new FBuilder("My f0","_f0",{viewPort:viewPortX2,borderColor:"black",borderType:"solid",borderThickness:1});
+		//var f0=new container("My f0",{viewPort:viewPortX,borderColor:"black",borderType:"solid",borderThickness:1});
+		//f0.addChild("label",{name:"lbl1",value:"Name :",left:15,top:5}); 
+		//f0.addChild("textBox",{name:"txt1",left:85,top:5,width:100,posCode:"console.log('leaves with'+this.get('txt1'));"});
+
+		//c1.addChild()
+		//alert("FIM");
+
+	
+		//if(this.oDbg.isDbg("main")) this.oDbg.display(document.title+"......  END..");//document title tem  a property <title> que está no head
+	}//closing of main function				
+);//closing of require function
+</script>
+	</head>
+	<body class="claro Mother"> 
+		<!--
+		<div id="wrapper" style="position:absolute;left:50;top:100;">
+	           <p>Name: 
+                <input type="text" id="user" name="user"></p>
+	    </div>
+		-->
+	</body>
+</html>
