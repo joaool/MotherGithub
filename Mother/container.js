@@ -7,19 +7,12 @@ define([
     "dijit/layout/ContentPane",//--
     "/pdojo/M19/Mother/area.js"
 ], function(declare,lang,win,domStyle,domConstruct,ContentPane,area){
-    //return declare(null,{
     return declare(area,{
         name:"",
-        //viewPort:{l:100,t:100,w:200,h:100},
-        //borderColor:"black",
-        //borderType:"solid",
-        //borderThickness:1,
         floatF:"nonFloat", //"nonFloat" => form in pane, "modal" =>modal floating form,  "nonModal" => floating form
         children:[],
         parentId:0,//id numer of the parent container or 0 if none 
         dojoObject:null,
-
-        // obj:null,//the dojo object 
         constructor: function(containerProperties){
            // The "constructor" method is special: the parent class areaWithText and area constructor are called automatically before this one.
             console.log("container class BEGIN OF CONSTRUCTOR");
@@ -32,9 +25,7 @@ define([
             console.log("INSIDE CONTAINER id="+this.id+" left="+this.left+" top="+this.top+" width="+this.width+" height="+this.height);
             
             var paneDivId="_PaneDiv" + this.id;
-            //var paneDivId = this.domId;
             var paneDiv = domConstruct.create("div");
-            //var xDivId=this.prefix+"_PaneDiv";
             paneDiv.innerHTML="<div id='"+paneDivId+"'></div>";
             win.body().appendChild(paneDiv);//places paneDiv in DOM
 
@@ -46,15 +37,7 @@ define([
                 //style:'position:absolute;left:800px;top:5px;width:200px;height:30px;border: 1px dotted green;'
                 style: paneStyleProperty
             }, paneDivId); //content Pane is placed over the div with name paneDivId
-            //this.setBorder({borderThickness: 5});            
-            console.log("container class END OF CONSTRUCTOR");
-        },
-        XXXXaddChild: function(widgetType, properties){
-            var indexes = {"textBox": 0, "label":1, "numberBox":2,"textArea":3,"checkBox":4,"dateTextBox":5,"button":6,"comboBox":7,"grid":8,"tabs":9,"picture":10,"door":11,"summary":12,"services":100,"buttonS1":101,"buttonS2":102,"_btnSubmit":103,"_btnSearch":104,"_btnNew":105,"_btnDelete":106};
-            var xInt = indexes[xType];
-            if (xInt === null)
-                alert("fBuilder.counterIndex: the type " + xType + " is unknown");
-            children.push(oObj);
+             console.log("container class END OF CONSTRUCTOR");
         },
         addExistingChild: function(childrenArr){
             //this.changeFromAbsoluteCoordinatesToContainerCoordinates(childrenArr);
@@ -74,28 +57,6 @@ define([
                     left: this.children[i].left + deltaCoordinates.left,
                     top: this.children[i].top + deltaCoordinates.top});
             }
-        },
-
-
-
-        resizeViewPort: function(newPositions){//{l:xL,t:xT,w:xW,h:xH}
-            //declare.safeMixin(this.viewPort,newViewPort);
-            declare.safeMixin({left: this.left, top: this.top, width: this.width, height: this.height}, newPositions);
-            this.redisplayAllWidgets();
-        },    
-        changeFromAbsoluteCoordinatesToContainerCoordinates: function(ArrayOfWidgetObjects){
-            for(var i = 0; i < ArrayOfWidgetObjects.length; i++){
-                ArrayOfWidgetObjects[i].left -= this.left;
-                ArrayOfWidgetObjects[i].top -= this.top;
-            };
-        },
-        redisplayAllWidgets: function(){
-            //var domId=null;
-            for(var i = 0; i < this.children.length; i++){
-                domId = this.children[i].domId;
-                domStyle.set(domId,"left",this.left+this.children[i].left);
-                domStyle.set(domId,"top",this.top+this.children[i].top);
-            };
         },
         topAreaUnderMouse: function(mouseEvent){
 
