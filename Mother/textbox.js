@@ -9,6 +9,7 @@ define([
 ], function(ready,declare,Form,ValidationTextBox,areaWithText){
     return declare(areaWithText,{
         obj:null,//the dojo object 
+        type:"textbox",
         constructor: function (widgetProperties) {
             // The "constructor" method is special: the parent class areaWithText and area constructor are called automatically before this one.
             var allPossibleProperties={value:"", name:"", required:false, invalidMessage:"Error...please correct",

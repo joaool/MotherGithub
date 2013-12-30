@@ -20,18 +20,19 @@ define([
         borderThickness:1,
         borderStyle:"solid",
         borderColor:"black",
-        order:-1,
-        zIndex:0,
+        areaOrder:null,
         name:null,
         constructor: function(areaProperties) {
             // alert("BEGIN AREA CONTRUCTOR AREA this.id="+this.id+" id="+areaProperties.id+" order="+areaProperties.order);
             lang.mixin(this, areaProperties);//mixin is used to mix an object-hash of properties passed has argument with default values in the class 
+            //this.areaOrder = this.areaOrder + 1;
             if (!this.id){ //case where area is built outside areasFactory
                 this.areas.lastId++;
                 this.id = "_free"+this.areas.lastId;
+                this.areaOrder = "Free" +  this.areas.lastId;
                 this.domId = "widget_"+this.id;
             }    
-            console.log("area class ----------------------------------------> id=" + this.id + " domId=" + this.domId + " left="+this.left+" top="+this.top);
+            console.log("area class ---------------------------------------->areaOrder=" + this.areaOrder +" id=" + this.id + " domId=" + this.domId + " left="+this.left+" top="+this.top);
             console.log("area class ------------------------------------------------>  width="+this.width+" height="+this.height+" zIndex="+this.zIndex);
             console.log("area class ------------------------------------------------>  borderThickness="+this.borderThickness+", borderStyle="+this.borderStyle+", borderColor="+this.borderColor+")");
         },
@@ -49,7 +50,7 @@ define([
                 lang.mixin(this,border);
             }
             var borderString = this.borderThickness+"px "+this.borderStyle+" "+this.borderColor;
-            console.log("area class setBorder------------------------>  borderThickness="+this.borderThickness+", borderStyle="+this.borderStyle+", borderColor="+this.borderColor+")");
+            console.log("area class setBorder for type="+this.type+" ------------------------>  borderThickness="+this.borderThickness+", borderStyle="+this.borderStyle+", borderColor="+this.borderColor+")");
             this.updateDOMPropertyWithValue("border", borderString);
         },
         moveTo: function(leftTopCoordinates) {
@@ -61,12 +62,17 @@ define([
         },
         updateDOMPropertyWithValue: function(propertyName, value){
             var domId = "widget_"+this.id;
+            // if(this.domId.substr(0,9)=="container")
+            if(this.type=="container")
+                domId=this.id;
             console.log("----------------->area.updateDOMPropertyWithValue(): domId="+ domId +" trying to change property " + propertyName + " to " + value);
             var domIdExists = (dom.byId(domId) === null)? false: true;
             if (domIdExists) {
                 domStyle.set(dom.byId(domId), propertyName, value);
             } else {
-                throw new Error("area.updateDOMPropertyWithValue(): In area order " + thiz.order +
+                // console.log(" Error: area.updateDOMPropertyWithValue(): In area order " + this.order +
+                //     " you tried to change property " + propertyName + " to " + value + ", but DOM id is null !");
+                throw new Error("area.updateDOMPropertyWithValue(): In area order " + this.order +
                     " you tried to change property " + propertyName + " to " + value + ", but DOM id is null !");
             }
         },

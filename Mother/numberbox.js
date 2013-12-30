@@ -8,6 +8,7 @@ define([
 ], function(ready,declare,Form,NumberTextBox,area_text){
     return declare(area_text,{
         obj:null,
+        type:"numberbox",
         constructor: function (widgetProperties) {
             // The "constructor" method is special: the parent class (area)constructor is called automatically before this one.
             var allPossibleProperties={left:0, top:0, width:0, height:0, value:"", name:"", required:false, invalidMessage:"Error...please correct",

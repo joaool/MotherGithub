@@ -154,9 +154,14 @@ require([
 		});
 		//alert("Hello");
 		// -------------------------------------------------------------------------------------------
+        // this.af = new areasFactory();
+
 
 		var c1 = af.createContainer({left: 680, top: 40, width: 500, height: 250, borderThickness: 7, borderColor: "red"});
-		//c1.setBorder({borderThickness: 10, borderColor: "green"});
+		var c2 = container({left: 680, top: 300, width: 100, height: 100, borderThickness: 5, borderColor: "blue"});
+		c2.setBorder({borderThickness: 6, borderColor: "yellow"});
+		alert("--->c2.borderThickness "+c2.borderThickness);
+		alert("--->c2.borderColor "+c2.borderColor);
 		//c1.addExistingChild([num1,txt1]);
 		//c1.moveTo({left: 800, top: 200});
 
@@ -193,6 +198,8 @@ require([
 
 	
 		//if(this.oDbg.isDbg("main")) this.oDbg.display(document.title+"......  END..");//document title tem  a property <title> que está no head
+		console.log(document.title+"......  END..");		
+
 	}//closing of main function				
 );//closing of require function
 </script>

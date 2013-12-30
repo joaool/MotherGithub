@@ -6,8 +6,9 @@ define([
     "dijit/registry",
     "simple/Mother/textbox",
     "simple/Mother/numberbox",
+    "simple/Mother/container",
     "simple/Mother/areasFactory"
-    ], function(doh,dom,domConstruct,registry,textbox,numberbox,areasFactory){
+    ], function(doh,dom,domConstruct,registry,textbox,numberbox,container,areasFactory){
     doh.register("textbox 101",{
         "Should instantiate successfully":{
             setUp:function(){
@@ -123,23 +124,33 @@ define([
         //http://kevinandre.com/dev/jsunittest-amd-doh-1/ ---//define(["doh","simple/Mother/textbox"], function(doh,textbox) {
         "Should instantiate succesfully":{
             setUp:function(){
-                var canvasContainer = registry.byId("_xxx1"); //to destroy a dijit widget by id
-                canvasContainer.destroyRecursive();
-                canvasContainer = registry.byId("_xxx2"); //to destroy a dijit widget by id
-                canvasContainer.destroyRecursive();
- 
+                this.canvasContainer = registry.byId("_1"); //to destroy a dijit widget by id
+                this.canvasContainer.destroyRecursive();
+                this.canvasContainer2 = registry.byId("_2"); //to destroy a dijit widget by id
+                this.canvasContainer2.destroyRecursive();
                 this.af = new areasFactory();
-                //c1 = new container({left:500, top:100, width:500, height:40, borderThickness:10, borderColor:"red"});
                 this.c1 = this.af.createContainer({left: 450, top: 100, width: 240, height: 150,borderColor: "red"});
+                this.c1.setBorder({borderThickness: 10, borderColor: "green"});
+              },
+            runTest:function(){
+                doh.assertEqual("green", this.c1.borderColor,"The container does not remember borderColor: 'green'");
+                doh.assertEqual("10", this.c1.borderThickness);
+                doh.assertEqual("450", this.c1.left);
+                doh.assertEqual("100", this.c1.top);
+                doh.assertEqual("240", this.c1.width);
+                doh.assertEqual("150", this.c1.height);
+            }
+        },
+        "free container: set borderThickness to 10 and borderColor to green":{
+            setUp:function(){
+                this.c1 = container({left: 680, top: 40, width: 500, height: 250, borderThickness: 7, borderColor: "red"});
+                this.c1.setBorder({borderThickness: 10, borderColor: "green"});
             },
             runTest:function(){
-                // doh.assertEqual("red", this.c1.borderColor,"The container does nor remember borderColor: 'red'");
-                // doh.assertEqual("450", this.c1.left);
-                // doh.assertEqual("100", this.c1.top);
-                // doh.assertEqual("240", this.c1.width);
-                // doh.assertEqual("150", this.c1.height);
+                doh.assertEqual("10", this.c1.borderThickness,"The container does nor remember borderThickness: 10");
+                doh.assertEqual("green", this.c1.borderColor, "The container does nor remember borderColor: 'green'");
             }
-        }
+        }        
     });
     doh.register("DOH test 4 release Model ", [
         //http://kevinandre.com/dev/jsunittest-amd-doh-1/ ---//define(["doh","simple/Mother/textbox"], function(doh,textbox) {

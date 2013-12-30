@@ -13,6 +13,7 @@ define([
         children:[],
         parentId:0,//id numer of the parent container or 0 if none 
         dojoObject:null,
+        type:"container",
         constructor: function(containerProperties){
            // The "constructor" method is special: the parent class areaWithText and area constructor are called automatically before this one.
             console.log("container class BEGIN OF CONSTRUCTOR");
@@ -36,6 +37,7 @@ define([
                 //style:'position:absolute;left:800px;top:5px;width:200px;height:30px;border: 1px dotted green;'
                 style: paneStyleProperty
             }, paneDivId); //content Pane is placed over the div with name paneDivId
+
             console.log("container class END OF CONSTRUCTOR");
         },
         addExistingChild: function(childrenArr){
