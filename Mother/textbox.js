@@ -4,19 +4,19 @@ define([
     "dijit/form/Form",
     "dijit/form/ValidationTextBox",
     //"Mother/area_text.js",
-    "/pdojo/M19/Mother/areaWithText.js",
+    "/pdojo/MotherGitHub/Mother/areaWithText.js",
     "dojo/domReady!"
 ], function(ready,declare,Form,ValidationTextBox,areaWithText){
     return declare(areaWithText,{
         obj:null,//the dojo object 
-        constructor: function (properties) {
+        constructor: function (widgetProperties) {
             // The "constructor" method is special: the parent class areaWithText and area constructor are called automatically before this one.
             var allPossibleProperties={value:"", name:"", required:false, invalidMessage:"Error...please correct",
                 missingMessage:"Must have a value !", regExp:"[^\t]*", preCode:"", posCode:"", changeCode:"", pattern:"0.###", disable:false,
                 disabled:false, title:"@|", headers:"", placeHolder:"", propercase:false, readOnly:false, template:null, zIndex:0};
             declare.safeMixin(allPossibleProperties,this.left, this.top, this.width, this.height);//priority to inherited defaults  
-            if (properties)
-                declare.safeMixin(allPossibleProperties,properties);   
+            if (widgetProperties)
+                declare.safeMixin(allPossibleProperties,widgetProperties);   
             
             console.log("INSIDE TEXTBOX id="+this.id+" left="+this.left+" top="+this.top+" width="+this.width+" height="+this.height);
             var form = new Form({
@@ -27,6 +27,8 @@ define([
             var JSON_forValidationTextBox=this.JSON_Default_TextBox(allPossibleProperties);
             this.obj = new ValidationTextBox(JSON_forValidationTextBox.props,this.id);
             form.domNode.appendChild(this.obj.domNode) //this places the widget inside the form 
+            this.setFontSize(this.fontSize);
+            this.setBorder();
         },
         //-------------------------------------------------------------------------------------------
         JSON_Default_TextBox: function(xProps){//Order within TextBoxes,xProps

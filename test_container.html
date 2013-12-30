@@ -85,27 +85,39 @@
 <script>
 oDbg=null;//so that we can use "this" inside this html with embedded script
 require([
+	"dojo/query",
+	"dojo/dom",
+	"dojo/dom-construct",
+	"dijit/registry",
 	"Mother/areasFactory.js",
 	"Mother/textbox.js",
 	"Mother/numberbox.js",
 	"Mother/container.js",
 	], 
-	function(areasFactory,textbox,numberbox,container){ 
+	function(query,dom,domConstruct,registry,areasFactory,textbox,numberbox,container){ 
 		//
 		//
 		//num1 = new numberbox({left:500, top:50, width:340, height:100, value:129.2, borderColor:"purple"});
 		//num2 = new numberbox({left:1000, top:50, width:340, height:50, value:123});
 		//txt1 = new textbox({left:100, top:50, width:340, height:300, value:"Pukas"});
 		console.log("Inicio");
-		var af=new areasFactory();
+		var af=new areasFactory();//by default a base container (the full screen) is defined
+		// alert("base container name=" + af.baseContainer.name + " zIndex="+af.baseContainer.zIndex);
 		var num1 = af.createNumberbox({left:320, top:50, width:200, height:50, value:129.2, borderColor:"purple"});
 		var num2 = af.createNumberbox({left:1000, top:50, width:340, height:50, value:123});
+		var num3 = new numberbox({left:1200, top:250, width:100, height:30, value:23});
+		num3.setBorder({borderThickness:3, borderColor:"green"});
+		// alert("Step 1");
 		num1.toggleItalic(true);
 		num2.toggleItalic(false);
 		var txt1 = af.createTextbox({left:100, top:50, width:200, height:100, value:"junkas"});
+		var txtc2 = af.createTextbox({left:700, top:150, width:100, height:50, value:"abc", borderColor: "yellow"});
+		var numc2 = af.createNumberbox({left:710, top:210, width:80, height:30, value:23.4});
 
 		num1.setFontSize(20);
 		num1.setBorder({borderThickness:40});
+		// alert("Step 2");
+
 		txt1.setBorder({borderThickness:5, borderColor:"blue"});
 		txt1.toggleBold(true);
 		num1.toggleItalic(true);
@@ -116,11 +128,46 @@ require([
 		console.log("------------------------------------------------- now the container.... -----------------------------------------------");		
 		//c1 = new container("c1", {left:500, top:100, height:40, border:{color:"red"}});
 		// c1 = new container({left:500, top:100, width:500, height:40, borderThickness:10, borderColor:"red"});
-		var c1 = af.createContainer({left: 80, top: 40, width: 500, height: 150,borderColor: "red"});
-		c1.setBorder({borderThickness: 10, borderColor: "green"});
-		c1.addExistingChild([num1,txt1]);
-		//c1.resizeViewPort({l:800});
-		c1.moveTo({left: 800, top: 200});
+
+		//--------------------------------- to show current dijita on screen -------------------------
+		k=1;
+		query('.dijit').forEach(function(node){//captures all dijits in DOM
+			widget = dijit.byNode(node);
+			console.log("*************->"+k+" id="+widget.get("id")+" value="+widget.get("value"));
+			k++;
+		});
+
+		k=1;
+		query('div').forEach(function(node){//captures all divs in DOM
+			console.log("=============================->"+k+" id="+node.id);
+			k++;
+		});
+
+		var canvasContainer = registry.byId("_1"); 
+		//canvasContainer.destroyRecursive(); //to destroy a dijit widget by id (in this case the canvas)
+
+		k=1
+		query('.dijitContentPane').forEach(function(node){//captures all containers in DOM
+			widget = dijit.byNode(node);
+			console.log("+++++++++++++++++++++++++++++++++++++++++++->"+k+" id="+widget.get("id"));
+			k++;
+		});
+		//alert("Hello");
+		// -------------------------------------------------------------------------------------------
+
+		var c1 = af.createContainer({left: 680, top: 40, width: 500, height: 250, borderThickness: 7, borderColor: "red"});
+		//c1.setBorder({borderThickness: 10, borderColor: "green"});
+		//c1.addExistingChild([num1,txt1]);
+		//c1.moveTo({left: 800, top: 200});
+
+		// c1 = new container({left:500, top:100, width:500, height:40, borderThickness:10, borderColor:"red"});
+	// var c2 = af.createContainer({left: 640, top: 140, width: 220, height: 110,borderColor: "blue"});
+		//c1.setBorder({borderThickness: 10, borderColor: "green"});
+	//c2.addExistingChild([txtc2,numc2]);
+	//c2.moveTo({left: 85, top: 170});
+
+	//c1.addExistingChild([num1,txt1,c2]);
+	//c1.moveTo({left: 700, top: 200});
 
 		console.log("------------------------------------------------- container done.... -----------------------------------------------");		
 

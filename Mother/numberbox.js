@@ -3,21 +3,21 @@ define([
     "dojo/_base/declare",
     "dijit/form/Form",
     "dijit/form/NumberTextBox",
-    "/pdojo/M19/Mother/areaWithText.js",
+    "/pdojo/MotherGitHub/Mother/areaWithText.js",
     "dojo/domReady!"
 ], function(ready,declare,Form,NumberTextBox,area_text){
     return declare(area_text,{
         obj:null,
-        constructor: function (options) {
+        constructor: function (widgetProperties) {
             // The "constructor" method is special: the parent class (area)constructor is called automatically before this one.
-            //this.id=id;
             var allPossibleProperties={left:0, top:0, width:0, height:0, value:"", name:"", required:false, invalidMessage:"Error...please correct",
                 missingMessage:"Must have a value !", regExp:"[^\t]*", preCode:"", posCode:"", changeCode:"", pattern:"#######.###", disable:false,
                 disabled:false, title:"@|", headers:"", placeHolder:"", propercase:false, readOnly:false, template:null, zIndex:0};
             declare.safeMixin(allPossibleProperties,this.left, this.top, this.width, this.height);//priority to inherited defaults  
-            if (options)
-                declare.safeMixin(allPossibleProperties,options);   
-            console.log("INSIDE NUMBERBOX id="+this.id+" left="+this.left+" top="+this.top+" width="+this.width+" height="+this.height);
+            if (widgetProperties)
+                declare.safeMixin(allPossibleProperties,widgetProperties);   
+            console.log("INSIDE NUMBERBOX id="+this.id+" left="+this.left+" top="+this.top+" width="+this.width+" height="+this.height+" zIndex="+this.zIndex+" domId="+this.domId);
+            // alert("NUMBERBOX id="+this.id);
             var form = new Form({
                     //empty
             }, dojo.doc.createElement('div'));
@@ -26,7 +26,9 @@ define([
              var JSON_forNumberTextBox=this.JSON_Default_NumberBox(allPossibleProperties);
             this.obj = new NumberTextBox(JSON_forNumberTextBox.props, this.id);
             form.domNode.appendChild(this.obj.domNode) //this places the widget inside the form 
-        },
+            this.setFontSize(this.fontSize);
+            this.setBorder();//now dom is formed
+         },
         //-------------------------------------------------------------------------------------------
         JSON_Default_NumberBox: function(xProps){//Order within NumberBoxes,xProps
         //-------------------------------------------------------------------------------------------
