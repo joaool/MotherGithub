@@ -32,24 +32,36 @@ define([
             this.lastAreaOrder++;
             this.lastTextboxOrder++;
             //id will be used inside dojo objects, domId will be used to access dom outside dojo...
-            declare.safeMixin(widgetProperties, {domId:  "widget_id" + this.lastAreaOrder, id:"_"+this.lastAreaOrder, areaOrder:this.lastAreaOrder });
+            declare.safeMixin(widgetProperties,
+                {domId: "widget_id" + this.lastAreaOrder,id: "_"+this.lastAreaOrder,areaOrder: this.lastAreaOrder,containerParent: this.baseContainer});
             //we verify wich zIndex should be selected for the current area
             //we need to know the zIndex of the top area (if any) under the area being constructed
-            return new textbox(widgetProperties);
+            // return new textbox(widgetProperties);
+            var txt = new textbox(widgetProperties);
+            this.baseContainer.addExistingChild([txt]);
+            return txt;
         },
         createNumberbox: function(widgetProperties) {
             console.log("------------------------------------------>createNumberbox");
             this.lastAreaOrder++;
             this.lastNumberboxOrder++;
-            declare.safeMixin(widgetProperties, {domId:  "widget_id" + this.lastAreaOrder, id:"_"+this.lastAreaOrder, areaOrder:this.lastAreaOrder });
-            return new numberbox(widgetProperties);
+            declare.safeMixin(widgetProperties,
+                {domId: "widget_id" + this.lastAreaOrder,id: "_"+this.lastAreaOrder, areaOrder: this.lastAreaOrder,containerParent: this.baseContainer });
+            // return new numberbox(widgetProperties);
+            var num = new numberbox(widgetProperties);
+            this.baseContainer.addExistingChild([num]);
+            return num;
         },
         createContainer: function(containerProperties) {
             console.log("------------------------------------------>createContainer");
             this.lastAreaOrder++;
             this.lastContainerOrder++;
-            declare.safeMixin(containerProperties, {domId:  "container_id" + this.lastContainerOrder, id:"_"+this.lastAreaOrder,  areaOrder:this.lastAreaOrder });
-            return new container(containerProperties);
+            declare.safeMixin(containerProperties,
+                {domId: "container_id" + this.lastContainerOrder,id: "_"+this.lastAreaOrder,areaOrder: this.lastAreaOrder,containerParent: this.baseContainer});
+            // return new container(containerProperties);
+            var c = new container(containerProperties);
+            // this.baseContainer.addExistingChild([c]);
+            return c;
         }
     });
 }); //end of  module  

@@ -16,15 +16,19 @@ define([
         top:100,
         width:100,
         height:30, //default area
-        //border:{thickness:1,style:"solid",color:"black"},
         borderThickness:1,
         borderStyle:"solid",
         borderColor:"black",
         areaOrder:null,
         name:null,
+        zIndex:-1,//all areas have a zIndex that is the next zIndex after the top highest area being covered 
+        containerParent:null,//all areas have a parent (parent of baseContainer is null)
         constructor: function(areaProperties) {
             // alert("BEGIN AREA CONTRUCTOR AREA this.id="+this.id+" id="+areaProperties.id+" order="+areaProperties.order);
             lang.mixin(this, areaProperties);//mixin is used to mix an object-hash of properties passed has argument with default values in the class 
+             // if (this.zIndex>=0) {//if not a baseContainer
+            //     // zIndex=this.highestZIndexAreaUnderArea();
+            // }
             //this.areaOrder = this.areaOrder + 1;
             if (!this.id){ //case where area is built outside areasFactory
                 this.areas.lastId++;
@@ -32,8 +36,16 @@ define([
                 this.areaOrder = "Free" +  this.areas.lastId;
                 this.domId = "widget_"+this.id;
             }    
+            var showContainerParentName = "Canvas Parent...";
+            if (this.containerParent) {//most frequent case where area is inside a container
+                // this.zIndex = this.containerParent.zIndex+1;
+                this.zIndex = this.containerParent.highestZIndexAreaUnderContainer({left: this.left, top: this.top, width: this.width, height: this.height})+1;
+                showContainerParentName = "No name but id=" + this.containerParent.id;
+                if (this.containerParent.name)
+                    showContainerParentName = this.containerParent.name;
+            }    
             console.log("area class ---------------------------------------->areaOrder=" + this.areaOrder +" id=" + this.id + " domId=" + this.domId + " left="+this.left+" top="+this.top);
-            console.log("area class ------------------------------------------------>  width="+this.width+" height="+this.height+" zIndex="+this.zIndex);
+            console.log("area class ------------------------------------------------>  width="+this.width+" height="+this.height+" zIndex="+this.zIndex+" containerParentName="+showContainerParentName);
             console.log("area class ------------------------------------------------>  borderThickness="+this.borderThickness+", borderStyle="+this.borderStyle+", borderColor="+this.borderColor+")");
         },
         getArea: function () {
@@ -87,10 +99,19 @@ define([
         },
         isPointBelowRight: function(pointLeft,pointTop){//given a point verifies if that point is below and to the right of the area 
             var isBelowRight = false;
-            if( pointLeft > this.left )
+            if (pointLeft > this.left )
                 if( pointTop > this.top )
                     isBelowRight = true;
             return isBelowRight
-        }
+        },
+        intersectsAreaDimensions: function(areaDimensions) {// true if current area intersects an area dimension {left:xL, top:xT, width:xW, height:xH}, false otherwise
+            var intersets = false;
+            var topLeft = {left: areaDimensions.left, top:areaDimensions.top};
+            var bottomRight = {left: areaDimensions.left + areaDimensions.width, top: areaDimensions.top + areaDimensions.height };
+            if ( isPointInsideArea(topLeft.left,topLeft.top) || isPointInsideArea(bottomRight.left,bottomRight.top)) {
+                intersets = true;
+            }
+            return intersets;
+        },        
     });
 }); //end of  module  

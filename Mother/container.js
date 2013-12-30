@@ -12,18 +12,25 @@ define([
         floatF:"nonFloat", //"nonFloat" => form in pane, "modal" =>modal floating form,  "nonModal" => floating form
         children:[],
         parentId:0,//id numer of the parent container or 0 if none 
+        highestZIndex:null, //the zIndex of the child with higest zIndex
         dojoObject:null,
         type:"container",
         constructor: function(containerProperties){
            // The "constructor" method is special: the parent class areaWithText and area constructor are called automatically before this one.
             console.log("container class BEGIN OF CONSTRUCTOR");
-            var allPossibleProperties = 
+            
+            //REVIEW: Imported from MotherLib10 for speed
+            var allPossibleProperties =
                 {value:"", name:"", preCode:"", posCode:"", changeCode:"", title:"@|", headers:"", template:null, zIndex:0};
             declare.safeMixin(allPossibleProperties,this.left, this.top, this.width, this.height, this.zIndex);//priority to inherited defaults  
             if (containerProperties)
                 declare.safeMixin(allPossibleProperties,containerProperties);
             console.log("INSIDE CONTAINER id="+this.id+" left="+this.left+" top="+this.top+" width="+this.width+" height="+this.height+" zIndex="+this.zIndex+" domId="+this.domId);
             
+            if (this.zIndex>=0) {//if not a baseContainer
+                var topZIndex=this.highestZIndexAreaUnderContainer({left: this.left,top: this.top,width: this.width,height: this.height});
+                this.zIndex = topZIndex + 1;
+            }
             var paneDivId="_PaneDiv" + this.id;
             var paneDiv = domConstruct.create("div");
             paneDiv.innerHTML="<div id='"+paneDivId+"'></div>";
@@ -41,8 +48,11 @@ define([
             console.log("container class END OF CONSTRUCTOR");
         },
         addExistingChild: function(childrenArr){
-            //this.changeFromAbsoluteCoordinatesToContainerCoordinates(childrenArr);
-            this.children = this.children.concat(childrenArr);
+            for(var i = 0; i < this.children.length; i++){
+                this.children[i].zIndex = this.zIndex+1;//initially all children have a zIndex 1 above their container
+                this.children.push( this.children[i]);
+            }
+            // this.children = this.children.concat(childrenArr);
         },
         moveTo: function(newCoordinates){//overrides the area moveTo() method
             //declare.safeMixin(this.viewPort,newViewPort);
@@ -70,7 +80,31 @@ define([
                     }
                 }
             }
-        },  
+        },
+        highestZIndexAreaUnderContainer: function(areaDimensions){//given {left:xL, top:xT, width:xW, height:xH} returns highest zIndex inside
+           var topZIndex = this.zIndex;
+           for (var i = 0; i < this.children.length; i++) {
+                 if (this.children[i].intersectsAreaDimensions(areaDimensions)) {
+                    if(this.children[i].zIndex > topZIndex) {
+                            topZIndex = this.children[i].zIndex;
+                    }
+                }
+            }
+            return topZIndex;
+        },
+        childDump: function() {
+            var showContainerParentName = "Canvas Parent...";
+            if (this.containerParent) {//most frequent case where area is inside a container
+                showContainerParentName = "No name but id=" + this.containerParent.id;
+                if (this.containerParent.name)
+                    showContainerParentName = this.containerParent.name;
+            }
+            console.log ("%%%%%%%%%%%%%%%%%%%%%%%%%%% container name="+ this.name+" id="+this.id+" parentContainerName="+showContainerParentName+"%%%%%%%%%%%%%%%%%%%%%%%%%");
+            for (var i = 0; i < this.children.length; i++) {
+                console.log(i+" Name="+this.children[i].name+" id="+this.children[i].id+" zIndex="+this.children[i].zIndex);
+            }
+            console.log ("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
+        },
         topWidgetUnderMouse: function(mouseEvent){
             var topChild = null;
             for(var i = 0; i < this.children.length; i++){

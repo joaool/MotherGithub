@@ -12,25 +12,32 @@ define([
         type:"textbox",
         constructor: function (widgetProperties) {
             // The "constructor" method is special: the parent class areaWithText and area constructor are called automatically before this one.
+
+            //REVIEW: Imported from MotherLib10 for speed
             var allPossibleProperties={value:"", name:"", required:false, invalidMessage:"Error...please correct",
                 missingMessage:"Must have a value !", regExp:"[^\t]*", preCode:"", posCode:"", changeCode:"", pattern:"0.###", disable:false,
                 disabled:false, title:"@|", headers:"", placeHolder:"", propercase:false, readOnly:false, template:null, zIndex:0};
             declare.safeMixin(allPossibleProperties,this.left, this.top, this.width, this.height);//priority to inherited defaults  
             if (widgetProperties)
-                declare.safeMixin(allPossibleProperties,widgetProperties);   
-            
+                declare.safeMixin(allPossibleProperties,widgetProperties);
             console.log("INSIDE TEXTBOX id="+this.id+" left="+this.left+" top="+this.top+" width="+this.width+" height="+this.height);
+            
+            //HACK: To have something to support the widget
             var form = new Form({
                     //empty
             }, dojo.doc.createElement('div'));
             document.body.appendChild(form.domNode);
+            
             allPossibleProperties.id=this.id;//the area class returns the id for this widget id<this.widgets.lastId>
             var JSON_forValidationTextBox=this.JSON_Default_TextBox(allPossibleProperties);
             this.obj = new ValidationTextBox(JSON_forValidationTextBox.props,this.id);
-            form.domNode.appendChild(this.obj.domNode) //this places the widget inside the form 
+            form.domNode.appendChild(this.obj.domNode);//this places the widget inside the form 
+           
             this.setFontSize(this.fontSize);
             this.setBorder();
         },
+
+        //REVIEW: Imported from MotherLib10 for speed
         //-------------------------------------------------------------------------------------------
         JSON_Default_TextBox: function(xProps){//Order within TextBoxes,xProps
         //-------------------------------------------------------------------------------------------
