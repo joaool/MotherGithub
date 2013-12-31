@@ -8,7 +8,7 @@ define([
     "dojo/domReady!"
 ], function(ready,declare,Form,ValidationTextBox,areaWithText){
     return declare(areaWithText,{
-        obj:null,//the dojo object 
+        dojoObj:null,
         type:"textbox",
         constructor: function (widgetProperties) {
             // The "constructor" method is special: the parent class areaWithText and area constructor are called automatically before this one.
@@ -27,11 +27,11 @@ define([
                     //empty
             }, dojo.doc.createElement('div'));
             document.body.appendChild(form.domNode);
-            
+
             allPossibleProperties.id=this.id;//the area class returns the id for this widget id<this.widgets.lastId>
             var JSON_forValidationTextBox=this.JSON_Default_TextBox(allPossibleProperties);
-            this.obj = new ValidationTextBox(JSON_forValidationTextBox.props,this.id);
-            form.domNode.appendChild(this.obj.domNode);//this places the widget inside the form 
+            this.dojoObj = new ValidationTextBox(JSON_forValidationTextBox.props,this.id);
+            form.domNode.appendChild(this.dojoObj.domNode);//this places the widget inside the form 
            
             this.setFontSize(this.fontSize);
             this.setBorder();

@@ -21,10 +21,13 @@ define([
             var top = 0;
             var width = window.screen.width;
             var height = window.screen.height;
-            //alert("width="+width+" height="+height);
-            //baseContainer = this.createContainer({name: "canvas", left: left, top: top, width: width, height: height, zIndex: 0, borderColor: "blue"});
-            this.baseContainer = this.createContainer({name: "canvas", left: left, top: top, width: width, height: height});
-            var z=32;
+            //REVIEW for clarity - this is an evolution from calling  this.createContainer()          
+            this.lastAreaOrder++;
+            this.lastContainerOrder++;
+            var baseContainerProperties = {name: "canvas", left: left, top: top, width: width, height: height};
+            declare.safeMixin(baseContainerProperties,
+                {domId: "container_id" + this.lastContainerOrder,id: "_"+this.lastAreaOrder,areaOrder: this.lastAreaOrder,containerParent: this.baseContainer});
+            this.baseContainer = new container(baseContainerProperties);
          },
         createTextbox: function(widgetProperties) {//always refer to a container if no container is present default container is selected
             //alert("OBJECT "+widgetProperties+" value="+widgetProperties.value);
@@ -34,11 +37,9 @@ define([
             //id will be used inside dojo objects, domId will be used to access dom outside dojo...
             declare.safeMixin(widgetProperties,
                 {domId: "widget_id" + this.lastAreaOrder,id: "_"+this.lastAreaOrder,areaOrder: this.lastAreaOrder,containerParent: this.baseContainer});
-            //we verify wich zIndex should be selected for the current area
-            //we need to know the zIndex of the top area (if any) under the area being constructed
-            // return new textbox(widgetProperties);
             var txt = new textbox(widgetProperties);
-            this.baseContainer.addExistingChild([txt]);
+            // this.baseContainer.addExistingChild([txt]);
+            this.baseContainer.addChildrenOnly([txt]);
             return txt;
         },
         createNumberbox: function(widgetProperties) {
@@ -49,7 +50,8 @@ define([
                 {domId: "widget_id" + this.lastAreaOrder,id: "_"+this.lastAreaOrder, areaOrder: this.lastAreaOrder,containerParent: this.baseContainer });
             // return new numberbox(widgetProperties);
             var num = new numberbox(widgetProperties);
-            this.baseContainer.addExistingChild([num]);
+            // this.baseContainer.addExistingChild([num]);
+            this.baseContainer.addChildrenOnly([num]);
             return num;
         },
         createContainer: function(containerProperties) {
@@ -61,6 +63,7 @@ define([
             // return new container(containerProperties);
             var c = new container(containerProperties);
             // this.baseContainer.addExistingChild([c]);
+            this.baseContainer.addChildrenOnly([c]);
             return c;
         }
     });

@@ -4,21 +4,29 @@ define([
     "dojo/_base/window",
     "dojo/dom-style",
     "dojo/dom-construct",
+    "dojo/dom-class",
+    "dijit/form/Form",
+    "dijit/Dialog",
     "dijit/layout/ContentPane",//--
     "/pdojo/MotherGitHub/Mother/area.js"
-], function(declare,lang,win,domStyle,domConstruct,ContentPane,area){
+], function(declare,lang,win,domStyle,domConstruct,domClass,Form,Dialog,ContentPane,area){
     return declare(area,{
         name:"",
         floatF:"nonFloat", //"nonFloat" => form in pane, "modal" =>modal floating form,  "nonModal" => floating form
         children:[],
         parentId:0,//id numer of the parent container or 0 if none 
         highestZIndex:null, //the zIndex of the child with higest zIndex
-        dojoObject:null,
+        floatingType:"nonFloat",// possible values("nonFloat" => form in pane ), ("modal" =>modal floating form), ("nonModal" => floating form)
+        dojoObject:null,//the pane object is the first dojo object for containers
+        dojoFormObj:null,// the form that is placed over the pane
+        dojoDialogObj:null,// only exists if the container is "modal" or "nonModal". Otherwise is null
         type:"container",
+        CSSTemplate:null,
         constructor: function(containerProperties){
-           // The "constructor" method is special: the parent class areaWithText and area constructor are called automatically before this one.
+            // The "constructor" method is special: the parent class areaWithText and area constructor are called automatically before this one.
+            //If your class contains arrays or other objects, they should be declared in the constructor() so that each instance gets its own copy. 
+            this.children = []; // to force per-instance object.
             console.log("container class BEGIN OF CONSTRUCTOR");
-            
             //REVIEW: Imported from MotherLib10 for speed
             var allPossibleProperties =
                 {value:"", name:"", preCode:"", posCode:"", changeCode:"", title:"@|", headers:"", template:null, zIndex:0};
@@ -31,29 +39,49 @@ define([
                 var topZIndex=this.highestZIndexAreaUnderContainer({left: this.left,top: this.top,width: this.width,height: this.height});
                 this.zIndex = topZIndex + 1;
             }
-            var paneDivId="_PaneDiv" + this.id;
-            var paneDiv = domConstruct.create("div");
-            paneDiv.innerHTML="<div id='"+paneDivId+"'></div>";
-            win.body().appendChild(paneDiv);//places paneDiv in DOM
-
-            var paneStyleProperty = "position:absolute; left:" + this.left +"px;top:"+ this.top +"px;width:"+ this.width +"px;height:";
-            paneStyleProperty+= this.height +"px; padding:0px; overflow: visible; border: "+ this.borderThickness +"px "+ this.borderStyle +" "+this.borderColor+";'";
-            this.dojoObject = new ContentPane({ //x Pane is a form variable. we need this to do a this.xPane.startup() necessary for tabs - to avoid 3 bar probelm
-                id: this.id,
-                content: "",
-                //style:'position:absolute;left:800px;top:5px;width:200px;height:30px;border: 1px dotted green;'
-                style: paneStyleProperty
-            }, paneDivId); //content Pane is placed over the div with name paneDivId
-
+            this.mountPaneInContainer();//sets this.dojoObject, this.dojoFormObj and places this.dojoFormObj over this.dojoObject
+            if (this.floatingType!="nonFloat")
+                this.mountDialog();//sets dojoDialogObj and places this.dojoObject over it (it already has this.dojoFormObj over it)
+            
             console.log("container class END OF CONSTRUCTOR");
         },
         addExistingChild: function(childrenArr){
-            for(var i = 0; i < this.children.length; i++){
-                this.children[i].zIndex = this.zIndex+1;//initially all children have a zIndex 1 above their container
-                this.children.push( this.children[i]);
-            }
-            // this.children = this.children.concat(childrenArr);
+            this.addChildrenOnly(childrenArr);
+            this._removeChildrenFromPreviousContainer(childrenArr);
         },
+        addChildrenOnly: function(childrenArr){//only adds - does nothing else... only areasFactory Class calls this method directly !
+            for(var i = 0; i < childrenArr.length; i++){
+                childrenArr[i].zIndex = this.zIndex+1;//initially all children have a zIndex 1 above their container
+                if (childrenArr[i].type!="container"){
+                    var dojoId="widget_"+childrenArr[i].id;
+                    // console.log("!!!!!!!!!!!!!!!!!!!!!!!!!!!!  APPEND CHILD with value="+childrenArr[i].dojoObj.value+" containerId="+this.id+" dojoId="+dojoId);
+                    domStyle.set(dojoId,"left",(childrenArr[i].left - this.left)+"px");// actualiza o node object                     
+                    domStyle.set(dojoId,"top",(childrenArr[i].top - this.top)+"px");// actualiza o node object                     
+                    this.dojoFormObj.domNode.appendChild(childrenArr[i].dojoObj.domNode);
+                }else{
+                    console.log("!!!!!!!!!!!!!!!!!!!!!!!!!!!!  APPEND CHILD CONTAINER ");
+                    this.dojoFormObj.domNode.appendChild(childrenArr[i].dojoObject.domNode);
+                }
+                this.children.push(childrenArr[i]);
+            }
+         },
+        _removeChildrenFromPreviousContainer: function(childrenArr){//cannot be called outside the class 
+            for(var i = 0; i < childrenArr.length; i++){
+                var previousContainer = childrenArr[i].containerParent;
+                if (previousContainer) {//free containers have containerParent = null
+                    // console.log("----------------- >REMOVES id="+childrenArr[i].id+" value="+"someValue"+" from "+previousContainer.name);
+                    previousContainer._removeChild(childrenArr[i]);
+                }
+             }
+        },
+        _removeChild: function(child){ //cannot be called outside the class  
+            for(var i = 0; i < this.children.length; i++){
+                if (this.children[i].id == child.id) {//match by id (it is always unique)
+                    this.children.splice(i,1);
+                    break;
+                }
+            }
+         },
         moveTo: function(newCoordinates){//overrides the area moveTo() method
             //declare.safeMixin(this.viewPort,newViewPort);
             var leftDelta = newCoordinates.left - this.left;
@@ -99,9 +127,12 @@ define([
                 if (this.containerParent.name)
                     showContainerParentName = this.containerParent.name;
             }
-            console.log ("%%%%%%%%%%%%%%%%%%%%%%%%%%% container name="+ this.name+" id="+this.id+" parentContainerName="+showContainerParentName+"%%%%%%%%%%%%%%%%%%%%%%%%%");
+            console.log ("%%%%%%%%%%%%%%%%%%%%%%%%%%% container name="+ this.name+" id="+this.id+" parentContainerName="+showContainerParentName+" id="+this.zIndex+" %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
             for (var i = 0; i < this.children.length; i++) {
-                console.log(i+" Name="+this.children[i].name+" id="+this.children[i].id+" zIndex="+this.children[i].zIndex);
+                var showValue = "NoValue";
+                if (this.children[i].type!="container")
+                    showValue = this.children[i].dojoObj.value; //"someValue";
+                console.log(i+" Name="+this.children[i].name+" id="+this.children[i].id+" type="+this.children[i].type+" value="+showValue+" zIndex="+this.children[i].zIndex);
             }
             console.log ("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
         },
@@ -119,6 +150,73 @@ define([
             var x = e.pageX;
             var y = e.pageY;
             // code here
-        }
+        },
+        mountPaneInContainer: function(){
+            var paneDivId="_PaneDiv" + this.id;
+            var paneDiv = domConstruct.create("div");
+            paneDiv.innerHTML="<div id='"+paneDivId+"'></div>";
+            win.body().appendChild(paneDiv);//places paneDiv in DOM
+
+            var paneStyleProperty = null;
+            if (this.floatingType == "nonFloat" ) {
+                paneStyleProperty = "position:absolute; left:" + this.left +"px;top:"+ this.top +"px;width:"+ this.width +"px;height:";
+                paneStyleProperty += this.height +"px; padding:0px; overflow: visible; border: "+ this.borderThickness +"px "+ this.borderStyle +" "+this.borderColor+";'";
+            } else {// ("modal" =>modal floating form) or ("nonModal" => floating form)
+                paneStyleProperty = "position:absolute;left:0px;top:0px;width:"+ this.width +"px;height:";
+                paneStyleProperty += this.height +"px; padding:0px; overflow: visible;";
+             }
+            this.dojoObject = new ContentPane( {
+                id: this.id,
+                content: "",
+                //style:'position:absolute;left:800px;top:5px;width:200px;height:30px;border: 1px dotted green;'
+                style: paneStyleProperty
+            }, paneDivId); //content Pane is placed over the div with name paneDivId
+
+            var JSON_f=this.JSON_Form("_form"+this.id);
+            this.dojoFormObj = new Form(JSON_f.props, dojo.doc.createElement("div"));
+            this.dojoFormObj.placeAt(this.id);
+            if (this.CSSTemplate) {
+                domClass.add(this.dojoObject.domNode, "Mother_" + this.CSSTemplate);//add the CSS class "Mother_"+A,B,C,D,E,F to ContentPane - Match with Mother.CSS
+            }
+        },
+        mountDialog: function() {
+             this.dojoDialogObj = new Dialog({
+                id   :this.prefix+"_DialogId",
+                title: this.name,
+                style: "width:" + this.width + "px;height:" + this.height + "px; overflow: visible;",
+                //style: "left:"+this.viewPort.l+"px;top:"+this.viewPort.t+"px;width:"+this.viewPort.w+"px;height:"+this.viewPort.h+"px; overflow: visible;",
+                //'class':this.getVP().floatF//just to use this in CSS with .nonModal_underlay { display:none} (in MotherBuilder.css) MAGIC !!! "modal" makes it modal
+                //onShow: function() { domStyle.set(this.containerNode.parentNode,'visibility','hidden'); },
+                //onLoad: function() { domStyle.set(this.containerNode.parentNode,{top:'10px', visibility:'visible'}); }    
+            });//there is  no dom node with content for the Dialog 
+            this.dojoDialogObj.containerNode.appendChild(this.dojoObject.domNode);//OK this includes the contentPane - all forms (including floating) will be over a content pane  !!!!!!!!!
+        },
+        //-------------------------------------------------------------------------------------------
+        JSON_Form: function(xId){//prepares properties object for DOJO form
+        //-------------------------------------------------------------------------------------------
+        // Builds a JSON object with the format {type:"form",props:JSON_props} for the default form
+        // Param: xId=form Id
+        // returns:a JSON Object representing the form object
+        //-------------------------------------------------------------------------------------------
+            var props = {
+                id       : xId,
+                title    : "Base Form",
+                encType  : 'multipart/form-data',
+                action   : '',
+                method   : '',
+                content  : "",
+                style    : "margin-top: 14px;",
+                onSubmit : function(event) {
+                    if (this.validate()) {
+                        return confirm('Ok !!! Form is valid, press OK to submit');
+                    } else {
+                        alert('Corrige lá isso antes de continuar');
+                        return false;
+                    }
+                }
+            };  
+            //obj=new dijit.form.DateTextBox(props, dojo.doc.createElement(props.id)); //o 2º param é o DomNode string
+            return {"type":"form","props":props}    
+        }        
     });
 }); //end of  module  

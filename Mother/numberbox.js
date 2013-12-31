@@ -7,7 +7,7 @@ define([
     "dojo/domReady!"
 ], function(ready,declare,Form,NumberTextBox,area_text){
     return declare(area_text,{
-        obj:null,
+        dojoObj:null,
         type:"numberbox",
         constructor: function (widgetProperties) {
             // The "constructor" method is special: the parent class (area)constructor is called automatically before this one.
@@ -27,11 +27,11 @@ define([
                     //empty
             }, dojo.doc.createElement('div'));
             document.body.appendChild(form.domNode);
-            
+
             allPossibleProperties.id=this.id;//the area class returns the id for this widget id<this.widgets.lastId>
              var JSON_forNumberTextBox=this.JSON_Default_NumberBox(allPossibleProperties);
-            this.obj = new NumberTextBox(JSON_forNumberTextBox.props, this.id);
-            form.domNode.appendChild(this.obj.domNode) //this places the widget inside the form 
+            this.dojoObj = new NumberTextBox(JSON_forNumberTextBox.props, this.id);
+            form.domNode.appendChild(this.dojoObj.domNode) //this places the widget inside the form 
             this.setFontSize(this.fontSize);
             this.setBorder();//now dom is formed
         },

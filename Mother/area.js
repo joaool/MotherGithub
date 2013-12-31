@@ -90,7 +90,7 @@ define([
         },
         isPointInsideArea: function(pointLeft,pointTop) {//given a point verifies if that point is inside the area
             var isInside = false;
-            if(isPointBelowRight) {
+            if(this.isPointBelowRight) {
                 if( pointLeft < this.left + this.width &&  pointTop < this.top + this.height ){
                     isInside = true;
                 }
@@ -105,13 +105,13 @@ define([
             return isBelowRight
         },
         intersectsAreaDimensions: function(areaDimensions) {// true if current area intersects an area dimension {left:xL, top:xT, width:xW, height:xH}, false otherwise
-            var intersets = false;
+            var intersects = false;
             var topLeft = {left: areaDimensions.left, top:areaDimensions.top};
             var bottomRight = {left: areaDimensions.left + areaDimensions.width, top: areaDimensions.top + areaDimensions.height };
-            if ( isPointInsideArea(topLeft.left,topLeft.top) || isPointInsideArea(bottomRight.left,bottomRight.top)) {
+            if ( this.isPointInsideArea(topLeft.left,topLeft.top) || this.isPointInsideArea(bottomRight.left,bottomRight.top)) {
                 intersets = true;
             }
-            return intersets;
+            return intersects;
         },        
     });
 }); //end of  module  
