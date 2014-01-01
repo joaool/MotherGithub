@@ -165,23 +165,23 @@ require([
 		// alert("--->c2.borderThickness "+c2.borderThickness);
 		// alert("--->c2.borderColor "+c2.borderColor);
 	c1.addExistingChild([num1,txt1]);
-	c1.childDump();
-	alert("num1 after inclusion in c1 num1.containerParent.name="+num1.containerParent.name);
+	// c1.addExistingChild([num1,{name: "hello"}]);//to force an error
 		// c1.moveTo({left: 800, top: 200});
 
 		// c1 = new container({left:500, top:100, width:500, height:40, borderThickness:10, borderColor:"red"});
 	var c2 = canvas.createContainer({left: 640, top: 140, width: 220, height: 100,borderColor: "blue"});
 		c2.setBorder({borderThickness: 7, borderColor: "green"});
 	c2.addExistingChild([txtc2,numc2]);
-
 	// c2.moveTo({left: 85, top: 170});
 
 	c1.addExistingChild([c2]);
-	// c1.moveTo({left: 600, top: 150});
 	c1.childDump();
 	c2.childDump();
-	canvas.baseContainer.childDump();
-	alert("Step 1");
+	alert("numc2 after inclusion in c1 numc2.containerParent.name="+numc2.containerParent.name);
+	// c1.moveTo({left: 600, top: 150});
+		canvas.baseContainer.childDump();
+		console.log("------------------------------------------------- summary.... -----------------------------------------------");	
+		console.log("totalAreas = "+canvas.lastAreaOrder+"  TotalTextboxes = "+canvas.lastTextboxOrder+"  TotalNumberboxes = "+canvas.lastNumberboxOrder+"  TotalContainers = "+canvas.lastContainerOrder);
 
 		console.log("--------------------------------------- container done.... -----------------------------------------------");		
 		console.log(document.title+"......  END..");		

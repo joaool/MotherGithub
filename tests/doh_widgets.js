@@ -124,10 +124,6 @@ define([
         //http://kevinandre.com/dev/jsunittest-amd-doh-1/ ---//define(["doh","simple/Mother/textbox"], function(doh,textbox) {
         "Should instantiate succesfully":{
             setUp:function(){
-                // this.canvasContainer = registry.byId("_1"); //to destroy a dijit widget by id
-                // this.canvasContainer.destroyRecursive();
-                // this.canvasContainer2 = registry.byId("_2"); //to destroy a dijit widget by id
-                // this.canvasContainer2.destroyRecursive();
                 this.af = new areasFactory();
                 this.c1 = this.af.createContainer({left: 450, top: 100, width: 240, height: 150,borderColor: "red"});
                 this.c1.setBorder({borderThickness: 10, borderColor: "green"});
@@ -143,7 +139,7 @@ define([
         },
         "free container: set borderThickness to 10 and borderColor to green":{
             setUp:function(){
-                this.c1 = container({left: 680, top: 40, width: 500, height: 250, borderThickness: 7, borderColor: "red"});
+                this.c1 = container({left: 680, top: 140, width: 500, height: 250, borderThickness: 7, borderColor: "red"});
                 this.c1.setBorder({borderThickness: 10, borderColor: "green"});
             },
             runTest:function(){
@@ -151,18 +147,35 @@ define([
                 doh.assertEqual("green", this.c1.borderColor, "The container does nor remember borderColor: 'green'");
             }
         },
-        "addExistingChild() ": {
+        "change # of children and containerParent.name on addExistingChild() ": {
             setUp:function(){
                 this.af = new areasFactory();
                 this.c1 = this.af.createContainer({left: 450, top: 100, width: 240, height: 150,borderColor: "red"});
                 this.num1 = this.af.createNumberbox({left:500, top:50, width:340, height:100, value:129.2, borderColor:"purple"});
-                this.c1.addExistingChild([this.num1]);
+                this.txt1 = this.af.createTextbox({left:500, top:50, width:340, height:100, value:129.2, borderColor:"purple"});
+                this.c1.addExistingChild([this.num1,this.txt1]);
             },
             runTest: function() {
-                console.log(this.num1.borderColor);
-                doh.assertEqual("purple", this.num1.borderColor);
+                doh.assertEqual("2", this.c1.children.length);
+                doh.assertEqual("container1", this.num1.containerParent.name);//"container1" is the default name for the first container
             }
-        }
+        },
+        "zIndex should change when we addExistingChild to container": {
+            setUp:function(){
+                this.af = new areasFactory();
+                this.c1 = this.af.createContainer({left: 567+10, top: 78+10, width: 500, height: 500,borderColor: "red"});//zIndex=0
+                this.num1 = this.af.createNumberbox({left: 567+20, top: 78+20, width:100, height:30, value:129.2, borderColor:"purple"});//zIndex=1
+                this.c1.addExistingChild([this.num1]);//num1.zIndex=1
+                this.c2 = this.af.createContainer({left: 567+30, top: 78+30, width: 400, height: 400,borderColor: "blue"});//zIndex=0
+                this.num2 = this.af.createNumberbox({left: 567+40, top: 78+40, width: 100, height: 30, value:129.2, borderColor:"purple"});//zIndex=0
+                this.c2.addExistingChild([this.num2]);//num2.zIndex=1
+                this.c1.addExistingChild([this.c2]);//c2.zIndex=2, num2.zIndex=3
+            },
+            runTest: function() {
+                // doh.assertEqual("23", this.c1.zIndex);
+                doh.assertEqual("3", this.num2.zIndex);
+            } 
+        }           
      });
     doh.register("DOH test 4 release Model ", [
         //http://kevinandre.com/dev/jsunittest-amd-doh-1/ ---//define(["doh","simple/Mother/textbox"], function(doh,textbox) {

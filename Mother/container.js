@@ -11,10 +11,7 @@ define([
     "/pdojo/MotherGitHub/Mother/area.js"
 ], function(declare,lang,win,domStyle,domConstruct,domClass,Form,Dialog,ContentPane,area){
     return declare(area,{
-        name:"",
-        floatF:"nonFloat", //"nonFloat" => form in pane, "modal" =>modal floating form,  "nonModal" => floating form
         children:[],
-        parentId:0,//id numer of the parent container or 0 if none 
         highestZIndex:null, //the zIndex of the child with higest zIndex
         floatingType:"nonFloat",// possible values("nonFloat" => form in pane ), ("modal" =>modal floating form), ("nonModal" => floating form)
         dojoObject:null,//the pane object is the first dojo object for containers
@@ -46,33 +43,34 @@ define([
             console.log("container class END OF CONSTRUCTOR");
         },
         addExistingChild: function(childrenArr){
-            this.addChildrenOnly(childrenArr);
-        },
-        addChildrenOnly: function(childrenArr){//only adds - does nothing else... only areasFactory Class calls this method directly !
-        // addExistingChild: function(childrenArr){//only adds - does nothing else... only areasFactory Class calls this method directly !
-            console.log("==================================== addChildrenOnly to "+this.name+ "=========================================");   
+            console.log("addExistingChild() $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ BEGIN "+this.name+" zIndex="+this.zIndex);
             for(var i = 0; i < childrenArr.length; i++){
-                console.log("child name is "+childrenArr[i].name);
-                childrenArr[i].zIndex = this.zIndex+1;//initially all children have a zIndex 1 above their container
+                if(!childrenArr[i].id) {
+                    alert("container.addExistingChild(): You attemped to add an object that is not widget nor container !");
+                    throw new Error("container.addExistingChild(): You attemped to add an object that is not widget nor container !");
+                }
+                var zIndexBefore = childrenArr[i].zIndex;
                 if (this.name != "canvas") {
-                    console.log("!!!!!!!!!!!!!!!!!!!!!!!!!!!! addChildrenOnly this.name="+this.name);
+                    // childrenArr[i].zIndex = this.zIndex+1;//initially all children have a zIndex 1 above their container
+                    childrenArr[i].zIndex = childrenArr[i].containerParent.highestZIndexAreaUnderContainer({left: childrenArr[i].left, top: childrenArr[i].top, width: childrenArr[i].width, height: childrenArr[i].height})+1;
+                    console.log("--------------------------->addExistingChild() adding "+childrenArr[i].name+"/"+childrenArr[i].zIndex+"---------------->to "+this.name+"/"+this.zIndex);
                     this._removeChildFromPreviousContainerChildrenList(childrenArr[i]);
                     childrenArr[i].containerParent = this;
                 }
                 if (childrenArr[i].type!="container"){
                     var dojoId="widget_"+childrenArr[i].id;
-                    // console.log("!!!!!!!!!!!!!!!!!!!!!!!!!!!!  APPEND CHILD with value="+childrenArr[i].dojoObj.value+" containerId="+this.id+" dojoId="+dojoId);
-                    domStyle.set(dojoId,"left",(childrenArr[i].left - this.left)+"px");// actualiza o node object                     
-                    domStyle.set(dojoId,"top",(childrenArr[i].top - this.top)+"px");// actualiza o node object                     
+                    domStyle.set(dojoId,"left",(childrenArr[i].left - this.left)+"px");// updates dojo object over widget with relative position
+                    domStyle.set(dojoId,"top",(childrenArr[i].top - this.top)+"px");
                     this.dojoFormObj.domNode.appendChild(childrenArr[i].dojoObj.domNode);
-                }else{
-                    console.log("!!!!!!!!!!!!!!!!!!!!!!!!!!!!  APPEND CHILD CONTAINER ");
+                }else{//a container was added
+                    //FIXME - if we do not remove a container from its previous container the append will go on infinitively
                     this.dojoFormObj.domNode.appendChild(childrenArr[i].dojoObject.domNode);
                 }
                 this.children.push(childrenArr[i]);
+                console.log("------------------->add Child="+childrenArr[i].name+" zIndex before="+zIndexBefore+" zIndex after="+childrenArr[i].zIndex);
             }
-            console.log("==================================== end of addChildrenOnly to "+this.name+ "=========================================");   
-         },
+            console.log("addExistingChild() $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ END "+this.name);
+        },
         _removeChildrenFromPreviousContainer: function(childrenArr){//cannot be called outside the class 
             for(var i = 0; i < childrenArr.length; i++){
                 var previousContainer = childrenArr[i].containerParent;
@@ -231,9 +229,8 @@ define([
                         return false;
                     }
                 }
-            };  
-            //obj=new dijit.form.DateTextBox(props, dojo.doc.createElement(props.id)); //o 2º param é o DomNode string
-            return {"type":"form","props":props}    
-        }        
+            };
+            return {"type":"form","props":props};
+        }
     });
 }); //end of  module  

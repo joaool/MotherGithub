@@ -41,8 +41,7 @@ define([
             declare.safeMixin(widgetProperties,
                 {name: widgetName,domId: "widget_id" + this.lastAreaOrder,id: "_"+this.lastAreaOrder,areaOrder: this.lastAreaOrder,containerParent: this.baseContainer});
             var txt = new textbox(widgetProperties);
-            // this.baseContainer.addExistingChild([txt]);
-            this.baseContainer.addChildrenOnly([txt]);
+            this.baseContainer.addExistingChild([txt]);
             return txt;
         },
         createNumberbox: function(widgetProperties) {
@@ -56,8 +55,7 @@ define([
                 {name: widgetName,domId: "widget_id" + this.lastAreaOrder,id: "_"+this.lastAreaOrder, areaOrder: this.lastAreaOrder,containerParent: this.baseContainer });
             // return new numberbox(widgetProperties);
             var num = new numberbox(widgetProperties);
-            // this.baseContainer.addExistingChild([num]);
-            this.baseContainer.addChildrenOnly([num]);
+            this.baseContainer.addExistingChild([num]);
             return num;
         },
         createContainer: function(containerProperties) {
@@ -71,8 +69,7 @@ define([
                 {name: containerName,domId: "container_id" + this.lastContainerOrder,id: "_"+this.lastAreaOrder,areaOrder: this.lastAreaOrder,containerParent: this.baseContainer});
             // return new container(containerProperties);
             var c = new container(containerProperties);
-            // this.baseContainer.addExistingChild([c]);
-            this.baseContainer.addChildrenOnly([c]);
+            this.baseContainer.addExistingChild([c]);
             return c;
         }
     });
