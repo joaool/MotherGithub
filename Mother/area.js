@@ -44,7 +44,7 @@ define([
                 if (this.containerParent.name)
                     showContainerParentName = this.containerParent.name;
             }    
-            console.log("area class ---------------------------------------->areaOrder=" + this.areaOrder +" id=" + this.id + " domId=" + this.domId + " left="+this.left+" top="+this.top);
+            console.log("area class ---------------------------------------->areaOrder=" + this.areaOrder +" id=" + this.id + " name=" + this.name + " left="+this.left+" top="+this.top);
             console.log("area class ------------------------------------------------>  width="+this.width+" height="+this.height+" zIndex="+this.zIndex+" containerParentName="+showContainerParentName);
             console.log("area class ------------------------------------------------>  borderThickness="+this.borderThickness+", borderStyle="+this.borderStyle+", borderColor="+this.borderColor+")");
         },

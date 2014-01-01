@@ -14,8 +14,8 @@ define([
         constructor: function(baseContainer) {
             var canvasContainer = registry.byId("_1"); //to destroy a dijit widget by id
             if(canvasContainer){
-                // alert("You attemped to recreate the canvas, but canvas already exists !!!");
-                throw new Error("You attemped to recreate the canvas, but canvas already exists !!!");
+                canvasContainer.destroyRecursive();
+                // throw new Error("You attemped to recreate the canvas, but canvas already exists !!!");
             }
             var left = 0;
             var top = 0;
@@ -35,8 +35,11 @@ define([
             this.lastAreaOrder++;
             this.lastTextboxOrder++;
             //id will be used inside dojo objects, domId will be used to access dom outside dojo...
+            var widgetName = widgetProperties.name;
+            if (!widgetName)
+                widgetName = "textbox" + this.lastTextboxOrder;
             declare.safeMixin(widgetProperties,
-                {domId: "widget_id" + this.lastAreaOrder,id: "_"+this.lastAreaOrder,areaOrder: this.lastAreaOrder,containerParent: this.baseContainer});
+                {name: widgetName,domId: "widget_id" + this.lastAreaOrder,id: "_"+this.lastAreaOrder,areaOrder: this.lastAreaOrder,containerParent: this.baseContainer});
             var txt = new textbox(widgetProperties);
             // this.baseContainer.addExistingChild([txt]);
             this.baseContainer.addChildrenOnly([txt]);
@@ -46,8 +49,11 @@ define([
             console.log("------------------------------------------>createNumberbox");
             this.lastAreaOrder++;
             this.lastNumberboxOrder++;
+            var widgetName = widgetProperties.name;
+            if (!widgetName)
+                widgetName = "numberbox" + this.lastNumberboxOrder;
             declare.safeMixin(widgetProperties,
-                {domId: "widget_id" + this.lastAreaOrder,id: "_"+this.lastAreaOrder, areaOrder: this.lastAreaOrder,containerParent: this.baseContainer });
+                {name: widgetName,domId: "widget_id" + this.lastAreaOrder,id: "_"+this.lastAreaOrder, areaOrder: this.lastAreaOrder,containerParent: this.baseContainer });
             // return new numberbox(widgetProperties);
             var num = new numberbox(widgetProperties);
             // this.baseContainer.addExistingChild([num]);
@@ -58,8 +64,11 @@ define([
             console.log("------------------------------------------>createContainer");
             this.lastAreaOrder++;
             this.lastContainerOrder++;
+            var containerName = containerProperties.name;
+            if (!containerName)
+                containerName = "container" + this.lastContainerOrder;
             declare.safeMixin(containerProperties,
-                {domId: "container_id" + this.lastContainerOrder,id: "_"+this.lastAreaOrder,areaOrder: this.lastAreaOrder,containerParent: this.baseContainer});
+                {name: containerName,domId: "container_id" + this.lastContainerOrder,id: "_"+this.lastAreaOrder,areaOrder: this.lastAreaOrder,containerParent: this.baseContainer});
             // return new container(containerProperties);
             var c = new container(containerProperties);
             // this.baseContainer.addExistingChild([c]);

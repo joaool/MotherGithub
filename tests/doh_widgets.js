@@ -124,14 +124,14 @@ define([
         //http://kevinandre.com/dev/jsunittest-amd-doh-1/ ---//define(["doh","simple/Mother/textbox"], function(doh,textbox) {
         "Should instantiate succesfully":{
             setUp:function(){
-                this.canvasContainer = registry.byId("_1"); //to destroy a dijit widget by id
-                this.canvasContainer.destroyRecursive();
-                this.canvasContainer2 = registry.byId("_2"); //to destroy a dijit widget by id
-                this.canvasContainer2.destroyRecursive();
+                // this.canvasContainer = registry.byId("_1"); //to destroy a dijit widget by id
+                // this.canvasContainer.destroyRecursive();
+                // this.canvasContainer2 = registry.byId("_2"); //to destroy a dijit widget by id
+                // this.canvasContainer2.destroyRecursive();
                 this.af = new areasFactory();
                 this.c1 = this.af.createContainer({left: 450, top: 100, width: 240, height: 150,borderColor: "red"});
                 this.c1.setBorder({borderThickness: 10, borderColor: "green"});
-              },
+            },
             runTest:function(){
                 doh.assertEqual("green", this.c1.borderColor,"The container does not remember borderColor: 'green'");
                 doh.assertEqual("10", this.c1.borderThickness);
@@ -150,8 +150,20 @@ define([
                 doh.assertEqual("10", this.c1.borderThickness,"The container does nor remember borderThickness: 10");
                 doh.assertEqual("green", this.c1.borderColor, "The container does nor remember borderColor: 'green'");
             }
-        }        
-    });
+        },
+        "addExistingChild() ": {
+            setUp:function(){
+                this.af = new areasFactory();
+                this.c1 = this.af.createContainer({left: 450, top: 100, width: 240, height: 150,borderColor: "red"});
+                this.num1 = this.af.createNumberbox({left:500, top:50, width:340, height:100, value:129.2, borderColor:"purple"});
+                this.c1.addExistingChild([this.num1]);
+            },
+            runTest: function() {
+                console.log(this.num1.borderColor);
+                doh.assertEqual("purple", this.num1.borderColor);
+            }
+        }
+     });
     doh.register("DOH test 4 release Model ", [
         //http://kevinandre.com/dev/jsunittest-amd-doh-1/ ---//define(["doh","simple/Mother/textbox"], function(doh,textbox) {
         function assertTrueTest() {

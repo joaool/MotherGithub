@@ -47,11 +47,18 @@ define([
         },
         addExistingChild: function(childrenArr){
             this.addChildrenOnly(childrenArr);
-            this._removeChildrenFromPreviousContainer(childrenArr);
         },
         addChildrenOnly: function(childrenArr){//only adds - does nothing else... only areasFactory Class calls this method directly !
+        // addExistingChild: function(childrenArr){//only adds - does nothing else... only areasFactory Class calls this method directly !
+            console.log("==================================== addChildrenOnly to "+this.name+ "=========================================");   
             for(var i = 0; i < childrenArr.length; i++){
+                console.log("child name is "+childrenArr[i].name);
                 childrenArr[i].zIndex = this.zIndex+1;//initially all children have a zIndex 1 above their container
+                if (this.name != "canvas") {
+                    console.log("!!!!!!!!!!!!!!!!!!!!!!!!!!!! addChildrenOnly this.name="+this.name);
+                    this._removeChildFromPreviousContainerChildrenList(childrenArr[i]);
+                    childrenArr[i].containerParent = this;
+                }
                 if (childrenArr[i].type!="container"){
                     var dojoId="widget_"+childrenArr[i].id;
                     // console.log("!!!!!!!!!!!!!!!!!!!!!!!!!!!!  APPEND CHILD with value="+childrenArr[i].dojoObj.value+" containerId="+this.id+" dojoId="+dojoId);
@@ -64,6 +71,7 @@ define([
                 }
                 this.children.push(childrenArr[i]);
             }
+            console.log("==================================== end of addChildrenOnly to "+this.name+ "=========================================");   
          },
         _removeChildrenFromPreviousContainer: function(childrenArr){//cannot be called outside the class 
             for(var i = 0; i < childrenArr.length; i++){
@@ -78,6 +86,15 @@ define([
             for(var i = 0; i < this.children.length; i++){
                 if (this.children[i].id == child.id) {//match by id (it is always unique)
                     this.children.splice(i,1);
+                    break;
+                }
+            }
+         },
+        _removeChildFromPreviousContainerChildrenList: function(child){ //cannot be called outside the class  
+            var previousContainer = child.containerParent;
+            for(var i = 0; i < previousContainer.children.length; i++){
+                if (previousContainer.children[i].id == child.id) {//match by id (it is always unique)
+                    previousContainer.children.splice(i,1);
                     break;
                 }
             }
@@ -127,12 +144,12 @@ define([
                 if (this.containerParent.name)
                     showContainerParentName = this.containerParent.name;
             }
-            console.log ("%%%%%%%%%%%%%%%%%%%%%%%%%%% container name="+ this.name+" id="+this.id+" parentContainerName="+showContainerParentName+" id="+this.zIndex+" %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
+            console.log ("%%%%%%%%%%%%%%%%%%%%%%%%%%% container name="+ this.name+" id="+this.id+" parentContainerName="+showContainerParentName+" zIndex="+this.zIndex+" %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
             for (var i = 0; i < this.children.length; i++) {
                 var showValue = "NoValue";
                 if (this.children[i].type!="container")
                     showValue = this.children[i].dojoObj.value; //"someValue";
-                console.log(i+" Name="+this.children[i].name+" id="+this.children[i].id+" type="+this.children[i].type+" value="+showValue+" zIndex="+this.children[i].zIndex);
+                console.log(i+" Name="+this.children[i].name+" id="+this.children[i].id+" type="+this.children[i].type+" value="+showValue+" zIndex="+this.children[i].zIndex+" containerParent.name="+this.children[i].containerParent.name);
             }
             console.log ("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
         },
