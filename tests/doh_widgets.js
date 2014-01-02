@@ -160,7 +160,31 @@ define([
                 doh.assertEqual("container1", this.num1.containerParent.name);//"container1" is the default name for the first container
             }
         },
-        "zIndex should change when we addExistingChild to container": {
+        "zIndex1) change when we create a container on an empty space and addExistingChild numberbox into it": {
+            setUp:function(){
+                this.af = new areasFactory();
+                this.c1 = this.af.createContainer({left: 567+10, top: 78+10, width: 500, height: 500,borderColor: "red"});//zIndex=0
+                this.num1 = this.af.createNumberbox({left: 567+20, top: 78+20, width:100, height:30, value:129.2, borderColor:"purple"});//zIndex=1
+                this.c1.addExistingChild([this.num1]);//num1.zIndex=1
+            },
+            runTest: function() {
+                doh.assertEqual("0", this.c1.zIndex);
+                doh.assertEqual("1", this.num2.zIndex);
+            } 
+        },
+       "zIndex2) change when we create a container over a numberbox and move that numberBox over the conmtainer": {
+            setUp:function(){
+                this.af = new areasFactory();
+                this.num1 = this.af.createNumberbox({left: 567+20, top: 78+20, width:100, height:30, value:129.2, borderColor:"purple"});//zIndex=0
+                this.c1 = this.af.createContainer({left: 567+10, top: 78+10, width: 500, height: 500,borderColor: "red"});//zIndex=1
+                this.c1.addExistingChild([this.num1]);//num1.zIndex=2
+            },
+            runTest: function() {
+                doh.assertEqual("1", this.c1.zIndex);
+                doh.assertEqual("2", this.num2.zIndex);
+            } 
+        },        
+       "zIndex when we create a container and addExistingChild numberbox into it": {
             setUp:function(){
                 this.af = new areasFactory();
                 this.c1 = this.af.createContainer({left: 567+10, top: 78+10, width: 500, height: 500,borderColor: "red"});//zIndex=0
@@ -175,7 +199,7 @@ define([
                 // doh.assertEqual("23", this.c1.zIndex);
                 doh.assertEqual("3", this.num2.zIndex);
             } 
-        }           
+        }
      });
     doh.register("DOH test 4 release Model ", [
         //http://kevinandre.com/dev/jsunittest-amd-doh-1/ ---//define(["doh","simple/Mother/textbox"], function(doh,textbox) {

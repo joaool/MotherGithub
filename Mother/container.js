@@ -52,7 +52,8 @@ define([
                 var zIndexBefore = childrenArr[i].zIndex;
                 if (this.name != "canvas") {
                     // childrenArr[i].zIndex = this.zIndex+1;//initially all children have a zIndex 1 above their container
-                    childrenArr[i].zIndex = childrenArr[i].containerParent.highestZIndexAreaUnderContainer({left: childrenArr[i].left, top: childrenArr[i].top, width: childrenArr[i].width, height: childrenArr[i].height})+1;
+                    // childrenArr[i].zIndex = childrenArr[i].containerParent.highestZIndexAreaUnderContainer({left: childrenArr[i].left, top: childrenArr[i].top, width: childrenArr[i].width, height: childrenArr[i].height})+1;
+                    childrenArr[i].zIndex = this.highestZIndexAreaUnderContainer({left: childrenArr[i].left, top: childrenArr[i].top, width: childrenArr[i].width, height: childrenArr[i].height})+1;
                     console.log("--------------------------->addExistingChild() adding "+childrenArr[i].name+"/"+childrenArr[i].zIndex+"---------------->to "+this.name+"/"+this.zIndex);
                     this._removeChildFromPreviousContainerChildrenList(childrenArr[i]);
                     childrenArr[i].containerParent = this;
@@ -109,7 +110,9 @@ define([
             for(var i = 0; i < this.children.length; i++){
                 this.children[i].moveTo({
                     left: this.children[i].left + deltaCoordinates.left,
-                    top: this.children[i].top + deltaCoordinates.top});
+                    top: this.children[i].top + deltaCoordinates.top
+                });
+                
             }
         },
         topAreaUnderPoint: function(pointLeft,pointTop){
