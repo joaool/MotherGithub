@@ -46,9 +46,7 @@ define([
                 }
                 var zIndexBefore = childrenArr[i].zIndex;
                 if (this.name != "canvas") {
-                    // childrenArr[i].zIndex = this.zIndex+1;//initially all children have a zIndex 1 above their container
-                    // childrenArr[i].zIndex = childrenArr[i].containerParent.highestZIndexAreaUnderContainer({left: childrenArr[i].left, top: childrenArr[i].top, width: childrenArr[i].width, height: childrenArr[i].height})+1;
-                    childrenArr[i].zIndex = this.highestZIndexAreaUnderContainer({left: childrenArr[i].left, top: childrenArr[i].top, width: childrenArr[i].width, height: childrenArr[i].height})+1;
+                    childrenArr[i].zIndex = this.highestZIndexAreaUnder(childrenArr[i],this)+1;
                     console.log("--------------------------->addExistingChild() adding "+childrenArr[i].name+"/"+childrenArr[i].zIndex+"---------------->to "+this.name+"/"+this.zIndex);
                     this._removeChildFromPreviousContainerChildrenList(childrenArr[i]);
                     childrenArr[i].containerParent = this;
@@ -122,40 +120,24 @@ define([
                 }
             }
         },
-        highestZIndexAreaUnderContainer: function(areaDimensions){//given {left:xL, top:xT, width:xW, height:xH} returns highest zIndex inside
-           var topZIndex = this.zIndex;
-           var z = null;
-           for (var i = 0; i < this.children.length; i++) {
-                if (this.children[i].intersectsAreaDimensions(areaDimensions)) {
-                    // if(this.children[i].zIndex > topZIndex) {
-                        // topZIndex = this.children[i].zIndex;//only one level
-                // if (area.children[i].type == "container") {
-                    if (false) {
-                        z = this.topZIndexIncludedInSubContainer(this.children[i]);//recursive method
+        highestZIndexAreaUnder: function(candidateArea,containerAreaRecipient){
+            //given an area to be placed in a containerArea returns the highest zIndex of all areas in the container (recursively)
+            //  that intersects with candidateArea          
+            var topZIndex = containerAreaRecipient.zIndex;
+            var z = null;
+            for (var i = 0; i < containerAreaRecipient.children.length; i++) { //scans all containerArea childrens
+                if (containerAreaRecipient.children[i].intersectsArea(candidateArea)) { //only intersecting areas are interesting
+                    if (containerAreaRecipient.children[i].type == "container") {
+                        z = containerAreaRecipient.children[i].highestZIndexAreaUnder(candidateArea,containerAreaRecipient.children[i]);//recursive method
                     } else {
-                        z = this.children[i].zIndex;//it is a widget
-                    }    
-                    if(z > topZIndex) 
+                        z = containerAreaRecipient.children[i].zIndex;
+                    }
+                    if( z>topZIndex)
                         topZIndex = z;
-                    // }
                 }
             }
             return topZIndex;
         },
-        topZIndexIncludedInSubContainer: function(area){//given {left:xL, top:xT, width:xW, height:xH} returns highest zIndex inside
-            var topZIndex = area.zIndex;
-            var z = null;
-            for (var i = 0; i < area.children.length; i++) {
-                if (area.children[i].type == "container") {
-                    z = this.topZIndexIncludedInSubarea(area.children[i]);
-                } else {
-                    z = this.children[i].zIndex;//it is a widget
-                }    
-                if(z > topZIndex) 
-                    topZIndex = z;
-            }
-            return topZIndex;
-        },        
         childDump: function() {
             var showContainerParentName = "Canvas Parent...";
             if (this.containerParent) {//most frequent case where area is inside a container

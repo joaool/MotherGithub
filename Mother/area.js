@@ -26,10 +26,6 @@ define([
         constructor: function(areaProperties) {
             // alert("BEGIN AREA CONTRUCTOR AREA this.id="+this.id+" id="+areaProperties.id+" order="+areaProperties.order);
             lang.mixin(this, areaProperties);//mixin is used to mix an object-hash of properties passed has argument with default values in the class 
-             // if (this.zIndex>=0) {//if not a baseContainer
-            //     // zIndex=this.highestZIndexAreaUnderArea();
-            // }
-            //this.areaOrder = this.areaOrder + 1;
             if (!this.id){ //case where area is built outside areasFactory
                 this.areas.lastId++;
                 this.id = "_free"+this.areas.lastId;
@@ -39,7 +35,7 @@ define([
             var showContainerParentName = "Canvas Parent...";
             if (this.containerParent) {//most frequent case where area is inside a container
                 // this.zIndex = this.containerParent.zIndex+1;
-                this.zIndex = this.containerParent.highestZIndexAreaUnderContainer({left: this.left, top: this.top, width: this.width, height: this.height})+1;
+                this.zIndex = this.containerParent.highestZIndexAreaUnder(this,this.containerParent)+1;
                 showContainerParentName = "No name but id=" + this.containerParent.id;
                 if (this.containerParent.name)
                     showContainerParentName = this.containerParent.name;
@@ -104,10 +100,10 @@ define([
                     isBelowRight = true;
             return isBelowRight;
         },
-        intersectsAreaDimensions: function(areaDimensions) {// true if current area intersects an area dimension {left:xL, top:xT, width:xW, height:xH}, false otherwise
+        intersectsArea: function(area) {// true if current area intersects area parameter, false otherwise
             var intersects = false;
-            var pointTopLeft = {left: areaDimensions.left, top:areaDimensions.top};
-            var pointBottomRight = {left: areaDimensions.left + areaDimensions.width, top: areaDimensions.top + areaDimensions.height };
+            var pointTopLeft = {left: area.left, top:area.top};
+            var pointBottomRight = {left: area.left + area.width, top: area.top + area.height };
             if (this.isPointUpLeftFromAreaBottomRight(pointTopLeft) && this.isPointBelowRight(pointBottomRight))
                  intersects = true;
             return intersects;

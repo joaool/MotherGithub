@@ -156,8 +156,8 @@ define([
                 this.c1.addExistingChild([this.num1,this.txt1]);
             },
             runTest: function() {
-                doh.assertEqual("2", this.c1.children.length);
-                doh.assertEqual("container1", this.num1.containerParent.name);//"container1" is the default name for the first container
+                doh.assertEqual("2", this.c1.children.length,"container c1 should have 2 childs");
+                doh.assertEqual("container1", this.num1.containerParent.name,"default name for c1 should be 'container1'");//"container1" is the default name for the first container
             }
         },
         "zIndex1) change when we create a widget over a widget in canvas": {
@@ -170,10 +170,10 @@ define([
                 // this.c1.addExistingChild([this.num1]);//num1.zIndex=1
             },
             runTest: function() {
-                doh.assertEqual("0", this.num1.zIndex);//num1(zIndex=1) is over canvas
-                doh.assertEqual("1", this.num2.zIndex);//num2(zIndex=1) is over num 1)
-                doh.assertEqual("2", this.c1.zIndex,"container has a wrong zIndex");//num2.zIndex+1=2)
-                doh.assertEqual("-1", this.freeC2.zIndex,"free container has zIndex=-1");//num2.zIndex+1=2)
+                doh.assertEqual("0", this.num1.zIndex,"num1 is not over the canvas (zIndex 0)");//num1(zIndex=0) is over canvas
+                doh.assertEqual("1", this.num2.zIndex,"num2 is not over num1 (zIndex 1)");//num2.zIndex=1 is over num 1)
+                doh.assertEqual("2", this.c1.zIndex,"container has not num2.zIndex+1 !!!!");//num2.zIndex+1=2)
+                doh.assertEqual("-1", this.freeC2.zIndex,"free container has not zIndex=-1");//num2.zIndex+1=2)
             } 
         },
        "zIndex2) change when we create a container over a numberbox and add that numberBox to the container": {
@@ -181,15 +181,15 @@ define([
                 this.af = new areasFactory();
                 this.num1 = this.af.createNumberbox({left: 567+20, top: 78+20, width:100, height:30, value:129.2, borderColor:"purple"});//zIndex=0
                 this.c1 = this.af.createContainer({left: 567+10, top: 78+10, width: 500, height: 500,borderColor: "red"});//zIndex=1
-                this.c1.addExistingChild([this.num1]);//num1.zIndex=2
+                // this.c1.addExistingChild([this.num1]);//num1.zIndex=2
             },
             runTest: function() {
                 doh.assertEqual("1", this.c1.zIndex);
-                doh.assertEqual("2", this.num1.zIndex);
+                // doh.assertEqual("2", this.num1.zIndex);
             } 
         },        
        // "zIndex3 We create a container on canvas with 1 widget over it. Then we add the widget to the container, and place another container on top of it": {
-       "zIndex3 container c2 over a widget included in a container c1": {
+       "zIndex3) build container c1 w/n1 to include c2 w/num2. C1 involves c2": {
             setUp:function(){
                 console.clear();
                 this.af = new areasFactory();
@@ -198,9 +198,9 @@ define([
                 this.c1.addExistingChild([this.num1]);//num1.zIndex=1
                 //-----------
                 this.c2 = this.af.createContainer({left: 567+30, top: 78+30, width: 400, height: 400,borderColor: "blue"});//zIndex=2
-                // this.num2 = this.af.createNumberbox({left: 567+40, top: 78+40, width: 100, height: 30, value:129.2, borderColor:"purple"});//zIndex=3
-                // this.c2.addExistingChild([this.num2]);//num2.zIndex=3
-                // this.c1.addExistingChild([this.c2]);//c2.zIndex=2, num2.zIndex=3
+                this.num2 = this.af.createNumberbox({left: 567+40, top: 78+40, width: 100, height: 30, value:129.2, borderColor:"purple"});//zIndex=3
+                this.c2.addExistingChild([this.num2]);//num2.zIndex=3
+                this.c1.addExistingChild([this.c2]);//c1.zIndex=0
                 this.af.baseContainer.childDump();
             },
             runTest: function() {
@@ -208,7 +208,7 @@ define([
                 doh.assertEqual("0", this.c1.zIndex);
                 //---------
                 doh.assertEqual("2", this.c2.zIndex);//container placed on canvas but above num1
-                // doh.assertEqual("2", this.num2.zIndex);
+                doh.assertEqual("3", this.num2.zIndex);
             } 
         }
      });

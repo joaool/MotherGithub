@@ -114,9 +114,6 @@ require([
 	  //        	af.baseContainer.childDump();
  		// alert("TEST");
    //      var canvas=af;
-
-
-
 		var num1 = canvas.createNumberbox({left:320, top:50, width:200, height:50, value:129.2, borderColor:"purple"});
 		var num2 = canvas.createNumberbox({left:1000, top:50, width:340, height:50, value: 123,borderThickness: 2,borderColor: "blue"});
 		var num3 = new numberbox({left:1200, top:250, width:100, height:30, value:23});
@@ -172,16 +169,10 @@ require([
 		console.log("------------------------------------------- now the container.... -----------------------------------------------");
 		console.log("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$");
 	var c1 = canvas.createContainer({name: "YellowSubmarine", left: 80, top: 40, width: 500, height: 250, borderThickness: 7, borderColor: "yellow"});
-	canvas.baseContainer.childDump();
-	alert(c1.zIndex);
-
-		// var c2 = container({left: 680, top: 300, width: 100, height: 100, borderThickness: 5, borderColor: "blue"});
-		// c2.setBorder({borderThickness: 6, borderColor: "yellow"});
-		// alert("--->c2.borderThickness "+c2.borderThickness);
-		// alert("--->c2.borderColor "+c2.borderColor);
-	c1.addExistingChild([num1,txt1]);
-	// c1.addExistingChild([num1,{name: "hello"}]);//to force an error
-		// c1.moveTo({left: 800, top: 200});
+		canvas.baseContainer.childDump();
+		c1.addExistingChild([num1,txt1]);
+		canvas.baseContainer.childDump();
+		alert("TEST");
 
 		// c1 = new container({left:500, top:100, width:500, height:40, borderThickness:10, borderColor:"red"});
 	var c2 = canvas.createContainer({left: 640, top: 140, width: 220, height: 100,borderColor: "blue"});
