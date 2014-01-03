@@ -88,30 +88,36 @@ define([
                     " you tried to change property " + propertyName + " to " + value + ", but DOM id is null !");
             }
         },
-        isPointInsideArea: function(pointLeft,pointTop) {//given a point verifies if that point is inside the area
+        isPointInsideArea: function(point) {//given a point{left:xL, top:xT} verifies if that point is inside the area
             var isInside = false;
-            if(this.isPointBelowRight) {
-                if( pointLeft < this.left + this.width &&  pointTop < this.top + this.height ){
+            if (this.isPointBelowRight(point)) {
+                if (point.left < (this.left + this.width) &&  point.top < (this.top + this.height)){
                     isInside = true;
                 }
             }
             return isInside;
         },
-        isPointBelowRight: function(pointLeft,pointTop){//given a point verifies if that point is below and to the right of the area 
+        isPointBelowRight: function(point){//given a point{left:xL, top:xT} verifies if that point is below and to the right of the area top right point 
             var isBelowRight = false;
-            if (pointLeft > this.left )
-                if( pointTop > this.top )
+            if (point.left > this.left)
+                if (point.top > this.top)
                     isBelowRight = true;
-            return isBelowRight
+            return isBelowRight;
         },
         intersectsAreaDimensions: function(areaDimensions) {// true if current area intersects an area dimension {left:xL, top:xT, width:xW, height:xH}, false otherwise
             var intersects = false;
-            var topLeft = {left: areaDimensions.left, top:areaDimensions.top};
-            var bottomRight = {left: areaDimensions.left + areaDimensions.width, top: areaDimensions.top + areaDimensions.height };
-            if ( this.isPointInsideArea(topLeft.left,topLeft.top) || this.isPointInsideArea(bottomRight.left,bottomRight.top)) {
-                intersets = true;
-            }
+            var pointTopLeft = {left: areaDimensions.left, top:areaDimensions.top};
+            var pointBottomRight = {left: areaDimensions.left + areaDimensions.width, top: areaDimensions.top + areaDimensions.height };
+            if (this.isPointUpLeftFromAreaBottomRight(pointTopLeft) && this.isPointBelowRight(pointBottomRight))
+                 intersects = true;
             return intersects;
-        },        
+        },
+        isPointUpLeftFromAreaBottomRight: function(point){//given a point verifies if that point is below and to the right of the area 
+            var isUpLeft = false;
+            if (point.left < (this.left + this.width))
+                if (point.top < (this.top + this.height))
+                    isUpLeft = true;
+            return isUpLeft;
+        }                
     });
 }); //end of  module  

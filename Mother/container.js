@@ -31,11 +31,6 @@ define([
             if (containerProperties)
                 declare.safeMixin(allPossibleProperties,containerProperties);
             console.log("INSIDE CONTAINER id="+this.id+" left="+this.left+" top="+this.top+" width="+this.width+" height="+this.height+" zIndex="+this.zIndex+" domId="+this.domId);
-            
-            if (this.zIndex>=0) {//if not a baseContainer
-                var topZIndex=this.highestZIndexAreaUnderContainer({left: this.left,top: this.top,width: this.width,height: this.height});
-                this.zIndex = topZIndex + 1;
-            }
             this.mountPaneInContainer();//sets this.dojoObject, this.dojoFormObj and places this.dojoFormObj over this.dojoObject
             if (this.floatingType!="nonFloat")
                 this.mountDialog();//sets dojoDialogObj and places this.dojoObject over it (it already has this.dojoFormObj over it)
@@ -43,7 +38,7 @@ define([
             console.log("container class END OF CONSTRUCTOR");
         },
         addExistingChild: function(childrenArr){
-            console.log("addExistingChild() $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ BEGIN "+this.name+" zIndex="+this.zIndex);
+            console.log("addExistingChild() $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ BEGIN "+this.name+" id="+this.id+" zIndex="+this.zIndex);
             for(var i = 0; i < childrenArr.length; i++){
                 if(!childrenArr[i].id) {
                     alert("container.addExistingChild(): You attemped to add an object that is not widget nor container !");
@@ -68,7 +63,7 @@ define([
                     this.dojoFormObj.domNode.appendChild(childrenArr[i].dojoObject.domNode);
                 }
                 this.children.push(childrenArr[i]);
-                console.log("------------------->add Child="+childrenArr[i].name+" zIndex before="+zIndexBefore+" zIndex after="+childrenArr[i].zIndex);
+                console.log("------------------->add Child="+childrenArr[i].name+" id="+childrenArr[i].id+" zIndex before="+zIndexBefore+" zIndex after="+childrenArr[i].zIndex);
             }
             console.log("addExistingChild() $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ END "+this.name);
         },
@@ -112,7 +107,7 @@ define([
                     left: this.children[i].left + deltaCoordinates.left,
                     top: this.children[i].top + deltaCoordinates.top
                 });
-                
+
             }
         },
         topAreaUnderPoint: function(pointLeft,pointTop){
