@@ -124,15 +124,38 @@ define([
         },
         highestZIndexAreaUnderContainer: function(areaDimensions){//given {left:xL, top:xT, width:xW, height:xH} returns highest zIndex inside
            var topZIndex = this.zIndex;
+           var z = null;
            for (var i = 0; i < this.children.length; i++) {
-                 if (this.children[i].intersectsAreaDimensions(areaDimensions)) {
-                    if(this.children[i].zIndex > topZIndex) {
-                            topZIndex = this.children[i].zIndex;
-                    }
+                if (this.children[i].intersectsAreaDimensions(areaDimensions)) {
+                    // if(this.children[i].zIndex > topZIndex) {
+                        // topZIndex = this.children[i].zIndex;//only one level
+                // if (area.children[i].type == "container") {
+                    if (false) {
+                        z = this.topZIndexIncludedInSubContainer(this.children[i]);//recursive method
+                    } else {
+                        z = this.children[i].zIndex;//it is a widget
+                    }    
+                    if(z > topZIndex) 
+                        topZIndex = z;
+                    // }
                 }
             }
             return topZIndex;
         },
+        topZIndexIncludedInSubContainer: function(area){//given {left:xL, top:xT, width:xW, height:xH} returns highest zIndex inside
+            var topZIndex = area.zIndex;
+            var z = null;
+            for (var i = 0; i < area.children.length; i++) {
+                if (area.children[i].type == "container") {
+                    z = this.topZIndexIncludedInSubarea(area.children[i]);
+                } else {
+                    z = this.children[i].zIndex;//it is a widget
+                }    
+                if(z > topZIndex) 
+                    topZIndex = z;
+            }
+            return topZIndex;
+        },        
         childDump: function() {
             var showContainerParentName = "Canvas Parent...";
             if (this.containerParent) {//most frequent case where area is inside a container
