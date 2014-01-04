@@ -50,7 +50,7 @@ define([
                 doh.assertEqual("blue", this.txt.borderColor);
             }
         },
-        "Should move to new position":{
+        "Should move free textbox to new position":{
             setUp:function(){
                 this.txt = new textbox({left:500, top:100, width:300, height:300, value:"Pukas"});
                 this.txt.moveTo({left:1000, top:200});
@@ -188,8 +188,7 @@ define([
                 // doh.assertEqual("2", this.num1.zIndex);
             } 
         },        
-       // "zIndex3 We create a container on canvas with 1 widget over it. Then we add the widget to the container, and place another container on top of it": {
-       "zIndex3) build container c1 w/n1 to include c2 w/num2. C1 involves c2": {
+        "zIndex3) build container c1 w/n1 to include c2 w/num2. C1 involves c2": {
             setUp:function(){
                 console.clear();
                 this.af = new areasFactory();
@@ -210,7 +209,57 @@ define([
                 doh.assertEqual("2", this.c2.zIndex);//container placed on canvas but above num1
                 doh.assertEqual("3", this.num2.zIndex);
             } 
-        }
+        },
+       "move within container: change zIndex moving a widget over another widget, a widget over a container and container over another container": {
+            setUp:function(){
+                this.af = new areasFactory();
+                this.num1 = this.af.createNumberbox({left: 567+20, top: 78+20, width:100, height:30, value:129.2, borderColor:"purple"});//zIndex=0
+                this.num2 = this.af.createNumberbox({left: 567+30, top: 78+30, width: 100, height: 30, value:229.2, borderColor:"purple"});//zIndex=1
+                this.num3 = this.af.createNumberbox({left: 567+30, top: 78+100, width: 100, height: 30, value:329.2, borderColor:"green"});//zIndex=0
+                this.num3.moveTo({top:  78+40});
+                this.c1 = this.af.createContainer({left: 567+30, top: 78+30, width: 400, height: 400,borderColor: "blue"});//zIndex=2
+                this.num4 = this.af.createNumberbox({left: 567+30, top: 78+450, width: 100, height: 30, value:429.2, borderColor:"green"});//zIndex=0
+                this.num4.moveTo({top: 78+100});
+                this.c2 = this.af.createContainer({left: 567+300, top: 78+450, width: 100, height: 200,borderColor: "blue"});//zIndex=0
+                this.c2.moveTo({left: 567+30,top: 78+100});
+  
+            },
+            runTest: function() {
+                doh.assertEqual("0", this.num1.zIndex);
+                doh.assertEqual("1", this.num2.zIndex);
+                doh.assertEqual("2", this.num3.zIndex,"num3 was moved over num1 (zIndex=1) and did not get zIndex=2");
+                doh.assertEqual("3", this.c1.zIndex);
+                // doh.assertEqual("0", this.num4.zIndex);//on canvas before move
+                doh.assertEqual("4", this.num4.zIndex,"num4 was moved over container c1 (zIndex=3) and did not get zIndex=4");
+                doh.assertEqual("5", this.c2.zIndex);//on canvas before move
+            } 
+        },        
+        "move container (c1) containing: 2 widgets (num1,num2) and a container (c2) with 2 widgets (num3,num4)": {
+            setUp:function(){
+                this.af = new areasFactory();
+                this.c1 = this.af.createContainer({left: 567+10, top: 78+10, width: 400, height: 400,borderColor: "blue"});//zIndex=0
+                this.num1 = this.af.createNumberbox({left: 567+20, top: 78+20, width:100, height:30, value:129.2, borderColor:"purple"});//zIndex=1
+                this.num2 = this.af.createNumberbox({left: 567+30, top: 78+30, width: 100, height: 30, value:229.2, borderColor:"purple"});//zIndex=2
+                this.c1.addExistingChild([this.num1,this.num2]); //c1.zIndex=0,num1.zIndex=1,num2.zIndex=2
+                this.c2 = this.af.createContainer({left: 567+200, top: 78+20, width: 150, height: 100,borderColor: "blue"});//zIndex=0
+                this.num3 = this.af.createNumberbox({left: 567+210, top: 78+30, width:100, height:30, value:329.2, borderColor:"purple"});//zIndex=1
+                this.num4 = this.af.createNumberbox({left: 567+210, top: 78+40, width:100, height:30, value:429.2, borderColor:"purple"});//zIndex=1
+                this.c2.addExistingChild([this.num3,this.num4]); //c2.zIndex=1,num3.zIndex=2,num3.zIndex=3
+                this.c1.addExistingChild([this.c2]); //c2.zIndex=1,num3.zIndex=2,num3.zIndex=3
+                this.c1.moveTo({left: 567+20,top: 78+20});
+            },
+            runTest: function() {
+                doh.assertEqual("0", this.c1.zIndex);
+                doh.assertEqual("1", this.num1.zIndex);
+                doh.assertEqual("2", this.num2.zIndex);
+                doh.assertEqual("1", this.c2.zIndex);
+                //------------------------------- now checks that widgets of container c2 were correctly moved
+                doh.assertEqual("787", this.num3.left);
+                doh.assertEqual("118", this.num3.top);
+                doh.assertEqual("787", this.num4.left);
+                doh.assertEqual("128", this.num4.top);
+            } 
+        },        
      });
     doh.register("DOH test 4 release Model ", [
         //http://kevinandre.com/dev/jsunittest-amd-doh-1/ ---//define(["doh","simple/Mother/textbox"], function(doh,textbox) {

@@ -30,8 +30,6 @@ define([
             this.baseContainer = new container(baseContainerProperties);
          },
         createTextbox: function(widgetProperties) {//always refer to a container if no container is present default container is selected
-            //alert("OBJECT "+widgetProperties+" value="+widgetProperties.value);
-            console.log("------------------------------------------>createTextbox");
             this.lastAreaOrder++;
             this.lastTextboxOrder++;
             //id will be used inside dojo objects, domId will be used to access dom outside dojo...
@@ -45,7 +43,6 @@ define([
             return txt;
         },
         createNumberbox: function(widgetProperties) {
-            console.log("------------------------------------------>createNumberbox");
             this.lastAreaOrder++;
             this.lastNumberboxOrder++;
             var widgetName = widgetProperties.name;
@@ -59,7 +56,6 @@ define([
             return num;
         },
         createContainer: function(containerProperties) {
-            console.log("------------------------------------------>createContainer");
             this.lastAreaOrder++;
             this.lastContainerOrder++;
             var containerName = containerProperties.name;

@@ -23,22 +23,19 @@ define([
             // The "constructor" method is special: the parent class areaWithText and area constructor are called automatically before this one.
             //If your class contains arrays or other objects, they should be declared in the constructor() so that each instance gets its own copy. 
             this.children = []; // to force per-instance object.
-            console.log("container class BEGIN OF CONSTRUCTOR");
             //REVIEW: Imported from MotherLib10 for speed
             var allPossibleProperties =
                 {value:"", name:"", preCode:"", posCode:"", changeCode:"", title:"@|", headers:"", template:null, zIndex:0};
             declare.safeMixin(allPossibleProperties,this.left, this.top, this.width, this.height, this.zIndex);//priority to inherited defaults  
             if (containerProperties)
                 declare.safeMixin(allPossibleProperties,containerProperties);
-            console.log("INSIDE CONTAINER id="+this.id+" left="+this.left+" top="+this.top+" width="+this.width+" height="+this.height+" zIndex="+this.zIndex+" domId="+this.domId);
+            // console.log("INSIDE CONTAINER id="+this.id+" left="+this.left+" top="+this.top+" width="+this.width+" height="+this.height+" zIndex="+this.zIndex+" domId="+this.domId);
             this.mountPaneInContainer();//sets this.dojoObject, this.dojoFormObj and places this.dojoFormObj over this.dojoObject
             if (this.floatingType!="nonFloat")
                 this.mountDialog();//sets dojoDialogObj and places this.dojoObject over it (it already has this.dojoFormObj over it)
-            
-            console.log("container class END OF CONSTRUCTOR");
         },
         addExistingChild: function(childrenArr){
-            console.log("addExistingChild() $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ BEGIN "+this.name+" id="+this.id+" zIndex="+this.zIndex);
+            // console.log("addExistingChild() $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ BEGIN "+this.name+" id="+this.id+" zIndex="+this.zIndex);
             for(var i = 0; i < childrenArr.length; i++){
                 if(!childrenArr[i].id) {
                     alert("container.addExistingChild(): You attemped to add an object that is not widget nor container !");
@@ -47,7 +44,7 @@ define([
                 var zIndexBefore = childrenArr[i].zIndex;
                 if (this.name != "canvas") {
                     childrenArr[i].zIndex = this.highestZIndexAreaUnder(childrenArr[i],this)+1;
-                    console.log("--------------------------->addExistingChild() adding "+childrenArr[i].name+"/"+childrenArr[i].zIndex+"---------------->to "+this.name+"/"+this.zIndex);
+                    // console.log("--------------------------->addExistingChild() adding "+childrenArr[i].name+"/"+childrenArr[i].zIndex+"---------------->to "+this.name+"/"+this.zIndex);
                     this._removeChildFromPreviousContainerChildrenList(childrenArr[i]);
                     childrenArr[i].containerParent = this;
                 }
@@ -61,9 +58,9 @@ define([
                     this.dojoFormObj.domNode.appendChild(childrenArr[i].dojoObject.domNode);
                 }
                 this.children.push(childrenArr[i]);
-                console.log("------------------->add Child="+childrenArr[i].name+" id="+childrenArr[i].id+" zIndex before="+zIndexBefore+" zIndex after="+childrenArr[i].zIndex);
+                // console.log("------------------->add Child="+childrenArr[i].name+" id="+childrenArr[i].id+" zIndex before="+zIndexBefore+" zIndex after="+childrenArr[i].zIndex);
             }
-            console.log("addExistingChild() $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ END "+this.name);
+            // console.log("addExistingChild() $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ END "+this.name);
         },
         _removeChildrenFromPreviousContainer: function(childrenArr){//cannot be called outside the class 
             for(var i = 0; i < childrenArr.length; i++){
@@ -91,22 +88,21 @@ define([
                 }
             }
          },
-        moveTo: function(newCoordinates){//overrides the area moveTo() method
-            //declare.safeMixin(this.viewPort,newViewPort);
-            var leftDelta = newCoordinates.left - this.left;
-            var topDelta = newCoordinates.top - this.top;
-            this.moveAllChildrenByDelta({left: leftDelta, top: topDelta});
-            // declare.safeMixin({left: this.left, top: this.top}, newCoordinates);
-            this.inherited(arguments);//the magic call to parent class
+        moveTo: function(leftTopCoordinates){//overrides the area moveTo() method
+            //http://apphacker.wordpress.com/2010/01/31/how-to-call-the-base-method-when-using-inheritance-in-dojo-1-4/
+            this.inherited(arguments);//it will call area.moveTo() and the will folow the next code...
+            // console.log("container.moveTo first left="+this.left+" top="+this.top);
+            this.adjustAllChildrenByDelta({left: this.left - this.previousLeft, top: this.top - this.previousTop},this);
         },
-        moveAllChildrenByDelta: function(deltaCoordinates){
-            for(var i = 0; i < this.children.length; i++){
-                this.children[i].moveTo({
-                    left: this.children[i].left + deltaCoordinates.left,
-                    top: this.children[i].top + deltaCoordinates.top
-                });
-
-            }
+        adjustAllChildrenByDelta: function(deltaCoordinates,container){
+            for(var i = 0; i < container.children.length; i++){
+                // console.log("container.adjustAllChildrenByDelta i="+i+" BEFORE left="+container.children[i].left+" top="+container.children[i].top);             
+                container.children[i].left += deltaCoordinates.left;
+                container.children[i].top += deltaCoordinates.top;
+                if (container.children[i].type == "container")
+                    this.adjustAllChildrenByDelta(deltaCoordinates,container.children[i]);
+                // console.log("                                   i="+i+" AFTER  left="+container.children[i].left+" top="+container.children[i].top);
+            };
         },
         topAreaUnderPoint: function(pointLeft,pointTop){
             var topAreaIndex=-1;
@@ -125,15 +121,17 @@ define([
             //  that intersects with candidateArea          
             var topZIndex = containerAreaRecipient.zIndex;
             var z = null;
-            for (var i = 0; i < containerAreaRecipient.children.length; i++) { //scans all containerArea childrens
-                if (containerAreaRecipient.children[i].intersectsArea(candidateArea)) { //only intersecting areas are interesting
-                    if (containerAreaRecipient.children[i].type == "container") {
-                        z = containerAreaRecipient.children[i].highestZIndexAreaUnder(candidateArea,containerAreaRecipient.children[i]);//recursive method
-                    } else {
-                        z = containerAreaRecipient.children[i].zIndex;
+            for (var i = 0; i < containerAreaRecipient.children.length; i++) { //scans all containerArea childrens except candidateArea
+                if (containerAreaRecipient.children[i].id!=candidateArea.id) {//the own area is excluded from the scan
+                    if (containerAreaRecipient.children[i].intersectsArea(candidateArea)) { //only intersecting areas are interesting
+                        if (containerAreaRecipient.children[i].type == "container") {
+                            z = containerAreaRecipient.children[i].highestZIndexAreaUnder(candidateArea,containerAreaRecipient.children[i]);//recursive method
+                        } else {
+                            z = containerAreaRecipient.children[i].zIndex;
+                        }
+                        if( z>topZIndex)
+                            topZIndex = z;
                     }
-                    if( z>topZIndex)
-                        topZIndex = z;
                 }
             }
             return topZIndex;
@@ -145,12 +143,12 @@ define([
                 if (this.containerParent.name)
                     showContainerParentName = this.containerParent.name;
             }
-            console.log ("%%%%%%%%%%%%%%%%%%%%%%%%%%% container name="+ this.name+" id="+this.id+" parentContainerName="+showContainerParentName+" zIndex="+this.zIndex+" %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
+            console.log ("%%%%%%%%%%%%%%%%%%%%%%%%%%% container name="+ this.name+" id="+this.id+" parentContainerName="+showContainerParentName+" zIndex="+this.zIndex+" l,t="+this.left+","+this.top+" %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
             for (var i = 0; i < this.children.length; i++) {
                 var showValue = "NoValue";
                 if (this.children[i].type!="container")
                     showValue = this.children[i].dojoObj.value; //"someValue";
-                console.log(i+" Name="+this.children[i].name+" id="+this.children[i].id+" type="+this.children[i].type+" value="+showValue+" zIndex="+this.children[i].zIndex+" containerParent.name="+this.children[i].containerParent.name);
+                console.log(i+" Name="+this.children[i].name+" id="+this.children[i].id+" type="+this.children[i].type+" value="+showValue+" zIndex="+this.children[i].zIndex+" containerParent.name="+this.children[i].containerParent.name+" l,t="+this.children[i].left+","+this.children[i].top);
             }
             console.log ("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
         },

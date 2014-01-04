@@ -14,6 +14,8 @@ define([
         areas:{lastId:0},
         left:500,
         top:100,
+        previousLeft: null, //only used by moveTo 
+        previousTop: null,//only used by moveTo 
         width:100,
         height:30, //default area
         borderThickness:1,
@@ -31,18 +33,17 @@ define([
                 this.id = "_free"+this.areas.lastId;
                 this.areaOrder = "Free" +  this.areas.lastId;
                 this.domId = "widget_"+this.id;
-            }    
+            }
             var showContainerParentName = "Canvas Parent...";
             if (this.containerParent) {//most frequent case where area is inside a container
-                // this.zIndex = this.containerParent.zIndex+1;
                 this.zIndex = this.containerParent.highestZIndexAreaUnder(this,this.containerParent)+1;
                 showContainerParentName = "No name but id=" + this.containerParent.id;
                 if (this.containerParent.name)
                     showContainerParentName = this.containerParent.name;
-            }    
-            console.log("area class ---------------------------------------->areaOrder=" + this.areaOrder +" id=" + this.id + " name=" + this.name + " left="+this.left+" top="+this.top);
-            console.log("area class ------------------------------------------------>  width="+this.width+" height="+this.height+" zIndex="+this.zIndex+" containerParentName="+showContainerParentName);
-            console.log("area class ------------------------------------------------>  borderThickness="+this.borderThickness+", borderStyle="+this.borderStyle+", borderColor="+this.borderColor+")");
+            }
+            // console.log("area class ---------------------------------------->areaOrder=" + this.areaOrder +" id=" + this.id + " name=" + this.name + " left="+this.left+" top="+this.top);
+            // console.log("area class ------------------------------------------------>  width="+this.width+" height="+this.height+" zIndex="+this.zIndex+" containerParentName="+showContainerParentName);
+            // console.log("area class ------------------------------------------------>  borderThickness="+this.borderThickness+", borderStyle="+this.borderStyle+", borderColor="+this.borderColor+")");
         },
         getArea: function () {
             return {left: this.left, top: this.top, width: this.width, height: this.height};
@@ -58,22 +59,26 @@ define([
                 lang.mixin(this,border);
             }
             var borderString = this.borderThickness+"px "+this.borderStyle+" "+this.borderColor;
-            console.log("area class setBorder for type="+this.type+" ------------------------>  borderThickness="+this.borderThickness+", borderStyle="+this.borderStyle+", borderColor="+this.borderColor+")");
+            // console.log("area class setBorder for type="+this.type+" ------------------------>  borderThickness="+this.borderThickness+", borderStyle="+this.borderStyle+", borderColor="+this.borderColor+")");
             this.updateDOMPropertyWithValue("border", borderString);
         },
         moveTo: function(leftTopCoordinates) {
             if(leftTopCoordinates) {
+                this.previousLeft = this.left; //if area is container this is used by moveTo override 
+                this.previousTop = this.top; //if area is container this is used by moveTo override in container
                 lang.mixin(this, leftTopCoordinates);
+                // console.log("area.moveTo first left="+this.left+" top="+this.top);
+                if(this.containerParent)//if it is not a free area
+                    this.zIndex = this.containerParent.highestZIndexAreaUnder(this,this.containerParent)+1;
                 this.updateDOMPropertyWithValue("left", this.left);
                 this.updateDOMPropertyWithValue("top", this.top);
             }
         },
         updateDOMPropertyWithValue: function(propertyName, value){
             var domId = "widget_"+this.id;
-            // if(this.domId.substr(0,9)=="container")
             if(this.type=="container")
                 domId=this.id;
-            console.log("----------------->area.updateDOMPropertyWithValue(): domId="+ domId +" trying to change property " + propertyName + " to " + value);
+            // console.log("----------------->area.updateDOMPropertyWithValue(): domId="+ domId +" trying to change property " + propertyName + " to " + value);
             var domIdExists = (dom.byId(domId) === null)? false: true;
             if (domIdExists) {
                 domStyle.set(dom.byId(domId), propertyName, value);

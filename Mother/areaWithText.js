@@ -46,7 +46,7 @@ define([
             if (propertyName == "fontSize") {
                 value = (value < this.height - 5) ? value: 0.85 * value - 3;//without this font will cross border...
             }
-            console.log("----------------->area.updateTextInDOM(): id="+this.id+" trying to change property " + propertyName + " to " + value);
+            // console.log("----------------->areaWithText.updateTextInDOM(): id="+this.id+" trying to change property " + propertyName + " to " + value);
             var domIdExists = (dom.byId(this.id) === null)? false: true;
             if (domIdExists) {
                 domStyle.set(dom.byId(this.id), propertyName, value);

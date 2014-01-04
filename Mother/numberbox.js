@@ -19,8 +19,7 @@ define([
             declare.safeMixin(allPossibleProperties,this.left, this.top, this.width, this.height);//priority to inherited defaults  
             if (widgetProperties)
                 declare.safeMixin(allPossibleProperties,widgetProperties);   
-            console.log("INSIDE NUMBERBOX id="+this.id+" left="+this.left+" top="+this.top+" width="+this.width+" height="+this.height+" zIndex="+this.zIndex+" domId="+this.domId);
-            // alert("NUMBERBOX id="+this.id);
+            // console.log("INSIDE NUMBERBOX id="+this.id+" left="+this.left+" top="+this.top+" width="+this.width+" height="+this.height+" zIndex="+this.zIndex+" domId="+this.domId);
             
             //HACK: To have something to support the widget
             var form = new Form({

@@ -96,24 +96,8 @@ require([
 	"Mother/container.js",
 	], 
 	function(query,dom,domConstruct,registry,canvas,textbox,numberbox,container){ 
-		//
-		//
-		//num1 = new numberbox({left:500, top:50, width:340, height:100, value:129.2, borderColor:"purple"});
-		//num2 = new numberbox({left:1000, top:50, width:340, height:50, value:123});
-		//txt1 = new textbox({left:100, top:50, width:340, height:300, value:"Pukas"});
 		console.log("Inicio");
 		var canvas = new canvas();//by default a base container (the full screen) is defined
-		// alert("base container name=" + canvas.baseContainer.name + " zIndex="+canvas.baseContainer.zIndex);
-			// 	var af = new canvas();//by default a base container (the full screen) is defined
-   //             	var c1 = af.createContainer({left: 567+10, top: 78+10, width: 500, height: 500,borderColor: "red"});//zIndex=0
-   //              var n1 = af.createNumberbox({left: 567+20, top: 78+20, width:100, height:30, value:129.2, borderColor:"purple"});//zIndex=1
-   //              c1.addExistingChild([n1]);//num1.zIndex=1
-   //              //-----------
-   //              var c2 = af.createContainer({left: 567+30, top: 78+30, width: 400, height: 400,borderColor: "blue"});//zIndex=2
-	  //        	c1.childDump();
-	  //        	af.baseContainer.childDump();
- 		// alert("TEST");
-   //      var canvas=af;
 		var num1 = canvas.createNumberbox({left:320, top:50, width:200, height:50, value:129.2, borderColor:"purple"});
 		var num2 = canvas.createNumberbox({left:1000, top:50, width:340, height:50, value: 123,borderThickness: 2,borderColor: "blue"});
 		var num3 = new numberbox({left:1200, top:250, width:100, height:30, value:23});
@@ -160,31 +144,25 @@ require([
 			console.log("+++++++++++++++++++++++++++++++++++++++++++->"+k+" id="+widget.get("id"));
 			k++;
 		});
-		//alert("Hello");
-		// -------------------------------------------------------------------------------------------
-        // this.canvas = new areasFactory();
-
-	// alert("Step 0");
 		console.log("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$");
 		console.log("------------------------------------------- now the container.... -----------------------------------------------");
 		console.log("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$");
-	var c1 = canvas.createContainer({name: "YellowSubmarine", left: 80, top: 40, width: 500, height: 250, borderThickness: 7, borderColor: "yellow"});
+		var c1 = canvas.createContainer({name: "YellowSubmarine", left: 80, top: 40, width: 500, height: 260, borderThickness: 7, borderColor: "yellow"});
 		canvas.baseContainer.childDump();
 		c1.addExistingChild([num1,txt1]);
-		canvas.baseContainer.childDump();
-		alert("TEST");
 
 		// c1 = new container({left:500, top:100, width:500, height:40, borderThickness:10, borderColor:"red"});
-	var c2 = canvas.createContainer({left: 640, top: 140, width: 220, height: 100,borderColor: "blue"});
+		var c2 = canvas.createContainer({left: 640, top: 140, width: 220, height: 100,borderColor: "blue"});
 		c2.setBorder({borderThickness: 7, borderColor: "green"});
-	c2.addExistingChild([txtc2,numc2]);
-	// c2.moveTo({left: 85, top: 170});
-
-	c1.addExistingChild([c2]);
-	c1.childDump();
-	c2.childDump();
-	// alert("numc2 after inclusion in c1 numc2.containerParent.name="+numc2.containerParent.name);
-	// c1.moveTo({left: 600, top: 150});
+		c2.addExistingChild([txtc2,numc2]);
+		console.log("---------------------------------------<< after c2 creation with txtc2 and numc2 >>-----------------------------");
+		// canvas.baseContainer.childDump();
+		c2.moveTo({left: 130});
+		console.log("-------------------------------------------------------<< after move (only) of c2 >>-----------------------------");
+		c1.addExistingChild([c2]);	
+		c1.moveTo({left: 600, top: 150}); //move everything togheter
+		c1.childDump();
+		c2.childDump();
 		canvas.baseContainer.childDump();
 		console.log("------------------------------------------------- summary.... -----------------------------------------------");	
 		console.log("totalAreas = "+canvas.lastAreaOrder+"  TotalTextboxes = "+canvas.lastTextboxOrder+"  TotalNumberboxes = "+canvas.lastNumberboxOrder+"  TotalContainers = "+canvas.lastContainerOrder);
