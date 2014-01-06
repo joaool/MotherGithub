@@ -18,8 +18,11 @@ define([
                 missingMessage:"Must have a value !", regExp:"[^\t]*", preCode:"", posCode:"", changeCode:"", pattern:"0.###", disable:false,
                 disabled:false, title:"@|", headers:"", placeHolder:"", propercase:false, readOnly:false, template:null, zIndex:0};
             declare.safeMixin(allPossibleProperties,this.left, this.top, this.width, this.height);//priority to inherited defaults  
-            if (widgetProperties)
+            if (widgetProperties){
+                // alert("textbox.constructor this.width="+this.width);
+                widgetProperties.width = this.width;
                 declare.safeMixin(allPossibleProperties,widgetProperties);
+            }    
             // console.log("INSIDE TEXTBOX id="+this.id+" left="+this.left+" top="+this.top+" width="+this.width+" height="+this.height);
             
             //HACK: To have something to support the widget

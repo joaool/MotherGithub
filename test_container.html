@@ -99,8 +99,10 @@ require([
 		console.log("Inicio");
 		var canvas = new canvas();//by default a base container (the full screen) is defined
 		var num1 = canvas.createNumberbox({left:320, top:50, width:200, height:50, value:129.2, borderColor:"purple"});
+        console.log("num1-> id="+num1.id+" left="+num1.left+" top="+num1.top+" width="+num1.width+" height="+num1.height+" zIndex="+num1.zIndex+" value="+num1.value+" domId="+num1.domId);
 		var num2 = canvas.createNumberbox({left:1000, top:50, width:340, height:50, value: 123,borderThickness: 2,borderColor: "blue"});
 		var num3 = new numberbox({left:1200, top:250, width:100, height:30, value:23});
+
 		num3.setBorder({borderThickness:5, borderColor:"red"});
 		num1.toggleItalic(true);
 		num2.toggleItalic(false);
