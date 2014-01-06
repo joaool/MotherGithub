@@ -44,8 +44,8 @@ define([
             // alert("hello !!! this is textbox width="+this.width+" height="+this.height);
             var domId = registry.byId(this.id);
             if(domId){
-                domStyle.set(domId.domNode, "width", this.width+"px");
-                domStyle.set(domId.domNode, "height", this.height+"px");
+                domStyle.set(domId.domNode, "width", this.width+"px");//excludes border
+                domStyle.set(domId.domNode, "height", this.height+"px");//excludes border
             } else {
                 alert("textbox.resize(): The dom node for "+ this.id + " does not exist!");
                 throw new Error("textbox.resize(): The dom node for "+ this.id + " does not exist!");

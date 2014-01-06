@@ -21,6 +21,7 @@ define([
         borderThickness:1,
         borderStyle:"solid",
         borderColor:"black",
+        isVisible:true,
         areaOrder:null,
         name:null,
         zIndex:-1,//all areas have a zIndex that is the next zIndex after the top highest area being covered 
@@ -64,6 +65,18 @@ define([
         },
         resize: function(widthHeight) {
             lang.mixin(this, widthHeight);
+        },
+        toggleVisible:function(isVisible){
+            this.isVisible = isVisible;
+            var visibleHTMLProperty=(isVisible)? "visible":"hidden";
+            // domStyle.set(this.id,"visibility",visibleHTMLProperty);   
+            var widget = dijit.byId(this.id);
+            if (widget) {
+                domStyle.set(dijit.byId(this.id).domNode,"visibility",visibleHTMLProperty);
+            } else {
+                alert("area.toggleVisible(): area is not a dojo widget. Missing code !");
+                throw new Error("area.toggleVisible(): area is not a dojo widget. Missing code !");
+            }
         },
         moveTo: function(leftTopCoordinates) {
             if(leftTopCoordinates) {

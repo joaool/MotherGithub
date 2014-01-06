@@ -138,12 +138,22 @@ require([
 		var txt11 = canvas.createTextboxIn(c1,{left:50,top:30,height: 22,title:"to test something outside the handles...handles will go",placeHolder:"something"});
 
 		//----------------------------------------
-		var t1 = new textbox({left:500, top:100,height: 22,value: "test",title: "active handles test !"});
+		var t1 = new textbox({left:400, top:100,height: 22,value: "test",title: "active handles test !"});
+		t1.setBorder({borderThickness: 10, borderColor: "red"});
 
-		var t2 = new textbox({left:500, top:150,height: 22,value: "resize",title: "to test resize !"});
+		var t2 = new textbox({left:750, top:250,height: 22,value: "resize",title: "to test resize !"});
 		t2.resize({width: 150,height:50});
-		var n2 = new numberbox({left:700, top:150,height: 22,value: "987.234",title: "to test resize !"});
+		var n2 = new numberbox({left:750, top:300,height: 22,value: "987.234",title: "to test resize !"});
 		n2.resize({width: 200,height:60});
+		
+		alert("BEFORE invisible");
+		t1.toggleVisible(false);
+		t2.toggleVisible(false);
+		n2.toggleVisible(false);
+		alert("AFTER invisible");
+		t1.toggleVisible(true);
+		t2.toggleVisible(true);
+		n2.toggleVisible(true);
 
 		var beginFunction=function(){
 			//alert("beginFunction !!!");
@@ -274,7 +284,7 @@ require([
 			};	
 		}));
 		//------------------------ w1 tied to t1 --------------------------------------------
-		var oLandingW={l: t1.left,t: t1.top,w: t1.width,h: t1.height};
+		var oLandingW={l: t1.left,t: t1.top,w: t1.width+2*t1.borderThickness,h: t1.height+2*t1.borderThickness};
 		var oBoundariesW={l:20,t:20,w:1270,h:420};//this will be the containerParent boundaries
 		w1=new ResizeMoveArea("w1",oLandingW,oBoundariesW,{
 			label:"W1",
@@ -292,9 +302,26 @@ require([
 			//x1.mouseDownCallback=zzz;
 			w1.activate();
 			mouseDownHandlerW1.pause(); 
-		});			
+		});	
+		w1.mouseDownCallback=function(){
+			t1.toggleVisible(false);
+		};
+		
+		w1.on("resizeMovePartial",Lang.hitch(this,function(oEvt){
+			console.log("######################################################################## ------ resizeMovePartial DETECTED in caller !!! (W1) inside="+oEvt.inside+", w1.current.active="+w1.current.active);
+		    // alert("resizeMovePartial W1->  left="+w1.position.x+" top="+w1.position.y+" width="+w1.position.w+" height="+w1.position.h);
+		    t1.moveTo({left: w1.position.x,top: w1.position.y});
+		    t1.resize({width: w1.position.w-2*t1.borderThickness,height: w1.position.h-2*t1.borderThickness});
+			t1.toggleVisible(true);
+		    if(t1.borderColor=="red")
+		    	t1.setBorder({borderColor: "blue"});
+		    else
+		    	t1.setBorder({borderColor: "red"});
+		    	
+		}));		
 		w1.on("resizeMoveEnd",Lang.hitch(this,function(oEvt){
 			console.log("######################################################################## ------ resizeMoveEnd DETECTED in caller !!! (W1) inside="+oEvt.inside+", w1.current.active="+w1.current.active);
+		    // alert("resizeMoveEnd W1->  left="+w1.position.x+" top="+w1.position.y+" width="+w1.position.w+" height="+w1.position.h);
 			mouseDownHandlerW1.resume();//put it ready to be detected when mouse clicks the area
 		}));		
 		//-----------------------------------------------------------------------------------

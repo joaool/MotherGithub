@@ -42,13 +42,14 @@
 					//
 					//    3- ResizeMoveArea emits the "resizeMovePartial" event at the end of every resize 
 					//			x1.on("resizeMovePartial",Lang.hitch(this,function(oEvt){
-					//				console.log("!!!!!!!!!!!!!!!!!!!!!!!!!!!  Parcial reside with x="+oEvt.x+" y="+oEvt.y+" w="+oEvt.w+" 	h="+oEvt.h+" move="+oEvt.move);
+					//				console.log("x1->  left="+x1.position.x+" top="+x1.position.y+" width="+x1.position.w+" height="+x1.position.h+" move="+oEvt.move);
 					//			}));
 					//
 					//			the "resizeMovePartial" event, allows a customized adjustment of the area after every resize.
 					//
 					//    4- ResizeMoveArea emits the "resizeMoveEnd" event when the user clicks inside the area to signal that she has finished the area definition
 					//			x1.on("resizeMoveEnd",Lang.hitch(this,function(oEvt){
+								//alert("x1->  left="+x1.position.x+" top="+x1.position.y+" width="+x1.position.w+" height="+x1.position.h);
 					//				handlerArea.resume();//put it ready to be detected when mouse clicks the area
 					//			}));
 					//
