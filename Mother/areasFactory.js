@@ -38,14 +38,14 @@ define([
                     absoluteLeft += widgetProperties.left;
                 if (widgetProperties.top)
                     absoluteTop += widgetProperties.top;
-                declare.safeMixin(widgetProperties,{left: absoluteLeft,top: absoluteTop});   
+                declare.safeMixin(widgetProperties,{left: absoluteLeft,top: absoluteTop});
                 var txt=this.createTextbox(widgetProperties);//textbox created in canvas
                 container.addExistingChild([txt]);//now textbox is inside in container
-            } else {
+                return txt;
+             } else {
                 alert("areasFactory.createTextboxIn(): You attemped to create a textbox inside an unexisting container !");
                 throw new Error("areasFactory.createTextboxIn(): You attemped to create a textbox inside an unexisting container !");
             }
-            return txt;
         },
         createNumberboxIn: function(container,widgetProperties) {//always refer to a container if no container is present default container is selected
             if(container){
@@ -56,15 +56,15 @@ define([
                     absoluteLeft += widgetProperties.left;
                 if (widgetProperties.top)
                     absoluteTop += widgetProperties.top;
-                declare.safeMixin(widgetProperties,{left: absoluteLeft,top: absoluteTop});   
+                declare.safeMixin(widgetProperties,{left: absoluteLeft,top: absoluteTop});
                 var num=this.createNumberbox(widgetProperties);//numberbox created in canvas
                 container.addExistingChild([num]);//now numberbox is inside in container
+                return num;
             } else {
                 alert("areasFactory.createTextboxIn(): You attemped to create a textbox inside an unexisting container !");
                 throw new Error("areasFactory.createNumberboxIn(): You attemped to create a textbox inside an unexisting container !");
             }
-            return num;
-        },
+         },
         createTextbox: function(widgetProperties) {//always refer to a container if no container is present default container is selected
             this.lastAreaOrder++;
             this.lastTextboxOrder++;

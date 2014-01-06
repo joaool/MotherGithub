@@ -1,12 +1,12 @@
 define([
-    "dojo/ready",
     "dojo/_base/declare",
+    "dijit/registry",
+    "dojo/dom-style",
     "dijit/form/Form",
     "dijit/form/ValidationTextBox",
-    //"Mother/area_text.js",
     "/pdojo/MotherGitHub/Mother/areaWithText.js",
     "dojo/domReady!"
-], function(ready,declare,Form,ValidationTextBox,areaWithText){
+], function(declare,registry,domStyle,Form,ValidationTextBox,areaWithText){
     return declare(areaWithText,{
         dojoObj:null,
         type:"textbox",
@@ -39,7 +39,18 @@ define([
             this.setFontSize(this.fontSize);
             this.setBorder();
         },
-
+        resize: function() {
+            this.inherited(arguments);//it will call area.moveTo() and the will folow the next code...
+            // alert("hello !!! this is textbox width="+this.width+" height="+this.height);
+            var domId = registry.byId(this.id);
+            if(domId){
+                domStyle.set(domId.domNode, "width", this.width+"px");
+                domStyle.set(domId.domNode, "height", this.height+"px");
+            } else {
+                alert("textbox.resize(): The dom node for "+ this.id + " does not exist!");
+                throw new Error("textbox.resize(): The dom node for "+ this.id + " does not exist!");
+            }
+         },
         //REVIEW: Imported from MotherLib10 for speed
         //-------------------------------------------------------------------------------------------
         JSON_Default_TextBox: function(xProps){//Order within TextBoxes,xProps

@@ -1,17 +1,17 @@
 		define([ "Mother/resizeWCoord5.js",
-				 "dojo/_base/declare",	
-				 "dojo/_base/window",	
-				 "dojo/on",
-				 "dojo/Evented",  
-				 "dojo/dnd/move",
-				 "dojo/dom",
-				 "dojo/dom-attr",
-				 "dojo/dom-geometry",
-				 "dojo/dom-construct",
-				 "dojo/dom-style",
-				 "dojo/_base/lang",						 
-				 "dojo/domReady!"], //só consome
-			function(ResizeWidget,Declare,Win,On,Evented,Move,Dom,DomAttr,DomGeom,DomConstruct,DomStyle,Lang){ 
+				"dojo/_base/declare",
+				"dojo/_base/window",
+				"dojo/on",
+				"dojo/Evented",
+				"dojo/dnd/move",
+				"dojo/dom",
+				"dojo/dom-attr",
+				"dojo/dom-geometry",
+				"dojo/dom-construct",
+				"dojo/dom-style",
+				"dojo/_base/lang",
+				"dojo/domReady!"],
+			function(ResizeWidget,Declare,Win,On,Evented,Move,Dom,DomAttr,DomGeom,DomConstruct,DomStyle,Lang){
 				return Declare("resizeMoveArea", [Evented],{
 					//This class allows the resize and move of a screen area within boundaries. The screen area can be an avatar of anything.
 					//	Use:
@@ -26,7 +26,7 @@
 									});
 					*/
 					//        The area will be activated by a click on it.
-					//	  2- define a click to activate ResizeMoveArea when user clicks the area
+					//	2- define a click to activate ResizeMoveArea when user clicks the area
 					/*
 								var handlerArea=On.pausable(Dom.byId(x1.moveResizeDivId), "click", Lang.hitch(this,function(evt){ 
 									if(x1.lastExitInside){//previous was inside the area
@@ -36,7 +36,7 @@
 										handlerArea.pause();//prevents "click" event reentry
 									};	
 								}));
-					*/			
+					*/
 					//			NOTICE: the click handler must allways test lastExitInside and set it to false if it is true
 					//					the click handler must allways activate ResizeMoveArea and pause itsel if lastExitInside=false
 					//
@@ -67,7 +67,7 @@
 					//  NOTE ON EVENTS: 
 					//          ResizeMoveArea  uses resizeWidget (resizeWCoord4.js) events:
 					//				_onResizeComplete <- when user finishes a parcial resize
-					//   			_endResize <- when user terminates the rezise operation by clicking outside the area  
+					//   			_endResize <- when user terminates the rezise operation by clicking outside the area
 					//				_insideEndResize <- when user terminates the rezise operation by clicking inside the area
 					//			Normally ResizeMoveArea deals internally with "onResizeComplete" by adjusting the avatar of the area to the new rectangle
 					//				resulting from resizeWidget object and only emits an event "resizeMoveEnd" when 

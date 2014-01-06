@@ -1,11 +1,12 @@
 define([
-    "dojo/ready",
     "dojo/_base/declare",
+    "dijit/registry",
+    "dojo/dom-style",
     "dijit/form/Form",
     "dijit/form/NumberTextBox",
     "/pdojo/MotherGitHub/Mother/areaWithText.js",
     "dojo/domReady!"
-], function(ready,declare,Form,NumberTextBox,area_text){
+], function(declare,registry,domStyle,Form,NumberTextBox,area_text){
     return declare(area_text,{
         dojoObj:null,
         type:"numberbox",
@@ -34,7 +35,18 @@ define([
             this.setFontSize(this.fontSize);
             this.setBorder();//now dom is formed
         },
-
+        resize: function() {
+            this.inherited(arguments);//it will call area.moveTo() and the will folow the next code...
+            // alert("hello !!! this is textbox width="+this.width+" height="+this.height);
+            var domId = registry.byId(this.id);
+            if(domId){
+                domStyle.set(domId.domNode, "width", this.width+"px");
+                domStyle.set(domId.domNode, "height", this.height+"px");
+            } else {
+                alert("numberbox.resize(): The dom node for "+ this.id + " does not exist!");
+                throw new Error("numberbox.resize(): The dom node for "+ this.id + " does not exist!");
+            }
+         },
         //REVIEW: Imported from MotherLib10 for speed
         //-------------------------------------------------------------------------------------------
         JSON_Default_NumberBox: function(xProps){//Order within NumberBoxes,xProps

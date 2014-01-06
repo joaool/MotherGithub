@@ -62,6 +62,9 @@ define([
             // console.log("area class setBorder for type="+this.type+" ------------------------>  borderThickness="+this.borderThickness+", borderStyle="+this.borderStyle+", borderColor="+this.borderColor+")");
             this.updateDOMPropertyWithValue("border", borderString);
         },
+        resize: function(widthHeight) {
+            lang.mixin(this, widthHeight);
+        },
         moveTo: function(leftTopCoordinates) {
             if(leftTopCoordinates) {
                 this.previousLeft = this.left; //if area is container this is used by moveTo override 

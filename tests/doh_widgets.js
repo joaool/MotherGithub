@@ -40,14 +40,17 @@ define([
                 doh.assertEqual("30", this.txt.height);
             }
         },
-        "Should set border thickness to 5 and color to blue":{
+        "Should set border thickness to 5 and color to blue and resize":{
             setUp:function(){
                 this.txt = new textbox({left:500, top:100, width:300, height:300, value:"Pukas"});
                 this.txt.setBorder({borderThickness:5, borderColor:"blue"});
+                this.txt.resize({width: 200, height: 100});
             },
             runTest:function(){
                 doh.assertEqual("5", this.txt.borderThickness);
                 doh.assertEqual("blue", this.txt.borderColor);
+                doh.assertEqual("200", this.txt.width);
+                doh.assertEqual("100", this.txt.height);
             }
         },
         "Should move free textbox to new position":{
@@ -78,8 +81,8 @@ define([
                 doh.assertEqual("300", this.n.height);
             },
             runTest:function(){
-                 console.log("===========================>value="+this.n.value);
-                 doh.assertEqual(129.2, this.n.value);
+                console.log("===========================>value="+this.n.value);
+                doh.assertEqual(129.2, this.n.value);
             }
         },
         "Should return default values left,top,width,height":{
@@ -93,14 +96,17 @@ define([
                 doh.assertEqual("30", this.n.height);
             }
         },
-        "Should set border thickness to 5 and color to blue":{
+        "Should set border thickness to 5 and color to blue and resize":{
             setUp:function(){
                 this.n = new numberbox({left:500, top:100, width:300, height:300, value:129.2});
                 this.n.setBorder({borderThickness:5, borderColor:"blue"});
+                this.n.resize({width: 200, height: 100});
             },
             runTest:function(){
-                 doh.assertEqual("5", this.n.borderThickness);
-                 doh.assertEqual("blue", this.n.borderColor);
+                doh.assertEqual("5", this.n.borderThickness);
+                doh.assertEqual("blue", this.n.borderColor);
+                doh.assertEqual("200", this.n.width);
+                doh.assertEqual("100", this.n.height);
             }
         }
     });

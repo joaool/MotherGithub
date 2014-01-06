@@ -138,7 +138,12 @@ require([
 		var txt11 = canvas.createTextboxIn(c1,{left:50,top:30,height: 22,title:"to test something outside the handles...handles will go",placeHolder:"something"});
 
 		//----------------------------------------
-		var n1 = new textbox({left:500, top:100,height: 22,value: "test",title: "active handles test !"});
+		var t1 = new textbox({left:500, top:100,height: 22,value: "test",title: "active handles test !"});
+
+		var t2 = new textbox({left:500, top:150,height: 22,value: "resize",title: "to test resize !"});
+		t2.resize({width: 150,height:50});
+		var n2 = new numberbox({left:700, top:150,height: 22,value: "987.234",title: "to test resize !"});
+		n2.resize({width: 200,height:60});
 
 		var beginFunction=function(){
 			//alert("beginFunction !!!");
@@ -256,7 +261,8 @@ require([
 */
 		x1.on("resizeMoveEnd",Lang.hitch(this,function(oEvt){
 			console.log("######################################################################## ------ resizeMoveEnd DETECTED in caller !!! (A1) inside="+oEvt.inside+", x1.current.active="+x1.current.active);
-			if(doubleActivation){//testing 2 activation in a row
+			// if(doubleActivation){//testing 2 activation in a row
+			if(false){//testing 2 activation in a row
 				/*
 				var oF=x1.getDim();
 				oF.l+=500; //a jump to the right
@@ -267,7 +273,31 @@ require([
 				mouseDownHandler.resume();//put it ready to be detected when mouse clicks the area
 			};	
 		}));
-		
+		//------------------------ w1 tied to t1 --------------------------------------------
+		var oLandingW={l: t1.left,t: t1.top,w: t1.width,h: t1.height};
+		var oBoundariesW={l:20,t:20,w:1270,h:420};//this will be the containerParent boundaries
+		w1=new ResizeMoveArea("w1",oLandingW,oBoundariesW,{
+			label:"W1",
+			gridPattern:5,
+			//borderThickness:4,
+			//borderType:"inset",//"dotted",
+			//borderColor:"blue",
+			fillColor:"purple",
+			opacity:.6,
+			tooltip:"this is resize move over a dojo widget !"
+		});
+		w1.setCursorInactive("move"); 
+		var mouseDownHandlerW1=On.pausable(Dom.byId(w1.avatarId),"mousedown",function(){
+			console.log("Caller =========================================->Mouse down in the area W1 <");
+			//x1.mouseDownCallback=zzz;
+			w1.activate();
+			mouseDownHandlerW1.pause(); 
+		});			
+		w1.on("resizeMoveEnd",Lang.hitch(this,function(oEvt){
+			console.log("######################################################################## ------ resizeMoveEnd DETECTED in caller !!! (W1) inside="+oEvt.inside+", w1.current.active="+w1.current.active);
+			mouseDownHandlerW1.resume();//put it ready to be detected when mouse clicks the area
+		}));		
+		//-----------------------------------------------------------------------------------
 		var oLanding2={l:20,t:70,w:120,h:30};
 		x2=new ResizeMoveArea("test2",oLanding2,oBoundaries,{
 			label:"Area 2",

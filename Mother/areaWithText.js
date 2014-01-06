@@ -20,6 +20,11 @@ define([
             this.fontSize = this.height;
             // this.setFontSize(this.fontSize);
         },
+        resize: function() {
+            this.inherited(arguments);//it will call area.moveTo() and the will folow the next code...
+            //alert("hello !!! this is areaWithText width="+this.width+" height="+this.height);
+            this.setFontSize(this.height);
+        },
         setFontSize:function(size){//notice that when border changes fontSize must change to fit the border
             this.fontSize = size;
             this.updateTextInDOM("fontSize", size); //so that edition fits inside border              
