@@ -105,7 +105,7 @@ define([
                     " you tried to change property " + propertyName + " to " + value + ", but DOM id is null !");
             }
         },
-        isPointInsideArea: function(point) {//given a point{left:xL, top:xT} verifies if that point is inside the area
+        isPointInsideArea: function(point) {//given a point{left:xL, top:xT} verifies if that point is inside the current area
             var isInside = false;
             if (this.isPointBelowRight(point)) {
                 if (point.left < (this.left + this.width) &&  point.top < (this.top + this.height)){

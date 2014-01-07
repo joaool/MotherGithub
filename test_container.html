@@ -118,9 +118,8 @@ require([
 		txt1.toggleBold(true);
 		num1.toggleItalic(true);
 
-		console.log("------------------------------------------------- summary.... -----------------------------------------------");	
-		console.log("totalAreas = "+canvas.lastAreaOrder+"  TotalTextboxes = "+canvas.lastTextboxOrder+"  TotalNumberboxes = "+canvas.lastNumberboxOrder+"  TotalContainers = "+canvas.lastContainerOrder);
-		console.log("------------------------------------------- now the free container.... -----------------------------------------------");		
+		canvas.containerSummaryDump();
+	
 		cFree = new container({left:600, top:80, width:200, height:40, borderThickness:10, borderColor:"red"});//a free container
 
 		//--------------------------------- to show current dijita on screen -------------------------

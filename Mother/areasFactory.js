@@ -40,7 +40,7 @@ define([
                     absoluteTop += widgetProperties.top;
                 declare.safeMixin(widgetProperties,{left: absoluteLeft,top: absoluteTop});
                 var txt=this.createTextbox(widgetProperties);//textbox created in canvas
-                container.addExistingChild([txt]);//now textbox is inside in container
+                container.addExistingChild([txt]);//now textbox is removed from canvas and added to container
                 return txt;
              } else {
                 alert("areasFactory.createTextboxIn(): You attemped to create a textbox inside an unexisting container !");
@@ -58,11 +58,29 @@ define([
                     absoluteTop += widgetProperties.top;
                 declare.safeMixin(widgetProperties,{left: absoluteLeft,top: absoluteTop});
                 var num=this.createNumberbox(widgetProperties);//numberbox created in canvas
-                container.addExistingChild([num]);//now numberbox is inside in container
+                container.addExistingChild([num]);//now numberbox removed from canvas and added to container
                 return num;
             } else {
-                alert("areasFactory.createTextboxIn(): You attemped to create a textbox inside an unexisting container !");
-                throw new Error("areasFactory.createNumberboxIn(): You attemped to create a textbox inside an unexisting container !");
+                alert("areasFactory.createNumberboxIn(): You attemped to create a numberbox inside an unexisting container !");
+                throw new Error("areasFactory.createNumberboxIn(): You attemped to create a numberbox inside an unexisting container !");
+            }
+         },
+        createContainerIn: function(container,containerProperties) {//always refer to a container if no container is present default container is selected
+            if(container){
+                //coordinates left,top are stored with absolute values, but in this method are received in container coordinates
+                var absoluteLeft = container.left;
+                var absoluteTop = container.top;
+                if (containerProperties.left)
+                    absoluteLeft += containerProperties.left;
+                if (containerProperties.top)
+                    absoluteTop += containerProperties.top;
+                declare.safeMixin(containerProperties,{left: absoluteLeft,top: absoluteTop});
+                var c=this.createContainer(containerProperties);//container created in canvas
+                container.addExistingChild([c]);//now the new container is removed from canvas and added to container
+                return c;
+            } else {
+                alert("areasFactory.createContainerIn(): You attemped to create a container inside an unexisting container !");
+                throw new Error("areasFactory.createContainerIn(): You attemped to create a container inside an unexisting container !");
             }
          },
         createTextbox: function(widgetProperties) {//always refer to a container if no container is present default container is selected
@@ -86,7 +104,6 @@ define([
                 widgetName = "numberbox" + this.lastNumberboxOrder;
             declare.safeMixin(widgetProperties,
                 {name: widgetName,domId: "widget_id" + this.lastAreaOrder,id: "_"+this.lastAreaOrder, areaOrder: this.lastAreaOrder,containerParent: this.baseContainer });
-            // return new numberbox(widgetProperties);
             var num = new numberbox(widgetProperties);
             this.baseContainer.addExistingChild([num]);
             return num;
@@ -99,10 +116,17 @@ define([
                 containerName = "container" + this.lastContainerOrder;
             declare.safeMixin(containerProperties,
                 {name: containerName,domId: "container_id" + this.lastContainerOrder,id: "_"+this.lastAreaOrder,areaOrder: this.lastAreaOrder,containerParent: this.baseContainer});
-            // return new container(containerProperties);
-            var c = new container(containerProperties);
+             var c = new container(containerProperties);
             this.baseContainer.addExistingChild([c]);
             return c;
+        },
+        containerSummaryDump: function() {
+            console.log("-------------------------- canvas summary dump (all objects on canvas at all levels) ... ------------------------");   
+            console.log("totalAreas = "+this.lastAreaOrder);
+            console.log("  TotalTextboxes   = "+this.lastTextboxOrder);
+            console.log("  TotalNumberboxes = "+this.lastNumberboxOrder);
+            console.log("  TotalContainers  = "+this.lastContainerOrder);
+            console.log("---------------------------------------- end of canvas summary dump ---------------------------------------------");              
         }
     });
 }); //end of  module  

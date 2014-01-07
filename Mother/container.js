@@ -2,6 +2,8 @@ define([
     "dojo/_base/declare",
     "dojo/_base/lang",
     "dojo/_base/window",
+    "dojo/dom",
+    "dijit/registry",
     "dojo/dom-style",
     "dojo/dom-construct",
     "dojo/dom-class",
@@ -9,7 +11,7 @@ define([
     "dijit/Dialog",
     "dijit/layout/ContentPane",//--
     "/pdojo/MotherGitHub/Mother/area.js"
-], function(declare,lang,win,domStyle,domConstruct,domClass,Form,Dialog,ContentPane,area){
+], function(declare,lang,win,dom,registry,domStyle,domConstruct,domClass,Form,Dialog,ContentPane,area){
     return declare(area,{
         children:[],
         highestZIndex:null, //the zIndex of the child with higest zIndex
@@ -54,8 +56,25 @@ define([
                     domStyle.set(dojoId,"top",(childrenArr[i].top - this.top)+"px");
                     this.dojoFormObj.domNode.appendChild(childrenArr[i].dojoObj.domNode);
                 }else{//a container was added
-                    //FIXME - if we do not remove a container from its previous container the append will go on infinitively
-                    this.dojoFormObj.domNode.appendChild(childrenArr[i].dojoObject.domNode);
+                    //the coordinates must be relative to the new container
+                    // var left = parseInt(childrenArr[i].dojoObject.style.left) - this.left;
+                    // var top = parseInt(childrenArr[i].dojoObject.style.top) - this.top;
+
+                    //HACK
+                    var domId = dom.byId(childrenArr[i].id);
+                    if (domId) {
+                        var left = domStyle.get(domId,"left");//relative left
+                        var top = domStyle.get(domId,"top");// relatove top
+                        domStyle.set(domId,"left", (left - this.left)+"px");// updates dojo object over widget with relative position
+                        domStyle.set(domId,"top", (top - this.top)+"px");// updates dojo object over widget with relative position
+                        this.dojoFormObj.domNode.appendChild(childrenArr[i].dojoObject.domNode);
+                    } else {
+                        alert("container.addExistingChild(): Error adding container "+childrenArr[i].dojoObject.name+" to "+this.name+" the id of container to be included does not exist !");
+                        throw new Error("container.addExistingChild(): Error adding container "+childrenArr[i].dojoObject.name+" to "+this.name+" the id of container to be included does not exist !");
+                    }
+
+                    // this.dojoFormObj.domNode.appendChild(childrenArr[i].dojoObject.domNode);
+
                 }
                 this.children.push(childrenArr[i]);
                 // console.log("------------------->add Child="+childrenArr[i].name+" id="+childrenArr[i].id+" zIndex before="+zIndexBefore+" zIndex after="+childrenArr[i].zIndex);
@@ -102,19 +121,34 @@ define([
                 if (container.children[i].type == "container")
                     this.adjustAllChildrenByDelta(deltaCoordinates,container.children[i]);
                 // console.log("                                   i="+i+" AFTER  left="+container.children[i].left+" top="+container.children[i].top);
-            };
+            }
         },
-        topAreaUnderPoint: function(pointLeft,pointTop){
+        topAreaUnderPoint: function(point,container){//given a point{left:xL, top:xT} and a start container returns the topArea under that point
             var topAreaIndex=-1;
-            var topZIndexOfChildren=this.zIndex;//the container zIndex
-            var topArea = this;
-            for(var i = 0; i < this.children.length; i++){
-                 if (this.children[i].isPointInsideArea(pointLeft,pointTop)) {
-                    if(this.children[i].zIndex > topArea.zIndex) {
-                            topArea = this.children[i];
+            var topZIndexOfChildren=container.zIndex;//the container zIndex
+            var topArea = container;
+            var topAreaCandidate = null;
+            for(var i = 0; i < container.children.length; i++){
+                if (container.children[i].isPointInsideArea(point)) {//point is inside the ith children of container container
+                    topAreaCandidate = container.children[i];
+                    if (container.children[i].type == "container"){
+                        topAreaCandidate =  this.topAreaUnderPoint(point,container.children[i]);
                     }
+                    if (topAreaCandidate.zIndex > topArea.zIndex) {
+                        topArea = topAreaCandidate;
+                        // nInfo.setValue(container.children.length);
+                //         topArea = container.children[i];
+                //         if (container.children[i].id=="_2"){
+                             // console.log("--->name="+container.children[i].name+" left="+container.children[i].left+" top="+container.children[i].top+" width="+container.children[i].width+" height="+container.children[i].height+" zIndex="+container.children[i].zIndex+" value="+this.children[i].value);
+                //         }
+                //         nInfo1.setValue(topArea.zIndex);
+                //         // alert("TOPAREA !!! txt1.zIndex="+txt1.zIndex);
+                    }
+                //     // topArea = this.children[i];//temporario
                 }
             }
+            nInfo1.setValue(topArea.zIndex);
+            return topArea;
         },
         highestZIndexAreaUnder: function(candidateArea,containerAreaRecipient){
             //given an area to be placed in a containerArea returns the highest zIndex of all areas in the container (recursively)

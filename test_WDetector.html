@@ -6,7 +6,7 @@
 		<link href="Dojo Toolkit/dojo-release-1.7.1/dijit/themes/claro/claro.css" rel="stylesheet">
 -->
 	<meta http-equiv="Content-Type" content="text/html;charset=utf-8" /> 
-    <title>Test resize_move 1.0</title>
+    <title>Test WDetector 1.0</title>
     <script> 
     	dojoConfig= {
 	        has: {
@@ -50,92 +50,95 @@ require([
 	], 
 	function(parser,kernel,Win,Lang,Event,On,Parser,Dom,DomConstruct,DomStyle,Ready,ResizeMoveArea,canvas,textbox,numberbox,container){ 
 		//TEST DESCRIPTION v1: 
-		//   ResizeMove tests:
-		//      When mouse enters the area the cursor changes to "move"
-		//      With mousedown area becomes active (handles show up) and move is immediately possible
-		//      before activation:
-		//      	  mouse down and immediate drag -ok
-		//      basic tests after activation:
-		//            click =>activate - ok
-		//					second click inside => no exit keeping activation - ok
-		//					second click outside => exit deactivating - ok
-		//           		move,move,move,clickin - ok
-		//            		move,move,move,clickout - ok
-		//			  		resize,resize,clickin- ok
-		//			  		resize,resize,clickout - ok 
-		//			  		move,move,resize,resize,clickin - ok
-		//			  		move,move,resize,resize,clickout - ok 
-		//			  		resize,resize,move,move,clickin - ok
-		//			  		resize,resize,move,move,clickout - ok
-		//						
-		//      Interaction with a second area to implement imediate move resize of an area without closing the previous one
+		//   WDetector tests the Container functionality that launches an event when the mouse is over a widget.
+		//   
+		//      OK-point frame (hovering it). Preselection will be visible (area1)
+		//      OK-point and drag a frame. Mouse down will activate the Area1 and we can move it(area semi-transparent until mouse up)
+		//         followed by solid frame image after mouse up.
 		//
-		//   Transitions
-		//		deselection->pre-selection - hovering the area
-		//		pre-selection ->selection - clicking the area or clicking the border 
-		//      selection ->deselection - clicking outside the area 
-		//		pre-selection ->deselection - moving the mouse out the area
-		//      selection ->pre-selection - clicking inside the  area  
-		//http://jsfiddle.net/phusick/3vTXW/ Floating pane within boundaries
-		//http://livedocs.dojotoolkit.org/dojox/widget/Standby
-		//http://examples.kevinandre.com/bootstrap/#modals
+		//      OK-point and drag a frame. Mouse down will activate the Area and we can move it(area semi-transparent until mouse up)
+		//		    -With area active click outside the area - Area (1) desappears
+		//          -point any frame (hovering it).  Preselection will be visible (area1)
 		//
-		console.log("Inicio");
+		//      OK-point and drag a frame. Mouse down will activate the Area and we can move it(area semi-transparent until mouse up)
+		//		    -With area active if we over other frames pre-selection will be visible (area2)
+		//          -point and drag a second frame. Mouse down will activate the Area with semi-transparent move until mouse up
+		//		    	-With 2nd area active click outside the area - Area (2) desappears
+		//
+		//      OK -point and drag a frame. Mouse down will activate the Area and we can move it(area semi-transparent until mouse up)
+		//		    -With area active if we over other frames pre-selection will be visible (area2)
+		//          -point and drag a second frame. Mouse down will activate the Area with semi-transparent move until mouse up
+		//		    	-With 2nd area active click outside the area - Area (2) desappears
+		//		    	-Click second area again. Area2 will be active
+		//              -point any frame (hovering it).  Preselection will be visible (area1)
+		//
+		//      OK -point and drag a frame. Mouse down will activate the Area and we can move it(area semi-transparent until mouse up)
+		//		    -With area active if we hover other frames pre-selection will be visible (area2)
+		//          -point and drag a second frame. Mouse down will activate the Area with semi-transparent move until mouse up
+		//		    	-With 2nd area active point and click first area again. First area will be active
+		//
+		//      OK -point and drag a frame. Mouse down will activate the Area and we can move it(area semi-transparent until mouse up)
+		//		    -With area active if we over other frames pre-selection will be visible (area2)
+		//          -point and drag a second frame. Mouse down will activate the Area with semi-transparent move until mouse up
+		//		    	-With 2nd area active click outside the area - Area (2) desappears
+		//		    	-Click second area again to activate it and move it. Area2 will be active
+		//              -point any frame (hovering it).  Preselection will be visible (area1)
+		//              -point and drag first frame. Mouse down will activate the Area1 with semi-transparent move until mouse up
+		//
+		//      OK -point and drag a frame. Mouse down will activate the Area and we can move it(area semi-transparent until mouse up)
+		//		    -With area active if we over other frames pre-selection will be visible (area2)
+		//          -point and drag a second frame. Mouse down will activate the Area with semi-transparent move until mouse up
+		//		    	-With 2nd area active click outside the area - Area (2) desappears
+		//		    	-Click second area again (without moving it). Area2 will be active
+		//              -point any frame (hovering it).  Preselection will be visible (area1)
+		//              -point and drag first frame. Mouse down will activate the Area1 with semi-transparent move until mouse up
+		//
+		// Version 10 - considers the widget's edition using the extended set of areas approach
+		// Version 10 with Frames - considers the widget's edition using the extended set of areas approach
+		//
+		//      ok -point and drag a frame. Mouse down will activate the Area and we can move it(area semi-transparent until mouse up)
+		//		    ok-Click in a desert area to deactivate the frame.
+		//			ok-point and drag another frame (smaller) and place it inside the former frame. 
+	    //			ok-Click in a desert area to deactivate the second frame.Second frame will be on top and pre- 	
+		//  			 selection of second frame will be visible when we hover it
+		//			ok-Activate first frame and resize it. Second area (the area inside) will still be on top
+		//
+		//      ok -point and drag a frame. Mouse down will activate the Area and we can move it(area semi-transparent until mouse up)
+		//		    ok-Click in a desert area to deactivate the frame.
+		//			ok-point and drag another frame (smaller) and place it inside the former frame. 
+	    //			ok-Click in a desert area to deactivate the second frame.Second frame will be on top and pre- 	
+		//  			 selection of second frame will be visible when we hover it
+		//			ok-Activate first frame
+		//		    ok-Click in a desert area to deactivate the frame. Second frame will still be visible on top		
+		//			ok-Hover second second frame. Second frame pre-selection will be visible
+		//		console.log("Inicio");
 	 	parser.parse();
 
 		var canvas = new canvas();//by default a base container (the full screen) is defined
+		nInfo = new numberbox({left: 1050,top: 0,width: 220,height: 40,value: -1})
+		nInfo1 = new numberbox({left: 1050,top: 40,width: 220,height: 40,value: -1})
 
-		// var viewPortX={l:50,t:220,w:220,h:130};
-		// var f0=new FBuilder("form f0","f0",{viewPort:viewPortX,borderColor:"green",borderType:"solid",borderThickness:1});
-		// f0.addChild("label",{value:"Linked w/ResizeMove area1",left:0,top:0}); //1
-		// f0.addChild("label",{value:"abcd:",left:0,top:30}); //1
-		// f0.addChild("textBox",{name:"box",left:50,top:30,title:"to test something outside the handles...handle will stay",placeHolder:"something"});//1
-		// f0.addChild("button",{left:0,top:60,value:"test",clickCode:"btn()"});//15
-		// btn=function(){
-		// 	x=f0.fieldShownByName("box");
-		// 	alert("This will change the label in the handles area to (abcd content)-->"+x);
-		// 	x1.refreshLabel(x);
-		// };
-		// f0.addChild("button",{left:0,top:90,value:"Force Termination",clickCode:"btnForceTermination()"});//15
-		// btnForceTermination=function(){
-		// 	alert("btnForceTermination !!!");
-		// 	x1.forceTermination();
-		// 	console.log("btnForceTermination EXECUTED!!!");
-		// 	x1.resize({l:500,t:30,w:120,h:30});
-		// 	x1.refreshFillColor("yellow");
-		// 	x1.activate();
-		// };
-		// var txt2 = new textbox({left: 500,top: 200,value: "my Test",height: 22});
-		var c0 = canvas.createContainer({name: "form f0", left: 50, top: 220, width: 220, height: 130, borderColor: "green"});
+		var c0 = canvas.createContainer({name: "form f0",left: 50,top: 220,width: 520,height: 130,borderColor: "green"});
 		var lbl1 = canvas.createTextboxIn(c0,{value: "Linked w/ResizeMove area1",height: 22});
 		var lbl2 = canvas.createTextboxIn(c0,{value: "abcd",left: 0, top: 30,width: 50,height: 20});
-		var txt1 = canvas.createTextboxIn(c0,{left: 60, top: 30,width: 100,height: 20,title:"to test something outside the handles...handle will stay"});
+		txt1 = canvas.createTextboxIn(c0,{left: 60, top: 30,width: 100,height: 40,title:"to test something outside the handles...handle will stay"});
 		var num1 = canvas.createNumberboxIn(c0,{top: 90,value: 127,height: 20,title:"Just a numeric box..."});
+
+		var c01 = canvas.createContainerIn(c0,{name: "Inside form f0",left:240,top: 10,width: 200,height: 150,borderColor: "red"});
+		var lbl01 = canvas.createTextboxIn(c01,{value: "jojo",height: 30});
 
 
 	    console.log("lbl1-> id="+lbl1.id+" left="+lbl1.left+" top="+lbl1.top+" width="+lbl1.width+" height="+lbl1.height+" zIndex="+lbl1.zIndex+" value="+lbl1.value+" domId="+lbl1.domId);
-		// //f0.addChild("button",{left:0,top:60,value:"test",clickCode:"alert('clickaste em mim !!!');"});//15
-
-/*
-		//----- form (alternative focus) definition - Este forme NAO pode interagir com move resize
-		var viewPortX={l:500,t:220,w:220,h:100};
-		var f1=new FBuilder("form f1","f1",{viewPort:viewPortX,borderColor:"green",borderType:"solid",borderThickness:1});
-		f1.addChild("label",{value:"Not linked",left:0,top:0}); //1
-		f1.addChild("label",{value:"abcd:",left:0,top:30}); //1
-		f1.addChild("textBox",{left:50,top:30,title:"to test something outside the handles...handles will go",placeHolder:"something"});//1
-		var doubleActivation=false;
-		f1.addChild("button",{left:0,top:60,value:"mouse move activation",clickCode:"btnf1()"});//15
-		btnf1=function(){
-			alert('After this mouse move will be enabled to test direct drag\n xxx');
-			//doubleActivation=true;
-			handlerMouseInCanvas.resume();
-		};
-*/
 		var c1 = canvas.createContainer({name: "form f1", left: 500, top: 220, width: 220, height: 100, borderColor: "green"});
 		var lbl11 = canvas.createTextboxIn(c1,{value: "Not linked",height: 22});
 		var lbl12 = canvas.createTextboxIn(c1,{top: 30,height: 22,value: "abcd"});
 		var txt11 = canvas.createTextboxIn(c1,{left:50,top:30,height: 22,title:"to test something outside the handles...handles will go",placeHolder:"something"});
 
+		canvas.containerSummaryDump();
+		canvas.baseContainer.childDump();
+		c0.childDump();
+		c1.childDump();
+		c01.childDump();
 		//----------------------------------------
 		var t1 = new textbox({left:400, top:100,height: 22,value: "test",title: "active handles test !"});
 		t1.setBorder({borderThickness: 10, borderColor: "red"});
@@ -145,15 +148,6 @@ require([
 		var n2 = new numberbox({left:750, top:300,height: 22,value: "987.234",title: "to test resize !"});
 		n2.resize({width: 200,height:60});
 		
-		alert("BEFORE invisible");
-		t1.toggleVisible(false);
-		t2.toggleVisible(false);
-		n2.toggleVisible(false);
-		alert("AFTER invisible");
-		t1.toggleVisible(true);
-		t2.toggleVisible(true);
-		n2.toggleVisible(true);
-
 		var beginFunction=function(){
 			//alert("beginFunction !!!");
 			//var oF=x2.getDim();
@@ -161,7 +155,7 @@ require([
 			//x2.forceTermination();
 		};
 		var endFunction=function(){
-			alert("endFunction !!!");
+			// alert("endFunction !!!");
 			//var oF=x2.getDim();
 			//x1.resize(oF);
 		};
@@ -193,10 +187,10 @@ require([
 		});	
 		//handlerMouseInCanvas.pause();
 		var zzz=function(){
-			console.log("»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»");
-			console.log("»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»mouseDownCallback»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»");
-			console.log("»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»  xxxName="+x1.xxxName+"»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»");
-			console.log("»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»");
+			console.log("Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»");
+			console.log("Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»mouseDownCallbackÂ»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»");
+			console.log("Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»  xxxName="+x1.xxxName+"Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»");
+			console.log("Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»Â»");
 			/*
 			/*
 			var oF=x1.getDim();
@@ -351,6 +345,13 @@ require([
 		// windowEventListeners.push(On(kernel.global, "scroll", Lang.hitch(this, function(){
 		// 	alert("scroll !!!");//the event triggers whenever there's a scroll in browser window done by the user
 		// })));
+		var handlerMouseInCanvas1 = On.pausable(Win.body(), "mousemove", Lang.hitch(this,function(e){
+			//this only works for areas under at least one container - built using (canvas) areaFactory class
+			var x=e.pageX;
+			var y=e.pageY;
+			var topArea = canvas.baseContainer.topAreaUnderPoint({left: x, top: y},canvas.baseContainer);
+			console.log(" x=" + x + " y="+ y +" type="+ topArea.type +" id="+ topArea.id +" name="+ topArea.name);
+		}));						
  		function test(){
 			alert("test message in function test - this call is defined in menu object exterior to the class...");
 		}

@@ -267,6 +267,42 @@ define([
             } 
         },        
      });
+    doh.register("createIn family", {
+        //http://kevinandre.com/dev/jsunittest-amd-doh-1/ ---//define(["doh","simple/Mother/textbox"], function(doh,textbox) {
+        "createContainerIn an empty container":{
+            setUp:function(){
+                this.af = new areasFactory();
+                this.c1 = this.af.createContainer({left: 567, top: 78, width: 240, height: 150,borderColor: "red"});
+                this.c11 = this.af.createContainerIn(this.c1,{name: "Inside form c1",left:20,top: 20,width: 100,height: 100,borderColor: "blue"});
+            },
+            runTest:function(){
+                doh.assertEqual("blue", this.c11.borderColor,"The inside container does not remember borderColor: 'blue'");
+                doh.assertEqual("587", this.c11.left,"The inside container coordinates are not 587,98 !");
+                doh.assertEqual("98", this.c11.top,"The inside container coordinates are not 587,98 !");
+            }
+        },
+        "createContainerIn a container with 2 widgets created with create___In and place num111 inside it":{
+            setUp:function(){
+                this.af = new areasFactory();
+                this.c1 = this.af.createContainer({left: 567, top: 78, width: 240, height: 150,borderColor: "red"});
+                this.txt1 = this.af.createTextboxIn(this.c1,{left: 10, top: 10,width: 100,height: 20,title:"txt1"}); 
+                this.num1 = this.af.createNumberboxIn(this.c1,{left: 10, top: 20,width: 50,height: 20,title:"num1"}); 
+                this.c11 = this.af.createContainerIn(this.c1,{name: "Inside form c1",left:20,top: 20,width: 100,height: 100,borderColor: "blue"});
+                this.num111 = this.af.createNumberboxIn(this.c11,{left: 10, top: 10,width: 50,height: 20,title:"num111"}); 
+            },
+            runTest:function(){
+                doh.assertEqual("587", this.c11.left,"The inside container coordinates are not 587,98 !");
+                doh.assertEqual("98", this.c11.top,"The inside container coordinates are not 587,98 !");
+                doh.assertEqual("0", this.c1.zIndex,"The inside container zIndex is not 0 !");
+                doh.assertEqual("1", this.txt1.zIndex,"The inside container zIndex is not 1 !");
+                doh.assertEqual("2", this.num1.zIndex,"The inside container zIndex is not 2 !");
+                doh.assertEqual("3", this.c11.zIndex,"The inside container zIndex is not 3 !");
+                doh.assertEqual("4", this.num111.zIndex,"The numberBox inside c11 zIndex is not 4 !");
+                doh.assertEqual("597", this.num111.left,"The inside container coordinates are not 597,108 !");
+                doh.assertEqual("108", this.num111.top,"The inside container coordinates are not 597,108 !");
+            }
+        },
+      });
     doh.register("DOH test 4 release Model ", [
         //http://kevinandre.com/dev/jsunittest-amd-doh-1/ ---//define(["doh","simple/Mother/textbox"], function(doh,textbox) {
         function assertTrueTest() {

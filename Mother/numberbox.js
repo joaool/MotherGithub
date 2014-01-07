@@ -35,6 +35,15 @@ define([
             this.setFontSize(this.fontSize);
             this.setBorder();//now dom is formed
         },
+        setValue: function(newValue){
+            var domId = registry.byId(this.id);
+            if(domId){
+                domId.set("value", newValue);
+            } else {
+                alert("numberbox.setValue(): The dom node for "+ this.id + " does not exist!");
+                throw new Error("numberbox.setValue(): The dom node for "+ this.id + " does not exist!");
+            }
+        },
         resize: function() {
             this.inherited(arguments);//it will call area.moveTo() and the will folow the next code...
             // alert("hello !!! this is textbox width="+this.width+" height="+this.height);
