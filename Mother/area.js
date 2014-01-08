@@ -135,6 +135,6 @@ define([
                 if (point.top < (this.top + this.height))
                     isUpLeft = true;
             return isUpLeft;
-        }                
+        }, 
     });
 }); //end of  module  

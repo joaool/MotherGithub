@@ -299,6 +299,16 @@
 						this.current.t=this.oLanding.t;
 						this.current.w=this.oLanding.w;
 						this.current.h=this.oLanding.h;
+						if(Dom.byId(this.moveResizeDivId)){//it must exist!!!
+							DomStyle.set(this.moveResizeDivId,"left",this.current.l);
+							DomStyle.set(this.moveResizeDivId,"top",this.current.t);
+							DomStyle.set(this.moveResizeDivId,"width",this.current.w);
+							DomStyle.set(this.moveResizeDivId,"height",this.current.h);
+							if(Dom.byId(this.avatarId)) {
+								DomStyle.set(this.avatarId,"width",this.current.w);
+								DomStyle.set(this.avatarId,"height",this.current.h);
+							}
+						}
 					},//setBoundaries
 					setBoundaries:function(oBoundaries){//updates boundaries where area can be resized/moved.
 						Declare.safeMixin(this.oBoundaries, oBoundaries);

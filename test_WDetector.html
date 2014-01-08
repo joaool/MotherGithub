@@ -38,17 +38,15 @@ require([
     "dojo/on",
 	"dojo/parser",//recomendation from JS
 	"dojo/dom",
-	"dojo/dom-construct",//used outside class
-	"dojo/dom-style",	
-	"dojo/ready",
     "Mother/ResizeMoveArea7.js", 
    	"Mother/areasFactory.js",
 	"Mother/textbox.js",
 	"Mother/numberbox.js",
 	"Mother/container.js",
+	"Mother/detect.js",
 	"dojo/domReady!"
 	], 
-	function(parser,kernel,Win,Lang,Event,On,Parser,Dom,DomConstruct,DomStyle,Ready,ResizeMoveArea,canvas,textbox,numberbox,container){ 
+	function(parser,kernel,Win,Lang,Event,On,Parser,Dom,ResizeMoveArea,canvas,textbox,numberbox,container,detect){ 
 		//TEST DESCRIPTION v1: 
 		//   WDetector tests the Container functionality that launches an event when the mouse is over a widget.
 		//   
@@ -112,8 +110,7 @@ require([
 		//		    ok-Click in a desert area to deactivate the frame. Second frame will still be visible on top		
 		//			ok-Hover second second frame. Second frame pre-selection will be visible
 		//		console.log("Inicio");
-	 	parser.parse();
-
+	 	// parser.parse();
 		var canvas = new canvas();//by default a base container (the full screen) is defined
 		nInfo = new numberbox({left: 1050,top: 0,width: 220,height: 40,value: -1})
 		nInfo1 = new numberbox({left: 1050,top: 40,width: 220,height: 40,value: -1})
@@ -132,7 +129,7 @@ require([
 		var c1 = canvas.createContainer({name: "form f1", left: 500, top: 220, width: 220, height: 100, borderColor: "green"});
 		var lbl11 = canvas.createTextboxIn(c1,{value: "Not linked",height: 22});
 		var lbl12 = canvas.createTextboxIn(c1,{top: 30,height: 22,value: "abcd"});
-		var txt11 = canvas.createTextboxIn(c1,{left:50,top:30,height: 22,title:"to test something outside the handles...handles will go",placeHolder:"something"});
+		var txt11 = canvas.createTextboxIn(c1,{left:100,top:30,height: 22,title:"test..",placeHolder:"something",borderThickness: 10});
 
 		canvas.containerSummaryDump();
 		canvas.baseContainer.childDump();
@@ -164,28 +161,28 @@ require([
 			var oF=x2.getDim();
 			//x1.resize(oF);
 		};
-		handlerMouseInCanvas=On.pausable(Win.body(), "mousemove", function(e){
-			//checks if mouse is over a candidate area while Area1 is active
-			if(x1.current.active){	
-				var target=redTarget(e.pageX,e.pageY);
-				if(target){
-					//alert("RED TARGET");
-					x1.xxxName="RED TARGET";
-					x2.resize({l:1000,t:100,w:100,h:100});
-					//x1.forceTermination();
-					x2.beginCallback=beginFunction;
-					x2.endCallback=endFunction;
-					x2.swapCallback=swapFunction;
-					//console.log("RED TARGET");
-					//x1.mouseDownCallback=zzz;
-					//console.log("@@@@@@ mouse in canvas pos x="+e.pageX+" y="+e.pageY+" x1.current.active="+x1.current.active+" target="+x1.xxxName);
-				}else{
-					//x1.mouseDownCallback=null;
-					x1.xxxName=""
-				};
-			};	
-		});	
-		//handlerMouseInCanvas.pause();
+		// handlerMouseInCanvas=On.pausable(Win.body(), "mousemove", function(e){
+		// 	//checks if mouse is over a candidate area while Area1 is active
+		// 	if(x1.current.active){	
+		// 		var target=redTarget(e.pageX,e.pageY);
+		// 		if(target){
+		// 			//alert("RED TARGET");
+		// 			x1.xxxName="RED TARGET";
+		// 			x2.resize({l:1000,t:100,w:100,h:100});
+		// 			//x1.forceTermination();
+		// 			x2.beginCallback=beginFunction;
+		// 			x2.endCallback=endFunction;
+		// 			x2.swapCallback=swapFunction;
+		// 			//console.log("RED TARGET");
+		// 			//x1.mouseDownCallback=zzz;
+		// 			//console.log("@@@@@@ mouse in canvas pos x="+e.pageX+" y="+e.pageY+" x1.current.active="+x1.current.active+" target="+x1.xxxName);
+		// 		}else{
+		// 			//x1.mouseDownCallback=null;
+		// 			x1.xxxName=""
+		// 		};
+		// 	};	
+		// });	
+		// handlerMouseInCanvas.pause();
 		var zzz=function(){
 			console.log("»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»");
 			console.log("»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»mouseDownCallback»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»");
@@ -247,21 +244,6 @@ require([
 
 			mouseDownHandler.pause(); 
 		});	
-/*			
-		var handlerInF0=On.pausable(f0.formObj.domNode,"mouseenter",function(){
-			console.log("Entrou no form f0 !!!");
-			x1.setCursor("move"); 
-			x1.suspend(true);
-		});
-		var handlerOutF0=On.pausable(f0.formObj.domNode,"mouseleave",function(){
-			console.log("saiu do form f0 !!!");
-			x1.suspend(false);
-		});		
-		if(this.oDbg.isDbg("main")) this.oDbg.display("Criou ResizeMoveArea");
-		x1.on("resizeMovePartial",Lang.hitch(this,function(oEvt){
-			console.log("!!!!!!!!!!!!!!! caller ->Parcial resize/move with x="+oEvt.x+" y="+oEvt.y+" w="+oEvt.w+" 	h="+oEvt.h+" move="+oEvt.move);
-		}));
-*/
 		x1.on("resizeMoveEnd",Lang.hitch(this,function(oEvt){
 			console.log("######################################################################## ------ resizeMoveEnd DETECTED in caller !!! (A1) inside="+oEvt.inside+", x1.current.active="+x1.current.active);
 			// if(doubleActivation){//testing 2 activation in a row
@@ -276,11 +258,18 @@ require([
 				mouseDownHandler.resume();//put it ready to be detected when mouse clicks the area
 			};	
 		}));
-		//------------------------ w1 tied to t1 --------------------------------------------
-		var oLandingW={l: t1.left,t: t1.top,w: t1.width+2*t1.borderThickness,h: t1.height+2*t1.borderThickness};
+		// ----------------- detector
+		var detect = new detect(canvas);
+		detect.toggleDetector(true);
+
+/*		
+		//------------------------ avatar tied to t1 --------------------------------------------
+		// var oLandingW={l: t1.left,t: t1.top,w: t1.width+2*t1.borderThickness,h: t1.height+2*t1.borderThickness};
+		var tx = n2;//t1,t2,n2
+		var oLandingW={l: tx.left,t: tx.top,w: tx.width+2*tx.borderThickness,h: tx.height+2*tx.borderThickness};
 		var oBoundariesW={l:20,t:20,w:1270,h:420};//this will be the containerParent boundaries
-		w1=new ResizeMoveArea("w1",oLandingW,oBoundariesW,{
-			label:"W1",
+		avatar = new ResizeMoveArea("avatar",oLandingW,oBoundariesW,{
+			label:"AVATAR",
 			gridPattern:5,
 			//borderThickness:4,
 			//borderType:"inset",//"dotted",
@@ -289,34 +278,43 @@ require([
 			opacity:.6,
 			tooltip:"this is resize move over a dojo widget !"
 		});
-		w1.setCursorInactive("move"); 
-		var mouseDownHandlerW1=On.pausable(Dom.byId(w1.avatarId),"mousedown",function(){
-			console.log("Caller =========================================->Mouse down in the area W1 <");
+		tx= n2;
+		var oLandingZ={l: tx.left,t: tx.top,w: tx.width+2*tx.borderThickness,h: tx.height+2*tx.borderThickness};
+		avatar.setLanding(oLandingZ);
+		avatar.setCursorInactive("move"); 
+		var avatarMouseDownHandler=On.pausable(Dom.byId(avatar.avatarId),"mousedown",function(){
+			console.log("Caller =========================================->Mouse down in AVATAR <");
 			//x1.mouseDownCallback=zzz;
-			w1.activate();
-			mouseDownHandlerW1.pause(); 
+			avatar.activate();
+			avatarMouseDownHandler.pause(); 
+			handlerMouseInCanvas.pause();
 		});	
-		w1.mouseDownCallback=function(){
-			t1.toggleVisible(false);
+		avatar.mouseDownCallback=function(){
+			tx.toggleVisible(false);
 		};
 		
-		w1.on("resizeMovePartial",Lang.hitch(this,function(oEvt){
-			console.log("######################################################################## ------ resizeMovePartial DETECTED in caller !!! (W1) inside="+oEvt.inside+", w1.current.active="+w1.current.active);
-		    // alert("resizeMovePartial W1->  left="+w1.position.x+" top="+w1.position.y+" width="+w1.position.w+" height="+w1.position.h);
-		    t1.moveTo({left: w1.position.x,top: w1.position.y});
-		    t1.resize({width: w1.position.w-2*t1.borderThickness,height: w1.position.h-2*t1.borderThickness});
-			t1.toggleVisible(true);
-		    if(t1.borderColor=="red")
-		    	t1.setBorder({borderColor: "blue"});
+		avatar.on("resizeMovePartial",Lang.hitch(this,function(oEvt){
+			console.log("######################################################################## ------ resizeMovePartial DETECTED in caller !!! (W1) inside="+oEvt.inside+", avatar.current.active="+avatar.current.active);
+			var deltaLeft = tx.containerParent.left;
+			var deltaTop = tx.containerParent.top;
+		    tx.moveTo({left: avatar.position.x - deltaLeft,top: avatar.position.y - deltaTop});
+		    // tx.resize({width: avatar.position.w-2*tx.borderThickness+2,height: avatar.position.h-2*tx.borderThickness+2});
+		    tx.resize({width: avatar.position.w,height: avatar.position.h});
+			tx.toggleVisible(true);
+		    if(tx.borderColor=="red")
+		    	tx.setBorder({borderColor: "blue"});
 		    else
-		    	t1.setBorder({borderColor: "red"});
+		    	tx.setBorder({borderColor: "red"});
 		    	
 		}));		
-		w1.on("resizeMoveEnd",Lang.hitch(this,function(oEvt){
-			console.log("######################################################################## ------ resizeMoveEnd DETECTED in caller !!! (W1) inside="+oEvt.inside+", w1.current.active="+w1.current.active);
-		    // alert("resizeMoveEnd W1->  left="+w1.position.x+" top="+w1.position.y+" width="+w1.position.w+" height="+w1.position.h);
-			mouseDownHandlerW1.resume();//put it ready to be detected when mouse clicks the area
-		}));		
+		avatar.on("resizeMoveEnd",Lang.hitch(this,function(oEvt){
+			console.log("######## AVATAR ######### ------ resizeMoveEnd DETECTED in caller !!! inside="+oEvt.inside+", avatar.current.active="+avatar.current.active);
+		    // alert("resizeMoveEnd W1->  left="+avatar.position.x+" top="+avatar.position.y+" width="+avatar.position.w+" height="+avatar.position.h);
+			avatarMouseDownHandler.resume();//put it ready to be detected when mouse clicks the area
+			handlerMouseInCanvas.resume();
+			c1.childDump();
+		}));	
+*/			
 		//-----------------------------------------------------------------------------------
 		var oLanding2={l:20,t:70,w:120,h:30};
 		x2=new ResizeMoveArea("test2",oLanding2,oBoundaries,{
@@ -345,13 +343,24 @@ require([
 		// windowEventListeners.push(On(kernel.global, "scroll", Lang.hitch(this, function(){
 		// 	alert("scroll !!!");//the event triggers whenever there's a scroll in browser window done by the user
 		// })));
-		var handlerMouseInCanvas1 = On.pausable(Win.body(), "mousemove", Lang.hitch(this,function(e){
+/*
+		lastDetectedAreaId = null;
+		var handlerMouseInCanvas = On.pausable(Win.body(), "mousemove", Lang.hitch(this,function(e){
 			//this only works for areas under at least one container - built using (canvas) areaFactory class
 			var x=e.pageX;
 			var y=e.pageY;
-			var topArea = canvas.baseContainer.topAreaUnderPoint({left: x, top: y},canvas.baseContainer);
-			console.log(" x=" + x + " y="+ y +" type="+ topArea.type +" id="+ topArea.id +" name="+ topArea.name);
+			var topArea = canvas.baseContainer.topAreaUnderPoint({left: e.pageX, top: e.pageY},canvas.baseContainer);
+			if(topArea.zIndex >= 0) {// if it is not the canvas
+				// console.log(" x=" + x + " y="+ y +" type="+ topArea.type +" id="+ topArea.id +" name="+ topArea.name);
+				if (lastDetectedAreaId != topArea.id) { //if cursor changed to a new area
+					lastDetectedAreaId = topArea.id;
+					console.log(" x=" + x + " y="+ y +" type="+ topArea.type +" id="+ topArea.id +" name="+ topArea.name + "-->"+topArea.left+","+topArea.top);
+					topArea.capturesAvatar();
+					tx=topArea;
+				}
+			}		
 		}));						
+ */
  		function test(){
 			alert("test message in function test - this call is defined in menu object exterior to the class...");
 		}
