@@ -151,20 +151,23 @@ define([
             runTest:function(){
                 doh.assertEqual("10", this.c1.borderThickness,"The container does nor remember borderThickness: 10");
                 doh.assertEqual("green", this.c1.borderColor, "The container does nor remember borderColor: 'green'");
+                doh.assertEqual("680", this.c1.left, "The container border increase changed the left position !!!");
             }
         },
-        "change # of children and containerParent.name on addExistingChild() ": {
+        "change # of children and containerParent.name on addExistingChild().Check container border increase": {
             setUp:function(){
                 this.af = new areasFactory();
                 this.c1 = this.af.createContainer({left: 450, top: 100, width: 240, height: 150,borderColor: "red"});
                 this.num1 = this.af.createNumberbox({left:500, top:50, width:340, height:100, value:129.2, borderColor:"purple"});
                 this.txt1 = this.af.createTextbox({left:500, top:50, width:340, height:100, value:129.2, borderColor:"purple"});
                 this.c1.addExistingChild([this.num1,this.txt1]);
+                this.c1.setBorder({borderThickness: 10});
             },
             runTest: function() {
                 doh.assertEqual("2", this.c1.children.length,"container c1 should have 2 childs");
                 doh.assertEqual("container1", this.num1.containerParent.name,"default name for c1 should be 'container1'");//"container1" is the default name for the first container
-            }
+                doh.assertEqual("500", this.num1.left, "The container border increase changed the left position of inside num1!!!");
+           }
         },
         "zIndex1) change when we create a widget over a widget in canvas": {
             setUp:function(){
@@ -235,7 +238,7 @@ define([
                 doh.assertEqual("1", this.num2.zIndex);
                 doh.assertEqual("2", this.num3.zIndex,"num3 was moved over num1 (zIndex=1) and did not get zIndex=2");
                 doh.assertEqual("3", this.c1.zIndex);
-                // doh.assertEqual("0", this.num4.zIndex);//on canvas before move
+                    // doh.assertEqual("0", this.num4.zIndex);//on canvas before move
                 doh.assertEqual("4", this.num4.zIndex,"num4 was moved over container c1 (zIndex=3) and did not get zIndex=4");
                 doh.assertEqual("5", this.c2.zIndex);//on canvas before move
             } 
@@ -281,7 +284,7 @@ define([
                 doh.assertEqual("98", this.c11.top,"The inside container coordinates are not 587,98 !");
             }
         },
-        "createContainerIn a container with 2 widgets created with create___In and place num111 inside it":{
+        "createContainerIn a container with 2 widgets created with create___In and place num111 inside it.Check positions after increasing borderThickness":{
             setUp:function(){
                 this.af = new areasFactory();
                 this.c1 = this.af.createContainer({left: 567, top: 78, width: 240, height: 150,borderColor: "red"});
@@ -289,6 +292,8 @@ define([
                 this.num1 = this.af.createNumberboxIn(this.c1,{left: 10, top: 20,width: 50,height: 20,title:"num1"}); 
                 this.c11 = this.af.createContainerIn(this.c1,{name: "Inside form c1",left:20,top: 20,width: 100,height: 100,borderColor: "blue"});
                 this.num111 = this.af.createNumberboxIn(this.c11,{left: 10, top: 10,width: 50,height: 20,title:"num111"}); 
+                this.c1.setBorder({borderThickness: 10});
+                this.num111.setBorder({borderThickness: 10});
             },
             runTest:function(){
                 doh.assertEqual("587", this.c11.left,"The inside container coordinates are not 587,98 !");

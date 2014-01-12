@@ -9,6 +9,7 @@ define([
         //http://dojotoolkit.org/reference-guide/1.9/dojo/_base/declare.html
         //http://dojotoolkit.org/reference-guide/1.9/dojo/_base/lang.html#mixins-with-classes
         id:null,//to be passed to dojo object as an id
+        name:null,
         domId:null, //to access dom directly
         //id0:null,
         areas:{lastId:0},
@@ -22,8 +23,8 @@ define([
         borderStyle:"solid",
         borderColor:"black",
         isVisible:true,
+        isActivated:false,
         areaOrder:null,
-        name:null,
         zIndex:-1,//all areas have a zIndex that is the next zIndex after the top highest area being covered 
         containerParent:null,//all areas have a parent (parent of baseContainer is null)
         constructor: function(areaProperties) {
@@ -37,7 +38,8 @@ define([
             }
             var showContainerParentName = "Canvas Parent...";
             if (this.containerParent) {//most frequent case where area is inside a container
-                this.zIndex = this.containerParent.highestZIndexAreaUnder(this,this.containerParent)+1;
+                var oTotalThickness = {total: 0};//3rd argument of area.highestZIndexAreaUnder() has cumulated borderThicknesses
+                this.zIndex = this.containerParent.highestZIndexAreaUnder(this,this.containerParent,oTotalThickness)+1;
                 showContainerParentName = "No name but id=" + this.containerParent.id;
                 if (this.containerParent.name)
                     showContainerParentName = this.containerParent.name;
@@ -53,10 +55,10 @@ define([
             if(areaProperties)
                 lang.mixin(this, areaProperties);
         },
-        setBorder: function(areaProperties) {
-            if(areaProperties){
+        setBorder: function(borderProperties) {
+            if(borderProperties){
                 var border = {borderThickness:this.borderThickness,  borderStyle: this.borderStyle, borderColor: this.borderColor};
-                declare.safeMixin(border,areaProperties);
+                declare.safeMixin(border,borderProperties);
                 lang.mixin(this,border);
             }
             var borderString = this.borderThickness+"px "+this.borderStyle+" "+this.borderColor;
@@ -84,8 +86,10 @@ define([
                 this.previousTop = this.top; //if area is container this is used by moveTo override in container
                 lang.mixin(this, leftTopCoordinates);
                 // console.log("area.moveTo first left="+this.left+" top="+this.top);
-                if(this.containerParent)//if it is not a free area
-                    this.zIndex = this.containerParent.highestZIndexAreaUnder(this,this.containerParent)+1;
+                if (this.containerParent) {//if it is not a free area
+                    var oTotalThickness = {total: 0};//3rd argument of area.highestZIndexAreaUnder() has cumulated borderThicknesses
+                    this.zIndex = this.containerParent.highestZIndexAreaUnder(this,this.containerParent,oTotalThickness)+1;
+                };    
                 this.updateDOMPropertyWithValue("left", this.left);
                 this.updateDOMPropertyWithValue("top", this.top);
             }
@@ -105,36 +109,59 @@ define([
                     " you tried to change property " + propertyName + " to " + value + ", but DOM id is null !");
             }
         },
-        isPointInsideArea: function(point) {//given a point{left:xL, top:xT} verifies if that point is inside the current area
+        isPointInsideArea: function(point, sumOfBordersThickness) {//given a point{left:xL, top:xT} verifies if that point is inside the current area
+            // sumOfBordersThickness has the sum of all container borders until the current area
             var isInside = false;
-            if (this.isPointBelowRight(point)) {
-                if (point.left < (this.left + this.width) &&  point.top < (this.top + this.height)){
+            if (this.isPointBelowRight(point,sumOfBordersThickness)) {
+                // if (point.left < (this.left + this.width) &&  point.top < (this.top + this.height)){
+                if (point.left < (this.left + this.width + 2*this.borderThickness + sumOfBordersThickness) &&
+                        point.top < (this.top + this.height +  2*this.borderThickness +sumOfBordersThickness)){
                     isInside = true;
                 }
             }
             return isInside;
         },
-        isPointBelowRight: function(point){//given a point{left:xL, top:xT} verifies if that point is below and to the right of the area top right point 
+        isPointBelowRight: function(point, sumOfBordersThickness){//given a point{left:xL, top:xT} verifies if that point is below and to the right of the area top right point 
+            // sumOfBordersThickness has the sum of all container borders until the current area
             var isBelowRight = false;
-            if (point.left > this.left)
-                if (point.top > this.top)
+            // if (point.left > this.left)
+            if (point.left > this.left + sumOfBordersThickness )
+                // if (point.top > this.top )
+                if (point.top > this.top + this.containerParent.borderThickness )
                     isBelowRight = true;
             return isBelowRight;
         },
-        intersectsArea: function(area) {// true if current area intersects area parameter, false otherwise
+        intersectsArea: function(candidateArea, sumOfBordersThickness) {// true if current candidateArea intersects candidateArea parameter, false otherwise
+            // sumOfBordersThickness has the sum of all container borders until the current candidateArea
+            // alert("candidateArea.intersectsArea BEGIN");
             var intersects = false;
-            var pointTopLeft = {left: area.left, top:area.top};
-            var pointBottomRight = {left: area.left + area.width, top: area.top + area.height };
-            if (this.isPointUpLeftFromAreaBottomRight(pointTopLeft) && this.isPointBelowRight(pointBottomRight))
-                 intersects = true;
+            var pointTopLeft = {left: candidateArea.left, top:candidateArea.top};
+            var pointBottomRight = {left: candidateArea.left + candidateArea.width, top: candidateArea.top + candidateArea.height };
+            if (this.isPointUpLeftFromAreaBottomRight(pointTopLeft,sumOfBordersThickness) && this.isPointBelowRight(pointBottomRight, sumOfBordersThickness))
+                intersects = true;
+            // alert("candidateArea.intersectsArea END");
             return intersects;
         },
-        isPointUpLeftFromAreaBottomRight: function(point){//given a point verifies if that point is below and to the right of the area 
+        isPointUpLeftFromAreaBottomRight: function(point,sumOfBordersThickness){//given a point verifies if that point is below and to the right of the area 
+            // sumOfBordersThickness has the sum of all container borders until the current area
+            // alert("area.isPointUpLeftFromAreaBottomRight BEGIN");
             var isUpLeft = false;
-            if (point.left < (this.left + this.width))
-                if (point.top < (this.top + this.height))
+            // if (point.left < (this.left + this.width))
+            if (point.left < (this.left + this.width + sumOfBordersThickness + 2*this.borderThickness))
+                if (point.top < (this.top + this.height + sumOfBordersThickness + 2*this.borderThickness))
                     isUpLeft = true;
             return isUpLeft;
-        }, 
+        },
+        getTooltipInsideString: function() {// returns ", inside 'form f1', inside 'form f0'" to insert in tooltip
+            var insideString = "";
+            var currentParent = this.containerParent;
+            if (currentParent) {
+                while (currentParent.zIndex >= 0) {
+                    insideString += ", inside '"+currentParent.name+"'";
+                    currentParent = currentParent.containerParent;
+                }
+            }
+            return insideString;
+        }
     });
 }); //end of  module  

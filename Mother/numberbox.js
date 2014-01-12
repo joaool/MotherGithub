@@ -16,7 +16,7 @@ define([
             //REVIEW: Imported from MotherLib10 for speed
             var allPossibleProperties={left:0, top:0, width:0, height:0, value:"", name:"", required:false, invalidMessage:"Error...please correct",
                 missingMessage:"Must have a value !", regExp:"[^\t]*", preCode:"", posCode:"", changeCode:"", pattern:"#######.###", disable:false,
-                disabled:false, title:"@|", headers:"", placeHolder:"", propercase:false, readOnly:false, template:null, zIndex:0};
+                disabled:false, title:"@|", placeHolder:"", readOnly:false, zIndex:0};
             declare.safeMixin(allPossibleProperties,this.left, this.top, this.width, this.height);//priority to inherited defaults  
             if (widgetProperties)
                 declare.safeMixin(allPossibleProperties,widgetProperties);   

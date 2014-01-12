@@ -112,24 +112,32 @@ require([
 		//		console.log("Inicio");
 	 	// parser.parse();
 		var canvas = new canvas();//by default a base container (the full screen) is defined
-		nInfo = new numberbox({left: 1050,top: 0,width: 220,height: 40,value: -1})
-		nInfo1 = new numberbox({left: 1050,top: 40,width: 220,height: 40,value: -1})
+		// nInfo = new numberbox({left: 1050,top: 0,width: 220,height: 40,value: -1})
+		// nInfo1 = new numberbox({left: 1050,top: 40,width: 220,height: 40,value: -1})
 
-		var c0 = canvas.createContainer({name: "form f0",left: 50,top: 220,width: 520,height: 130,borderColor: "green"});
+		var c0 = canvas.createContainer({name: "form f0",left: 50,top: 100,width: 520,height: 230,borderColor: "green"});
 		var lbl1 = canvas.createTextboxIn(c0,{value: "Linked w/ResizeMove area1",height: 22});
 		var lbl2 = canvas.createTextboxIn(c0,{value: "abcd",left: 0, top: 30,width: 50,height: 20});
-		txt1 = canvas.createTextboxIn(c0,{left: 60, top: 30,width: 100,height: 40,title:"to test something outside the handles...handle will stay"});
+		// var txt1 = canvas.createTextboxIn(c0,{left: 60, top: 30,width: 100,height: 40,value: "Junkas", title:"to test something outside the handles...handle will stay", borderThickness: 10});
+		var txt1 = canvas.createTextboxIn(c0,{left: 20, top: 30,width: 100,height: 40,value: "Junkas", title:"to test something outside the handles...handle will stay", borderThickness: 10});
+		// alert("zIndex txt1.zIndex="+txt1.zIndex);
 		var num1 = canvas.createNumberboxIn(c0,{top: 90,value: 127,height: 20,title:"Just a numeric box..."});
 
-		var c01 = canvas.createContainerIn(c0,{name: "Inside form f0",left:240,top: 10,width: 200,height: 150,borderColor: "red"});
-		var lbl01 = canvas.createTextboxIn(c01,{value: "jojo",height: 30});
+		var c01 = canvas.createContainerIn(c0,{name: "Inside form f0",left:240,top: 10,width: 200,height: 250,borderColor: "red"});
+		var lbl01 = canvas.createTextboxIn(c01,{left: 5,top: 5,value: "jojo",height: 30});
+		c0.setBorder({borderThickness: 30});
+		c01.setBorder({borderThickness: 20});
+		var c011 = canvas.createContainerIn(c01,{name: "deepest f2",left:10,top: 50,width: 150,height: 150,borderColor: "red"});
+		c011.setBorder({borderThickness: 15,borderColor: "yellow"});
+		var num0111 = canvas.createNumberboxIn(c011,{left: 10,top: 10,value: 132,height: 20,title:"Another numeric box..."});
 
 
 	    console.log("lbl1-> id="+lbl1.id+" left="+lbl1.left+" top="+lbl1.top+" width="+lbl1.width+" height="+lbl1.height+" zIndex="+lbl1.zIndex+" value="+lbl1.value+" domId="+lbl1.domId);
-		var c1 = canvas.createContainer({name: "form f1", left: 500, top: 220, width: 220, height: 100, borderColor: "green"});
+		var c1 = canvas.createContainer({name: "form f1", left: 500, top: 100, width: 220, height: 100, borderColor: "green"});
 		var lbl11 = canvas.createTextboxIn(c1,{value: "Not linked",height: 22});
 		var lbl12 = canvas.createTextboxIn(c1,{top: 30,height: 22,value: "abcd"});
 		var txt11 = canvas.createTextboxIn(c1,{left:100,top:30,height: 22,title:"test..",placeHolder:"something",borderThickness: 10});
+		c1.setBorder({borderThickness: 5, borderColor: "purple"});
 
 		canvas.containerSummaryDump();
 		canvas.baseContainer.childDump();
@@ -137,13 +145,23 @@ require([
 		c1.childDump();
 		c01.childDump();
 		//----------------------------------------
-		var t1 = new textbox({left:400, top:100,height: 22,value: "test",title: "active handles test !"});
+		var t1 = new textbox({left:400, top:5000,height: 22,value: "test",title: "active handles test !"});
 		t1.setBorder({borderThickness: 10, borderColor: "red"});
 
-		var t2 = new textbox({left:750, top:250,height: 22,value: "resize",title: "to test resize !"});
+		// var t2 = new textbox({left:750, top:250,height: 22,value: "resize",title: "to test resize !"});
+		// t2.resize({width: 150,height:50});
+		// var n2 = new numberbox({left:750, top:300,height: 22,value: "987.234",title: "to test resize !"});
+		// n2.resize({width: 200,height:60});
+
+		var t2 = canvas.createTextbox({left:750, top:250,height: 22,value: "resize",title: "to test resize !"});
 		t2.resize({width: 150,height:50});
-		var n2 = new numberbox({left:750, top:300,height: 22,value: "987.234",title: "to test resize !"});
+		var n2 = canvas.createNumberbox({left:750, top:280,height: 22,value: "280.234",title: "to test resize !"});
 		n2.resize({width: 200,height:60});
+		var n3 = canvas.createNumberbox({left:750, top:350,height: 22,value: "350.234",title: "to test resize !"});
+		n3.moveTo({top:300});
+		// alert("zIndex n3.zIndex="+n3.zIndex);
+
+
 		
 		var beginFunction=function(){
 			//alert("beginFunction !!!");
@@ -262,59 +280,6 @@ require([
 		var detect = new detect(canvas);
 		detect.toggleDetector(true);
 
-/*		
-		//------------------------ avatar tied to t1 --------------------------------------------
-		// var oLandingW={l: t1.left,t: t1.top,w: t1.width+2*t1.borderThickness,h: t1.height+2*t1.borderThickness};
-		var tx = n2;//t1,t2,n2
-		var oLandingW={l: tx.left,t: tx.top,w: tx.width+2*tx.borderThickness,h: tx.height+2*tx.borderThickness};
-		var oBoundariesW={l:20,t:20,w:1270,h:420};//this will be the containerParent boundaries
-		avatar = new ResizeMoveArea("avatar",oLandingW,oBoundariesW,{
-			label:"AVATAR",
-			gridPattern:5,
-			//borderThickness:4,
-			//borderType:"inset",//"dotted",
-			//borderColor:"blue",
-			fillColor:"purple",
-			opacity:.6,
-			tooltip:"this is resize move over a dojo widget !"
-		});
-		tx= n2;
-		var oLandingZ={l: tx.left,t: tx.top,w: tx.width+2*tx.borderThickness,h: tx.height+2*tx.borderThickness};
-		avatar.setLanding(oLandingZ);
-		avatar.setCursorInactive("move"); 
-		var avatarMouseDownHandler=On.pausable(Dom.byId(avatar.avatarId),"mousedown",function(){
-			console.log("Caller =========================================->Mouse down in AVATAR <");
-			//x1.mouseDownCallback=zzz;
-			avatar.activate();
-			avatarMouseDownHandler.pause(); 
-			handlerMouseInCanvas.pause();
-		});	
-		avatar.mouseDownCallback=function(){
-			tx.toggleVisible(false);
-		};
-		
-		avatar.on("resizeMovePartial",Lang.hitch(this,function(oEvt){
-			console.log("######################################################################## ------ resizeMovePartial DETECTED in caller !!! (W1) inside="+oEvt.inside+", avatar.current.active="+avatar.current.active);
-			var deltaLeft = tx.containerParent.left;
-			var deltaTop = tx.containerParent.top;
-		    tx.moveTo({left: avatar.position.x - deltaLeft,top: avatar.position.y - deltaTop});
-		    // tx.resize({width: avatar.position.w-2*tx.borderThickness+2,height: avatar.position.h-2*tx.borderThickness+2});
-		    tx.resize({width: avatar.position.w,height: avatar.position.h});
-			tx.toggleVisible(true);
-		    if(tx.borderColor=="red")
-		    	tx.setBorder({borderColor: "blue"});
-		    else
-		    	tx.setBorder({borderColor: "red"});
-		    	
-		}));		
-		avatar.on("resizeMoveEnd",Lang.hitch(this,function(oEvt){
-			console.log("######## AVATAR ######### ------ resizeMoveEnd DETECTED in caller !!! inside="+oEvt.inside+", avatar.current.active="+avatar.current.active);
-		    // alert("resizeMoveEnd W1->  left="+avatar.position.x+" top="+avatar.position.y+" width="+avatar.position.w+" height="+avatar.position.h);
-			avatarMouseDownHandler.resume();//put it ready to be detected when mouse clicks the area
-			handlerMouseInCanvas.resume();
-			c1.childDump();
-		}));	
-*/			
 		//-----------------------------------------------------------------------------------
 		var oLanding2={l:20,t:70,w:120,h:30};
 		x2=new ResizeMoveArea("test2",oLanding2,oBoundaries,{

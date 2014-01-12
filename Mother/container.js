@@ -45,7 +45,8 @@ define([
                 }
                 var zIndexBefore = childrenArr[i].zIndex;
                 if (this.name != "canvas") {
-                    childrenArr[i].zIndex = this.highestZIndexAreaUnder(childrenArr[i],this)+1;
+                    var oTotalThickness = {total: 0};//3rd argument of contqainer.highestZIndexAreaUnder() to sumThicknesses
+                    childrenArr[i].zIndex = this.highestZIndexAreaUnder(childrenArr[i],this,oTotalThickness)+1;
                     // console.log("--------------------------->addExistingChild() adding "+childrenArr[i].name+"/"+childrenArr[i].zIndex+"---------------->to "+this.name+"/"+this.zIndex);
                     this._removeChildFromPreviousContainerChildrenList(childrenArr[i]);
                     childrenArr[i].containerParent = this;
@@ -113,6 +114,18 @@ define([
             // console.log("container.moveTo first left="+this.left+" top="+this.top);
             this.adjustAllChildrenByDelta({left: this.left - this.previousLeft, top: this.top - this.previousTop},this);
         },
+        resize: function() {//override over resize() in area base class
+            this.inherited(arguments);//it will call area.resize() and the will folow the next code...
+            // alert("hello !!! this is container width="+this.width+" height="+this.height);
+            var domId = registry.byId(this.id);
+            if(domId){
+                domStyle.set(domId.domNode, "width", this.width+"px");//excludes border
+                domStyle.set(domId.domNode, "height", this.height+"px");//excludes border
+            } else {
+                alert("container.resize(): The dom node for "+ this.id + " does not exist!");
+                throw new Error("container.resize(): The dom node for "+ this.id + " does not exist!");
+            }
+         },        
         adjustAllChildrenByDelta: function(deltaCoordinates,container){
             for(var i = 0; i < container.children.length; i++){
                 // console.log("container.adjustAllChildrenByDelta i="+i+" BEFORE left="+container.children[i].left+" top="+container.children[i].top);             
@@ -123,43 +136,43 @@ define([
                 // console.log("                                   i="+i+" AFTER  left="+container.children[i].left+" top="+container.children[i].top);
             }
         },
-        topAreaUnderPoint: function(point,container){//given a point{left:xL, top:xT} and a start container returns the topArea under that point
+        topAreaUnderPoint: function(point,container,oTotalThickness){//given a point{left:xL, top:xT} and a start container returns the topArea under that point
+            // oTotalThickness is an object {total: x} that will return the cumulated thicknesses until the top area
             var topAreaIndex=-1;
             var topZIndexOfChildren=container.zIndex;//the container zIndex
             var topArea = container;
             var topAreaCandidate = null;
             for(var i = 0; i < container.children.length; i++){
-                if (container.children[i].isPointInsideArea(point)) {//point is inside the ith children of container container
+                if (container.children[i].isPointInsideArea(point,oTotalThickness.total)) {//point is inside the ith children of container container
                     topAreaCandidate = container.children[i];
                     if (container.children[i].type == "container"){
-                        topAreaCandidate =  this.topAreaUnderPoint(point,container.children[i]);
+                        oTotalThickness.total += topAreaCandidate.borderThickness;
+                        topAreaCandidate =  this.topAreaUnderPoint(point,container.children[i],oTotalThickness);
                     }
                     if (topAreaCandidate.zIndex > topArea.zIndex) {
                         topArea = topAreaCandidate;
-                        // nInfo.setValue(container.children.length);
-                //         topArea = container.children[i];
-                //         if (container.children[i].id=="_2"){
-                             // console.log("--->name="+container.children[i].name+" left="+container.children[i].left+" top="+container.children[i].top+" width="+container.children[i].width+" height="+container.children[i].height+" zIndex="+container.children[i].zIndex+" value="+this.children[i].value);
-                //         }
-                //         nInfo1.setValue(topArea.zIndex);
-                //         // alert("TOPAREA !!! txt1.zIndex="+txt1.zIndex);
-                    }
-                //     // topArea = this.children[i];//temporario
+                     }
                 }
             }
-            nInfo1.setValue(topArea.zIndex);
-            return topArea;
+            // nInfo1.setValue(topArea.zIndex);
+            return topArea;//this area will have the auxiliar property totalThickness with the sum of all borderThicknesses...
         },
-        highestZIndexAreaUnder: function(candidateArea,containerAreaRecipient){
+        highestZIndexAreaUnder: function(candidateArea,containerAreaRecipient,oTotalThickness){
+            // oTotalThickness is an object {total: x} that will return the cumulated thicknesses until the top area
             //given an area to be placed in a containerArea returns the highest zIndex of all areas in the container (recursively)
             //  that intersects with candidateArea          
             var topZIndex = containerAreaRecipient.zIndex;
             var z = null;
             for (var i = 0; i < containerAreaRecipient.children.length; i++) { //scans all containerArea childrens except candidateArea
                 if (containerAreaRecipient.children[i].id!=candidateArea.id) {//the own area is excluded from the scan
-                    if (containerAreaRecipient.children[i].intersectsArea(candidateArea)) { //only intersecting areas are interesting
+                    // alert("container.highestZIndexAreaUnder BEFORE intersectsArea");
+                    if (containerAreaRecipient.children[i].intersectsArea(candidateArea,oTotalThickness.total)) { //only intersecting areas are interesting
                         if (containerAreaRecipient.children[i].type == "container") {
-                            z = containerAreaRecipient.children[i].highestZIndexAreaUnder(candidateArea,containerAreaRecipient.children[i]);//recursive method
+                            oTotalThickness.total += containerAreaRecipient.children[i].borderThickness;
+                            // alert("container.highestZIndexAreaUnder BEFORE RECURSION");
+                            z = containerAreaRecipient.children[i].highestZIndexAreaUnder(candidateArea,
+                                    containerAreaRecipient.children[i],oTotalThickness);//recursive method
+                            // alert("container.highestZIndexAreaUnder AFTER->"+z);
                         } else {
                             z = containerAreaRecipient.children[i].zIndex;
                         }
