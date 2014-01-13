@@ -124,10 +124,8 @@ define([
         isPointBelowRight: function(point, sumOfBordersThickness){//given a point{left:xL, top:xT} verifies if that point is below and to the right of the area top right point 
             // sumOfBordersThickness has the sum of all container borders until the current area
             var isBelowRight = false;
-            // if (point.left > this.left)
             if (point.left > this.left + sumOfBordersThickness )
-                // if (point.top > this.top )
-                if (point.top > this.top + this.containerParent.borderThickness )
+                if (point.top > this.top + sumOfBordersThickness )
                     isBelowRight = true;
             return isBelowRight;
         },

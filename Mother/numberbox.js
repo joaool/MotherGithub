@@ -44,6 +44,9 @@ define([
                 throw new Error("numberbox.setValue(): The dom node for "+ this.id + " does not exist!");
             }
         },
+        getValue: function(){
+            return this.dojoObj.textbox.value;
+        },        
         resize: function() {
             this.inherited(arguments);//it will call area.moveTo() and the will folow the next code...
             // alert("hello !!! this is textbox width="+this.width+" height="+this.height);

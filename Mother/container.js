@@ -36,6 +36,9 @@ define([
             if (this.floatingType!="nonFloat")
                 this.mountDialog();//sets dojoDialogObj and places this.dojoObject over it (it already has this.dojoFormObj over it)
         },
+        getValue: function() {
+            return "No value";
+        }, 
         addExistingChild: function(childrenArr){
             // console.log("addExistingChild() $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ BEGIN "+this.name+" id="+this.id+" zIndex="+this.zIndex);
             for(var i = 0; i < childrenArr.length; i++){
@@ -125,7 +128,7 @@ define([
                 alert("container.resize(): The dom node for "+ this.id + " does not exist!");
                 throw new Error("container.resize(): The dom node for "+ this.id + " does not exist!");
             }
-         },        
+         },
         adjustAllChildrenByDelta: function(deltaCoordinates,container){
             for(var i = 0; i < container.children.length; i++){
                 // console.log("container.adjustAllChildrenByDelta i="+i+" BEFORE left="+container.children[i].left+" top="+container.children[i].top);             
@@ -192,10 +195,9 @@ define([
             }
             console.log ("%%%%%%%%%%%%%%%%%%%%%%%%%%% container name="+ this.name+" id="+this.id+" parentContainerName="+showContainerParentName+" zIndex="+this.zIndex+" l,t="+this.left+","+this.top+" %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
             for (var i = 0; i < this.children.length; i++) {
-                var showValue = "NoValue";
-                if (this.children[i].type!="container")
-                    showValue = this.children[i].dojoObj.value; //"someValue";
-                console.log(i+" Name="+this.children[i].name+" id="+this.children[i].id+" type="+this.children[i].type+" value="+showValue+" zIndex="+this.children[i].zIndex+" containerParent.name="+this.children[i].containerParent.name+" l,t="+this.children[i].left+","+this.children[i].top);
+                console.log(i+" Name="+this.children[i].name+" id="+this.children[i].id+" type="+this.children[i].type+
+                        " value="+this.children[i].getValue()+" zIndex="+this.children[i].zIndex+" containerParent.name="+
+                        this.children[i].containerParent.name+" l,t="+this.children[i].left+","+this.children[i].top);
             }
             console.log ("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
         },

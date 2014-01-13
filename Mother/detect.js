@@ -13,6 +13,11 @@ define([
         canvas: null,
         avatar: null,
         topArea: null,
+        
+        previousTopArea: null,//only to be use by this.borderRed()
+        previousTopAreaBorderThickness: null,//only to be use by this.borderRed()
+        previousTopAreaBorderColor: null,//only to be use by this.borderRed()
+        
         lastDetectedAreaId: null,
         avatar1ClickInsideHandler:null,
         avatar1MouseDownHandler: null,
@@ -65,18 +70,24 @@ define([
                 var oTotalThickness = {total: 0};
                 var topAreaCandidate = this.canvas.baseContainer.topAreaUnderPoint({left: e.pageX, top: e.pageY},
                         this.canvas.baseContainer,oTotalThickness);
-                if(topAreaCandidate.zIndex >= 0) {// if it is not the canvas
-                    console.log(" x=" + x + " y="+ y +" type="+ topAreaCandidate.type +" id="+ topAreaCandidate.id +" name="+ topAreaCandidate.name);
                     if (this.lastDetectedAreaId != topAreaCandidate.id) { //if cursor changed to a new area
                         this.lstDetectedAreaId = topAreaCandidate.id;
+                        
+                        var extraThickness = null;
+
+                        if (topAreaCandidate.type == "container")
+                            extraThickness =  oTotalThickness.total - topAreaCandidate.borderThickness;
+                        else
+                            extraThickness =  oTotalThickness.total;
                         console.log("-------------------> Change to new area  x=" + x + " y="+ y +" type="+ topAreaCandidate.type +
                                 " id="+ topAreaCandidate.id +" name="+ topAreaCandidate.name + "-->"+topAreaCandidate.left+","+
-                                topAreaCandidate.top + " totalThicknesses=" + oTotalThickness.total);
+                                topAreaCandidate.top + " totalThicknesses=" + extraThickness+ " =>"+
+                                (topAreaCandidate.left+extraThickness)+","+(topAreaCandidate.top+extraThickness));
+                        
                         this.topArea = topAreaCandidate;
                         this.preparesAvatarToRepresentTopArea(oTotalThickness.total);
-                        // tx=topArea;
                     }
-                }
+                // }
             }));
             this.mouseMoveHandler.pause();
         },//setEventHandlers  
@@ -180,37 +191,58 @@ define([
         },
         preparesAvatarToRepresentTopArea: function(extraThickness) {
             //extraThickness - is the total thickness to add to area due to the thickness of containers inside containers.
-            var avatarLanding = {
-                l: this.topArea.left + extraThickness,// + this.topArea.containerParent.borderThickness+1+extraThickness,
-                // l: this.topArea.left + extraThickness,
-                t: this.topArea.top + extraThickness, // + this.topArea.containerParent.borderThickness+1+extraThickness,
-                // t: this.topArea.top + extraThickness,
-                w: this.topArea.width+2*this.topArea.borderThickness,
-                h: this.topArea.height+2*this.topArea.borderThickness
-            };
-            if (this.topArea.type == "container") {
-                avatarLanding.l -= this.topArea.borderThickness;
-                avatarLanding.t -= this.topArea.borderThickness;
-            }
+            var avatarLanding = null;
             var avatarBoundaries = null;
-            if (this.topArea.containerParent) {
-                avatarBoundaries = {
-                    l:this.topArea.containerParent.left + this.topArea.containerParent.borderThickness,
-                    t:this.topArea.containerParent.top + this.topArea.containerParent.borderThickness,
-                    w:this.topArea.containerParent.width + 2,
-                    h:this.topArea.containerParent.height + 2
-                };
-            } else {
-                avatarBoundaries = {
-                    l:this.canvas.baseContainer.left,
-                    t:this.canvas.baseContainer.top,
-                    w:this.canvas.baseContainer.width,
-                    h:this.canvas.baseContainer.height
-                };
+            if (this.topArea.zIndex >= 0) {
+                if (this.topArea.type == "container") {
+                    avatarLanding = {
+                        l: this.topArea.left + extraThickness - this.topArea.borderThickness,// + this.topArea.containerParent.borderThickness+1+extraThickness,
+                        t: this.topArea.top + extraThickness - this.topArea.borderThickness, // + this.topArea.containerParent.borderThickness+1+extraThickness,
+                        w: this.topArea.width+3+2*this.topArea.borderThickness,
+                        h: this.topArea.height+3+2*this.topArea.borderThickness
+                    };
+                } else {
+                    avatarLanding = {
+                        l: this.topArea.left + extraThickness,// + this.topArea.containerParent.borderThickness+1+extraThickness,
+                        t: this.topArea.top + extraThickness, // + this.topArea.containerParent.borderThickness+1+extraThickness,
+                        w: this.topArea.width+3+2*this.topArea.borderThickness,
+                        h: this.topArea.height+3+2*this.topArea.borderThickness
+                    };    
+                }
+                if (this.topArea.containerParent) {
+                    avatarBoundaries = {
+                        l:this.topArea.containerParent.left,// + this.topArea.containerParent.borderThickness,
+                        t:this.topArea.containerParent.top,// + this.topArea.containerParent.borderThickness,
+                        w:this.topArea.containerParent.width + 2,
+                        h:this.topArea.containerParent.height + 2
+                    };
+                } else {
+                    avatarBoundaries = {
+                        l:this.canvas.baseContainer.left,
+                        t:this.canvas.baseContainer.top,
+                        w:this.canvas.baseContainer.width,
+                        h:this.canvas.baseContainer.height
+                    };
+                }
+            } else { //it is the canvas
+                avatarLanding = {l: 0,t: 0,w: 0,h: 0};
+                avatarBoundaries = {l: 0,t: 0,w:0,h:420};
             }
             this.avatar.setLanding(avatarLanding);
+            console.log("preparesAvatarToRepresentTopArea -> this.topArea.name="+this.topArea.name+" value="+this.topArea.getValue());
+
             this.avatar.setBoundaries(avatarBoundaries);
             this.setAvatarTooltipToActivatedStatus();
+            // this.borderRed();
+        },
+        borderRed: function() {
+            if (this.previousTopArea) {
+                this.previousTopArea.setBorder({borderThickness: this.previousTopAreaBorderThickness,borderColor: this.previousTopAreaBorderColor});
+            }
+            this.previousTopArea = this.topArea;
+            this.previousTopAreaBorderThickness = this.topArea.borderThickness;
+            this.previousTopAreaBorderColor = this.topArea.borderColor;
+            this.topArea.setBorder({borderThickness: 5,borderColor: "red"});
         },
         setAvatarTooltipToActivatedStatus: function() {
            var tooltip = null;
