@@ -38,8 +38,7 @@ define([
             }
             var showContainerParentName = "Canvas Parent...";
             if (this.containerParent) {//most frequent case where area is inside a container
-                var oTotalThickness = {total: 0};//3rd argument of area.highestZIndexAreaUnder() has cumulated borderThicknesses
-                this.zIndex = this.containerParent.highestZIndexAreaUnder(this,this.containerParent,oTotalThickness)+1;
+                this.zIndex = this.containerParent.highestZIndexAreaUnder(this,this.containerParent)+1;
                 showContainerParentName = "No name but id=" + this.containerParent.id;
                 if (this.containerParent.name)
                     showContainerParentName = this.containerParent.name;
@@ -87,9 +86,8 @@ define([
                 lang.mixin(this, leftTopCoordinates);
                 // console.log("area.moveTo first left="+this.left+" top="+this.top);
                 if (this.containerParent) {//if it is not a free area
-                    var oTotalThickness = {total: 0};//3rd argument of area.highestZIndexAreaUnder() has cumulated borderThicknesses
-                    this.zIndex = this.containerParent.highestZIndexAreaUnder(this,this.containerParent,oTotalThickness)+1;
-                };    
+                   this.zIndex = this.containerParent.highestZIndexAreaUnder(this,this.containerParent)+1;
+                }
                 this.updateDOMPropertyWithValue("left", this.left);
                 this.updateDOMPropertyWithValue("top", this.top);
             }
@@ -128,6 +126,16 @@ define([
                 if (point.top > this.top + sumOfBordersThickness )
                     isBelowRight = true;
             return isBelowRight;
+        },
+        totalBorderThicknessesBelowArea: function() { //including the current area borderThickness
+            // var total = 0;
+            var total = this.borderThickness;
+            var parentArea = this.containerParent;
+            while (parentArea) {
+                total += parentArea.borderThickness;
+                parentArea = parentArea.containerParent;
+            }
+            return total;
         },
         intersectsArea: function(candidateArea, sumOfBordersThickness) {// true if current candidateArea intersects candidateArea parameter, false otherwise
             // sumOfBordersThickness has the sum of all container borders until the current candidateArea

@@ -67,27 +67,20 @@ define([
                 //this only works for areas under at least one container - built using (canvas) areaFactory class
                 var x=e.pageX;
                 var y=e.pageY;
-                var oTotalThickness = {total: 0};
                 var topAreaCandidate = this.canvas.baseContainer.topAreaUnderPoint({left: e.pageX, top: e.pageY},
-                        this.canvas.baseContainer,oTotalThickness);
-                    if (this.lastDetectedAreaId != topAreaCandidate.id) { //if cursor changed to a new area
-                        this.lstDetectedAreaId = topAreaCandidate.id;
-                        
-                        var extraThickness = null;
+                        this.canvas.baseContainer);
+                if (this.lastDetectedAreaId != topAreaCandidate.id) { //if cursor changed to a new area
+                    this.lstDetectedAreaId = topAreaCandidate.id;
 
-                        if (topAreaCandidate.type == "container")
-                            extraThickness =  oTotalThickness.total - topAreaCandidate.borderThickness;
-                        else
-                            extraThickness =  oTotalThickness.total;
-                        console.log("-------------------> Change to new area  x=" + x + " y="+ y +" type="+ topAreaCandidate.type +
-                                " id="+ topAreaCandidate.id +" name="+ topAreaCandidate.name + "-->"+topAreaCandidate.left+","+
-                                topAreaCandidate.top + " totalThicknesses=" + extraThickness+ " =>"+
-                                (topAreaCandidate.left+extraThickness)+","+(topAreaCandidate.top+extraThickness));
-                        
-                        this.topArea = topAreaCandidate;
-                        this.preparesAvatarToRepresentTopArea(oTotalThickness.total);
-                    }
-                // }
+                    var extraThickness = topAreaCandidate.totalBorderThicknessesBelowArea();
+                    console.log("-------------------> Change to new area  x=" + x + " y="+ y +" type="+ topAreaCandidate.type +
+                            " id="+ topAreaCandidate.id +" name="+ topAreaCandidate.name + "-->"+topAreaCandidate.left+","+
+                            topAreaCandidate.top + " totalThicknesses=" + extraThickness+ " =>"+
+                            (topAreaCandidate.left+extraThickness)+","+(topAreaCandidate.top+extraThickness));
+
+                    this.topArea = topAreaCandidate;
+                    this.preparesAvatarToRepresentTopArea();
+                }
             }));
             this.mouseMoveHandler.pause();
         },//setEventHandlers  
@@ -189,26 +182,17 @@ define([
                 alert("detect.setClickInsideHandlerPausedToAvatar1_2 Error: only suports 1 or 2 !!");
             }
         },
-        preparesAvatarToRepresentTopArea: function(extraThickness) {
-            //extraThickness - is the total thickness to add to area due to the thickness of containers inside containers.
+        preparesAvatarToRepresentTopArea: function() {
             var avatarLanding = null;
             var avatarBoundaries = null;
+            extraThickness = this.topArea.totalBorderThicknessesBelowArea();//the total thickness to add to area due to the thickness of containers inside containers.
             if (this.topArea.zIndex >= 0) {
-                if (this.topArea.type == "container") {
-                    avatarLanding = {
-                        l: this.topArea.left + extraThickness - this.topArea.borderThickness,// + this.topArea.containerParent.borderThickness+1+extraThickness,
-                        t: this.topArea.top + extraThickness - this.topArea.borderThickness, // + this.topArea.containerParent.borderThickness+1+extraThickness,
-                        w: this.topArea.width+3+2*this.topArea.borderThickness,
-                        h: this.topArea.height+3+2*this.topArea.borderThickness
-                    };
-                } else {
-                    avatarLanding = {
-                        l: this.topArea.left + extraThickness,// + this.topArea.containerParent.borderThickness+1+extraThickness,
-                        t: this.topArea.top + extraThickness, // + this.topArea.containerParent.borderThickness+1+extraThickness,
-                        w: this.topArea.width+3+2*this.topArea.borderThickness,
-                        h: this.topArea.height+3+2*this.topArea.borderThickness
-                    };    
-                }
+                avatarLanding = {
+                    l: this.topArea.left + extraThickness - this.topArea.borderThickness,
+                    t: this.topArea.top + extraThickness - this.topArea.borderThickness,
+                    w: this.topArea.width+3+2*this.topArea.borderThickness,
+                    h: this.topArea.height+3+2*this.topArea.borderThickness
+                };
                 if (this.topArea.containerParent) {
                     avatarBoundaries = {
                         l:this.topArea.containerParent.left,// + this.topArea.containerParent.borderThickness,

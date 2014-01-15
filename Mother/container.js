@@ -48,8 +48,7 @@ define([
                 }
                 var zIndexBefore = childrenArr[i].zIndex;
                 if (this.name != "canvas") {
-                    var oTotalThickness = {total: 0};//3rd argument of contqainer.highestZIndexAreaUnder() to sumThicknesses
-                    childrenArr[i].zIndex = this.highestZIndexAreaUnder(childrenArr[i],this,oTotalThickness)+1;
+                     childrenArr[i].zIndex = this.highestZIndexAreaUnder(childrenArr[i],this)+1;
                     // console.log("--------------------------->addExistingChild() adding "+childrenArr[i].name+"/"+childrenArr[i].zIndex+"---------------->to "+this.name+"/"+this.zIndex);
                     this._removeChildFromPreviousContainerChildrenList(childrenArr[i]);
                     childrenArr[i].containerParent = this;
@@ -139,44 +138,39 @@ define([
                 // console.log("                                   i="+i+" AFTER  left="+container.children[i].left+" top="+container.children[i].top);
             }
         },
-        topAreaUnderPoint: function(point,container,oTotalThickness){//given a point{left:xL, top:xT} and a start container returns the topArea under that point
-            // oTotalThickness is an object {total: x} that will return the cumulated thicknesses until the top area
+        topAreaUnderPoint: function(point,container){//given a point{left:xL, top:xT} and a start container returns the topArea under that point
             var topAreaIndex=-1;
             var topZIndexOfChildren=container.zIndex;//the container zIndex
             var topArea = container;
             var topAreaCandidate = null;
+            var sumOfBordersThickness = container.totalBorderThicknessesBelowArea()
             for(var i = 0; i < container.children.length; i++){
-                if (container.children[i].isPointInsideArea(point,oTotalThickness.total)) {//point is inside the ith children of container container
+                if (container.children[i].isPointInsideArea(point,sumOfBordersThickness)) {//point is inside the ith children of container container
                     topAreaCandidate = container.children[i];
                     if (container.children[i].type == "container"){
-                        oTotalThickness.total += topAreaCandidate.borderThickness;
-                        topAreaCandidate =  this.topAreaUnderPoint(point,container.children[i],oTotalThickness);
+                        topAreaCandidate =  this.topAreaUnderPoint(point,container.children[i]);
                     }
                     if (topAreaCandidate.zIndex > topArea.zIndex) {
                         topArea = topAreaCandidate;
-                     }
+                    }
                 }
             }
             // nInfo1.setValue(topArea.zIndex);
             return topArea;//this area will have the auxiliar property totalThickness with the sum of all borderThicknesses...
         },
-        highestZIndexAreaUnder: function(candidateArea,containerAreaRecipient,oTotalThickness){
-            // oTotalThickness is an object {total: x} that will return the cumulated thicknesses until the top area
+        highestZIndexAreaUnder: function(candidateArea,containerAreaRecipient){
             //given an area to be placed in a containerArea returns the highest zIndex of all areas in the container (recursively)
             //  that intersects with candidateArea          
             var topZIndex = containerAreaRecipient.zIndex;
+            var sumOfBordersThickness = containerAreaRecipient.totalBorderThicknessesBelowArea()
             var z = null;
             for (var i = 0; i < containerAreaRecipient.children.length; i++) { //scans all containerArea childrens except candidateArea
                 if (containerAreaRecipient.children[i].id!=candidateArea.id) {//the own area is excluded from the scan
-                    // alert("container.highestZIndexAreaUnder BEFORE intersectsArea");
-                    if (containerAreaRecipient.children[i].intersectsArea(candidateArea,oTotalThickness.total)) { //only intersecting areas are interesting
+                   if (containerAreaRecipient.children[i].intersectsArea(candidateArea,sumOfBordersThickness)) { //only intersecting areas are interesting
                         if (containerAreaRecipient.children[i].type == "container") {
-                            oTotalThickness.total += containerAreaRecipient.children[i].borderThickness;
-                            // alert("container.highestZIndexAreaUnder BEFORE RECURSION");
-                            z = containerAreaRecipient.children[i].highestZIndexAreaUnder(candidateArea,
-                                    containerAreaRecipient.children[i],oTotalThickness);//recursive method
-                            // alert("container.highestZIndexAreaUnder AFTER->"+z);
-                        } else {
+                             z = containerAreaRecipient.children[i].highestZIndexAreaUnder(candidateArea,
+                                    containerAreaRecipient.children[i]);//recursive method
+                         } else {
                             z = containerAreaRecipient.children[i].zIndex;
                         }
                         if( z>topZIndex)

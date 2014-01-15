@@ -269,7 +269,7 @@ define([
                 doh.assertEqual("128", this.num4.top);
             } 
         },        
-     });
+    });
     doh.register("createIn family", {
         //http://kevinandre.com/dev/jsunittest-amd-doh-1/ ---//define(["doh","simple/Mother/textbox"], function(doh,textbox) {
         "createContainerIn an empty container":{
@@ -307,14 +307,56 @@ define([
                 doh.assertEqual("108", this.num111.top,"The inside container coordinates are not 597,108 !");
             }
         },
-      });
-    doh.register("DOH test 4 release Model ", [
+    });
+    doh.register("interactions between areas", {
         //http://kevinandre.com/dev/jsunittest-amd-doh-1/ ---//define(["doh","simple/Mother/textbox"], function(doh,textbox) {
-        function assertTrueTest() {
-            doh.assertTrue(true);
-            doh.assertFalse(false);
-            doh.assertEqual("Kevin", String('Kevin'));
-            doh.assertNotEqual("Kevin", String('Kevin A'));
-        }
-    ]);
+        "topAreaUnderPoint detection with borderThickness effect":{
+            setUp:function(){
+                this.canvas = new areasFactory();
+                this.c0 = this.canvas.createContainer({name: "form f0",left: 500+50,top: 100,width: 520,height: 230,borderColor: "green"});
+                this.c0.setBorder({borderThickness: 30});
+                this.lbl1 = this.canvas.createTextboxIn(this.c0,{value: "Linked w/ResizeMove area1",height: 22});
+                this.topAreaCandidate1 = this.canvas.baseContainer.topAreaUnderPoint({left: 500+66, top: 117},this.canvas.baseContainer);
+                this.lbl2 = this.canvas.createTextboxIn(this.c0,{value: "abcd",left: 0, top: 30,width: 50,height: 20});
+                this.txt1 = this.canvas.createTextboxIn(this.c0,{left: 20, top: 30,width: 100,height: 40,value: "Junkas", title:"to test something outside the handles...handle will stay", borderThickness: 10});
+                this.topAreaCandidate2 = this.canvas.baseContainer.topAreaUnderPoint({left: 500+120, top: 144},this.canvas.baseContainer);
+                this.topAreaCandidate3 = this.canvas.baseContainer.topAreaUnderPoint({left: 500+620, top: 380},this.canvas.baseContainer);
+                // previous line detects c0 if c0.borderThickness is 30 !!!. With c0.borderThickness=3 it will detect the canvas !.
+                this.c01 = this.canvas.createContainerIn(this.c0,{name: "Inside form f0",left: 240,top: 10,width: 200,height: 250,borderColor: "red"});
+                this.lbl01 = this.canvas.createTextboxIn(this.c01,{left: 5,top: 5,value: "jojo",height: 30});
+                this.c01.setBorder({borderThickness: 20});
+                this.topAreaCandidate4 = this.canvas.baseContainer.topAreaUnderPoint({left: 500+555, top: 300},this.canvas.baseContainer);
+                // // previous line detects c01 if c0.borderThickness is 30 !!!. With c0.borderThickness=3 it will detect the canvas ! (notice that 30+20=50 sumThickness).
+            },
+            runTest:function(){
+                doh.assertEqual("form f0", this.topAreaCandidate1.name,"Top area under point1 is not 'form f0' !!!");
+                doh.assertEqual("textbox1", this.topAreaCandidate2.name,"Top area under point2 is not 'textbox1' !!!");
+                doh.assertEqual("form f0", this.topAreaCandidate3.name,"Top area under point is not 'form f0' !!!");
+                doh.assertEqual("Inside form f0", this.topAreaCandidate4.name,"Top area under point1 is not 'Inside form f0' !!!");
+            }
+        },
+        "topAreaUnderPoint detect c1 over c0":{
+            setUp:function(){
+                this.canvas = new areasFactory();
+                this.c0 = this.canvas.createContainer({name: "form f0",left: 500+50,top: 100,width: 520,height: 230,borderColor: "green"});
+                this.c0.setBorder({borderThickness: 30});
+                this.lbl1 = this.canvas.createTextboxIn(this.c0,{value: "Linked w/ResizeMove area1",height: 22});
+                this.lbl2 = this.canvas.createTextboxIn(this.c0,{value: "abcd",left: 0, top: 30,width: 50,height: 20});
+                this.txt1 = this.canvas.createTextboxIn(this.c0,{left: 20, top: 30,width: 100,height: 40,value: "Junkas", title:"to test something outside the handles...handle will stay", borderThickness: 10});
+                this.c01 = this.canvas.createContainerIn(this.c0,{name: "Inside form f0",left:240,top: 10,width: 200,height: 250,borderColor: "red"});
+                this.lbl01 = this.canvas.createTextboxIn(this.c01,{left: 5,top: 5,value: "jojo",height: 30});
+                this.c01.setBorder({borderThickness: 20});
+
+                this.c1 = this.canvas.createContainer({name: "form f1", left: 500+500, top: 100, width: 220, height: 100, borderColor: "green"});
+                this.lbl11 = this.canvas.createTextboxIn(this.c1,{value: "Not linked",height: 22});
+                this.lbl12 = this.canvas.createTextboxIn(this.c1,{top: 30,height: 22,value: "abcd"});
+                this.txt11 = this.canvas.createTextboxIn(this.c1,{left:100,top:30,height: 22,title:"test..",placeHolder:"something",borderThickness: 10});
+                this.c1.setBorder({borderThickness: 5, borderColor: "purple"});
+                this.topAreaCandidate = this.canvas.baseContainer.topAreaUnderPoint({left: 500+575, top: 180},this.canvas.baseContainer);
+            },
+            runTest:function(){
+                doh.assertEqual("form f1", this.topAreaCandidate.name,"Top are under point1 is not 'form f1' !!!");
+            }
+        },
+    });
 });
