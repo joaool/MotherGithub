@@ -310,6 +310,30 @@ define([
     });
     doh.register("interactions between areas", {
         //http://kevinandre.com/dev/jsunittest-amd-doh-1/ ---//define(["doh","simple/Mother/textbox"], function(doh,textbox) {
+        "moveTo":{
+            setUp:function(){
+                this.canvas = new areasFactory();
+                this.c0 = this.canvas.createContainer({name: "form f0",left: 500+50,top: 100,width: 520,height: 230,
+                        borderColor: "green"});
+                this.lbl1 = this.canvas.createTextboxIn(this.c0,{value: "Linked w/ResizeMove area1",height: 22});
+                this.lbl2 = this.canvas.createTextboxIn(this.c0,{value: "abcd",left: 0, top: 30,width: 50,height: 20});
+                this.txt1 = this.canvas.createTextboxIn(this.c0,{left: 20, top: 30,width: 100,height: 40,value: "Junkas",
+                        title:"to test something outside the handles...handle will stay", borderThickness: 10});
+                this.num1 = this.canvas.createNumberboxIn(this.c0,{top: 90,value: 127,height: 20,title:"Just a numeric box..."});
+                this.c01 = this.canvas.createContainerIn(this.c0,{name: "Inside form f0",left:240,top: 10,width: 200,height: 250,borderColor: "red"});
+                this.lbl01 = this.canvas.createTextboxIn(this.c01,{left: 5,top: 5,value: "jojo",height: 30});
+                this.c0.setBorder({borderThickness: 30});
+
+                this.txt1.moveTo({left: 500+159,top: 124});  //absolute coordinates              
+             },
+            runTest:function(){
+                // doh.assertEqual("570", this.txt1.left,"textbox3 has not left=500+70 !!!");
+                // doh.assertEqual("130", this.txt1.top,"textbox3 has not top=130 !!!");
+                doh.assertEqual("659", this.txt1.left,"textbox3 has not left=500+159 !!!");
+                doh.assertEqual("124", this.txt1.top,"textbox3 has not top=124 !!!");
+                doh.assertEqual("1", this.txt1.zIndex,"textbox3 has not zIndex=1 !!!");
+           }
+        },
         "topAreaUnderPoint detection with borderThickness effect":{
             setUp:function(){
                 this.canvas = new areasFactory();
@@ -334,7 +358,7 @@ define([
                 doh.assertEqual("form f0", this.topAreaCandidate3.name,"Top area under point is not 'form f0' !!!");
                 doh.assertEqual("Inside form f0", this.topAreaCandidate4.name,"Top area under point1 is not 'Inside form f0' !!!");
             }
-        },
+        },       
         "topAreaUnderPoint detect c1 over c0":{
             setUp:function(){
                 this.canvas = new areasFactory();

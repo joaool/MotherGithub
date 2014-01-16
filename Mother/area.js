@@ -79,21 +79,37 @@ define([
                 throw new Error("area.toggleVisible(): area is not a dojo widget. Missing code !");
             }
         },
-        moveTo: function(leftTopCoordinates) {
-            if(leftTopCoordinates) {
+        moveTo: function(leftTopProperties) {//coordinates {left: xl,top: xt} are absolute coordinates !!!
+            if(leftTopProperties) {
                 this.previousLeft = this.left; //if area is container this is used by moveTo override 
                 this.previousTop = this.top; //if area is container this is used by moveTo override in container
-                lang.mixin(this, leftTopCoordinates);
+                lang.mixin(this, leftTopProperties);
                 // console.log("area.moveTo first left="+this.left+" top="+this.top);
+                var left = this.left;
+                var top = this.top;
                 if (this.containerParent) {//if it is not a free area
-                   this.zIndex = this.containerParent.highestZIndexAreaUnder(this,this.containerParent)+1;
+                    left -= this.containerParent.left;//to force display of absolute coordinates !
+                    top -= this.containerParent.top;//to force display of absolute coordinates !
+                    this.zIndex = this.containerParent.highestZIndexAreaUnder(this,this.containerParent)+1;
+                    this.updateDOMPropertyWithValue("zIndex", this.zIndex);
                 }
-                this.updateDOMPropertyWithValue("left", this.left);
-                this.updateDOMPropertyWithValue("top", this.top);
+                this.updateDOMPropertyWithValue("left", left);//these coordinates are container relative
+                this.updateDOMPropertyWithValue("top", top);
             }
         },
-        updateDOMPropertyWithValue: function(propertyName, value){
-            var domId = "widget_"+this.id;
+        moveInContainerTo: function(leftTopProperties) {//coordinates {left: xl,top: xt} are container relative
+            if (this.containerParent) {//if it is not a free area
+                leftTopProperties.left += this.containerParent.left;
+                leftTopProperties.top += this.containerParent.top;
+                this.moveTo(leftTopProperties)
+            } else {
+                alert("area.moveInContainerTo(): area is not inside a container !!!");
+                throw new Error("area.moveInContainerTo(): area is not inside a container !!!");
+            }                
+        },        
+        updateDOMPropertyWithValue: function(propertyName, value){//in the case of left,top properties they are relative to the container !!!            
+            //because the id uses "widget_" prefix left,top are container relative (it is a dom element contructed by dojo )
+            var domId = "widget_"+this.id;//this makes left top container relative !!!
             if(this.type=="container")
                 domId=this.id;
             // console.log("----------------->area.updateDOMPropertyWithValue(): domId="+ domId +" trying to change property " + propertyName + " to " + value);
@@ -122,8 +138,8 @@ define([
         isPointBelowRight: function(point, sumOfBordersThickness){//given a point{left:xL, top:xT} verifies if that point is below and to the right of the area top right point 
             // sumOfBordersThickness has the sum of all container borders until the current area
             var isBelowRight = false;
-            if (point.left > this.left + sumOfBordersThickness )
-                if (point.top > this.top + sumOfBordersThickness )
+            if (point.left > this.left + sumOfBordersThickness - this.borderThickness)
+                if (point.top > this.top + sumOfBordersThickness - this.borderThickness)
                     isBelowRight = true;
             return isBelowRight;
         },
@@ -137,15 +153,20 @@ define([
             }
             return total;
         },
-        intersectsArea: function(candidateArea, sumOfBordersThickness) {// true if current candidateArea intersects candidateArea parameter, false otherwise
-            // sumOfBordersThickness has the sum of all container borders until the current candidateArea
-            // alert("candidateArea.intersectsArea BEGIN");
+        intersectsArea: function(candidateArea) {// true if current candidateArea intersects candidateArea parameter, false otherwise
             var intersects = false;
-            var pointTopLeft = {left: candidateArea.left, top:candidateArea.top};
-            var pointBottomRight = {left: candidateArea.left + candidateArea.width, top: candidateArea.top + candidateArea.height };
-            if (this.isPointUpLeftFromAreaBottomRight(pointTopLeft,sumOfBordersThickness) && this.isPointBelowRight(pointBottomRight, sumOfBordersThickness))
+            var pointSumOfBordersThicknesses = candidateArea.totalBorderThicknessesBelowArea();
+            var sumOfBordersThicknesses = this.totalBorderThicknessesBelowArea();
+            var pointTopLeft = {
+                left: candidateArea.left + pointSumOfBordersThicknesses - candidateArea.borderThickness,//pointSumOfBordersThicknesses includes this.borderThickness
+                top:candidateArea.top + pointSumOfBordersThicknesses - candidateArea.borderThickness
+            };
+            var pointBottomRight = {
+                left: candidateArea.left + candidateArea.width + pointSumOfBordersThicknesses + candidateArea.borderThickness,
+                top: candidateArea.top + candidateArea.height + pointSumOfBordersThicknesses + candidateArea.borderThickness
+            };            
+            if (this.isPointUpLeftFromAreaBottomRight(pointTopLeft,sumOfBordersThicknesses) && this.isPointBelowRight(pointBottomRight, sumOfBordersThicknesses))
                 intersects = true;
-            // alert("candidateArea.intersectsArea END");
             return intersects;
         },
         isPointUpLeftFromAreaBottomRight: function(point,sumOfBordersThickness){//given a point verifies if that point is below and to the right of the area 

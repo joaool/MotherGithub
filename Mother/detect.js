@@ -87,7 +87,7 @@ define([
         setResizeMoveEndListernerTo: function(avatar1_avatar2) {
             if (avatar1_avatar2 == 1) {
                 this.avatar.on("resizeMoveEnd",lang.hitch(this,function(oEvt){
-                    console.log("######## AVATAR ######### ------ resizeMoveEnd DETECTED in caller !!! inside="+oEvt.inside+", avatar.current.active="+this.avatar.current.active);
+                    console.log("@######## AVATAR ######### ------ resizeMoveEnd DETECTED in caller !!! inside="+oEvt.inside+", avatar.current.active="+this.avatar.current.active);
                     this.avatar1MouseDownHandler.resume();//put it ready to be detected when mouse clicks the area
                     this.topArea.isActivated = false;
                     this.setAvatarTooltipToActivatedStatus();
@@ -110,16 +110,19 @@ define([
         setResizeMovePartialListernerTo: function(avatar1_avatar2) {
             if (avatar1_avatar2 == 1) {
                 this.avatar.on("resizeMovePartial",lang.hitch(this,function(oEvt){
-                    console.log("######################################################################## ------ resizeMovePartial DETECTED in caller !!! (W1) inside="+oEvt.inside+", avatar.current.active="+this.avatar.current.active);
-                    var deltaLeft = this.topArea.containerParent.left;
-                    var deltaTop = this.topArea.containerParent.top;
-                    this.topArea.moveTo({
-                        left: this.avatar.position.x - deltaLeft - this.topArea.containerParent.borderThickness,
-                        top: this.avatar.position.y - deltaTop - this.topArea.containerParent.borderThickness
+                    console.log("@######################################################################## ------ resizeMovePartial DETECTED in caller !!! (W1) inside="+oEvt.inside+", avatar.current.active="+this.avatar.current.active);
+                    var totalBorderThicknesses = this.topArea.totalBorderThicknessesBelowArea();
+                     this.topArea.moveTo({//moves to absolute positions !!!
+                        left: this.avatar.position.x - totalBorderThicknesses + this.topArea.borderThickness,
+                        top: this.avatar.position.y - totalBorderThicknesses + this.topArea.borderThickness
                     });
                     this.topArea.resize({width: this.avatar.position.w - 2*this.topArea.borderThickness,
                         height: this.avatar.position.h - 2*this.topArea.borderThickness});
+                    console.log("@### avatar x,y="+this.avatar.position.x+","+this.avatar.position.y+
+                            " topArea name="+this.topArea.name+" left,top="+this.topArea.left+","+this.topArea.top+" zIndex="+this.topArea.zIndex);
+                    // var deltaLeft = this.topArea.containerParent.left;
                     this.topArea.toggleVisible(true);
+                    this.avatar.setZIndex(this.topArea.zIndex+1);
                     // this.preparesAvatarToRepresentTopArea();
                 }));
             } else if (avatar1_avatar2 == 2 ) {
@@ -134,6 +137,7 @@ define([
                     this.topArea.resize({width: this.avatar.position.w - 2*this.topArea.borderThickness,
                         height: this.avatar.position.h - 2*this.topArea.borderThickness});
                     this.topArea.toggleVisible(true);
+                    this.avatar.setZIndex(this.topArea.zIndex+1);
                     // this.preparesAvatarToRepresentTopArea();
                 }));
             } else {
@@ -143,7 +147,7 @@ define([
         setMouseDownHandlerPausedToAvatar1_2: function(avatar1_avatar2){//clickInside and MouseDownHandler
              if (avatar1_avatar2 == 1) {
                 this.avatar1MouseDownHandler=on.pausable(dom.byId(this.avatar.avatarId),"mousedown",lang.hitch(this,function(){
-                    console.log("Caller =========================================->Mouse down in AVATAR1 <");
+                    console.log("@Caller =========================================->Mouse down in AVATAR1 <");
                     this.avatar.activate();
                     this.topArea.isActivated = true;
                     this.setAvatarTooltipToActivatedStatus();
@@ -195,10 +199,10 @@ define([
                 };
                 if (this.topArea.containerParent) {
                     avatarBoundaries = {
-                        l:this.topArea.containerParent.left,// + this.topArea.containerParent.borderThickness,
-                        t:this.topArea.containerParent.top,// + this.topArea.containerParent.borderThickness,
-                        w:this.topArea.containerParent.width + 2,
-                        h:this.topArea.containerParent.height + 2
+                        l:this.topArea.containerParent.left + extraThickness - this.topArea.borderThickness,// + this.topArea.containerParent.borderThickness,
+                        t:this.topArea.containerParent.top + extraThickness - this.topArea.borderThickness,// + this.topArea.containerParent.borderThickness,
+                        w:this.topArea.containerParent.width + 0,
+                        h:this.topArea.containerParent.height + 0
                     };
                 } else {
                     avatarBoundaries = {
@@ -217,16 +221,23 @@ define([
 
             this.avatar.setBoundaries(avatarBoundaries);
             this.setAvatarTooltipToActivatedStatus();
-            // this.borderRed();
+            this.containerBorderRed();
         },
-        borderRed: function() {
-            if (this.previousTopArea) {
-                this.previousTopArea.setBorder({borderThickness: this.previousTopAreaBorderThickness,borderColor: this.previousTopAreaBorderColor});
+        containerBorderRed: function() { //used to access container thru borders - if forces a red border to all containers
+            if (this.topArea.type == "container" ) {
+                if (this.previousTopArea) {//resets previous area to its own border
+                    this.previousTopArea.setBorder({borderThickness: this.previousTopAreaBorderThickness,borderColor: this.previousTopAreaBorderColor});
+                }
+                this.previousTopArea = this.topArea;//saves for future reset
+                this.previousTopAreaBorderThickness = this.topArea.borderThickness;
+                this.previousTopAreaBorderColor = this.topArea.borderColor;
+                if (this.topArea.name != "canvas") { //dont do it for canvas
+                    if (this.topArea.borderThickness < 4) {//if border is 5 or greater...no neeed to create it
+                        this.topArea.setBorder({borderThickness: 4, borderStyle: "dotted", borderColor: "gold" });
+                        // this.topArea.setBorder({borderColor: "red"});
+                    }
+                }
             }
-            this.previousTopArea = this.topArea;
-            this.previousTopAreaBorderThickness = this.topArea.borderThickness;
-            this.previousTopAreaBorderColor = this.topArea.borderColor;
-            this.topArea.setBorder({borderThickness: 5,borderColor: "red"});
         },
         setAvatarTooltipToActivatedStatus: function() {
            var tooltip = null;

@@ -110,7 +110,7 @@ define([
                 }
             }
          },
-        moveTo: function(leftTopCoordinates){//overrides the area moveTo() method
+        moveTo: function(leftTopCoordinates){//overrides the area moveTo() method - coordinates are container coordinates
             //http://apphacker.wordpress.com/2010/01/31/how-to-call-the-base-method-when-using-inheritance-in-dojo-1-4/
             this.inherited(arguments);//it will call area.moveTo() and the will folow the next code...
             // console.log("container.moveTo first left="+this.left+" top="+this.top);
@@ -162,11 +162,10 @@ define([
             //given an area to be placed in a containerArea returns the highest zIndex of all areas in the container (recursively)
             //  that intersects with candidateArea          
             var topZIndex = containerAreaRecipient.zIndex;
-            var sumOfBordersThickness = containerAreaRecipient.totalBorderThicknessesBelowArea()
             var z = null;
             for (var i = 0; i < containerAreaRecipient.children.length; i++) { //scans all containerArea childrens except candidateArea
                 if (containerAreaRecipient.children[i].id!=candidateArea.id) {//the own area is excluded from the scan
-                   if (containerAreaRecipient.children[i].intersectsArea(candidateArea,sumOfBordersThickness)) { //only intersecting areas are interesting
+                   if (containerAreaRecipient.children[i].intersectsArea(candidateArea)) { //only intersecting areas are interesting
                         if (containerAreaRecipient.children[i].type == "container") {
                              z = containerAreaRecipient.children[i].highestZIndexAreaUnder(candidateArea,
                                     containerAreaRecipient.children[i]);//recursive method
