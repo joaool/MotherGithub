@@ -350,13 +350,15 @@ define([
                 this.lbl01 = this.canvas.createTextboxIn(this.c01,{left: 5,top: 5,value: "jojo",height: 30});
                 this.c01.setBorder({borderThickness: 20});
                 this.topAreaCandidate4 = this.canvas.baseContainer.topAreaUnderPoint({left: 500+555, top: 300},this.canvas.baseContainer);
-                // // previous line detects c01 if c0.borderThickness is 30 !!!. With c0.borderThickness=3 it will detect the canvas ! (notice that 30+20=50 sumThickness).
-            },
+                // previous line detects c01 if c0.borderThickness is 30 !!!. With c0.borderThickness=3 it will detect the canvas ! (notice that 30+20=50 sumThickness).
+             },
             runTest:function(){
                 doh.assertEqual("form f0", this.topAreaCandidate1.name,"Top area under point1 is not 'form f0' !!!");
                 doh.assertEqual("textbox1", this.topAreaCandidate2.name,"Top area under point2 is not 'textbox1' !!!");
                 doh.assertEqual("form f0", this.topAreaCandidate3.name,"Top area under point is not 'form f0' !!!");
                 doh.assertEqual("Inside form f0", this.topAreaCandidate4.name,"Top area under point1 is not 'Inside form f0' !!!");
+                doh.assertEqual(false, this.c01.isPointInsideArea({left: 500+319,top: 180}),"point 319,180 must be outside container c01, but is not !!!");
+                doh.assertEqual(true, this.c01.isPointInsideArea({left: 500+322,top: 180}),"point 322,180 must be inside container c01, but is not !!!");
             }
         },       
         "topAreaUnderPoint detect c1 over c0":{

@@ -143,9 +143,9 @@ define([
             var topZIndexOfChildren=container.zIndex;//the container zIndex
             var topArea = container;
             var topAreaCandidate = null;
-            var sumOfBordersThickness = container.totalBorderThicknessesBelowArea()
+            // var sumOfBordersThickness = container.totalBorderThicknessesBelowArea();
             for(var i = 0; i < container.children.length; i++){
-                if (container.children[i].isPointInsideArea(point,sumOfBordersThickness)) {//point is inside the ith children of container container
+                if (container.children[i].isPointInsideArea(point)) {//point is inside the ith children of container container
                     topAreaCandidate = container.children[i];
                     if (container.children[i].type == "container"){
                         topAreaCandidate =  this.topAreaUnderPoint(point,container.children[i]);

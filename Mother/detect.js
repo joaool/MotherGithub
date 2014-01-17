@@ -76,7 +76,7 @@ define([
                     console.log("-------------------> Change to new area  x=" + x + " y="+ y +" type="+ topAreaCandidate.type +
                             " id="+ topAreaCandidate.id +" name="+ topAreaCandidate.name + "-->"+topAreaCandidate.left+","+
                             topAreaCandidate.top + " totalThicknesses=" + extraThickness+ " =>"+
-                            (topAreaCandidate.left+extraThickness)+","+(topAreaCandidate.top+extraThickness));
+                            (topAreaCandidate.left+extraThickness)+","+(topAreaCandidate.top+extraThickness)+" zIndex="+topAreaCandidate.zIndex);
 
                     this.topArea = topAreaCandidate;
                     this.preparesAvatarToRepresentTopArea();

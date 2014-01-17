@@ -116,7 +116,10 @@ require([
 		// nInfo1 = new numberbox({left: 1050,top: 40,width: 220,height: 40,value: -1})
 
 		var c0 = canvas.createContainer({name: "form f0",left: 50,top: 100,width: 520,height: 230,borderColor: "green"});
+		c0.setBorder({borderThickness: 30});
 		var lbl1 = canvas.createTextboxIn(c0,{value: "Form 0",height: 22});
+
+
 		var lbl2 = canvas.createTextboxIn(c0,{value: "abcd",left: 0, top: 30,width: 50,height: 20});
 		// var txt1 = canvas.createTextboxIn(c0,{left: 60, top: 30,width: 100,height: 40,value: "Junkas", title:"to test something outside the handles...handle will stay", borderThickness: 10});
 		var txt1 = canvas.createTextboxIn(c0,{left: 20, top: 30,width: 100,height: 40,value: "Junkas", title:"to test something outside the handles...handle will stay", borderThickness: 10});
@@ -129,16 +132,13 @@ require([
 		var c01 = canvas.createContainerIn(c0,{name: "Inside form f0",left:240,top: 10,width: 200,height: 250,borderColor: "red"});
 		var lbl01 = canvas.createTextboxIn(c01,{left: 5,top: 5,value: "form 01",height: 30});
 		// c0.setBorder({borderThickness: 0,borderColor: ""});
-		c0.setBorder({borderThickness: 30});
 
 		// txt1.moveTo({left: 159, top: 124});
 		// txt1.moveInContainerTo({left:0, top: 0});
 		// alert("xxx1 txt1.left="+txt1.left+" txt1.top="+txt1.top+" zIndex="+txt1.zIndex);
 
 		// var oTotalThickness = {total: 0};//3rd argument of area.highestZIndexAreaUnder() has cumulated borderThicknesses
-		var topAreaCandidate = canvas.baseContainer.topAreaUnderPoint({left: 66, top: 117},canvas.baseContainer);
 		// var topAreaCandidate = canvas.baseContainer.topAreaUnderPoint({left: 575, top: 180},canvas.baseContainer);
-	// alert("STOP after topAreaUnderPoint="+topAreaCandidate.name);
 
 		c01.setBorder({borderThickness: 20});
 		var c011 = canvas.createContainerIn(c01,{name: "deepest f2",left:10,top: 50,width: 150,height: 150,borderColor: "red"});
@@ -150,8 +150,16 @@ require([
 		// alert("c011.totalBorderThicknessesBelowArea()="+c011.totalBorderThicknessesBelowArea());
 		// alert("c01.totalBorderThicknessesBelowArea()="+c01.totalBorderThicknessesBelowArea());
 		// alert("c0.totalBorderThicknessesBelowArea()="+c0.totalBorderThicknessesBelowArea());
-
+        
 	    console.log("lbl1-> id="+lbl1.id+" left="+lbl1.left+" top="+lbl1.top+" width="+lbl1.width+" height="+lbl1.height+" zIndex="+lbl1.zIndex+" value="+lbl1.value+" domId="+lbl1.domId);
+
+    // alert("c01.isPointInsideArea({left: 319,top: 180})="+c01.isPointInsideArea({left: 319,top: 180}));
+    // alert("c01.isPointInsideArea({left: 322,top: 180})="+c01.isPointInsideArea({left: 322,top: 180}));
+
+	// var topAreaCandidate = canvas.baseContainer.topAreaUnderPoint({left: 620, top: 380},canvas.baseContainer);
+	// alert("STOP after topAreaUnderPoint({left: 620, top: 380})="+topAreaCandidate.name);
+
+
 		var c1 = canvas.createContainer({name: "form f1", left: 500+00, top: 100, width: 220, height: 100, borderColor: "green"});
 		var lbl11 = canvas.createTextboxIn(c1,{value: "Form 1",height: 22});
 		var lbl12 = canvas.createTextboxIn(c1,{top: 30,height: 22,value: "abcd"});
@@ -162,6 +170,7 @@ require([
 		var lbl11 = canvas.createTextboxIn(c2,{value: "Form 2",height: 22});
 		var lbl12 = canvas.createTextboxIn(c2,{top: 30,height: 22,value: "abcd"});
 		var txt11 = canvas.createTextboxIn(c2,{left:100,top:30,height: 22,title:"test..",placeHolder:"something",borderThickness: 10});
+
 
 		
 

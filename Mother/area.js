@@ -123,13 +123,12 @@ define([
                     " you tried to change property " + propertyName + " to " + value + ", but DOM id is null !");
             }
         },
-        isPointInsideArea: function(point, sumOfBordersThickness) {//given a point{left:xL, top:xT} verifies if that point is inside the current area
-            // sumOfBordersThickness has the sum of all container borders until the current area
+        isPointInsideArea: function(point) {//given a point{left:xL, top:xT} verifies if that point is inside the current area
             var isInside = false;
+            var sumOfBordersThickness = this.totalBorderThicknessesBelowArea();
             if (this.isPointBelowRight(point,sumOfBordersThickness)) {
-                // if (point.left < (this.left + this.width) &&  point.top < (this.top + this.height)){
-                if (point.left < (this.left + this.width + 2*this.borderThickness + sumOfBordersThickness) &&
-                        point.top < (this.top + this.height +  2*this.borderThickness +sumOfBordersThickness)){
+                 if (point.left < (this.left + this.width + sumOfBordersThickness + this.borderThickness) &&
+                        point.top < (this.top + this.height + sumOfBordersThickness + this.borderThickness)){
                     isInside = true;
                 }
             }
