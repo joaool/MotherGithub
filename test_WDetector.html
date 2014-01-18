@@ -167,6 +167,7 @@ require([
 		c1.setBorder({borderThickness: 5, borderColor: "purple"});
 
 		var c2 = canvas.createContainer({name: "form f2", left: 750+00, top: 100, width: 220, height: 100, borderColor: "green"});
+		c2.setBorder({borderThickness: 0});
 		var lbl11 = canvas.createTextboxIn(c2,{value: "Form 2",height: 22});
 		var lbl12 = canvas.createTextboxIn(c2,{top: 30,height: 22,value: "abcd"});
 		var txt11 = canvas.createTextboxIn(c2,{left:100,top:30,height: 22,title:"test..",placeHolder:"something",borderThickness: 10});

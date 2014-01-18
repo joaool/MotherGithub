@@ -14,9 +14,9 @@ define([
         avatar: null,
         topArea: null,
         
-        previousTopArea: null,//only to be use by this.borderRed()
-        previousTopAreaBorderThickness: null,//only to be use by this.borderRed()
-        previousTopAreaBorderColor: null,//only to be use by this.borderRed()
+        previousTopContainerArea: null,//only to be use by this.borderRed()
+        previousTopContainerAreaBorderThickness: null,//only to be use by this.borderRed()
+        previousTopContainerAreaBorderColor: null,//only to be use by this.borderRed()
         
         lastDetectedAreaId: null,
         avatar1ClickInsideHandler:null,
@@ -72,11 +72,11 @@ define([
                 if (this.lastDetectedAreaId != topAreaCandidate.id) { //if cursor changed to a new area
                     this.lstDetectedAreaId = topAreaCandidate.id;
 
-                    var extraThickness = topAreaCandidate.totalBorderThicknessesBelowArea();
-                    console.log("-------------------> Change to new area  x=" + x + " y="+ y +" type="+ topAreaCandidate.type +
-                            " id="+ topAreaCandidate.id +" name="+ topAreaCandidate.name + "-->"+topAreaCandidate.left+","+
-                            topAreaCandidate.top + " totalThicknesses=" + extraThickness+ " =>"+
-                            (topAreaCandidate.left+extraThickness)+","+(topAreaCandidate.top+extraThickness)+" zIndex="+topAreaCandidate.zIndex);
+                    // var extraThickness = topAreaCandidate.totalBorderThicknessesBelowArea();
+                    // console.log("-------------------> Change to new area  x=" + x + " y="+ y +" type="+ topAreaCandidate.type +
+                    //         " id="+ topAreaCandidate.id +" name="+ topAreaCandidate.name + "-->"+topAreaCandidate.left+","+
+                    //         topAreaCandidate.top + " totalThicknesses=" + extraThickness+ " =>"+
+                    //         (topAreaCandidate.left+extraThickness)+","+(topAreaCandidate.top+extraThickness)+" zIndex="+topAreaCandidate.zIndex);
 
                     this.topArea = topAreaCandidate;
                     this.preparesAvatarToRepresentTopArea();
@@ -217,25 +217,29 @@ define([
                 avatarBoundaries = {l: 0,t: 0,w:0,h:420};
             }
             this.avatar.setLanding(avatarLanding);
-            console.log("preparesAvatarToRepresentTopArea -> this.topArea.name="+this.topArea.name+" value="+this.topArea.getValue());
+            // console.log("preparesAvatarToRepresentTopArea -> this.topArea.name="+this.topArea.name+" value="+this.topArea.getValue());
 
             this.avatar.setBoundaries(avatarBoundaries);
             this.setAvatarTooltipToActivatedStatus();
-            this.containerBorderRed();
+            this.containerSensibleBorder("gold");
         },
-        containerBorderRed: function() { //used to access container thru borders - if forces a red border to all containers
-            if (this.topArea.type == "container" ) {
-                if (this.previousTopArea) {//resets previous area to its own border
-                    this.previousTopArea.setBorder({borderThickness: this.previousTopAreaBorderThickness,borderColor: this.previousTopAreaBorderColor});
-                }
-                this.previousTopArea = this.topArea;//saves for future reset
-                this.previousTopAreaBorderThickness = this.topArea.borderThickness;
-                this.previousTopAreaBorderColor = this.topArea.borderColor;
-                if (this.topArea.name != "canvas") { //dont do it for canvas
-                    if (this.topArea.borderThickness < 4) {//if border is 5 or greater...no neeed to create it
-                        this.topArea.setBorder({borderThickness: 4, borderStyle: "dotted", borderColor: "gold" });
-                        // this.topArea.setBorder({borderColor: "red"});
-                    }
+        containerSensibleBorder: function(sensibleBorderColor) { //used to access container thru borders - if forces a dotted sensibleBorderColor border to all containers
+            if (this.previousTopContainerArea) {//resets previous area to its own border
+                 this.previousTopContainerArea.setBorder({borderThickness: this.previousTopContainerAreaBorderThickness,
+                            borderColor: this.previousTopContainerAreaBorderColor});
+            }
+            var containerArea = this.topArea;   
+            if (this.topArea.type != "container" ) 
+                containerArea = this.topArea.containerParent;
+
+            this.previousTopContainerArea = containerArea;//saves for future reset
+            this.previousTopContainerAreaBorderThickness = containerArea.borderThickness;
+            this.previousTopContainerAreaBorderColor = containerArea.borderColor;
+         
+            if (containerArea.name != "canvas") { //dont do it for canvas
+                if (containerArea.borderThickness < 4) {//if border is 5 or greater...no neeed to create it
+                    containerArea.setBorder({borderThickness: 4, borderStyle: "dotted", borderColor: sensibleBorderColor });
+                    // this.topArea.setBorder({borderColor: "red"});
                 }
             }
         },
