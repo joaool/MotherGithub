@@ -46,7 +46,7 @@ require([
 	"Mother/detect.js",
 	"dojo/domReady!"
 	], 
-	function(parser,kernel,Win,Lang,Event,On,Parser,Dom,ResizeMoveArea,canvas,textbox,numberbox,container,detect){ 
+	function(parser,kernel,Win,Lang,Event,On,Parser,Dom,ResizeMoveArea,canvas,textbox,numberbox,container,detectEngine){ 
 		//TEST DESCRIPTION v1: 
 		//   WDetector tests the Container functionality that launches an event when the mouse is over a widget.
 		//   
@@ -142,7 +142,7 @@ require([
 
 		c01.setBorder({borderThickness: 20});
 		var c011 = canvas.createContainerIn(c01,{name: "deepest f2",left:10,top: 50,width: 150,height: 150,borderColor: "red"});
-		c011.setBorder({borderThickness: 15,borderColor: "yellow"});
+		c011.setBorder({borderThickness: 1,borderColor: "yellow"});
 		var txt0111 = canvas.createTextboxIn(c011,{left: 0,top: 0,value: "Form c011",height: 20,title:"Another numeric box..."});
 		var num0111 = canvas.createNumberboxIn(c011,{left: 10,top: 40,value: 132,height: 20,title:"Another numeric box..."});
 
@@ -152,6 +152,8 @@ require([
 		// alert("c0.totalBorderThicknessesBelowArea()="+c0.totalBorderThicknessesBelowArea());
         
 	    console.log("lbl1-> id="+lbl1.id+" left="+lbl1.left+" top="+lbl1.top+" width="+lbl1.width+" height="+lbl1.height+" zIndex="+lbl1.zIndex+" value="+lbl1.value+" domId="+lbl1.domId);
+	    // alert("txt0111.isPointOnContainerBorderMargin(348,208)="+txt0111.isPointOnContainerBorderMargin(348,208));
+	    // alert("txt0111.isPointOnContainerBorderMargin(353,213)="+txt0111.isPointOnContainerBorderMargin(353,213));
 
     // alert("c01.isPointInsideArea({left: 319,top: 180})="+c01.isPointInsideArea({left: 319,top: 180}));
     // alert("c01.isPointInsideArea({left: 322,top: 180})="+c01.isPointInsideArea({left: 322,top: 180}));
@@ -313,8 +315,16 @@ require([
 			};	
 		}));
 		// ----------------- detector
-		var detect = new detect(canvas);
-		detect.toggleDetector(true);
+		var detectEngine1 = new detectEngine(canvas,"engine1");//canvas is the mouse area where detection is possible for detectEngine1
+		detectEngine1.togglePossibleActivation(true);
+		// canvas.baseContainer.detectableBy(detectEngine1);//canvas is now sensible to detection by detectEngine1
+		c0.detectableBy(detectEngine1);//c0 now is sensible to detection by detectEngine1 
+	// var detectEngine2 = new detectEngine(canvas,"engine2");//canvas is the mouse area where detection is possible for detectEngine2
+	// detectEngine2.togglePossibleActivation(true);
+
+		// // c1.detectableBy(detect.avatar);//c1 now is sensible to detection
+		c2.detectableBy(detectEngine1);//c2 now is sensible to detection by detectEngine1
+		n3.detectableBy(detectEngine1);//n3 now is sensible to detection by detectEngine1
 
 		//-----------------------------------------------------------------------------------
 		var oLanding2={l:20,t:70,w:120,h:30};
@@ -339,29 +349,7 @@ require([
 			x2.swapCallback=null;
 			mouseDownHandler2.resume();//put it ready to be detected when mouse clicks the area
 		}));
-		//x2.resize({l:1000,t:100,w:100,h:100});//to test resize without handles
-		// var windowEventListeners = new Array();
-		// windowEventListeners.push(On(kernel.global, "scroll", Lang.hitch(this, function(){
-		// 	alert("scroll !!!");//the event triggers whenever there's a scroll in browser window done by the user
-		// })));
-/*
-		lastDetectedAreaId = null;
-		var handlerMouseInCanvas = On.pausable(Win.body(), "mousemove", Lang.hitch(this,function(e){
-			//this only works for areas under at least one container - built using (canvas) areaFactory class
-			var x=e.pageX;
-			var y=e.pageY;
-			var topArea = canvas.baseContainer.topAreaUnderPoint({left: e.pageX, top: e.pageY},canvas.baseContainer);
-			if(topArea.zIndex >= 0) {// if it is not the canvas
-				// console.log(" x=" + x + " y="+ y +" type="+ topArea.type +" id="+ topArea.id +" name="+ topArea.name);
-				if (lastDetectedAreaId != topArea.id) { //if cursor changed to a new area
-					lastDetectedAreaId = topArea.id;
-					console.log(" x=" + x + " y="+ y +" type="+ topArea.type +" id="+ topArea.id +" name="+ topArea.name + "-->"+topArea.left+","+topArea.top);
-					topArea.capturesAvatar();
-					tx=topArea;
-				}
-			}		
-		}));						
- */
+
  		function test(){
 			alert("test message in function test - this call is defined in menu object exterior to the class...");
 		}

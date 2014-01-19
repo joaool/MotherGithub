@@ -385,4 +385,34 @@ define([
             }
         },
     });
+    doh.register("detect class", {
+        "isPointOnContainerBorderMargin()":{
+            setUp:function(){
+                this.canvas = new areasFactory();
+                this.c0 = this.canvas.createContainer({name: "form f0",left: 500+50,top: 100,width: 520,height: 230,borderColor: "green"});
+                this.c0.setBorder({borderThickness: 30});
+                this.lbl1 = this.canvas.createTextboxIn(this.c0,{value: "Linked w/ResizeMove area1",height: 22});
+                this.lbl2 = this.canvas.createTextboxIn(this.c0,{value: "abcd",left: 0, top: 30,width: 50,height: 20});
+                this.txt1 = this.canvas.createTextboxIn(this.c0,{left: 20, top: 30,width: 100,height: 40,value: "Junkas", title:"to test something outside the handles...handle will stay", borderThickness: 10});
+                this.c01 = this.canvas.createContainerIn(this.c0,{name: "Inside form f0",left:240,top: 10,width: 200,height: 250,borderColor: "red"});
+                this.lbl01 = this.canvas.createTextboxIn(this.c01,{left: 5,top: 5,value: "jojo",height: 30});
+                this.c01.setBorder({borderThickness: 20});
+
+                this.c011 = this.canvas.createContainerIn(this.c01,{name: "deepest f2",left: 10,top: 50,width: 150,height: 150,borderColor: "red"});
+                this.c011.setBorder({borderThickness: 1,borderColor: "yellow"});
+                this.txt0111 = this.canvas.createTextboxIn(this.c011,{left: 0,top: 0,value: "Form c011",height: 20,title:"Another numeric box..."});
+                this.num0111 = this.canvas.createNumberboxIn(this.c011,{left: 10,top: 40,value: 132,height: 20,title:"Another numeric box..."});
+
+                },
+            runTest:function(){
+                //points outside margin
+                doh.assertEqual(false, this.txt0111.isPointOnContainerBorderMargin(500+393,223),"Point inside txt and outside container margin reported as inside margin !!!");             
+                //points inside margin
+                doh.assertEqual(true, this.txt0111.isPointOnContainerBorderMargin(500+353,213),"Point NE should be but is not in c011 margin!!!");
+                doh.assertEqual(true, this.txt0111.isPointOnContainerBorderMargin(500+393,213),"Point N should be but is not in c011 margin!!!");
+                doh.assertEqual(true, this.txt0111.isPointOnContainerBorderMargin(500+353,223),"Point E should be but is not in c011 margin!!!");
+            }
+        },    
+    });
+
 });

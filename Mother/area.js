@@ -27,6 +27,8 @@ define([
         areaOrder:null,
         zIndex:-1,//all areas have a zIndex that is the next zIndex after the top highest area being covered 
         containerParent:null,//all areas have a parent (parent of baseContainer is null)
+        avatar:null,//to be used by builder version methods
+        rootDetectionArea: null,//to be used by builder version methods
         constructor: function(areaProperties) {
             // alert("BEGIN AREA CONTRUCTOR AREA this.id="+this.id+" id="+areaProperties.id+" order="+areaProperties.order);
             lang.mixin(this, areaProperties);//mixin is used to mix an object-hash of properties passed has argument with default values in the class 
@@ -163,7 +165,7 @@ define([
             var pointBottomRight = {
                 left: candidateArea.left + candidateArea.width + pointSumOfBordersThicknesses + candidateArea.borderThickness,
                 top: candidateArea.top + candidateArea.height + pointSumOfBordersThicknesses + candidateArea.borderThickness
-            };            
+            };
             if (this.isPointUpLeftFromAreaBottomRight(pointTopLeft,sumOfBordersThicknesses) && this.isPointBelowRight(pointBottomRight, sumOfBordersThicknesses))
                 intersects = true;
             return intersects;
@@ -188,6 +190,77 @@ define([
                 }
             }
             return insideString;
+        },
+        // -----------------------------   methods below this line to be used exclusively by builder version ----------------------------
+        detectableBy: function(detectorEngine) {//recursively propagates avatar
+            this.avatar = detectorEngine.avatar;
+            if (this.type == "container") {
+                for(var i = 0; i < this.children.length; i++){
+                    this.children[i].detectableBy(detectorEngine);
+                }
+            }
+        },
+        isPointOnContainerBorderMargin: function(x,y) {//true if x,y besides being inside area is in the the container margin of this area.
+            var pointOnBorderMargin = false;
+            if (this.type != "container") {//this method only aplies to widgets (non container areas)
+                var borderMargin = 7;
+                var bordersSum = this.totalBorderThicknessesBelowArea() - this.borderThickness;
+                var containerOfThisArea = this.containerParent;
+                if ( ( (x > containerOfThisArea.left + bordersSum) && (x < containerOfThisArea.left + borderMargin + bordersSum) ) ||
+                        ( (x > containerOfThisArea.left + containerOfThisArea.width - borderMargin + bordersSum) && (x <= containerOfThisArea.left + containerOfThisArea.width + bordersSum) ) ) {
+                    if ( (y > containerOfThisArea.top + bordersSum) && (y <= containerOfThisArea.top + containerOfThisArea.height + bordersSum) ) {
+                        pointOnBorderMargin = true;
+                        if(this.avatar) //HACK - without this we get: this.avatar is null
+                            this.avatar.setZIndex(this.zIndex+1);//the avatar will be always above the area
+                    }                 
+                } else {//point is not in container's vertical contour, but may be in container's horizontal contour
+                    if ( ( (y > containerOfThisArea.top + bordersSum) && (y < containerOfThisArea.top + borderMargin + bordersSum) ) ||
+                            ( (y > containerOfThisArea.top + containerOfThisArea.height - borderMargin + bordersSum) && (y <= containerOfThisArea.top + containerOfThisArea.height + bordersSum) ) ) {
+                        if ( (x > containerOfThisArea.left + bordersSum) && (y <= containerOfThisArea.left + containerOfThisArea.width + bordersSum) ) {
+                            pointOnBorderMargin = true;
+                            if(this.avatar)//HACK - without this we get: this.avatar is null
+                                this.avatar.setZIndex(this.zIndex+1);//the avatar will be always above the area 
+                        }                 
+                    }
+                }
+            } 
+            // if (pointOnBorderMargin)
+            //     console.log("%%%%%%%%%%%%%%%%%%%%%->point is on margin of "+this.containerParent.name);
+            // else
+            //    console.log("%%%%%%%%%%%%%%%%%%%%%->point is outside the margin of "+this.containerParent.name);            
+            return pointOnBorderMargin;
+        },
+        setAvatarPreSelection: function(isPreSelected) {
+            var avatarLanding = {l: 0,t: 0,w: 0,h: 0};//assumes an area under root container
+            var avatarBoundaries = {l: 0,t: 0,w: 0,h: 0};//assumes an area under  root container
+            if (this.avatar) {//preSelects if the area is detectable (same as having this.avatar pointing to a resizeMove object)
+                var extraThickness = this.totalBorderThicknessesBelowArea();//the total thickness to add to area due to the thickness of containers inside containers.
+                avatarLanding = {
+                    l: this.left + extraThickness - this.borderThickness,
+                    t: this.top + extraThickness - this.borderThickness,
+                    w: this.width+3+2*this.borderThickness,
+                    h: this.height+3+2*this.borderThickness
+                };
+                avatarBoundaries = {
+                    l:this.containerParent.left + extraThickness - this.borderThickness,// + this.containerParent.borderThickness,
+                    t:this.containerParent.top + extraThickness - this.borderThickness,// + this.containerParent.borderThickness,
+                    w:this.containerParent.width + 0,
+                    h:this.containerParent.height + 0
+                };
+                this.avatar.setLanding(avatarLanding);
+                this.avatar.setBoundaries(avatarBoundaries);
+                this.avatar.setZIndex(this.zIndex+1);//the avatar will be always above the area
+                this.setActivatedStatusTooltip();
+            }    
+        },
+        setActivatedStatusTooltip: function() {
+            var tooltip = null;
+            if (this.isActivated)
+                tooltip = "click outside " + this.type +" named " + this.name + " to stop move/resize";
+            else
+                tooltip = "click " + this.type +" named " + this.name +
+                    this.getTooltipInsideString() + " to activate it";
+            this.avatar.setTooltip(tooltip);
         }
     });
 }); //end of  module  
