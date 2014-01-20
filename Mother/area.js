@@ -71,14 +71,24 @@ define([
         },
         toggleVisible:function(isVisible){
             this.isVisible = isVisible;
+            this._toggleAreaVisible(isVisible,this);
+        },
+        _toggleAreaVisible:function(isVisible,area){//recursive method
+            area._setVisibility(isVisible);
+            if (area.type == "container") {
+               for(var i = 0; i < area.children.length; i++){
+                    area.children[i]._toggleAreaVisible(isVisible,area.children[i]);
+                }
+            }
+        },
+        _setVisibility: function(isVisible){
             var visibleHTMLProperty=(isVisible)? "visible":"hidden";
-            // domStyle.set(this.id,"visibility",visibleHTMLProperty);   
             var widget = dijit.byId(this.id);
             if (widget) {
                 domStyle.set(dijit.byId(this.id).domNode,"visibility",visibleHTMLProperty);
             } else {
-                alert("area.toggleVisible(): area is not a dojo widget. Missing code !");
-                throw new Error("area.toggleVisible(): area is not a dojo widget. Missing code !");
+                alert("area._setVisibility(): area is not a dojo widget. Missing code !");
+                throw new Error("area._setVisibility(): area is not a dojo widget. Missing code !");
             }
         },
         moveTo: function(leftTopProperties) {//coordinates {left: xl,top: xt} are absolute coordinates !!!
@@ -212,7 +222,7 @@ define([
                         pointOnBorderMargin = true;
                         if(this.avatar) //HACK - without this we get: this.avatar is null
                             this.avatar.setZIndex(this.zIndex+1);//the avatar will be always above the area
-                    }                 
+                    }
                 } else {//point is not in container's vertical contour, but may be in container's horizontal contour
                     if ( ( (y > containerOfThisArea.top + bordersSum) && (y < containerOfThisArea.top + borderMargin + bordersSum) ) ||
                             ( (y > containerOfThisArea.top + containerOfThisArea.height - borderMargin + bordersSum) && (y <= containerOfThisArea.top + containerOfThisArea.height + bordersSum) ) ) {
@@ -220,15 +230,11 @@ define([
                             pointOnBorderMargin = true;
                             if(this.avatar)//HACK - without this we get: this.avatar is null
                                 this.avatar.setZIndex(this.zIndex+1);//the avatar will be always above the area 
-                        }                 
+                        }
                     }
                 }
-            } 
-            // if (pointOnBorderMargin)
-            //     console.log("%%%%%%%%%%%%%%%%%%%%%->point is on margin of "+this.containerParent.name);
-            // else
-            //    console.log("%%%%%%%%%%%%%%%%%%%%%->point is outside the margin of "+this.containerParent.name);            
-            return pointOnBorderMargin;
+            }
+             return pointOnBorderMargin;
         },
         setAvatarPreSelection: function(isPreSelected) {
             var avatarLanding = {l: 0,t: 0,w: 0,h: 0};//assumes an area under root container
@@ -249,9 +255,9 @@ define([
                 };
                 this.avatar.setLanding(avatarLanding);
                 this.avatar.setBoundaries(avatarBoundaries);
-                this.avatar.setZIndex(this.zIndex+1);//the avatar will be always above the area
+                this.avatar.setZIndex(this.zIndex+3);//the avatar will be always above the area
                 this.setActivatedStatusTooltip();
-            }    
+            }
         },
         setActivatedStatusTooltip: function() {
             var tooltip = null;
@@ -261,6 +267,15 @@ define([
                 tooltip = "click " + this.type +" named " + this.name +
                     this.getTooltipInsideString() + " to activate it";
             this.avatar.setTooltip(tooltip);
+        },
+        activate: function() {
+            this.avatar.activate();
+            this.toggleVisible(false);
+            this.isActivated = true;
+        },
+        deActivate: function() {
+            this.toggleVisible(true);
+            this.isActivated = false;
         }
     });
 }); //end of  module  

@@ -172,8 +172,7 @@ require([
 		c2.setBorder({borderThickness: 0});
 		var lbl11 = canvas.createTextboxIn(c2,{value: "Form 2",height: 22});
 		var lbl12 = canvas.createTextboxIn(c2,{top: 30,height: 22,value: "abcd"});
-		var txt11 = canvas.createTextboxIn(c2,{left:100,top:30,height: 22,title:"test..",placeHolder:"something",borderThickness: 10});
-
+		var txt11 = canvas.createTextboxIn(c2,{left:100,top:30,height: 22,value: "jojo",title:"test..",placeHolder:"something",borderThickness: 10});
 
 		
 
@@ -199,6 +198,11 @@ require([
 		n3.moveTo({top:300});
 		// alert("zIndex n3.zIndex="+n3.zIndex);
 
+		// txt11.toggleVisible(false);
+		// n3.toggleVisible(false);
+		// alert("INVISIBLE");
+		// txt11.toggleVisible(true);
+		// n3.toggleVisible(true);
 
 		
 		var beginFunction=function(){
@@ -319,10 +323,10 @@ require([
 		detectEngine1.togglePossibleActivation(true);
 		// canvas.baseContainer.detectableBy(detectEngine1);//canvas is now sensible to detection by detectEngine1
 		c0.detectableBy(detectEngine1);//c0 now is sensible to detection by detectEngine1 
-	// var detectEngine2 = new detectEngine(canvas,"engine2");//canvas is the mouse area where detection is possible for detectEngine2
-	// detectEngine2.togglePossibleActivation(true);
+		// var detectEngine2 = new detectEngine(canvas,"engine2");//canvas is the mouse area where detection is possible for detectEngine2
+		// detectEngine2.togglePossibleActivation(true);
 
-		// // c1.detectableBy(detect.avatar);//c1 now is sensible to detection
+		// c1.detectableBy(detectEngine2);//c1 now is sensible to detection
 		c2.detectableBy(detectEngine1);//c2 now is sensible to detection by detectEngine1
 		n3.detectableBy(detectEngine1);//n3 now is sensible to detection by detectEngine1
 

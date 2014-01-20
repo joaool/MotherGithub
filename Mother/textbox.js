@@ -43,7 +43,7 @@ define([
             return this.dojoObj.textbox.value;
         },         
         resize: function() {
-            this.inherited(arguments);//it will call area.moveTo() and the will folow the next code...
+            this.inherited(arguments);//it will call area.resize() and it will follow with next code...
             // alert("hello !!! this is textbox width="+this.width+" height="+this.height);
             var domId = registry.byId(this.id);
             if(domId){
@@ -53,7 +53,7 @@ define([
                 alert("textbox.resize(): The dom node for "+ this.id + " does not exist!");
                 throw new Error("textbox.resize(): The dom node for "+ this.id + " does not exist!");
             }
-         },
+        },
         //REVIEW: Imported from MotherLib10 for speed
         //-------------------------------------------------------------------------------------------
         JSON_Default_TextBox: function(xProps){//Order within TextBoxes,xProps

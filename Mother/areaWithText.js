@@ -9,6 +9,7 @@ define([
         //http://dojotoolkit.org/reference-guide/1.9/dojo/_base/declare.html
         //http://dojotoolkit.org/reference-guide/1.9/dojo/_base/lang.html#mixins-with-classes
         //https://dojotoolkit.org/reference-guide/1.9/dijit/_editor/plugins/TextColor.html
+        //http://learningdojotoolkit.blogspot.pt/2011/06/change-background-color-of.html
         fontSize:null,
         isItalic:false,
         isBold:false,
