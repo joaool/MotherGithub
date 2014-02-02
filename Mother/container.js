@@ -38,7 +38,7 @@ define([
         },
         getValue: function() {
             return "No value";
-        }, 
+        },
         addExistingChild: function(childrenArr){
             // console.log("addExistingChild() $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ BEGIN "+this.name+" id="+this.id+" zIndex="+this.zIndex);
             for(var i = 0; i < childrenArr.length; i++){
@@ -46,10 +46,23 @@ define([
                     alert("container.addExistingChild(): You attemped to add an object that is not widget nor container !");
                     throw new Error("container.addExistingChild(): You attemped to add an object that is not widget nor container !");
                 }
+                //TO REVIEW for clarity
                 var zIndexBefore = childrenArr[i].zIndex;
-                if (this.name != "canvas") {
-                     childrenArr[i].zIndex = this.highestZIndexAreaUnder(childrenArr[i],this)+1;
+                // if (this.name != "canvas") {
+                if (this.containerParent) {//if the recipient is not the  canvas. (only canvas has containerParent = null)
+                    //because the area to be added is going to be added to an existing container (not the canvas) if that container
+                    //  has thickness the position to evaluate overlaps must take that thickness into account
+                    var thicknessUntilContainer = this.totalBorderThicknessesBelowArea();
+                    childrenArr[i].left+=thicknessUntilContainer;
+                    childrenArr[i].top+=thicknessUntilContainer;
+                    childrenArr[i].zIndex = this.highestZIndexAreaUnder(childrenArr[i],this)+1;
+                    childrenArr[i].left-=thicknessUntilContainer;
+                    childrenArr[i].top-=thicknessUntilContainer;
                     // console.log("--------------------------->addExistingChild() adding "+childrenArr[i].name+"/"+childrenArr[i].zIndex+"---------------->to "+this.name+"/"+this.zIndex);
+                    this._removeChildFromPreviousContainerChildrenList(childrenArr[i]);
+                    childrenArr[i].containerParent = this;
+                } else { // the area childrenArr[i] is going to be added to the canvas
+                    childrenArr[i].zIndex = this.highestZIndexAreaUnder(childrenArr[i],this)+1;
                     this._removeChildFromPreviousContainerChildrenList(childrenArr[i]);
                     childrenArr[i].containerParent = this;
                 }

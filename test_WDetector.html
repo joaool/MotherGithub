@@ -38,7 +38,7 @@ require([
     "dojo/on",
 	"dojo/parser",//recomendation from JS
 	"dojo/dom",
-    "Mother/ResizeMoveArea7.js", 
+    "Mother/ResizeMoveArea8.js", 
    	"Mother/areasFactory.js",
 	"Mother/textbox.js",
 	"Mother/numberbox.js",
@@ -119,9 +119,9 @@ require([
 		c0.setBorder({borderThickness: 30});
 		var lbl1 = canvas.createTextboxIn(c0,{value: "Form 0",height: 22});
 
-
 		var lbl2 = canvas.createTextboxIn(c0,{value: "abcd",left: 0, top: 30,width: 50,height: 20});
 		// var txt1 = canvas.createTextboxIn(c0,{left: 60, top: 30,width: 100,height: 40,value: "Junkas", title:"to test something outside the handles...handle will stay", borderThickness: 10});
+
 		var txt1 = canvas.createTextboxIn(c0,{left: 20, top: 30,width: 100,height: 40,value: "Junkas", title:"to test something outside the handles...handle will stay", borderThickness: 10});
 
 
@@ -168,7 +168,7 @@ require([
 		var txt11 = canvas.createTextboxIn(c1,{left:100,top:30,height: 22,title:"test..",placeHolder:"something",borderThickness: 10});
 		c1.setBorder({borderThickness: 5, borderColor: "purple"});
 
-		var c2 = canvas.createContainer({name: "form f2", left: 750+00, top: 100, width: 220, height: 100, borderColor: "green"});
+		var c2 = canvas.createContainer({name: "form f2", left: 950+00, top: 100, width: 220, height: 100, borderColor: "green"});
 		c2.setBorder({borderThickness: 0});
 		var lbl11 = canvas.createTextboxIn(c2,{value: "Form 2",height: 22});
 		var lbl12 = canvas.createTextboxIn(c2,{top: 30,height: 22,value: "abcd"});
@@ -204,76 +204,13 @@ require([
 		// txt11.toggleVisible(true);
 		// n3.toggleVisible(true);
 
-		
-		var beginFunction=function(){
-			//alert("beginFunction !!!");
-			//var oF=x2.getDim();
-			//x1.resize(oF);
-			//x2.forceTermination();
-		};
-		var endFunction=function(){
-			// alert("endFunction !!!");
-			//var oF=x2.getDim();
-			//x1.resize(oF);
-		};
-		var swapFunction=function(){
-			//alert("swapFunction !!!");
-			var oF=x2.getDim();
-			//x1.resize(oF);
-		};
-		// handlerMouseInCanvas=On.pausable(Win.body(), "mousemove", function(e){
-		// 	//checks if mouse is over a candidate area while Area1 is active
-		// 	if(x1.current.active){	
-		// 		var target=redTarget(e.pageX,e.pageY);
-		// 		if(target){
-		// 			//alert("RED TARGET");
-		// 			x1.xxxName="RED TARGET";
-		// 			x2.resize({l:1000,t:100,w:100,h:100});
-		// 			//x1.forceTermination();
-		// 			x2.beginCallback=beginFunction;
-		// 			x2.endCallback=endFunction;
-		// 			x2.swapCallback=swapFunction;
-		// 			//console.log("RED TARGET");
-		// 			//x1.mouseDownCallback=zzz;
-		// 			//console.log("@@@@@@ mouse in canvas pos x="+e.pageX+" y="+e.pageY+" x1.current.active="+x1.current.active+" target="+x1.xxxName);
-		// 		}else{
-		// 			//x1.mouseDownCallback=null;
-		// 			x1.xxxName=""
-		// 		};
-		// 	};	
-		// });	
-		// handlerMouseInCanvas.pause();
-		var zzz=function(){
-			console.log("»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»");
-			console.log("»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»mouseDownCallback»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»");
-			console.log("»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»  xxxName="+x1.xxxName+"»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»");
-			console.log("»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»");
-			/*
-			/*
-			var oF=x1.getDim();
-			oF.w=oF.w+10;
-			x1.resize(oF);
-			*/
-			/*
-			x1.resize({l:1000,t:100,w:100,h:100});
-			zzz=null;
-			*/
-		};	
-		redTarget=function(x,y){//returns always false except if mouse is over red target (1000,100,100,100)
-			var bRet=false;
-			var tg={l:1000,t:100,w:100,h:100};
-			if(x>tg.l){
-				if(y>tg.t){
-					if(x<(tg.l+tg.w)){
-						if(y<(tg.t+tg.h)){
-							bRet=true;
-						};
-					};
-				};
+		// ----------------- detector
+		var detectEngine1 = new detectEngine(canvas,"engine1");//canvas is the mouse area where detection is possible for detectEngine1
+		detectEngine1.toggleActivation(true);
+		canvas.baseContainer.detectableBy(detectEngine1);//canvas is now sensible to detection by detectEngine1
+		// c1.detectableBy(detectEngine2);//c1 now is sensible to detection
 
-			};
-			return bRet;
-		};
+ /* remove to include pair x1,x2  in test
 		var oLanding={l:20,t:30,w:120,h:30};
 		var oBoundaries={l:20,t:20,w:1270,h:420};
 		//var oProps={label:"Area",gridPattern:5,borderThickness:2,borderType:"dotted",activeColor:"gold",fillColor:"red",opacity:1};
@@ -288,48 +225,21 @@ require([
 			opacity:.9
 			//tooltip:"this is a test"
 		});
-		//x1.refreshFillColor(255,255,0);
-		//x1.setOpacity(0.9);
-		//x1.refreshFillColor("#F09EED");
-		//x1.refreshFillColor("red");
-		//x1.refreshFillColor("blue");
-		//x1.activate(); // a primeira vez, a partir dai eram sempre resets
-
 		x1.setCursorInactive("move"); 
 
 		var mouseDownHandler=On.pausable(Dom.byId(x1.avatarId),"mousedown",function(){
 			console.log("Caller =========================================->Mouse down in the area1 <");
-			//x1.mouseDownCallback=zzz;
-			x1.activate();
-
-			mouseDownHandler.pause(); 
+			if(x2.current.active) {
+			    x2.toggleHandles(false);
+			}	
+			x1.toggleHandles(true);
+			mouseDownHandler.pause(); //will be resumed by mouseDownHandler2
+			mouseDownHandler2.resume(); 
 		});	
 		x1.on("resizeMoveEnd",Lang.hitch(this,function(oEvt){
 			console.log("######################################################################## ------ resizeMoveEnd DETECTED in caller !!! (A1) inside="+oEvt.inside+", x1.current.active="+x1.current.active);
-			// if(doubleActivation){//testing 2 activation in a row
-			if(false){//testing 2 activation in a row
-				/*
-				var oF=x1.getDim();
-				oF.l+=500; //a jump to the right
-				x1.resize(oF);
-				*/
-				//x1.activate();
-			}else{
-				mouseDownHandler.resume();//put it ready to be detected when mouse clicks the area
-			};	
+			mouseDownHandler.resume();//put it ready to be detected when mouse clicks the area
 		}));
-		// ----------------- detector
-		var detectEngine1 = new detectEngine(canvas,"engine1");//canvas is the mouse area where detection is possible for detectEngine1
-		detectEngine1.togglePossibleActivation(true);
-		// canvas.baseContainer.detectableBy(detectEngine1);//canvas is now sensible to detection by detectEngine1
-		c0.detectableBy(detectEngine1);//c0 now is sensible to detection by detectEngine1 
-		// var detectEngine2 = new detectEngine(canvas,"engine2");//canvas is the mouse area where detection is possible for detectEngine2
-		// detectEngine2.togglePossibleActivation(true);
-
-		// c1.detectableBy(detectEngine2);//c1 now is sensible to detection
-		c2.detectableBy(detectEngine1);//c2 now is sensible to detection by detectEngine1
-		n3.detectableBy(detectEngine1);//n3 now is sensible to detection by detectEngine1
-
 		//-----------------------------------------------------------------------------------
 		var oLanding2={l:20,t:70,w:120,h:30};
 		x2=new ResizeMoveArea("test2",oLanding2,oBoundaries,{
@@ -343,17 +253,22 @@ require([
 		x2.setCursorActive("pointer"); 
 		var mouseDownHandler2=On.pausable(Dom.byId(x2.avatarId),"mousedown",function(){
 			console.log("Caller =====================================================->Mouse down in the area2");
-			x2.activate();
+			if(x1.current.active) {
+			    x1.toggleHandles(false);
+			}
+			x2.toggleHandles(true);
 			mouseDownHandler2.pause(); 
+			mouseDownHandler.resume(); 
 		});	
 		x2.on("resizeMoveEnd",Lang.hitch(this,function(oEvt){
 			console.log("######################################################################## ------ resizeMoveEnd DETECTED in caller (A2) !!! inside="+oEvt.inside+", x2.current.active="+x2.current.active);
-			x2.beginCallback=null;
-			x2.endCallback=null;
-			x2.swapCallback=null;
+			// x2.beginCallback=null;
+			// x2.endCallback=null;
+			// x2.swapCallback=null;
 			mouseDownHandler2.resume();//put it ready to be detected when mouse clicks the area
 		}));
-
+		
+*/ 
  		function test(){
 			alert("test message in function test - this call is defined in menu object exterior to the class...");
 		}

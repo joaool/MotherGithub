@@ -115,7 +115,8 @@ define([
             if (!containerName)
                 containerName = "container" + this.lastContainerOrder;
             declare.safeMixin(containerProperties,
-                {name: containerName,domId: "container_id" + this.lastContainerOrder,id: "_"+this.lastAreaOrder,areaOrder: this.lastAreaOrder,containerParent: this.baseContainer});
+                {name: containerName,domId: "container_id" + this.lastContainerOrder,id: "_"+
+                        this.lastAreaOrder,areaOrder: this.lastAreaOrder,containerParent: this.baseContainer});
              var c = new container(containerProperties);
             this.baseContainer.addExistingChild([c]);
             return c;

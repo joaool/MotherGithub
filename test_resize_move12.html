@@ -1,0 +1,248 @@
+<html>
+<head>
+<!--
+		<script type="text/javascript" src="Dojo Toolkit/dojo-release-1.7.1/dojo/dojo.js" djconfig="parseOnLoad: true, isDebug: true" >
+		</script> 
+		<link href="Dojo Toolkit/dojo-release-1.7.1/dijit/themes/claro/claro.css" rel="stylesheet">
+-->
+	<meta http-equiv="Content-Type" content="text/html;charset=utf-8" /> 
+    <title>Teste de resize_move 12.0</title>
+	<link href="../dojo1.7.1/dijit/themes/claro/claro.css" rel="stylesheet"> 
+	
+		
+	<link href="../dojo1.7.1/dojox/grid/resources/claroGrid.css" rel="stylesheet">
+
+<!--		
+	<script>
+		// we’re creating a dojoConfig object *before* we load dojo.js
+		var dojoConfig = {
+			async: true,
+			parseOnLoad:true,
+			isDebug:true
+		};
+	</script>
+	<script src="Dojo Toolkit/dojo-release-1.7.1/dojo/dojo.js"></script>
+-->
+	<!-- este bloco substitui o bloco anterior -->
+	<script type="text/javascript" src="../dojo1.7.1/dojo/dojo.js" djconfig="parseOnLoad: true, isDebug: true" >
+		</script> 
+
+
+	<link href="../dojo1.7.1/dijit/themes/claro/claro.css" rel="stylesheet"> 
+	<link href="../dojo1.7.1/dojox/grid/resources/claroGrid.css" rel="stylesheet">
+	<link href="../dojo1.7.1/dojox/layout/resources/FloatingPane.css " rel="stylesheet">
+	<link href="../dojo1.7.1/dojox/layout/resources/ResizeHandle.css " rel="stylesheet">
+	<link rel="stylesheet" href="../dgrid/css/dgrid.css">  
+	<!------ Mother CSS ------------------------------------------------------------------- -->
+		<!--- For Mother Builder --->
+		<link rel="stylesheet" type="text/css" href="Mother1/MotherBuilder.css" /> 
+		<!--- For Mother Forms  A -BlueHills, B-Simple Green C- Tree D-Chess E-light blue F(A+C)=>(fz,f0)--->
+		<link rel="stylesheet" type="text/css" href="Mother1/MotherF.css"/>  
+	<!------------------------------------------------------------------------------------- -->
+		<link href="../dojo1.7.1/dijit/themes/claro/claro.css" rel="stylesheet">
+
+<script>
+oDbg=null;//so that we can use "this" inside this html with embedded script
+require([
+    "Mother/ResizeMoveArea7.js",  
+	"dojo/_base/declare",	 
+	"dojo/_base/window",
+	"dojo/_base/lang",	
+	"dojo/_base/event",
+    "dojo/on",
+	"dojo/parser",//recomendation from JS
+	"dojo/dom",
+	"dojo/dom-construct",//used outside class
+	"dojo/dom-style",	
+	"dojo/ready",
+	], 
+	function(ResizeMoveArea,
+	Declare,Win,Lang,Event,On,Parser,Dom,DomConstruct,DomStyle,Ready){ 
+
+		//----------------------------------------
+		var beginFunction=function(){
+			//alert("beginFunction !!!");
+			//var oF=x2.getDim();
+			//x1.resize(oF);
+			//x2.forceTermination();
+		};
+		var endFunction=function(){
+			alert("endFunction !!!");
+			//var oF=x2.getDim();
+			//x1.resize(oF);
+		};
+		var swapFunction=function(){
+			//alert("swapFunction !!!");
+			var oF=x2.getDim();
+			//x1.resize(oF);
+		};
+		handlerMouseInCanvas=On.pausable(Win.body(), "mousemove", function(e){
+			//checks if mouse is over a candidate area while Area1 is active
+			if(x1.current.active){	
+				var target=redTarget(e.pageX,e.pageY);
+				if(target){
+					//alert("RED TARGET");
+					x1.xxxName="RED TARGET";
+					x2.resize({l:1000,t:100,w:100,h:100});
+					//x1.forceTermination();
+					x2.beginCallback=beginFunction;
+					x2.endCallback=endFunction;
+					x2.swapCallback=swapFunction;
+					//console.log("RED TARGET");
+					//x1.mouseDownCallback=zzz;
+					//console.log("@@@@@@ mouse in canvas pos x="+e.pageX+" y="+e.pageY+" x1.current.active="+x1.current.active+" target="+x1.xxxName);
+				}else{
+					//x1.mouseDownCallback=null;
+					x1.xxxName=""
+				};
+			};	
+		});	
+		//handlerMouseInCanvas.pause();
+		var zzz=function(){
+			console.log("»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»");
+			console.log("»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»mouseDownCallback»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»");
+			console.log("»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»  xxxName="+x1.xxxName+"»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»");
+			console.log("»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»");
+		};	
+		redTarget=function(x,y){//returns always false except if mouse is over red target (1000,100,100,100)
+			var bRet=false;
+			var tg={l:1000,t:100,w:100,h:100};
+			if(x>tg.l){
+				if(y>tg.t){
+					if(x<(tg.l+tg.w)){
+						if(y<(tg.t+tg.h)){
+							bRet=true;
+						};
+					};
+				};
+
+			};
+			return bRet;
+		};
+		var oLanding={l:20,t:30,w:120,h:30};
+		var oBoundaries={l:20,t:20,w:1270,h:420};
+		//var oProps={label:"Area",gridPattern:5,borderThickness:2,borderType:"dotted",activeColor:"gold",fillColor:"red",opacity:1};
+		//=new ResizeMoveArea("test",oLanding,oBoundaries,oProps);
+		x1=new ResizeMoveArea("test",oLanding,oBoundaries,{
+			label:"Area 1",
+			gridPattern:5,
+			//borderThickness:4,
+			//borderType:"inset",//"dotted",
+			//borderColor:"blue",
+			//fillColor:"purple",
+			opacity:.9
+			//tooltip:"this is a test"
+		});
+		x1.setCursorInactive("move"); 
+
+		var mouseDown = function(){
+			console.log("Caller =========================================->Mouse down in the area1 <");
+			//x1.mouseDownCallback=zzz;
+			// x2.forceTermination();
+			// if (x2.current.active) {
+			// 	x2.forceTermination();
+			// 	// x2.
+			// }
+			if(x2.current.active)
+				x2.toggleHandles(false);	
+			x1.activate();
+
+			mouseDownHandler.pause(); 
+		};
+		var mouseDownHandler=On.pausable(Dom.byId(x1.avatarId),"mousedown",mouseDown);
+		// var mouseDownHandler=On.pausable(Dom.byId(x1.avatarId),"mousedown",function(){
+		// 	console.log("Caller =========================================->Mouse down in the area1 <");
+		// 	//x1.mouseDownCallback=zzz;
+		// 	// x2.forceTermination();
+		// 	if (x2.current.active) {
+		// 		x2.forceTermination();
+		// 		// x2.
+		// 	}	
+		// 	x1.activate();
+
+		// 	mouseDownHandler.pause(); 
+		// });	
+			
+		// x1.on("resizeMovePartial",Lang.hitch(this,function(oEvt){
+		// 	console.log("!!!!!!!!!!!!!!! caller ->Parcial Area1 resize/move with x="+oEvt.x+" y="+oEvt.y+" w="+oEvt.w+" 	h="+oEvt.h+" move="+oEvt.move);
+		// 	// x1.setLanding({l: oEvt.x,t: oEvt.y,w: oEvt.w,h: oEvt.h});
+		// }));
+
+		x1.on("resizeMoveEnd",Lang.hitch(this,function(oEvt){
+			console.log("######################################################################## ------ resizeMoveEnd DETECTED in caller !!! (A1) inside="+oEvt.inside+", x1.current.active="+x1.current.active);
+			mouseDownHandler.resume();//put it ready to be detected when mouse clicks the area
+		}));
+		
+		var oLanding2={l:20,t:70,w:120,h:30};
+		x2=new ResizeMoveArea("test2",oLanding2,oBoundaries,{
+			label:"Area 2",
+			gridPattern:5,
+			opacity:.6,
+			fillColor:"lightblue",
+			tooltip:"this is area2 that has inactiveCursor 'crosshair' and active cursor 'pointer'"
+		});
+		x2.setCursorInactive("crosshair"); 
+		x2.setCursorActive("pointer"); 
+		var mouseDownHandler2=On.pausable(Dom.byId(x2.avatarId),"mousedown",function(){
+			console.log("Caller =====================================================->Mouse down in the area2");
+			// x1.forceTermination();
+			// if (x1.current.active)
+			// 	x1.forceTermination();
+			if(x1.current.active) {
+				console.log("x1 is activated !!!! - we will toggle handles down !");
+				x1.toggleHandles(false);
+			}	
+			x2.activate();
+			console.log("====->Mouse down in the area2 - ForceTermination of 1 done, activation of 2 done !");
+			mouseDownHandler2.pause(); 
+		});	
+		// x2.on("resizeMovePartial",Lang.hitch(this,function(oEvt){
+		// 	console.log("!!!!!!!!!!!!!!! caller ->Parcial Area2 resize/move with x="+oEvt.x+" y="+oEvt.y+" w="+oEvt.w+" 	h="+oEvt.h+" move="+oEvt.move);
+		// 	// x2.setLanding({l: oEvt.x,t: oEvt.y,w: oEvt.w,h: oEvt.h});
+		// }));
+		x2.on("resizeMoveEnd",Lang.hitch(this,function(oEvt){
+		// var resizeMoveEndHandler2=x2.on.pausable("resizeMoveEnd",Lang.hitch(this,function(oEvt){
+			console.log("######################################################################## ------ resizeMoveEnd DETECTED in caller (A2) !!! inside="+oEvt.inside+", x2.current.active="+x2.current.active);
+			x2.beginCallback=null;
+			x2.endCallback=null;
+			x2.swapCallback=null;
+           	// On.emit(Dom.byId(x1.avatarId), "mousedown", {
+            //     bubbles: true,
+            //     cancelable: true
+            // });
+			// mouseDownHandler();
+			//mouseDown();
+			// x1.activate();
+			mouseDownHandler2.resume();//put it ready to be detected when mouse clicks the area
+		}));
+		//x2.resize({l:1000,t:100,w:100,h:100});//to test resize without handles
+		x1.mouseDownCallback = function() {
+			console.log("oooooooooooooooooooooooooo-> x1.mouseDownCallback !!! l="+x1.current.l+" t="+x1.current.t+
+					" - AREA 2 - x2.avatarId="+x2.avatarId+" x2.l="+x2.current.l+" x2.t="+x2.current.t);
+			x1.toggleHandles(true);
+			console.log("oooooooooooooooooooooooooooooooooooooo-> closeHandles in x2 !!! ");
+			x2.toggleHandles(false);
+		};
+		x2.mouseDownCallback = function() {
+			console.log("oooooooooooooooooooooooooo-> x2.mouseDownCallback !!! x1.avatarId="+x1.avatarId);
+			console.log("oooooooooooooooooooooooooo-> x2.mouseDownCallback !!! l="+x2.current.l+" t="+x2.current.t+
+					" - AREA 1 - x1.avatarId="+x1.avatarId+" x1.l="+x1.current.l+" x1.t="+x1.current.t);
+			x2.toggleHandles(true);
+			console.log("oooooooooooooooooooooooooooooooooooooo-> closeHandles in x1 !!! ");
+			x1.toggleHandles(false);
+		};
+		function test(){
+			alert("test message in function test - this call is defined in menu object exterior to the class...");
+		}
+		//--------------------------------------------------------------------------------------------------------------------------
+	}//closing of main function				
+);//closing of require function
+</script>
+	</head>
+	<body class="claro">
+		<div id="xwrapper" width="640" height="360" color="red" </div>
+		<!--<div id="box" style="position: absolute;left:1000px;top:100px;width:100px;height:1030px;border:1px solid red" class="boxes" onmouseover="alert('Red spot - was blue !')">	-->
+		<div id="box" style="position: absolute;left:1000px;top:100px;width:100px;height:100px;border:1px solid red">	
+
+	</body>
+</html>

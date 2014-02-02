@@ -13,6 +13,7 @@
 				"dojo/domReady!"],
 			function(ResizeWidget,Declare,Win,On,Evented,Move,Dom,DomAttr,DomGeom,DomConstruct,DomStyle,Lang){
 				return Declare("resizeMoveArea", [Evented],{
+			        //http://dojotoolkit.org/reference-guide/1.9/dojo/_base/declare.html - objects declared in contructor so that each instance gets its own copy
 					//This class allows the resize and move of a screen area within boundaries. The screen area can be an avatar of anything.
 					//	Use:
 					//    1 - Create ResizeMoveArea - this will show the area non activated (without handles)
@@ -26,9 +27,9 @@
 									});
 					*/
 					//        The area will be activated by a click on it.
-					//	2- define a click to activate ResizeMoveArea when user clicks the area
+					//	2- Version8 will be activated whenever the user does a mouse down inside the area. However if the user wants to catch 
 					/*
-								var handlerArea=On.pausable(Dom.byId(x1.moveResizeDivId), "click", Lang.hitch(this,function(evt){ 
+								var handlerArea=On.pausable(Dom.byId(x1.moveResizeDivId), "mousedown", Lang.hitch(this,function(evt){ 
 									if(x1.lastExitInside){//previous was inside the area
 										x1.lastExitInside=false;.
 									}else{//first time (lastExitInside default is false) or previous click was outside the area
@@ -41,6 +42,7 @@
 					//					the click handler must allways activate ResizeMoveArea and pause itsel if lastExitInside=false
 					//
 					//    3- ResizeMoveArea emits the "resizeMovePartial" event at the end of every resize 
+					//			YOU DO NOT NEED TO CATCH THIS EVENT. CATCH IT IF YOU WANT TO DO SOMETHING SPECIAL BETWEEN MOVES/RESIZES
 					//			x1.on("resizeMovePartial",Lang.hitch(this,function(oEvt){
 					//				console.log("x1->  left="+x1.position.x+" top="+x1.position.y+" width="+x1.position.w+" height="+x1.position.h+" move="+oEvt.move);
 					//			}));
@@ -89,11 +91,11 @@
 					//				<input id="_avatarId0_"+<xId> ... where xId is param 1 
 					//						...visible position and value are defined here>
 					//			</div>
-					//		 </div>
+					//       </div>
 					//	</div>
 					//  The above DOM structure is all that exists when handles are not active
 					//  When handles are activated an extra temporary DOM structure appears at the
-					//			  style="display: block;"  level
+					//         style="display: block;"  level
 					//			<div style="display: block;">
 					//				<input id="_avatarId0"+<xId> ... where xId is param 1 
 					//						...visible position and value are defined here>
@@ -117,19 +119,19 @@
 					//
 					//  fMan.addChild("button",{name:"moveFMan",value:"<-Mve->",left:5,top:xBtnOffset+13*xBtnH,width:162,title:"Move this Window",clickCode:"mveWindow()"});
 					//  mveWindow=function(){	
-					// 		var oVP=fMan.viewPort;
-					// 		var mve=new ResizeMoveArea("test","test Area",5, oVP.l, oVP.t, oVP.w+18, oVP.h+18,2,"dotted","gold");//borderType:solid, dotted,dashed
-					// 		handlerArea=On.once(Dom.byId(mve.moveResizeDivId), "mouseenter", Lang.hitch(this,function(evt){ 
-					// 			mve.activate();//qdo o mouse entra no area esta é activada
-					// 			fMan.visible(false);
-					// 		}));	
-					// 		mve.on("resizeMoveEnd",Lang.hitch(this,function(){
-					// 			var iLeft = mve.position.x;//
-					// 			var iTop  = mve.position.y;// 
-					// 			fMan.resizeVPort(iLeft, iTop);
-					// 			fMan.visible(true);
-					// 			mve.visible(false);
-					// 		}));	
+					//		var oVP=fMan.viewPort;
+					//		var mve=new ResizeMoveArea("test","test Area",5, oVP.l, oVP.t, oVP.w+18, oVP.h+18,2,"dotted","gold");//borderType:solid, dotted,dashed
+					//		handlerArea=On.once(Dom.byId(mve.moveResizeDivId), "mouseenter", Lang.hitch(this,function(evt){ 
+					//			mve.activate();//qdo o mouse entra no area esta é activada
+					//			fMan.visible(false);
+					//		}));	
+					//		mve.on("resizeMoveEnd",Lang.hitch(this,function(){
+					//			var iLeft = mve.position.x;//
+					//			var iTop  = mve.position.y;// 
+					//			fMan.resizeVPort(iLeft, iTop);
+					//			fMan.visible(true);
+					//			mve.visible(false);
+					//		}));	
 					// };
 					moveResizeDivId:null, //this will have "_moveResizeDiv0_"+xId;
 					avatarId:null,//this will have "_avatarId0_"+xId;
@@ -141,6 +143,7 @@
 					oExchanger:null,//exchanger object
 					objResizeWidget:null,//resizeWidget instance
 					partialResizeHandler:null,
+					mouseDownInsideHandlerArea: null,//when user clicks the area
 					mouseUpInsideHandler:null,
 					mouseUpOutsideHandler:null,
 					//mouseDownHandler:null,
@@ -150,15 +153,17 @@
 					initStatus:false,
 					lastExitInside:false,
 					mousedownStatus:false, //to prepare an exit if mouseUp occurs with signal this.mousedownStatus=true
-					mouseupStatus:false, 
+					mouseupStatus:false,
 					//readyToExit:false, 
 					activeCursor:"move",
 					inactiveCursor:"default",
 					z:0,
 					z1:0,
 					oProps:{label:"Area",gridPattern:5,borderThickness:2,borderType:"dotted",borderColor:"gold",fillColor:"azure",opacity:1,tooltip:""},	//default
-					oLanding:{l:0,t:0,w:100,h:30},	//default
-					oBoundaries:{l:0,t:0,w:1350,h:500},	//default boundaries
+					// oLanding:{l:0,t:0,w:100,h:30},	//default
+					oLanding: null,	//default
+					// oBoundaries:{l:0,t:0,w:1350,h:500},	//default boundaries
+					oBoundaries: null,	//default boundaries
 					mouseDownCallback:null,
 					forceTerminationStatus:false,
 					onMoveHandler:null,
@@ -167,6 +172,7 @@
 					beginCallback:null,
 					endCallback:null,
 					swapCallback:null,
+					handlesStatus: false,//no handles at the beginning
 					constructor:function(xId,oLanding,oBoundaries,oProps){
 						/*
 						Parameters:
@@ -185,34 +191,31 @@
 								fillColor - internal area color.(default="azure")
 								opacity -opacity grade (0=transparent, 1=solid) (default=1)
 								tooltip -area tooltip.  (default="")
-						*/	
-						if(oLanding)
-							Declare.safeMixin(this.oLanding, oLanding);
-						console.log("ResizeMoveArea Landing: l="+this.oLanding.l+" t="+this.oLanding.t+" w="+this.oLanding.w+" h="+this.oLanding.h);
-						if(oBoundaries)
-							Declare.safeMixin(this.oBoundaries, oBoundaries);
-						console.log("ResizeMoveArea Boundaries: l="+this.oBoundaries.l+" t="+this.oBoundaries.t+" w="+this.oBoundaries.w+" h="+this.oBoundaries.h);
+						*/
+						this.oLanding = {l: 0,t: 0,w: 100,h: 30};//default
+						Declare.safeMixin(this.oLanding, oLanding);
+						// console.log("ResizeMoveArea Landing: l="+this.oLanding.l+" t="+this.oLanding.t+" w="+this.oLanding.w+" h="+this.oLanding.h);
+						this.oBoundaries = {l: 0,t: 0,w: 1350,h: 500};	//default boundaries
+						Declare.safeMixin(this.oBoundaries, oBoundaries);
+						// console.log("ResizeMoveArea Boundaries: l="+this.oBoundaries.l+" t="+this.oBoundaries.t+" w="+this.oBoundaries.w+" h="+this.oBoundaries.h);
 						if(oProps)
 							Declare.safeMixin(this.oProps, oProps);
-						//this.gridPattern=nGridPattern
 						var xBaseNode=Dom.byId("_moveResizeBaseDiv");
 						if(!xBaseNode){//if it does not exist cereates it
 							this.element = DomConstruct.create("div",{id:"_moveResizeBaseDiv", style:"position:inherit; top:0; left:0;"}); //cria HTML div -
-							Win.body().appendChild(this.element); 
+							Win.body().appendChild(this.element);
 						}else{
 							this.element =xBaseNode;
 							this.element.style.position="inherit"; //necessary to prevent JUMP in move....
-						};
+						}
 						this.moveResizeDivId="_moveResizeDiv0_"+xId;
 						if(Dom.byId(this.moveResizeDivId)){//if it exists, destroy its parent
-							//alert("ResizeMoveArea - Já existe menu !!! Vai destruir !");
 							var node2Destroy=Dom.byId(this.moveResizeDivId).parentNode;
-							//DomConstruct.destroy(Dom.byId(this.moveResizeDivId));
 							DomConstruct.destroy(node2Destroy);
-						};
+						}
 						this.avatarId="_avatarId0_"+xId;
 						this.current={label:this.oProps.label,active:false,l:this.oLanding.l,t:this.oLanding.t,w:this.oLanding.w,h:this.oLanding.h,borderThickness:this.oProps.borderThickness,borderType:this.oProps.borderType,borderColor:this.oProps.borderColor,fillColor:this.oProps.fillColor,opacity:this.oProps.opacity,tooltip:this.oProps.tooltip};
-
+						// alert("resizeMoveArea CONSTRUCTOR current l="+this.current.l+" t="+this.current.t);
 						var xInner0="<div id='"+this.moveResizeDivId+"' style='position: absolute; left:"+this.current.l+"px; top:"+this.current.t+"px; width:"+this.current.w+"px; height:"+this.current.h+"px;'></div>";
 						DomConstruct.create("div",{innerHTML:xInner0},this.element);
 						this.visibleElement = DomConstruct.create("div"); //cria outro HTML div 
@@ -226,36 +229,81 @@
 						this.refreshFillColor(this.oProps.fillColor);
 						this.setOpacity(this.oProps.opacity);
 						this.setTooltip(this.oProps.tooltip);
-						//this.setupEvents();
-						//body()
-						//    div ->this.element with id="_moveResizeBaseDiv"
-						//			div (innerHTML do div this.element) -->this.moveResizeDivId
-						//				div -->this.visibleElement
-						//	
+						// alert("constructor");
+						this.setupEvents();
+						this.mouseDownInsideHandlerArea.resume();
+						this.mouseDownOutsideHandler.resume();
+						// console.log("ResizeMoveArea8 END OF CONSTRUCTOR for "+this.avatarId);
+						// console.log("-------------------------------------------------------------------------------------------");
 					},//constructor
 					setupEvents:function(){
+						this.mouseDownInsideHandlerArea=On.pausable(Dom.byId(this.avatarId),"mousedown", Lang.hitch(this,function(e){
+							// console.log(" - resizeMoveArea8.setupEvents   <<"+this.current.label+
+							// 		" >> was ACTIVATED mouseDownInsideHandlerArea");
+							this.mouseDownInsideHandlerArea.pause();
+							this.mouseDownOutsideHandler.resume();
+							this.activate();
+						}));
+						this.mouseDownInsideHandlerArea.pause();
+
 						this.mouseDownOutsideHandler=On.pausable(window,"mousedown", Lang.hitch(this,function(e){
-							//console.log("!!!!!!!!!!!!!!!!!!!!!!!!"+this.current.label+"!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!  ResizeMoveArea mouseDownOutsideHandler EXIT ");
+							// console.log(" - resizeMoveArea8.setupEvents  <<"+this.current.label+
+							// 		">> was DEACTIVATED mouseDownOutsideHandler EXIT ");
 							if(this.endCallback)
 								this.endCallback();
 							this.emitEvent({inside:false,l:e.pageX,t:e.pageY});
-						}));	
+						}));
 						this.mouseDownOutsideHandler.pause();
 						this.mouseUpOutsideHandler=On.pausable(window,"mouseup", Lang.hitch(this,function(e){
 							alert("ResizeMoveArea  mouseUpOutsideHandler");
-							console.log("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx  ResizeMoveArea mouseUpOutsideHandler EXIT ");
+							console.log("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx  ResizeMoveArea mouseUpOutsideHandler EXIT ");
 							if(this.mousedownStatus){
 								console.log("mouseUpOutsideHandler EXIT ");
 								this.emitEvent({inside:true,l:e.pageX,t:e.pageY});
-							};	
+							}
 						}));
 						this.mouseUpOutsideHandler.pause();
 					},//setupEvents
+					toggleHandles: function(isHandles) {
+						if (this.objResizeWidget) {
+							this.handlesStatus = (isHandles)? true:false;
+							if(!this.handlesStatus) {
+								this.objResizeWidget.clearResizeHandles();
+							} else {
+								this.objResizeWidget.createResizeHandles();
+							}
+						}
+					},
+					isPointInside: function(x,y,enlargeMargin) {//checks if x,y is inside considering rectangle growth by optional enlargeMargin pixels
+						if(!enlargeMargin)
+							enlargeMargin = 0;
+						// enlargeMargin = 0;
+						var isInside = false;
+						if (this._isPointBelowRight(x, y, enlargeMargin )) {
+							// console.log("resizeMoveArea.isPointInside POINT "+x +","+y +" IS BelowRight ("+this.current.l+","+this.current.t+")");
+							// console.log("resizeMoveArea.isPointInside ooooo-> checks if "+ x+" < ("+this.current.l+" + "+this.current.w+")");
+							if (x < (this.current.l + this.current.w + enlargeMargin ) && y < (this.current.t + this.current.h + enlargeMargin)){
+								isInside = true;
+							}
+						}
+						// if (isInside)
+						// 	console.log("resizeMoveArea.isPointInside point "+(x-enlargeMargin)+","+(y-enlargeMargin)+" is INSIDE area ");
+						// else
+						// 	console.log("resizeMoveArea.isPointInside point "+(x-enlargeMargin)+","+(y-enlargeMargin)+" is OUTSIDE area ");
+						return isInside;
+					},
+					_isPointBelowRight: function(x,y,enlargeMargin){//given a point verifies if that point is below and to the right of area
+						var isBelowRight = false;
+						if (x > this.current.l - enlargeMargin)
+							if (y > this.current.t - enlargeMargin)
+								isBelowRight = true;
+						return isBelowRight;
+					},
 					refreshLabel:function(xLabel){//writes xLabel inside the area
 						this.current.label=xLabel;
 						var xNode=Dom.byId(this.avatarId);
 						DomAttr.set(xNode,"value",xLabel); //Dojo way to do it...
-						DomStyle.set(this.avatarId,"cursor",this.inactiveCursor); 
+						DomStyle.set(this.avatarId,"cursor",this.inactiveCursor);
 					},//refreshLabel
 					refreshFillColor:function(xR,xG,xB){//receives color text/hexadecimal single parameter/ or 3 RGB color parameters (0-255)
 						var xRGB=null;
@@ -264,17 +312,17 @@
 							this.current.fillColor.r=xR;
 							this.current.fillColor.g=xG;
 							this.current.fillColor.b=xB;
-							var xRGB="rgb("+xR+","+xG+","+xB+")";
-						}else{	
+							var xRGB="rgb(" + xR + "," + xG + "," + xB +")";
+						} else {
 							xRGB=xR;//xRGB is taking an hexadecimal format
-						};
+						}
 						DomStyle.set(xNode,"backgroundColor",xRGB); //,"#F09EED"; ,"red"; 
 					},//refreshFillColor
 					setOpacity:function(xOpacity){//updates opacity level
 						//areaOpacity=xOpacity;
 						var xNode=Dom.byId(this.avatarId);
 						//DomStyle.set(xNode,"opacity",areaOpacity); 
-						DomStyle.set(xNode,"opacity",xOpacity); 
+						DomStyle.set(xNode,"opacity",xOpacity);
 					},//setOpacity
 					setTooltip:function(xTitle){//sets xTitle as the area tooltip
 						var xNode=Dom.byId(this.avatarId);
@@ -326,11 +374,11 @@
 						var xDim={l:null,t:null,w:null,h:null,text:null};
 						var xNode=Dom.byId(this.moveResizeDivId);
 						var xxNode=Dom.byId(this.avatarId);
-						xDim.l=parseInt(DomStyle.get(xNode,"left")); 
-						xDim.t=parseInt(DomStyle.get(xNode,"top")); 
-						xDim.w=parseInt(DomStyle.get(xxNode,"width")); 
-						xDim.h=parseInt(DomStyle.get(xxNode,"height")); 
-						xDim.text=DomAttr.get(xxNode,"value"); 
+						xDim.l = parseInt(DomStyle.get(xNode,"left"));
+						xDim.t = parseInt(DomStyle.get(xNode,"top"));
+						xDim.w = parseInt(DomStyle.get(xxNode,"width"));
+						xDim.h = parseInt(DomStyle.get(xxNode,"height"));
+						xDim.text = DomAttr.get(xxNode,"value");
 					return xDim;
 					},//getDim
 					visible:function(bSet){//shows or hides area
@@ -340,8 +388,8 @@
 								DomStyle.set(xNode,"visibility","visible");
 							}else{
 								DomStyle.set(xNode,"visibility","hidden");
-							};
-						};
+							}
+						}
 					},//visible	
 					resize:function(oDim){//repositions and resize oDim ({l:xl,t:xt,w:xw,h:xh})
 						var xNode=Dom.byId(this.moveResizeDivId);
@@ -350,22 +398,22 @@
 							DomStyle.set(xNode, "top",oDim.t);
 							DomStyle.set(xNode, "width",oDim.w);
 							DomStyle.set(xNode, "height",oDim.h);
-						};
+						}
 						var xxNode=Dom.byId(this.avatarId);
 						if(xxNode){
 							DomStyle.set(xxNode, "width",oDim.w);
 							DomStyle.set(xxNode, "height",oDim.h);
-						};
+						}
 						if(this.current.active){
 							this.objResizeWidget.clearResizeHandles();
 							this.objResizeWidget.createResizeHandles();
-						};
+						}
 					},//resize	
 					colorToHex:function(c) {//converts rgb format to hex format
 						//example equals(colorToHex('rgb(120, 120, 240)'), '#7878f0');
 						var m = /rgba?\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)/.exec(c);
 						return m ? '#' + (1 << 24 | m[1] << 16 | m[2] << 8 | m[3]).toString(16).substr(1) : c;
-					},				
+					},
 					activate:function(){
 						//Activates only one element at a time.
 						//when activated one element has 2 states "Handles on" and "drag"
@@ -376,29 +424,29 @@
 						// the property __isResize ->defines the status resizing(true) or moving(false) --->default=false
 						//     this property is updated by this.setStatus(true) [isResize] or false [is Moving]
 						//			the update is done at resizeWidget when resizes begins (resizeWidget._onMouseDown) or 
-						//						       at moveCoord when onMouseMove begins (moveCoord.onMouseMove)
+						//          at moveCoord when onMouseMove begins (moveCoord.onMouseMove)
 						//
 						if(this.beginCallback)
 							this.beginCallback();
-						this.setupEvents();
+						console.log("resizeMove.activate INITIAL POSITION l="+this.current.l+" t="+this.current.t);
+						// this.setupEvents();
 						//DomStyle.set(this.avatarId,"cursor", "move"); //#### move
 						DomStyle.set(this.avatarId,"cursor", this.activeCursor); //#### move
 						DomStyle.set(this.visibleElement,"display","block");//to make element visible all times
 						//---------- Regista o evento para saida (click sobre o element) ------------
 						this.current.active=true;
+						this.forceTerminationStatus=false;
 						//DomStyle.set(this.avatarId,"border",this.current.borderThickness+"px dotted "+this.current.activeColor);
 						DomStyle.set(this.avatarId,"border",this.current.borderThickness+"px "+this.current.borderType+" "+this.current.activeColor);
-
-						//if(!this.objResizeWidget){//ResizeWidget is created and its coordinator property is set to resizeMoveArea (this class)
-							//var oBoundaries={l:10,t:10,w:1250,h:400};
-							//this.objResizeWidget=new ResizeWidget({"targetNode":this.moveResizeDivId,"targetType":"textArea"},this);
 							this.objResizeWidget=new ResizeWidget({"targetNode":this.moveResizeDivId,"targetType":"textArea"},this,this.oBoundaries);
-							//console.log("-----------------------------------------------------------------------------------------");
-							//console.log("--------------------------  this.objResizeWidget CREATED for "+this.current.label+" -------------------------------");
-							//console.log("-----------------------------------------------------------------------------------------");
+							// console.log("-----------------------------------------------------------------------------------------");
+							// console.log("--------------------------  this.objResizeWidget CREATED for "+this.current.label+" -------------------------------");
+							// console.log("-----------------------------------------------------------------------------------------");
 							this.objResizeWidget.mouseDownCallback=this.mouseDownCallback;
-							if(this.mouseDownCallback)
+							if(this.mouseDownCallback) {
 								this.objResizeWidget.mouseDownCallback();
+								// this.mouseDownCallback();
+							}
 							this.objResizeWidget.gridPattern=this.oProps.gridPattern;
 							//console.log("ResizeMoveArea.activate this.objResizeWidget WAS BUILT for "+this.current.label);
 							//this.objResizeWidget.upHandler.pause();
@@ -416,18 +464,24 @@
 								this.resizeStatus=false;
 							}));
 
+							// this.toggleHandles(true);
+
+
 							var thiz=this;
 							this.partialResizeHandler=this.objResizeWidget.on("_onResizeComplete",Lang.hitch(this,function(e){//callback with an anonimous function
-								//console.log("ResizeMoveArea6.activate onResizeComplete ****BEGIN****");
-								//console.log("ResizeMoveArea6.activate ---->runs objResizeWidget event 'onResizeComplete' (the parcial)  vai emitir resizeMovePartial !!!");
-								//console.log("ResizeMoveArea6.activate ---->runs objResizeWidget event width="+this.objResizeWidget.targetW+" height="+this.objResizeWidget.targetH);
-								//console.log("@@@@@@@@-onResizeParcial-@@@@@@@ "+thiz.current.label+"---> catch _onResizeComplete EVENT ");
-								DomStyle.set(this.avatarId,"width",this.objResizeWidget.targetW);
-								DomStyle.set(this.avatarId,"height",this.objResizeWidget.targetH);
+								// console.log("ResizeMoveArea8.activate ---->@@@@@@@@-onResizeParcial-@@@@@@@ "+thiz.current.label+
+								//		"---> catch _onResizeComplete EVENT W,H="+e.w+","+e.h);
+								// DomStyle.set(this.avatarId,"width",this.objResizeWidget.targetW);
+								// DomStyle.set(this.avatarId,"height",this.objResizeWidget.targetH);
+								DomStyle.set(this.avatarId,"width",e.w);//HACK why is this.objResizeWidget.targetW different ?
+								DomStyle.set(this.avatarId,"height",e.h);//HACK
 								thiz.resizeStatus=true;
-								this.position = DomGeom.position(dojo.byId(this.avatarId));	
+							// this.position = DomGeom.position(dojo.byId(this.avatarId));
+							this.position = {x: e.x,y: e.y,w: e.w,h: e.h};
 								this.position["move"]=false;
 								thiz.objResizeWidget.upHandler.pause();
+
+								// thiz.setLanding({l:this.position.x,t: this.position.y,w: this.position.w,h: this.position.h});
 								this.emit("resizeMovePartial",this.position);//- new on/event system - 
 							}));//partialResizeHandler
 							this.mouseDownOutsideHandler.resume();
@@ -435,9 +489,9 @@
 						//-----------------------------------------this.ready2Move();--------------------------------------------------------------
 						this.position = DomGeom.position(this.moveResizeDivId,true);//o arg é o id não o node. use true to get the x/y relative to the document root
 						//* -- move preparation
-						var thiz=this;
+						var thiz = this;
 						/*
-						this.objMove = new Moveable(Dom.byId(this.moveResizeDivId),{// o HTML element passa a mover-se. a classe moveable vai alterar a sua style property indicando as posições...
+							this.objMove = new Moveable(Dom.byId(this.moveResizeDivId),{// o HTML element passa a mover-se. a classe moveable vai alterar a sua style property indicando as posições...
 							delay:5 //moveable only triggers after a drag of 5 pixels
 							//mover:MoveCoord //Moveable instanciates moveCoord (coordinated by this class) when we click on element
 						});
@@ -456,14 +510,17 @@
 						this.onMoveHandler=On(this.objMove, "Move", function (mover,leftTop,e) {//called at every onmousemove event
 							// necessary to make snapToGrid to work on move
 							//console.log("ResizeMoveArea Move ///////////////////////////////////////////////////////////////////////////////////////////////////////  ON MOVE !!!!");
-								var x=e.pageX;
+							var x=e.pageX;//this is mouse x position inside this.objectMove
 							var y=e.pageY;
 
-							//console.log("x="+x+" y="+y+" with gridPattern="+thiz.oProps.gridPattern);
+							// console.log("ResizeMoveArea7.activate this.onMoveHandler x="+x+" y="+y+" with gridPattern="+thiz.oProps.gridPattern);
 							this.onMoving(mover, leftTop);
 							var s = mover.node.style;
 							s.left = thiz.snapToGrid(leftTop.l) + "px";
 							s.top  = thiz.snapToGrid(leftTop.t) + "px";
+							// console.log("resizeMove.onMoveHandler - l="+leftTop.l+" t="+leftTop.t);
+							thiz.current.l=leftTop.l;
+							thiz.current.t=leftTop.t;
 							this.onMoved(mover, leftTop);
 						});
 						
@@ -474,11 +531,18 @@
 							thiz.initStatus=false;
 							thiz.moveCounter++;
 							thiz.objResizeWidget.upHandler.pause();//pause resizeWCoord upHandler
-							if(thiz.objResizeWidget.mouseDownCallback)
-								thiz.objResizeWidget.mouseDownCallback();
+							// if(thiz.objResizeWidget.mouseDownCallback)
+							// 	thiz.objResizeWidget.mouseDownCallback();
+							if(thiz.mouseDownCallback)
+								thiz.mouseDownCallback();
 							thiz.objResizeWidget.upHandler.pause();
-							//console.log("@@@@@@@@-onMoveStart-@@@@@@@ "+thiz.current.label+" move#"+thiz.moveCounter+" ---> catch onMoveStart EVENT ");
-						});						
+
+							thiz.position = DomGeom.position(dojo.byId(thiz.avatarId));
+							var x=thiz.position.x;
+							var y=thiz.position.y;
+
+							// console.log("@@@@@@@@-onMoveStart-@@@@@@@ ResizeMoveArea7.activate "+thiz.current.label+" move#"+thiz.moveCounter+" ---> catch onMoveStart EVENT x="+x+" y="+y);
+						});
 						//Connect.connect(this.objMove, "onMoveStop", function (mover) { //return from from moveable when mouse is up
 						On(this.objMove, "MoveStop", function (mover) { //return from from moveable when mouse is up
 							//alert("ResizeMoveArea onMoveStop STOP"+mover);
@@ -488,28 +552,30 @@
 							thiz.mousedownStatus=false;
 							thiz.mouseupStatus=true;
 
-							thiz.position = DomGeom.position(dojo.byId(thiz.avatarId));	
+							thiz.position = DomGeom.position(dojo.byId(thiz.avatarId));
+
+							var x=thiz.position.x;
+							var y=thiz.position.y;
+							// console.log("@@@@@@@@-onMoveStop-@@@@@@@@ ResizeMoveArea7.activate "+thiz.current.label+" MoveStop EVENT x="+x+" y="+y);
+
 							thiz.position["move"]=true;
+							// thiz.setLanding({l:thiz.position.x,t: thiz.position.y,w: thiz.position.w,h: thiz.position.h});
 							thiz.emit("resizeMovePartial",thiz.position);//- new on/event system - 
 						//thiz.objResizeWidget.upHandler.resume();
 							thiz.objResizeWidget.upHandler.pause();
 							if(thiz.swapCallback)
 								thiz.swapCallback();
-							//console.log("@@@@@@@@-onMoveStop-@@@@@@@ "+thiz.current.label+"---> catch onMoveStop EVENT ");
 						});
 					},//activate
 					forceTermination:function(){
 						this.forceTerminationStatus=true;
-						this.emitEvent({inside:true,l:0,t:0});//runs normally emit event except emiting the event
-						this.forceTerminationStatus=false;
+						this.emitEvent({inside:true,l:0,t:0});//runs normally emitevent() except emiting the event
+						// this.forceTerminationStatus=false;
+						this.current.active=false;
+						alert("resizeMoveArea.forceTermination");
+						this.mouseDownOutsideHandler.pause();
 					},//forceTermination
 					emitEvent:function(oEvt){//colects events from resizeWCoord and moveCoord 
-						/*
-						if(!this.forceTerminationStatus)
-							console.log("ResizeMoveArea.emitEvent ------------------------------------------->exit with z1="+this.z1);
-						else
-							console.log("ResizeMoveArea.emitEvent -- forceTerminationStatus=true ------------>Leaves by termination z1="+this.z1);
-						*/
 						this.z1++;
 				
 						if(this.objMove){
@@ -524,7 +590,7 @@
 						//console.log("@@@@@@@@@@@@@@@@@@@@@@@@@@ ResizeMove.emitEvent ANTES DO TESTE !!! this.objResizeWidget="+this.objResizeWidget);
 						if(this.objResizeWidget){
 							//this.mouseDownHandler.remove();
-							this.mouseDownOutsideHandler.remove();
+							// this.mouseDownOutsideHandler.remove();
 							//this.mouseUpInsideHandler.remove();
 							this.mouseUpOutsideHandler.remove();
 							this.objResizeWidget.upHandler.remove();
@@ -535,13 +601,15 @@
 							//console.log("@@@@@@@@@@@@@@@@@@@@@@@@@@ ResizeMove.emitEvent event handlers removed !!!");
 						}else{
 							//alert("resizeMoveArea.emitEvent IMPOSSIBILITY:this.objResizeWidget MUST NOT EXIST !");
-						};
+						}
 						//console.log("@@@@@@@@@@@@@@@@@@@@@@@@@@ ResizeMove.emitEvent resizeMoveEnd EVENT !!! inside="+oEvt.inside+" terminationStatus="+this.forceTerminationStatus);
 						//console.log("@@@@@@@@@@@@@@@@@@@@@@@@@@ ResizeMove.emitEvent resizeMoveEnd EVENT !!! this.objResizeWidget="+this.objResizeWidget+" InactiveCursor="+this.inactiveCursor);
 						this.lastExitInside=oEvt.inside;//to be used if true (inside) in the begining of activate()
 						this.setCursor(this.inactiveCursor);
 						this.current.active=false;
 						//alert("@@@@@@@ ResizeMove.emitEvent endResize EVENT !!! inside="+oEvt.inside);
+						this.mouseDownInsideHandlerArea.resume();
+						this.mouseDownOutsideHandler.resume();
 						if(!this.forceTerminationStatus)
 							this.emit("resizeMoveEnd",oEvt);//- new on/event system - 
 					},

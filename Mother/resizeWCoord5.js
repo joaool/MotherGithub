@@ -121,7 +121,7 @@
 				targetType:null,
 				inside:null,//outside or inside element...
 				lastX:null,//last cursor x position 
-				lastY:null,//last cursor y position 	
+				lastY:null,//last cursor y position
 				upHandler:null,
 				moveHandler:null,
 				mouseDownInsideHandler:null,
@@ -140,8 +140,8 @@
 				positions:[],//array with 8 positions NW,NE,SE,SW,N,S,W,E used in create handles and clear handles - it will be defined in constructor to avoid static effect 
 				k:0,	//for test only this.upHandler and this.moveHandler
 				k1:0,	//for test only this.upHandler and this.moveHandler	
-				pos:{x:null,y:null},
-				oBoundaries:{l:0,t:0,w:1350,h:500},	
+				//pos:{x:null,y:null},
+				oBoundaries:{l:0,t:0,w:1350,h:500},
 				mouseDownCallback:null,
 				lastMoveX:null,
 				lastMoveY:null,
@@ -170,10 +170,10 @@
 						this.lastMoveY=DomStyle.get(this.targetNode,"top");
 						this.lastMoveW=DomStyle.get(this.avatarNode,"width");
 						this.lastMoveH=DomStyle.get(this.avatarNode,"height");
-						//console.log("resizeWCoord CONSTRUCTOR ++++++++++++++++++ lastMoveX="+this.lastMoveX+", lastMoveY="+this.lastMoveY+", lastMoveW="+this.lastMoveW+", lastMoveH="+this.lastMoveH+" +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
+						// console.log("resizeWCoord CONSTRUCTOR ++++++++++++++++++ lastMoveX="+this.lastMoveX+", lastMoveY="+this.lastMoveY+", lastMoveW="+this.lastMoveW+", lastMoveH="+this.lastMoveH+" +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
 					}else{
-						alert("resizeWidget.constructor - Error: targetNode "+this.targetNode+" is not in the DOM."); 
-					};					
+						alert("resizeWidget.constructor - Error: targetNode "+this.targetNode+" is not in the DOM.");
+					}
 					//var coords = dojo.coords(dojo.byId(this.targetNode)); //targetNode tem a string que foi passada na construção ex"avatarId"
 					var coords = DomGeom.position(dojo.byId(this.targetNode)); //targetNode tem a string que foi passada na construção ex"avatarId"
 					//alert("Em resizeWidget 1.6 com par1="+this.targetNode+" par2="+this.targetType);
@@ -205,7 +205,7 @@
 					//alert("resizeWCoord 3 postCreate resizeStatus="+this.callerObj.resizeStatus);
 					if (dojo.isString(this.targetNode)) {
 						this.targetNode = Dom.byId(this.targetNode); //deixa de ser um Id e passa a ser um node 
-					};
+					}
 					//this.upHandler=this.connect(dojo.doc, "onmouseup", dojo.hitch(this, "_onMouseUp"));
 					//  var buttonHandler = on.pausable(button, "click", clickHandler);
 					//  var signal = on(win.doc, "click", function(){
@@ -218,7 +218,7 @@
 						this._onMouseUp(e);
 					}));
 					this.upHandler.pause();
-					this.moveHandler=On.pausable(Win.doc,"mousemove", Lang.hitch(this,function(e){	
+					this.moveHandler=On.pausable(Win.doc,"mousemove", Lang.hitch(this,function(e){
 						//alert("this.moveHandler mousemove");
 						this._onMouseMove(e);
 					}));
@@ -230,14 +230,14 @@
 						if(this.resizeMoveStatus>0){
 							//alert("resizeWCoord mouseDownInsideHandler emit EVENT 'endResize' AND EXIT !!!!");
 							//*
-							this.inside=true;	
+							this.inside=true;
 							//this.clearResizeHandles();
 							//this.upHandler.remove();
 							//this.moveHandler.remove();
 							// if(this.oDbg.isDbg("postCreate")) this.oDbg.display("Next step will emit EVENT '_insideEndResize'");
 							//console.log("resizeWCoord.postCreate Next step will emit EVENT '_insideEndResize'");
 							this.emit("_insideEndResize",{inside:true,fromMover:false});//a move may follow
-						};
+						}
 						///
 							//alert("resizeWCoord mouseDownInsideHandler emit EVENT 'endResize' AND EXIT !!!!");
 					}));
@@ -254,25 +254,24 @@
 				},
 				*/
 				onResizeComplete: function(marginBox) {
-					//connect here
-					//alert("resizeWidget.onResizeComplete faz destroy aqui !!!")
-					//console.log("resizeWCoord.onResizeComplete @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ resizeWidget.onResizeComplete ENTROU ...");
 					var coords = DomGeom.position(dojo.byId(this.targetNode));//this refere-se a moveResize
 					this.targetL=coords.x;
 					this.targetT=coords.y;
 					this.targetW=coords.w;
 					this.targetH=coords.h;
-					this.emit("_onResizeComplete",{});
+					// console.log("@@@@@@@@@@ resizeWCoord.onResizeComplete before emiting _onResizeComplete EVENT... this.targetL="+
+					// 		this.targetL+","+this.targetT+","+this.targetW+","+this.targetH);
+					this.emit("_onResizeComplete",{x: this.targetL,y: this.targetT,w: this.targetW,h: this.targetH});
 				},
 				_onMouseDown: function(e) {//Only enters here when mouse is down over an handl for resizing
-					//console.log("resizeWCoord._onMouseDown in "+this.callerObj.current.label+"<----------------------------------------------");
+					console.log("---->resizeWCoord._onMouseDown in "+this.callerObj.current.label+"<----------------------------------------------");
 					if(this.mouseDownCallback)
 						this.mouseDownCallback(); //each time mouse down is pressed runs callback
 					this.lastMoveX=this.snapToGrid(DomStyle.get(this.targetNode,"left"));
 					this.lastMoveY=this.snapToGrid(DomStyle.get(this.targetNode,"top"));
 					//console.log("resizeWCoord._onMouseDown ++++++++++++++++++ lastMoveX="+this.lastMoveX+", lastMoveY="+this.lastMoveY+", lastMoveW="+this.lastMoveW+", lastMoveH="+this.lastMoveH+" +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
 					this.upHandler.resume();
-					this.callerObj.mousedownStatus=false;//to prevent to sequece mouse down,mouseup in caller
+					this.callerObj.mousedownStatus=false;//to prevent to sequence mouse down,mouseup in caller
 					this.callerObj.resizeStatus=true;
 					this.callerObj.initStatus=false;
 					this.resizeMoveStatus=1;// 1- resize status
@@ -313,9 +312,9 @@
 							this.inside=false;
 							if((x>=this.targetL) && (x<=this.targetL+this.targetW) && (y>=this.targetT) && (y<=this.targetT+this.targetH)){
 								this.inside=true;//mouse is inside frame
-							};	
-							this.lastX=x;	
-							this.lastY=y;	
+							}
+							this.lastX=x;
+							this.lastY=y;
 						//alert("resizeWidget _onMouseUp vai sair x="+x+" y="+y+" inside="+this.inside);
 							this.clearResizeHandles();
 							//this.destroy();
@@ -329,49 +328,50 @@
 							if(this.inside)
 								alert("resizeWCoord._onMouseUp ESTRANHO this.inside está TRUE !!!");
 							this.emit("_endResize",{inside:this.inside,fromMover:false});
-						};
+						}
 					}else{
-						alert("ResizeWCoord _onMouseUp isResize=false !!!");
-					};
+						// alert("ResizeWCoord _onMouseUp isResize=false !!!");
+					}
 				},
 				_onMouseMove: function(e) {
-					 var x = this.snapToGrid(e.clientX);
-					 //var x= e.clientX;
-					 var y = this.snapToGrid(e.clientY); 
-					 //var y= e.clientY;
-					 //keep handles within boundaries !!!
-					 x=(x<this.oBoundaries.l)?this.oBoundaries.l:x;
-					 x=(x>this.oBoundaries.l+this.oBoundaries.w)?this.oBoundaries.l+this.oBoundaries.w:x;
-					 y=(y<this.oBoundaries.t)?this.oBoundaries.t:y;
-					 y=(y>this.oBoundaries.t+this.oBoundaries.h)?this.oBoundaries.t+this.oBoundaries.h:y;
+					var x = this.snapToGrid(e.clientX);
+					//var x= e.clientX;
+					var y = this.snapToGrid(e.clientY);
+					//var y= e.clientY;
+					//keep handles within boundaries !!!
+					x=(x<this.oBoundaries.l)?this.oBoundaries.l:x;
+					x=(x>this.oBoundaries.l+this.oBoundaries.w)?this.oBoundaries.l+this.oBoundaries.w:x;
+					y=(y<this.oBoundaries.t)?this.oBoundaries.t:y;
+					y=(y>this.oBoundaries.t+this.oBoundaries.h)?this.oBoundaries.t+this.oBoundaries.h:y;
 
 
-					 if (this._mouseDown === true) {
+					if (this._mouseDown === true) {
 						//console.log("Class resizeWidget2 _onMouseMove /mouseDown with gridPattern="+this.gridPattern+" x="+x+" y="+y+" mouse down="+this._mouseDown);
-			 			//console.log("//////////////////////////////////////////////////////////////////////////////////////////////////////x="+x+" y="+y+" gridPattern="+this.gridPattern);
+						//console.log("//////////////////////////////////////////////////////////////////////////////////////////////////////x="+x+" y="+y+" gridPattern="+this.gridPattern);
 						var xMin = 15;
 						var yMin = 20;
-					 	//console.log("///////////////////////////////////////////////////////////// Width Inicial = ->"+this.lastMoveW);
+						//console.log("///////////////////////////////////////////////////////////// Width Inicial = ->"+this.lastMoveW);
 						//console.log("///////////////////////////////////////////////////////////// x     Inicial = ->"+this.lastMoveX);
 						if (this._lastDirection.indexOf("E") != -1){
-						 	var xW=Math.max(xMin, x - parseInt(this.targetNode.style.left));
-						 	this.lastMoveW=xW;
+							var xW=Math.max(xMin, x - parseInt(this.targetNode.style.left,10));
+							this.lastMoveW=xW;
 							this.targetNode.style.width = xW + "px";
-						 	this.avatarNode.style.width = xW + "px";
-						};
+							this.avatarNode.style.width = xW + "px";
+						}
 						if (this._lastDirection.indexOf("S") != -1){
-						 	var xH=Math.max(yMin, y - parseInt(this.targetNode.style.top));
-						 	this.lastMoveH=xH;
+							var xH=Math.max(yMin, y - parseInt(this.targetNode.style.top,10));
+							this.lastMoveH=xH;
 							//console.log("////////////// S ->"+xH);
 							this.targetNode.style.height = xH + "px";
 							this.avatarNode.style.height = xH + "px";
-						};	
+						}
 						if (this._lastDirection.indexOf("W") != -1) {
 							//console.log("////////////West this.lastMoveW="+this.lastMoveW);
 							var difX=x-this.lastMoveX;//this is 1 if mouse moves to right or -1 if it moves to left
 							if((this.lastMoveW-difX)>xMin){//width still greater than minimum - x change and w change accepted !
 								this.targetNode.style.left = x + "px";
-								var xW=this.lastMoveW-difX;
+								this.callerObj.current.l = x;//informs caller about current position
+								var xW = this.lastMoveW-difX;
 								this.targetNode.style.width = xW + "px";
 								this.avatarNode.style.width = xW + "px";
 								//console.log("//////////////////////////West   x  = ->"+x);
@@ -379,15 +379,16 @@
 								//console.log("//////////////////////////West Width= ->"+xW);
 								this.lastMoveX=x;
 								this.lastMoveW=xW;
-							}else{	
+							}else{
 								console.log("xxxxx across limit xxxxxxxxxxxx W ->"+x);
-							};	
-						};
+							}
+						}
 						if (this._lastDirection.indexOf("N") != -1) {
 							//console.log("////////////North this.lastMoveH="+this.lastMoveH);
 							var difY=y-this.lastMoveY;//this is 1 if mouse moves lower or -1 if it moves upper
 							if((this.lastMoveH-difY)>yMin){//width still greater than minimum - x change and w change accepted !
 								this.targetNode.style.top = y + "px";
+								this.callerObj.current.t = y;//informs caller about current position
 								var xH=this.lastMoveH-difY;
 								this.targetNode.style.height = xH + "px";
 								this.avatarNode.style.height = xH + "px";
@@ -396,13 +397,14 @@
 								//console.log("//////////////////////////North height= ->"+xH);
 								this.lastMoveY=y;
 								this.lastMoveH=xH;
-							}else{	
+							} else {
 								console.log("resizeWCoord4 xxxxx across limit xxxxxxxxxxxx H ->"+y);
-							};	
-						};
-						this.createResizeHandles();					
+							}
+						}
+						// console.log("------->_onMouseMove.resizeWCoord x,y="+this.callerObj.current.l+","+this.callerObj.current.t);
+						this.createResizeHandles();
 						dojo.stopEvent(e);
-					};
+					}
 				},
 				createResizeHandles: function() {
 					/*
@@ -432,10 +434,11 @@
 						var node = undefined;
 
 						//if (node = dojo.query("." + "wuhiDesignerResizeSquare_" + item.direction, this.targetNode)[0]) {               
-						if (node = Query(".resize_" + item.direction, this.targetNode)[0]) {
+						if (node = Query(".resize_" + this.targetId + item.direction, this.targetNode)[0]) {
 						} else {
 							node = Lang.clone(square);
-							DomClass.add(node, "resize_" + item.direction);//poe no CSS a classe resize_NW, resize_NE etc para poder mudar o cursor em cima do node
+							// DomClass.add(node, "resize_"+item.direction);//poe no CSS a classe resize_NW, resize_NE etc para poder mudar o cursor em cima do node
+							DomClass.add(node, "resize_"+ this.targetId + item.direction);//poe no CSS a classe resize_NW, resize_NE etc para poder mudar o cursor em cima do node
 							DomStyle.set(node, "cursor", item.direction + "-resize");// o cursor "NW-resize" é dupla seta diagonal esq ...etc...
 							DomConstruct.place(node, this.targetNode);//coloca o square no element cujo id foi o input (recordar que o id foi substituido pelo node node=dojo.byId(xId))
 							//this.connect(node, "onmousedown", dojo.hitch(this, "_onMouseDown"));//old version
@@ -453,7 +456,8 @@
 				clearResizeHandles: function() {
 					this.setPositions();// to define the array 
 					Array.forEach(this.positions, function(item) {
-						var class2Del=".resize_"+item.direction;// não esquecer o ponto !!!
+						// var class2Del=".resize_"+item.direction;// não esquecer o ponto !!!
+						var class2Del=".resize_" + this.targetId + item.direction;// não esquecer o ponto !!!
 						//console.log("------------->apaga "+class2Del);
 						var nl=Query(class2Del);
 						//alert("Numero elementos com "+class2Del+"="+nl.length);

@@ -8,6 +8,7 @@ define([
     return declare(null,{
         //http://dojotoolkit.org/reference-guide/1.9/dojo/_base/declare.html
         //http://dojotoolkit.org/reference-guide/1.9/dojo/_base/lang.html#mixins-with-classes
+        //http://dojotoolkit.org/reference-guide/1.9/dojo/_base/declare.html - objects declared in contructor so that each instance gets its own copy
         id:null,//to be passed to dojo object as an id
         name:null,
         domId:null, //to access dom directly
@@ -27,8 +28,14 @@ define([
         areaOrder:null,
         zIndex:-1,//all areas have a zIndex that is the next zIndex after the top highest area being covered 
         containerParent:null,//all areas have a parent (parent of baseContainer is null)
-        avatar:null,//to be used by builder version methods
-        rootDetectionArea: null,//to be used by builder version methods
+
+        avatar:null,//to be used by builder version methods - the avatar of the detection engine currently selected 
+        avatarId:null,//to be used by builder version methods - the avatar id is the detection engine Id
+        detectorEngine:null,// engine to listen by area
+        rootDetectionArea: null,//to be used by builder version methods - the object that was set as detectableBy()
+ 
+        rootDetectionAreaActivated: null,//to be used by builder version methods - if true some area above this root was activated
+        rootDetectionActivationEngine: null,//to be used by builder version methods - Identifies the engine that has the activation 1-for engine1 2-for engine 2
         constructor: function(areaProperties) {
             // alert("BEGIN AREA CONTRUCTOR AREA this.id="+this.id+" id="+areaProperties.id+" order="+areaProperties.order);
             lang.mixin(this, areaProperties);//mixin is used to mix an object-hash of properties passed has argument with default values in the class 
@@ -39,12 +46,15 @@ define([
                 this.domId = "widget_"+this.id;
             }
             var showContainerParentName = "Canvas Parent...";
-            if (this.containerParent) {//most frequent case where area is inside a container
-                this.zIndex = this.containerParent.highestZIndexAreaUnder(this,this.containerParent)+1;
-                showContainerParentName = "No name but id=" + this.containerParent.id;
-                if (this.containerParent.name)
-                    showContainerParentName = this.containerParent.name;
-            }
+            // if (this.containerParent) {//most frequent case where area is inside a container
+            //     this.zIndex = this.containerParent.highestZIndexAreaUnder(this,this.containerParent)+1;
+            //     showContainerParentName = "No name but id=" + this.containerParent.id;
+            //     if (this.containerParent.name)
+            //         showContainerParentName = this.containerParent.name;
+            // }
+            this.zIndex = -1;
+            this.detectorEngines = {engine1: null,engine2: null};
+
             // console.log("area class ---------------------------------------->areaOrder=" + this.areaOrder +" id=" + this.id + " name=" + this.name + " left="+this.left+" top="+this.top);
             // console.log("area class ------------------------------------------------>  width="+this.width+" height="+this.height+" zIndex="+this.zIndex+" containerParentName="+showContainerParentName);
             // console.log("area class ------------------------------------------------>  borderThickness="+this.borderThickness+", borderStyle="+this.borderStyle+", borderColor="+this.borderColor+")");
@@ -113,12 +123,12 @@ define([
             if (this.containerParent) {//if it is not a free area
                 leftTopProperties.left += this.containerParent.left;
                 leftTopProperties.top += this.containerParent.top;
-                this.moveTo(leftTopProperties)
+                this.moveTo(leftTopProperties);
             } else {
                 alert("area.moveInContainerTo(): area is not inside a container !!!");
                 throw new Error("area.moveInContainerTo(): area is not inside a container !!!");
-            }                
-        },        
+            }
+        },     
         updateDOMPropertyWithValue: function(propertyName, value){//in the case of left,top properties they are relative to the container !!!            
             //because the id uses "widget_" prefix left,top are container relative (it is a dom element contructed by dojo )
             var domId = "widget_"+this.id;//this makes left top container relative !!!
@@ -185,8 +195,8 @@ define([
             // alert("area.isPointUpLeftFromAreaBottomRight BEGIN");
             var isUpLeft = false;
             // if (point.left < (this.left + this.width))
-            if (point.left < (this.left + this.width + sumOfBordersThickness + 2*this.borderThickness))
-                if (point.top < (this.top + this.height + sumOfBordersThickness + 2*this.borderThickness))
+            if (point.left < (this.left + this.width + sumOfBordersThickness + this.borderThickness))
+                if (point.top < (this.top + this.height + sumOfBordersThickness + this.borderThickness))
                     isUpLeft = true;
             return isUpLeft;
         },
@@ -201,12 +211,22 @@ define([
             }
             return insideString;
         },
-        // -----------------------------   methods below this line to be used exclusively by builder version ----------------------------
-        detectableBy: function(detectorEngine) {//recursively propagates avatar
-            this.avatar = detectorEngine.avatar;
+        // -----------------------------------------------------------------------------------------------------------------------
+        // -----------------------------   methods below this line to be used exclusively by builder version ---------------------
+         // -----------------------------------------------------------------------------------------------------------------------
+         detectableBy: function(detectorEngine) {////REVIEWED
+            this._setDetectableBy(detectorEngine,this);
+        },
+        _setDetectableBy: function(detectorEngine, rootArea) {//recursively propagates avatar //REVIEWED
+            //detectorEngines = {engine1: null,engine2: null};
+            // lang.mixin(this.detectorEngines,detectorEngineProperties);
+            this.detectorEngine = detectorEngine;
+            this.rootDetectionArea = rootArea;
+            this.avatar = this.detectorEngine.avatarA;
+            this.avatarId = this.detectorEngine.avatarAId;
             if (this.type == "container") {
                 for(var i = 0; i < this.children.length; i++){
-                    this.children[i].detectableBy(detectorEngine);
+                    this.children[i]._setDetectableBy(detectorEngine,rootArea);
                 }
             }
         },
@@ -236,27 +256,36 @@ define([
             }
              return pointOnBorderMargin;
         },
-        setAvatarPreSelection: function(isPreSelected) {
+        setAvatarPreSelection: function(engineAvatarId) {//REVIEWED
+            if (this.containerParent) {//no preselection on root containers (canvas)
+                console.log(" ======= setAvatarPreSelection ======== > this.avatar.id="+this.avatar.avatarId+ " - engineAvatarId ="+engineAvatarId);
+                this._preSelectionOnForEngine(engineAvatarId);
+            }
+        },
+        _preSelectionOnForEngine: function(engineAvatarId) {//REVIEWED
             var avatarLanding = {l: 0,t: 0,w: 0,h: 0};//assumes an area under root container
             var avatarBoundaries = {l: 0,t: 0,w: 0,h: 0};//assumes an area under  root container
             if (this.avatar) {//preSelects if the area is detectable (same as having this.avatar pointing to a resizeMove object)
-                var extraThickness = this.totalBorderThicknessesBelowArea();//the total thickness to add to area due to the thickness of containers inside containers.
-                avatarLanding = {
-                    l: this.left + extraThickness - this.borderThickness,
-                    t: this.top + extraThickness - this.borderThickness,
-                    w: this.width+3+2*this.borderThickness,
-                    h: this.height+3+2*this.borderThickness
-                };
-                avatarBoundaries = {
-                    l:this.containerParent.left + extraThickness - this.borderThickness,// + this.containerParent.borderThickness,
-                    t:this.containerParent.top + extraThickness - this.borderThickness,// + this.containerParent.borderThickness,
-                    w:this.containerParent.width + 0,
-                    h:this.containerParent.height + 0
-                };
-                this.avatar.setLanding(avatarLanding);
-                this.avatar.setBoundaries(avatarBoundaries);
-                this.avatar.setZIndex(this.zIndex+3);//the avatar will be always above the area
-                this.setActivatedStatusTooltip();
+                // console.log("_preSelectionOnForEngine this.avatarId="+this.avatar.avatarId+" engineAvatarId="+engineAvatarId);
+                if(this.avatar.avatarId == engineAvatarId) {
+                    var extraThickness = this.totalBorderThicknessesBelowArea();//the total thickness to add to area due to the thickness of containers inside containers.
+                    avatarLanding = {
+                        l: this.left + extraThickness - this.borderThickness,
+                        t: this.top + extraThickness - this.borderThickness,
+                        w: this.width+3+2*this.borderThickness,
+                        h: this.height+3+2*this.borderThickness
+                    };
+                    avatarBoundaries = {
+                        l:this.containerParent.left + extraThickness - this.borderThickness,// + this.containerParent.borderThickness,
+                        t:this.containerParent.top + extraThickness - this.borderThickness,// + this.containerParent.borderThickness,
+                        w:this.containerParent.width + 0,
+                        h:this.containerParent.height + 0
+                    };
+                    this.avatar.setLanding(avatarLanding);
+                    this.avatar.setBoundaries(avatarBoundaries);
+                    this.avatar.setZIndex(this.zIndex+3);//the avatar will be always above the area
+                    this.setActivatedStatusTooltip();
+                }
             }
         },
         setActivatedStatusTooltip: function() {
@@ -269,13 +298,56 @@ define([
             this.avatar.setTooltip(tooltip);
         },
         activate: function() {
-            this.avatar.activate();
-            this.toggleVisible(false);
+            // this.toggleVisible(false);
             this.isActivated = true;
+            this.rootDetectionArea.rootDetectionAreaActivated = true;//informs all areas above root (inclusive) that one of them is activated
+            //this.avatar.activate();
+        },
+        prepareAreaActivation: function() {
+            this._preSelectionOnForEngine(this.avatarId);
+        },
+        switchAvatarForAllAreasExceptActivatedTo: function(alternateAvatar) {
+            if (this.rootDetectionArea) {
+                console.log("area.switchAvatarForAllAreasExceptActivatedTo Begin propagation from " + this.rootDetectionArea.name);
+                this.rootDetectionArea._propagateSwithToAvatar(alternateAvatar,this.rootDetectionArea,true);
+             } else {
+                alert("area.switchAvatarForAllAreasExceptActivatedTo(): area " + this.name + " has no rootDetection area !!!");
+                throw new Error("area.switchAvatarForAllAreasExceptActivatedTo(): area " +  this.name + " has no rootDetection area !!!");
+            }
+        },
+        switchAvatarAllAreasTo: function(alternateAvatar) {
+            if (this.rootDetectionArea) {
+                console.log("area.switchAvatarAllAreasTo Begin propagation from " + this.rootDetectionArea.name);
+                this.rootDetectionArea._propagateSwithToAvatar(alternateAvatar,this.rootDetectionArea,false);
+             } else {
+                alert("area.switchAvatarForAllAreasExceptActivatedTo(): area " + this.name + " has no rootDetection area !!!");
+                throw new Error("area.switchAvatarForAllAreasExceptActivatedTo(): area " +  this.name + " has no rootDetection area !!!");
+            }
+        },        
+        _propagateSwithToAvatar: function(alternateAvatar,rootArea,isException) {//recursively propagates switch to engine 1 from rootArea
+            if(isException) {
+                if (!rootArea.isActivated) {
+                    rootArea.avatar = alternateAvatar;
+                } else {
+                    console.log(" --------------->" + rootArea.name + " excluded from propagation");            
+                }
+            } else {
+                rootArea.avatar = alternateAvatar;
+            }   
+            if (rootArea.type == "container") {
+                for(var i = 0; i < rootArea.children.length; i++){
+                    console.log(" ---> Propagates avatar "+ alternateAvatar.avatarId +" to " + rootArea.name);
+                    rootArea.children[i]._propagateSwithToAvatar(alternateAvatar,rootArea.children[i],isException);
+                }
+            }
         },
         deActivate: function() {
+            //alert("DEACTIVATE !!!");
             this.toggleVisible(true);
             this.isActivated = false;
-        }
+            // this.rootDetectionArea.rootDetectionAreaActivated = false;
+            console.log("area.deActivate() area "+this.name+" was deActivated !");
+            // this.rootDetectionArea.rootDetectionAreaActivated = false;
+        },
     });
 }); //end of  module  
