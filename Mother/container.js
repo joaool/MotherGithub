@@ -125,9 +125,14 @@ define([
          },
         moveTo: function(leftTopCoordinates){//overrides the area moveTo() method - coordinates are container coordinates
             //http://apphacker.wordpress.com/2010/01/31/how-to-call-the-base-method-when-using-inheritance-in-dojo-1-4/
+            var initialZindex = this.zIndex;
+            // alert("---->container.moveTo initialZindex="+initialZindex);
             this.inherited(arguments);//it will call area.moveTo() and the will folow the next code...
             // console.log("container.moveTo first left="+this.left+" top="+this.top);
-            this.adjustAllChildrenByDelta({left: this.left - this.previousLeft, top: this.top - this.previousTop},this);
+            this.adjustAllChildrenPositionsByDelta({left: this.left - this.previousLeft, top: this.top - this.previousTop},this);
+            var deltaZIndex = this.zIndex - initialZindex;
+            // alert("---->container.moveTo deltaZIndex="+deltaZIndex);
+            this.adjustAllChildrenZIndexByDelta(deltaZIndex,this);
         },
         resize: function() {//override over resize() in area base class
             this.inherited(arguments);//it will call area.resize() and the will folow the next code...
@@ -141,13 +146,22 @@ define([
                 throw new Error("container.resize(): The dom node for "+ this.id + " does not exist!");
             }
          },
-        adjustAllChildrenByDelta: function(deltaCoordinates,container){
+        adjustAllChildrenPositionsByDelta: function(deltaCoordinates,container){
             for(var i = 0; i < container.children.length; i++){
-                // console.log("container.adjustAllChildrenByDelta i="+i+" BEFORE left="+container.children[i].left+" top="+container.children[i].top);             
+                // console.log("container.adjustAllChildrenPositionsByDelta i="+i+" BEFORE left="+container.children[i].left+" top="+container.children[i].top);             
                 container.children[i].left += deltaCoordinates.left;
                 container.children[i].top += deltaCoordinates.top;
                 if (container.children[i].type == "container")
-                    this.adjustAllChildrenByDelta(deltaCoordinates,container.children[i]);
+                    this.adjustAllChildrenPositionsByDelta(deltaCoordinates,container.children[i]);
+                // console.log("                                   i="+i+" AFTER  left="+container.children[i].left+" top="+container.children[i].top);
+            }
+        },
+        adjustAllChildrenZIndexByDelta: function(deltaZIndex,container){
+            for(var i = 0; i < container.children.length; i++){
+                // console.log("container.adjustAllChildrenPositionsByDelta i="+i+" BEFORE left="+container.children[i].left+" top="+container.children[i].top);             
+                container.children[i].zIndex += deltaZIndex;
+                if (container.children[i].type == "container")
+                    this.adjustAllChildrenZIndexByDelta(deltaZIndex,container.children[i]);
                 // console.log("                                   i="+i+" AFTER  left="+container.children[i].left+" top="+container.children[i].top);
             }
         },

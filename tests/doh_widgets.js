@@ -370,9 +370,9 @@ define([
                 //moving c0 over form f1
                 doh.assertEqual("5", this.z5,"c0(form f0)  has not zIndex=5 !!!");
                 //if zIndex of "form f0" now becomes 5 all its belongings should adjust accordingly
-                doh.assertEqual("6", this.lbl1,"lbl1 has not zIndex=6 !!!");
-                doh.assertEqual("6", this.c01,"c01 has not zIndex=6 !!!");
-                doh.assertEqual("7", this.lbl01,"lbl01 has not zIndex=7 !!!");
+                doh.assertEqual("6", this.lbl1.zIndex,"lbl1 has not zIndex=6 !!!");
+                doh.assertEqual("6", this.c01.zIndex,"c01 has not zIndex=6 !!!");
+                doh.assertEqual("7", this.lbl01.zIndex,"lbl01 has not zIndex=7 !!!");
            }
         },
         "topAreaUnderPoint detection with borderThickness effect":{
