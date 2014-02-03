@@ -13,74 +13,9 @@
 				"dojo/domReady!"],
 			function(ResizeWidget,Declare,Win,On,Evented,Move,Dom,DomAttr,DomGeom,DomConstruct,DomStyle,Lang){
 				return Declare("resizeMoveArea", [Evented],{
-			        //http://dojotoolkit.org/reference-guide/1.9/dojo/_base/declare.html - objects declared in contructor so that each instance gets its own copy
+					//http://dojotoolkit.org/reference-guide/1.9/dojo/_base/declare.html - objects declared in contructor so that each instance gets its own copy
 					//This class allows the resize and move of a screen area within boundaries. The screen area can be an avatar of anything.
-					//	Use:
-					//    1 - Create ResizeMoveArea - this will show the area non activated (without handles)
-					//        Ex:	
-					/*				var oLanding={l:20,t:30,w:120,h:30};
-									var oBoundaries={l:20,t:20,w:1270,h:420};
-									x1=new ResizeMoveArea("test",oLanding,oBoundaries,{
-										label:"Area",
-										gridPattern:5,
-										opacity:.9
-									});
-					*/
-					//        The area will be activated by a click on it.
-					//	2- Version8 will be activated whenever the user does a mouse down inside the area. However if the user wants to catch 
-					/*
-								var handlerArea=On.pausable(Dom.byId(x1.moveResizeDivId), "mousedown", Lang.hitch(this,function(evt){ 
-									if(x1.lastExitInside){//previous was inside the area
-										x1.lastExitInside=false;.
-									}else{//first time (lastExitInside default is false) or previous click was outside the area
-										x1.activate();
-										handlerArea.pause();//prevents "click" event reentry
-									};	
-								}));
-					*/
-					//			NOTICE: the click handler must allways test lastExitInside and set it to false if it is true
-					//					the click handler must allways activate ResizeMoveArea and pause itsel if lastExitInside=false
-					//
-					//    3- ResizeMoveArea emits the "resizeMovePartial" event at the end of every resize 
-					//			YOU DO NOT NEED TO CATCH THIS EVENT. CATCH IT IF YOU WANT TO DO SOMETHING SPECIAL BETWEEN MOVES/RESIZES
-					//			x1.on("resizeMovePartial",Lang.hitch(this,function(oEvt){
-					//				console.log("x1->  left="+x1.position.x+" top="+x1.position.y+" width="+x1.position.w+" height="+x1.position.h+" move="+oEvt.move);
-					//			}));
-					//
-					//			the "resizeMovePartial" event, allows a customized adjustment of the area after every resize.
-					//
-					//    4- ResizeMoveArea emits the "resizeMoveEnd" event when the user clicks inside the area to signal that she has finished the area definition
-					//			x1.on("resizeMoveEnd",Lang.hitch(this,function(oEvt){
-								//alert("x1->  left="+x1.position.x+" top="+x1.position.y+" width="+x1.position.w+" height="+x1.position.h);
-					//				handlerArea.resume();//put it ready to be detected when mouse clicks the area
-					//			}));
-					//
-					//			NOTICE: the resizeMoveEnd handler must reactivate the area handler (it is disarmed in every activation)
-					//
-					//     It is possible to keep the handles activated while clicking outside the area with the suspend()  method
-					/*     Example:
-								var handler=On.pausable(f0.formObj.domNode,"mouseenter",function(){
-									x1.suspend(true);//mouse entered f0
-								});
-								var handler=On.pausable(f0.formObj.domNode,"mouseleave",function(){
-									x1.suspend(false);
-								});
-					*/
-					//
-					//  NOTE ON EVENTS: 
-					//          ResizeMoveArea  uses resizeWidget (resizeWCoord4.js) events:
-					//				_onResizeComplete <- when user finishes a parcial resize
-					//   			_endResize <- when user terminates the rezise operation by clicking outside the area
-					//				_insideEndResize <- when user terminates the rezise operation by clicking inside the area
-					//			Normally ResizeMoveArea deals internally with "onResizeComplete" by adjusting the avatar of the area to the new rectangle
-					//				resulting from resizeWidget object and only emits an event "resizeMoveEnd" when 
-					//				resizing and moving are complete. However we may need to change the undelaying frame (hidden by the avatar) 
-					//				for instance to adjust an <img> element...
-					//
-					//   ResizeMoveArea Events (to be used by callers) are: 
-					//     "resizeMovePartial" - equivalent to onResizeComplete but including avatar adjustment
-					//	   "resizeMoveEnd" - normal finishing of area resizing - click inside or outside handles
-					//				The event argument has the property inside with true for click inside the event and false otherwise.
+					//	Use:see documentation on MotherTec_8.docx point 11.2.2 - ResizeMoveArea8+ class
 					//
 					// DOM NOTES:
 					//   ResizeMoveArea uses a DOM area under the node id="_moveResizeBaseDiv" as an umbrella to all handled frames
@@ -173,6 +108,8 @@
 					endCallback:null,
 					swapCallback:null,
 					handlesStatus: false,//no handles at the beginning
+					beingResized:false, //true if area is being resized
+					beingMoved:false, //true if area is being moved
 					constructor:function(xId,oLanding,oBoundaries,oProps){
 						/*
 						Parameters:
@@ -214,7 +151,9 @@
 							DomConstruct.destroy(node2Destroy);
 						}
 						this.avatarId="_avatarId0_"+xId;
-						this.current={label:this.oProps.label,active:false,l:this.oLanding.l,t:this.oLanding.t,w:this.oLanding.w,h:this.oLanding.h,borderThickness:this.oProps.borderThickness,borderType:this.oProps.borderType,borderColor:this.oProps.borderColor,fillColor:this.oProps.fillColor,opacity:this.oProps.opacity,tooltip:this.oProps.tooltip};
+						this.current={label:this.oProps.label,active:false,l:this.oLanding.l,t:this.oLanding.t,w:this.oLanding.w,h:this.oLanding.h,
+								borderThickness:this.oProps.borderThickness,borderType:this.oProps.borderType,borderColor:this.oProps.borderColor,
+								fillColor:this.oProps.fillColor,opacity:this.oProps.opacity,tooltip:this.oProps.tooltip};
 						// alert("resizeMoveArea CONSTRUCTOR current l="+this.current.l+" t="+this.current.t);
 						var xInner0="<div id='"+this.moveResizeDivId+"' style='position: absolute; left:"+this.current.l+"px; top:"+this.current.t+"px; width:"+this.current.w+"px; height:"+this.current.h+"px;'></div>";
 						DomConstruct.create("div",{innerHTML:xInner0},this.element);
@@ -273,6 +212,9 @@
 								this.objResizeWidget.createResizeHandles();
 							}
 						}
+					},
+					beingMovedResized: function() {
+						return (this.beingMoved || this.beingResized);
 					},
 					isPointInside: function(x,y,enlargeMargin) {//checks if x,y is inside considering rectangle growth by optional enlargeMargin pixels
 						if(!enlargeMargin)
@@ -529,6 +471,7 @@
 							thiz.moveStatus=true;
 							thiz.resizeStatus=false;
 							thiz.initStatus=false;
+							thiz.beingMoved = true;
 							thiz.moveCounter++;
 							thiz.objResizeWidget.upHandler.pause();//pause resizeWCoord upHandler
 							// if(thiz.objResizeWidget.mouseDownCallback)
@@ -551,6 +494,7 @@
 
 							thiz.mousedownStatus=false;
 							thiz.mouseupStatus=true;
+							thiz.beingMoved = false;
 
 							thiz.position = DomGeom.position(dojo.byId(thiz.avatarId));
 

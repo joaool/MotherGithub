@@ -260,11 +260,14 @@
 					this.targetW=coords.w;
 					this.targetH=coords.h;
 					// console.log("@@@@@@@@@@ resizeWCoord.onResizeComplete before emiting _onResizeComplete EVENT... this.targetL="+
-					// 		this.targetL+","+this.targetT+","+this.targetW+","+this.targetH);
+					//		this.targetL+","+this.targetT+","+this.targetW+","+this.targetH);
 					this.emit("_onResizeComplete",{x: this.targetL,y: this.targetT,w: this.targetW,h: this.targetH});
 				},
 				_onMouseDown: function(e) {//Only enters here when mouse is down over an handl for resizing
-					console.log("---->resizeWCoord._onMouseDown in "+this.callerObj.current.label+"<----------------------------------------------");
+					// console.log("---->resizeWCoord._onMouseDown in "+this.callerObj.current.label+"<----------------------------------------------");
+					this.callerObj.beingResized = true;//informs caller that it is under resize operation
+					// console.log("%%%%%%%%% resizeWCoord5._onMouseMove %%%%%%%%%%%%%%%%%%%%%%%%%->this.callerObj.beingResized="+this.callerObj.beingResized);
+
 					if(this.mouseDownCallback)
 						this.mouseDownCallback(); //each time mouse down is pressed runs callback
 					this.lastMoveX=this.snapToGrid(DomStyle.get(this.targetNode,"left"));
@@ -291,12 +294,15 @@
 				_onMouseUp: function(e) {
 					// ---- JO This will receive mouseUp comming after handles drag (this._mouseDown=true) and mouseUp after mouse down outside
 					//console.log("resizeWCoord._onMouseUp in "+this.callerObj.current.label+"<----------------------------------------------");
+					this.callerObj.beingResized = false;//informs caller that it is under resize operation
+					// console.log("%%%%%%%%% resizeWCoord5._onMouseMove %%%%%%%% BACK TO FALSE %%%%%%%%%%%%%%%%%->"+this.callerObj.beingResized);
+
 					if(this.callerObj.swapCallback)
 						this.callerObj.swapCallback();
 					var isResize=this.callerObj.resizeStatus;
 					if(isResize){//only enters if not under moveCoord control
-						var x = e.clientX; 
-						var y = e.clientY; 
+						var x = e.clientX;
+						var y = e.clientY;
 						if(x>DomStyle.get(Win.body(), "width"))
 							this.exitNormally=false;
 						if(y>DomStyle.get(Win.body(), "height"))
@@ -346,6 +352,7 @@
 
 
 					if (this._mouseDown === true) {
+
 						//console.log("Class resizeWidget2 _onMouseMove /mouseDown with gridPattern="+this.gridPattern+" x="+x+" y="+y+" mouse down="+this._mouseDown);
 						//console.log("//////////////////////////////////////////////////////////////////////////////////////////////////////x="+x+" y="+y+" gridPattern="+this.gridPattern);
 						var xMin = 15;

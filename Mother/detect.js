@@ -16,14 +16,8 @@ define([
         detectorId: null,
         avatarA: null,
         avatarB: null,
-        // avatarAId: null,
-        // avatarBId: null,
         topArea: null,
-        
-        previousTopContainerArea: null,//only to be use by this.borderRed()
-        previousTopContainerAreaBorderThickness: null,//only to be use by this.borderRed()
-        previousTopContainerAreaBorderColor: null,//only to be use by this.borderRed()
-        
+              
         lastDetectedAreaId: null,
         avatarAMouseDownHandler: null,
         avatarBMouseDownHandler: null,
@@ -38,8 +32,7 @@ define([
             var initialLanding={l: 0,t: 0,w: 0,h: 0};
             var initialBoundaries={l: 0,t: 0,w:0,h:420};
             
-            this.avatarAId = detectorId+"_A";
-            this.avatarA = new resizeMoveArea(this.avatarAId,initialLanding,initialBoundaries,{
+            this.avatarA = new resizeMoveArea(detectorId+"_A",initialLanding,initialBoundaries,{
                 label:"AvatarA",
                 gridPattern:5,
                 //borderThickness:4,
@@ -51,22 +44,15 @@ define([
             });
             this.avatarA.setCursorInactive("pointer");
 
-            this.avatarBId = detectorId+"_B";
-            this.avatarB = new resizeMoveArea(this.avatarBId,initialLanding,initialBoundaries,{
+            this.avatarB = new resizeMoveArea(detectorId+"_B",initialLanding,initialBoundaries,{
                 label:"AvatarB",
                 gridPattern:5,
-                //borderThickness:4,
-                //borderType:"inset",//"dotted",
-                //borderColor:"blue",
                 fillColor:"purple",
                 opacity:0.6,
                 tooltip:"B this is resize move over a dojo widget !"
             });
             this.avatarB.setCursorInactive("pointer");
-            // this.avatar.mouseDownCallback = lang.hitch(this,function(){
-            //     this.topArea.toggleVisible(false);//when user clicks the area to drag, makes topArea invisible
-            // });
-
+            this.avatar = this.avatarA;
             // console.log(" DETECT end of contructor "+this.avatar.current.label);
         },
         toggleActivation: function(isDetectOn){
@@ -102,16 +88,20 @@ define([
                 // console.log("topAreaCandidate.name="+topAreaCandidate.name);
                 var doesPreSelection = true;
                 if (this.activeAvatar) {
-                    if(this.activeAvatar.isPointInside(x,y,6)) {
+                    if(this.isAlternateAvatarBeingResized()) {
                         doesPreSelection = false;
                         this.avatar.setLanding({l: 0,t: 0,w: 0,h: 0});//undoes eventual PreSelection
                         topAreaCandidate = this.activeArea;
-                        // console.log("mouse inside active area "+topAreaCandidate.name+" id="+ topAreaCandidate.id+
-                        //         " previous id="+ this.lastDetectedAreaId);
                     } else {
-                        // console.log("mouse outside active area. Current area is "+topAreaCandidate.name+" with id="+
-                        //         topAreaCandidate.id+" previous id="+ this.lastDetectedAreaId +" does="+doesPreSelection);
+                        if (this.activeAvatar.isPointInside(x,y)) {
+                            // console.log("cursor entered activated area !!!!");
+                            this.avatar.setLanding({l: 0,t: 0,w: 0,h: 0});//undoes eventual PreSelection
+                            doesPreSelection = false;
+                       } else {    
+                            // console.log("cursor EXITED activated area !!!! Now cursor is over "+topAreaCandidate.name);
+                        }
                     }
+                    this.lastDetectedAreaId = this.activeAvatar.avatarId;
                 }
                 // console.log(" does="+doesPreSelection);
                 if (doesPreSelection) {
@@ -135,127 +125,113 @@ define([
         },//setEventHandlers  
         setResizeMoveEndListernerForAvatarA: function() {
             this.avatarA.on("resizeMoveEnd",lang.hitch(this,function(oEvt){
-                console.log("@######## AvatarA ######### ------ resizeMoveEnd DETECTED in caller !!! engine="+this.detectorId+", area="+this.topArea.name);
-                // this.topArea.deActivate();
-                //this.isActive = false;
-                if(this.activeAvatar)
-                    this.activeAvatar.setLanding({l: 0,t: 0,w: 0,h: 0});//undoes eventual PreSelection
-                this.avatar = this.avatarA;//a reset closing the circle
-                if(this.activeArea)
-                    this.activeArea.switchAvatarAllAreasTo(this.avatar);
-                this.activeArea = null;
-                this.activeAvatar = null;
+                this.resizeMoveEndCommonGovernance("A");
                 this.avatarAMouseDownHandler.resume();
                 // this.topArea.containerParent.childDump();
             }));
         },
         setResizeMoveEndListernerForAvatarB: function() {
             this.avatarA.on("resizeMoveEnd",lang.hitch(this,function(oEvt){
-                console.log("@######## AvatarB ######### ------ resizeMoveEnd DETECTED in caller !!! engine="+this.detectorId+", area="+this.topArea.name);
-                // this.topArea.deActivate();
-                //this.isActive = false;
-                if(this.activeAvatar)
-                    this.activeAvatar.setLanding({l: 0,t: 0,w: 0,h: 0});//undoes eventual PreSelection
-                this.avatar = this.avatarA;// a reset closing the circle
-                if(this.activeArea)
-                    this.activeArea.switchAvatarAllAreasTo(this.avatar);
-                this.activeArea = null;
-                this.activeAvatar = null;
+                this.resizeMoveEndCommonGovernance("B");
                 this.avatarBMouseDownHandler.resume();
             }));
         },
         setResizeMovePartialListernerForAvatarA: function() {
             this.avatarA.on("resizeMovePartial",lang.hitch(this,function(oEvt){
-                console.log("@################################################## A ------ resizeMovePartial DETECTED in caller !!! avatar.current.active="+this.avatar.current.active);
-                var totalBorderThicknesses = this.activeArea.totalBorderThicknessesBelowArea();
-                 this.activeArea.moveTo({//moves to absolute positions !!!
-                    left: this.activeAvatar.position.x - totalBorderThicknesses + this.activeArea.borderThickness,
-                    top: this.activeAvatar.position.y - totalBorderThicknesses + this.activeArea.borderThickness
-                });
-                this.activeArea.resize({width: this.activeAvatar.position.w - 2*this.activeArea.borderThickness,
-                    height: this.activeAvatar.position.h - 2*this.activeArea.borderThickness});
-                console.log("@### avatarA x,y="+this.activeAvatar.position.x+","+this.activeAvatar.position.y+
-                        " activeArea name="+this.activeArea.name+" left,top="+this.activeArea.left+","+this.activeArea.top+" zIndex="+this.activeArea.zIndex);
-                this.activeArea.toggleVisible(true);
+                this.partialCommonGovernance();
             }));
         },
         setResizeMovePartialListernerForAvatarB: function() {
             this.avatarB.on("resizeMovePartial",lang.hitch(this,function(oEvt){
-                console.log("@################################################## A ------ resizeMovePartial DETECTED in caller !!! avatar.current.active="+this.avatar.current.active);
-                var totalBorderThicknesses = this.activeArea.totalBorderThicknessesBelowArea();
-                 this.activeArea.moveTo({//moves to absolute positions !!!
-                    left: this.activeAvatar.position.x - totalBorderThicknesses + this.activeArea.borderThickness,
-                    top: this.activeAvatar.position.y - totalBorderThicknesses + this.activeArea.borderThickness
-                });
-                this.activeArea.resize({width: this.activeAvatar.position.w - 2*this.activeArea.borderThickness,
-                    height: this.activeAvatar.position.h - 2*this.activeArea.borderThickness});
-                console.log("@### activeAvatar x,y="+this.activeAvatar.position.x+","+this.activeAvatar.position.y+
-                        " activeArea name="+this.activeArea.name+" left,top="+this.activeArea.left+","+this.activeArea.top+" zIndex="+this.activeArea.zIndex);
-                this.activeArea.toggleVisible(true);
+                this.partialCommonGovernance();
             }));
         },
         setMouseDownHandlersPaused: function(){
             this.avatarAMouseDownHandler=on.pausable(dom.byId(this.avatarA.avatarId),"mousedown",lang.hitch(this,function(){
-                if (this.activeArea)
-                    this.activeArea.isActivated = false;//marks previous area as deactivate
-                this.activeArea = this.topArea;
-                this.activeArea.isActivated = true;
-                this.activeAvatar =  this.avatar;
-                this.activeAvatar.mouseDownCallback = lang.hitch(this,function(){
-                    if (this.activeArea)
-                      this.activeArea.toggleVisible(false);
-                });
-                // alert("montou this.activeAvatar.mouseDownCallback em A");
-                console.log("Caller (A)====->Mouse down in "+this.avatarA.avatarId+" detected by engine " + this.detectorId +
-                         ". The area="+this.activeArea.name + " was clicked ");
-                this.avatar = this.avatarB;
-                if(this.avatarB.current.active) {
-                    this.avatarB.toggleHandles(false);
-
-                }
-                this.avatarA.toggleHandles(true);
+                this.mouseDownCommonGovernance();
                 this.avatarAMouseDownHandler.pause(); //will be resumed by avatarBMouseDownHandler
                 this.avatarBMouseDownHandler.resume();
                 this.activeArea.switchAvatarForAllAreasExceptActivatedTo(this.avatar);//the detect avatar is passed to all areas except active
-                // alert("switchAvatarForAllAreasExceptActivatedTo DONE!");
             }));
             this.avatarAMouseDownHandler.pause();
-            // this.avatarA.mouseDownCallback = function(){
-            //     alert("begin of a move or resize in avatar A");
-            // };
             this.avatarBMouseDownHandler=on.pausable(dom.byId(this.avatarB.avatarId),"mousedown",lang.hitch(this,function(){
-                if (this.activeArea)
-                    this.activeArea.isActivated = false;//marks previous area as deactivate
-                this.activeArea = this.topArea;
-                this.activeArea.isActivated = true;
-                this.activeAvatar =  this.avatar;
-                this.activeAvatar.mouseDownCallback = lang.hitch(this,function(){
-                     this.activeArea.toggleVisible(false);
-                });
-                console.log("Caller (B)====->Mouse down in "+this.avatarB.avatarId+" detected by engine " + this.detectorId +
-                        ". The area="+this.activeArea.name + " was clicked ");
-                this.avatar = this.avatarA;
-                if(this.avatarA.current.active) {
-                    this.avatarA.toggleHandles(false);
-                }
-                this.avatarB.toggleHandles(true);
+                this.mouseDownCommonGovernance();
                 this.avatarBMouseDownHandler.pause(); //will be resumed by avatarAMouseDownHandler
                 this.avatarAMouseDownHandler.resume();
                 this.activeArea.switchAvatarForAllAreasExceptActivatedTo(this.avatar);//the detect avatar is passed to all areas except active
             }));
             this.avatarBMouseDownHandler.pause();
         },
-        clearPreSelection: function(candidateArea) {// clears if candidateArea does not belong to an activated root
-            if(candidateArea.rootDetectionArea.rootDetectionAreaActivated) {
-                if(candidateArea.rootDetectionArea.rootDetectionActivationEngine == 1) {
-                    //
-                } else { //candidateArea.rootDetectionArea.rootDetectionActivationEngine == 2 !
-                    //
+        switchToAlternateAvatar: function(){
+            if(this.avatar.avatarId == this.avatarA.avatarId)
+                this.avatar = this.avatarB;
+            else
+                this.avatar = this.avatarA;
+        },
+        isAlternateAvatarBeingResized: function(){
+            var beingResized = false;
+            if(this.avatar.avatarId == this.avatarA.avatarId)
+                beingResized = this.avatarB.beingMovedResized();
+            else
+                beingResized = this.avatarA.beingMovedResized();
+            return beingResized;
+        },
+        switchActivationToCurrentAvatar: function(){
+                if(this.avatarB.current.active) {
+                    this.avatarB.toggleHandles(false);
+                 }
+                if(this.avatarA.current.active) {
+                    this.avatarA.toggleHandles(false);
                 }
+                if(this.avatar.avatarId == this.avatarB.avatarId)
+                    this.avatarA.toggleHandles(true);
+                else
+                    this.avatarB.toggleHandles(true);
+        },
+        mouseDownCommonGovernance: function() {
+           if (this.activeArea)
+                this.activeArea.isActivated = false;//marks previous area as deactivate
+            this.activeArea = this.topArea;
+            this.activeArea.isActivated = true;
+            this.activeAvatar =  this.avatar;
+            this.activeAvatar.mouseDownCallback = lang.hitch(this,function(){
+                if (this.activeArea)
+                  this.activeArea.toggleVisible(false);
+            });
+            this.switchToAlternateAvatar();//if current is avatarA sets current to avatarB otherwise sets current to avatarA
+            console.log("Caller ====->Mouse down in "+this.avatar.avatarId+" detected by engine " + this.detectorId +
+                     ". The area="+this.activeArea.name + " was clicked ");
+            this.switchActivationToCurrentAvatar();
+        },
 
-            } else {
-                this.avatar.setLanding({l: 0,t: 0,w: 0,h: 0});//undoes eventual PreSelection
-            }
-         },
+        resizeMoveEndCommonGovernance: function(msg) {
+            console.log("@######## "+ msg +" ######### ------ resizeMoveEnd DETECTED in caller !!! engine="+this.detectorId+", area="+this.topArea.name);
+            if(this.activeAvatar)
+                this.activeAvatar.setLanding({l: 0,t: 0,w: 0,h: 0});//undoes eventual PreSelection
+            this.avatar = this.avatarA;//a reset closing the circle
+            if(this.activeArea)
+                this.activeArea.switchAvatarAllAreasTo(this.avatar);
+            this.activeArea = null;
+            this.activeAvatar = null;
+        },
+        partialCommonGovernance: function(){
+            console.log("@###############  "+ this.activeAvatar.current.label+" ------ resizeMovePartial DETECTED in caller !!! avatar.current.active="+this.avatar.current.active);
+            var totalBorderThicknesses = this.activeArea.totalBorderThicknessesBelowArea();
+             this.activeArea.moveTo({//moves to absolute positions !!!
+                left: this.activeAvatar.position.x - totalBorderThicknesses + this.activeArea.borderThickness,
+                top: this.activeAvatar.position.y - totalBorderThicknesses + this.activeArea.borderThickness
+            });
+            this.activeArea.resize({width: this.activeAvatar.position.w - 2*this.activeArea.borderThickness,
+                height: this.activeAvatar.position.h - 2*this.activeArea.borderThickness});
+            console.log("@### activeAvatar x,y="+this.activeAvatar.position.x+","+this.activeAvatar.position.y+
+                    " activeArea name="+this.activeArea.name+" left,top="+this.activeArea.left+","+this.activeArea.top+" zIndex="+this.activeArea.zIndex);
+            this.activeArea.toggleVisible(true);
+            if(this.activeArea.type == "container")//HACK
+                this.activeAvatar.setZIndex(this.activeArea.highestZIndexAreaUnder(this.activeArea,this.activeArea)+1);
+            console.log("@### avatar x,y="+this.activeAvatar.position.x+","+this.activeAvatar.position.y+
+                        " activeArea name="+this.activeArea.name+" left,top="+this.activeArea.left+","+
+                        this.activeArea.top+" zIndex="+this.activeArea.zIndex+
+                        " activeAvatar.zIndex="+this.activeAvatar.getZIndex());
+        },
     });
 }); //end of  module  
