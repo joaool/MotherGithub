@@ -178,7 +178,7 @@
 					setupEvents:function(){
 						this.mouseDownInsideHandlerArea=On.pausable(Dom.byId(this.avatarId),"mousedown", Lang.hitch(this,function(e){
 							// console.log(" - resizeMoveArea8.setupEvents   <<"+this.current.label+
-							// 		" >> was ACTIVATED mouseDownInsideHandlerArea");
+							//		" >> was ACTIVATED mouseDownInsideHandlerArea");
 							this.mouseDownInsideHandlerArea.pause();
 							this.mouseDownOutsideHandler.resume();
 							this.activate();
@@ -187,7 +187,7 @@
 
 						this.mouseDownOutsideHandler=On.pausable(window,"mousedown", Lang.hitch(this,function(e){
 							// console.log(" - resizeMoveArea8.setupEvents  <<"+this.current.label+
-							// 		">> was DEACTIVATED mouseDownOutsideHandler EXIT ");
+							//		">> was DEACTIVATED mouseDownOutsideHandler EXIT ");
 							if(this.endCallback)
 								this.endCallback();
 							this.emitEvent({inside:false,l:e.pageX,t:e.pageY});
@@ -302,6 +302,8 @@
 					},//setBoundaries
 					setBoundaries:function(oBoundaries){//updates boundaries where area can be resized/moved.
 						Declare.safeMixin(this.oBoundaries, oBoundaries);
+						if(this.objResizeWidget)
+							Declare.safeMixin(this.objResizeWidget.oBoundaries,this.oBoundaries);
 					},//setBoundaries
 					getZIndex:function(){//gets area's zIndex 
 						var xNode=Dom.byId(this.avatarId);
@@ -387,7 +389,7 @@
 							this.objResizeWidget.mouseDownCallback=this.mouseDownCallback;
 							if(this.mouseDownCallback) {
 								this.objResizeWidget.mouseDownCallback();
-								// this.mouseDownCallback();
+								//this.mouseDownCallback();
 							}
 							this.objResizeWidget.gridPattern=this.oProps.gridPattern;
 							//console.log("ResizeMoveArea.activate this.objResizeWidget WAS BUILT for "+this.current.label);

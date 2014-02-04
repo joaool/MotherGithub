@@ -375,6 +375,75 @@ define([
                 doh.assertEqual("7", this.lbl01.zIndex,"lbl01 has not zIndex=7 !!!");
            }
         },
+        "moveTo with canvas shift":{
+            setUp:function(){
+                this.canvas = new areasFactory({left: 50,top: 10,width: 1000,height: 500});
+                this.c0 = this.canvas.createContainer({name: "form f0",left: 500+50,top: 100,width: 520,height: 230,
+                        borderColor: "green"});
+                this.lbl1 = this.canvas.createTextboxIn(this.c0,{value: "Linked w/ResizeMove area1",height: 22});
+                this.lbl2 = this.canvas.createTextboxIn(this.c0,{value: "abcd",left: 0, top: 30,width: 50,height: 20});
+                this.z0 = this.lbl2.zIndex;
+                this.txt1 = this.canvas.createTextboxIn(this.c0,{left: 20, top: 30,width: 100,height: 40,value: "Junkas",
+                        title:"to test something outside the handles...handle will stay", borderThickness: 10});
+                this.l0 = this.txt1.left;//must be 620
+                this.t0 = this.txt1.top;//must be 140
+
+                this.num1 = this.canvas.createNumberboxIn(this.c0,{top: 90,value: 127,height: 20,title:"Just a numeric box..."});
+                this.c01 = this.canvas.createContainerIn(this.c0,{name: "Inside form f0",left:240,top: 10,width: 200,height: 250,borderColor: "red"});
+                this.lbl01 = this.canvas.createTextboxIn(this.c01,{left: 5,top: 5,value: "jojo",height: 30});
+                this.c0.setBorder({borderThickness: 30});
+
+                this.txt1.moveTo({left: 50+500+170-1,top: 10+124});  //absolute coordinates    
+                this.l1 = this.txt1.left;
+                this.t1 = this.txt1.top;
+                this.z1 = this.txt1.zIndex;
+
+                this.txt1.moveTo({left: 50+500+170+1,top: 10+124});  //absolute coordinates    
+                this.z2 = this.txt1.zIndex;          
+
+                this.txt1.moveTo({left: 50+500+200+1,top: 10+124});  //absolute coordinates    
+                this.z3 = this.txt1.zIndex;          
+
+                this.c0.moveTo({left: 500+51,top: 123});  //move to empty area, no zIndex changes expected
+                this.z4 = this.c0.zIndex;
+
+                //now we set container Formf1 with 3 widgets
+                this.c1 = this.canvas.createContainer({name: "form f1", left: 500+500, top: 100, width: 220, height: 100, borderColor: "green"});
+                this.lbl11 = this.canvas.createTextboxIn(this.c1,{value: "Form 1",height: 22});
+                this.lbl12 = this.canvas.createTextboxIn(this.c1,{top: 30,height: 22,value: "abcd"});
+                this.txt11 = this.canvas.createTextboxIn(this.c1,{left:100,top:30,height: 22,title:"test..",placeHolder:"something",borderThickness: 10});
+                this.c1.setBorder({borderThickness: 5, borderColor: "purple"});
+                this.lc1 = this.c1.left;
+                this.tc1 = this.c1.top;
+                // this.xxx = 
+                this.zc1 = this.c1.zIndex;
+
+                //now we move again container c0
+                this.c0.moveTo({left: 50+500+51,top: 10+123});  //move to an area , where form f1 exists !
+                this.z5 = this.c0.zIndex;
+             },
+            runTest:function(){
+                doh.assertEqual("620", this.l0,"textbox3 before move has not left=50+500+50+20 !!!");
+                doh.assertEqual("140", this.t0,"textbox3 before move has not top=10+100+30 !!!");
+                doh.assertEqual("1", this.z0,"lbl2 has not zIndex=1 at creation!!!");
+                doh.assertEqual("719", this.l1,"textbox3 has not left=50+500+159 !!!");
+                doh.assertEqual("134", this.t1,"textbox3 has not top=10+124 !!!");
+                doh.assertEqual("1", this.z1,"textbox3 has not zIndex=1 after first move!!!");
+                doh.assertEqual("2", this.z2,"textbox3 has not zIndex=2 after second move!!!");
+                doh.assertEqual("3", this.z3,"textbox3 has not zIndex=3 after third move!!!");
+                doh.assertEqual("0", this.z4,"c0 has not zIndex=0 after move 4 !!!");
+                //placing form f1
+                doh.assertEqual("1050", this.lc1,"c1(form f1) has not left=50+500+500 !!!");
+                doh.assertEqual("110", this.tc1,"c1(form f1)  has not top=10+100 !!!");
+                doh.assertEqual("1", this.zc1,"c1(form f1)  has not zIndex=2 !!!");//!!!!!!!!!
+                // //moving c0 over form f1
+                doh.assertEqual("4", this.z5,"c0(form f0)  has not zIndex=5 !!!");//!!!!!!!!!!!
+                //if zIndex of "form f0" now becomes 5 all its belongings should adjust accordingly
+                doh.assertEqual("5", this.lbl1.zIndex,"lbl1 has not zIndex=6 !!!");//!!!!!!!!!!!
+                doh.assertEqual("5", this.c01.zIndex,"c01 has not zIndex=6 !!!");//!!!!!!!!!!!
+                doh.assertEqual("6", this.lbl01.zIndex,"lbl01 has not zIndex=7 !!!");//!!!!!!!!!!!
+           }
+        },        
         "topAreaUnderPoint detection with borderThickness effect":{
             setUp:function(){
                 this.canvas = new areasFactory();

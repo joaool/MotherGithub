@@ -349,6 +349,8 @@
 					x=(x>this.oBoundaries.l+this.oBoundaries.w)?this.oBoundaries.l+this.oBoundaries.w:x;
 					y=(y<this.oBoundaries.t)?this.oBoundaries.t:y;
 					y=(y>this.oBoundaries.t+this.oBoundaries.h)?this.oBoundaries.t+this.oBoundaries.h:y;
+                    console.log("             resizeWCoord5._onMouseMove boundaries="+this.oBoundaries.l+","+
+                            this.oBoundaries.t+","+this.oBoundaries.w+","+ this.oBoundaries.h);
 
 
 					if (this._mouseDown === true) {

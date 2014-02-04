@@ -6,11 +6,12 @@ define([
     "/pdojo/MotherGitHub/Mother/container.js",
 ], function(declare,registry,textbox,numberbox,container) {
     return declare(null,{
-        lastAreaOrder:0,
-        lastTextboxOrder:0,
-        lastNumberboxOrder:0,
-        lastContainerOrder:-1, //0 is reserved for the base container
-        baseContainer:null,
+        lastAreaOrder: 0,
+        lastTextboxOrder: 0,
+        lastNumberboxOrder: 0,
+        lastContainerOrder: -1, //0 is reserved for the base container
+        baseContainer: null,
+        baseContainerProperties: null,
         constructor: function(baseContainer) {
             var canvasContainer = registry.byId("_1"); //to destroy a dijit widget by id
             if(canvasContainer){
@@ -24,10 +25,15 @@ define([
             //REVIEW for clarity - this is an evolution from calling  this.createContainer()          
             this.lastAreaOrder++;
             this.lastContainerOrder++;
-            var baseContainerProperties = {name: "canvas", left: left, top: top, width: width, height: height};
-            declare.safeMixin(baseContainerProperties,
-                {domId: "container_id" + this.lastContainerOrder,id: "_"+this.lastAreaOrder,areaOrder: this.lastAreaOrder,containerParent: this.baseContainer});
-            this.baseContainer = new container(baseContainerProperties);
+            this.baseContainerProperties = {name: "canvas", left: left, top: top, width: width, height: height};
+            declare.safeMixin(this.baseContainerProperties, {
+                domId: "container_id" + this.lastContainerOrder,
+                id: "_"+this.lastAreaOrder,
+                areaOrder: this.lastAreaOrder,
+                containerParent: this.baseContainer
+            });
+            declare.safeMixin(this.baseContainerProperties,baseContainer);
+            this.baseContainer = new container(this.baseContainerProperties);
         },
         createTextboxIn: function(container,widgetProperties) {//always refer to a container if no container is present default container is selected
             if(container){
@@ -40,6 +46,8 @@ define([
                     absoluteTop += widgetProperties.top;
                 declare.safeMixin(widgetProperties,{left: absoluteLeft,top: absoluteTop});
                 var txt=this.createTextbox(widgetProperties);//textbox created in canvas
+                txt.left -= this.baseContainer.left; //the container already has the basecontainer left,top coordinates, so we remove them here
+                txt.top -= this.baseContainer.top; //the container already has the basecontainer left,top coordinates, so we remove them here
                 container.addExistingChild([txt]);//now textbox is removed from canvas and added to container
                 return txt;
              } else {
@@ -58,6 +66,8 @@ define([
                     absoluteTop += widgetProperties.top;
                 declare.safeMixin(widgetProperties,{left: absoluteLeft,top: absoluteTop});
                 var num=this.createNumberbox(widgetProperties);//numberbox created in canvas
+                num.left -= this.baseContainer.left; //the container already has the basecontainer left,top coordinates, so we remove them here
+                num.top -= this.baseContainer.top; //the container already has the basecontainer left,top coordinates, so we remove them here
                 container.addExistingChild([num]);//now numberbox removed from canvas and added to container
                 return num;
             } else {
@@ -66,6 +76,12 @@ define([
             }
          },
         createContainerIn: function(container,containerProperties) {//always refer to a container if no container is present default container is selected
+            // var absoluteLeft = container.left;
+            // var absoluteTop = container.top;
+            // if (!container.containerParent.containerParent) {//the container where we want to create a container is directly on canvas
+            //     absoluteLeft += this.baseContainer.left;
+            //     absoluteTop += this.baseContainer.top;
+            // }
             if(container){
                 //coordinates left,top are stored with absolute values, but in this method are received in container coordinates
                 var absoluteLeft = container.left;
@@ -76,6 +92,8 @@ define([
                     absoluteTop += containerProperties.top;
                 declare.safeMixin(containerProperties,{left: absoluteLeft,top: absoluteTop});
                 var c=this.createContainer(containerProperties);//container created in canvas
+                c.left -= this.baseContainer.left; //the container already has the basecontainer left,top coordinates, so we remove them here
+                c.top -= this.baseContainer.top; //the container already has the basecontainer left,top coordinates, so we remove them here
                 container.addExistingChild([c]);//now the new container is removed from canvas and added to container
                 return c;
             } else {
@@ -90,8 +108,15 @@ define([
             var widgetName = widgetProperties.name;
             if (!widgetName)
                 widgetName = "textbox" + this.lastTextboxOrder;
-            declare.safeMixin(widgetProperties,
-                {name: widgetName,domId: "widget_id" + this.lastAreaOrder,id: "_"+this.lastAreaOrder,areaOrder: this.lastAreaOrder,containerParent: this.baseContainer});
+            declare.safeMixin(widgetProperties, {
+                name: widgetName,
+                domId: "widget_id" + this.lastAreaOrder,
+                id: "_"+this.lastAreaOrder,
+                areaOrder: this.lastAreaOrder,
+                containerParent: this.baseContainer
+            });
+            widgetProperties.left += this.baseContainer.left;
+            widgetProperties.top += this.baseContainer.top;
             var txt = new textbox(widgetProperties);
             this.baseContainer.addExistingChild([txt]);
             return txt;
@@ -102,8 +127,15 @@ define([
             var widgetName = widgetProperties.name;
             if (!widgetName)
                 widgetName = "numberbox" + this.lastNumberboxOrder;
-            declare.safeMixin(widgetProperties,
-                {name: widgetName,domId: "widget_id" + this.lastAreaOrder,id: "_"+this.lastAreaOrder, areaOrder: this.lastAreaOrder,containerParent: this.baseContainer });
+            declare.safeMixin(widgetProperties,{
+                name: widgetName,
+                domId: "widget_id" + this.lastAreaOrder,
+                id: "_"+this.lastAreaOrder, 
+                areaOrder: this.lastAreaOrder,
+                containerParent: this.baseContainer
+            });
+            widgetProperties.left += this.baseContainer.left;
+            widgetProperties.top += this.baseContainer.top;
             var num = new numberbox(widgetProperties);
             this.baseContainer.addExistingChild([num]);
             return num;
@@ -114,10 +146,16 @@ define([
             var containerName = containerProperties.name;
             if (!containerName)
                 containerName = "container" + this.lastContainerOrder;
-            declare.safeMixin(containerProperties,
-                {name: containerName,domId: "container_id" + this.lastContainerOrder,id: "_"+
-                        this.lastAreaOrder,areaOrder: this.lastAreaOrder,containerParent: this.baseContainer});
-             var c = new container(containerProperties);
+            declare.safeMixin(containerProperties,{
+                name: containerName,
+                domId: "container_id" + this.lastContainerOrder,
+                id: "_" + this.lastAreaOrder,
+                areaOrder: this.lastAreaOrder,
+                containerParent: this.baseContainer
+            });
+            containerProperties.left += this.baseContainer.left;
+            containerProperties.top += this.baseContainer.top;
+            var c = new container(containerProperties);
             this.baseContainer.addExistingChild([c]);
             return c;
         },

@@ -53,6 +53,20 @@ define([
             });
             this.avatarB.setCursorInactive("pointer");
             this.avatar = this.avatarA;
+            var thiz = this;
+            var mouseDownCallback = function () {
+                console.log("                                @vai garantir que as boundaries são correctas...");
+                if(thiz.activeArea){
+                    console.log("                                @poe boundaries=" + this.oBoundaries.l+","+
+                            this.oBoundaries.t+","+this.oBoundaries.w+","+this.oBoundaries.h);
+                    declare.safeMixin(this.oBoundaries,thiz.activeArea.getBoundaries());
+                } else {
+                    console.log("                                @this.activeArea=null");
+                }    
+            };
+            this.avatarA.mouseDownCallback = mouseDownCallback;
+            this.avatarB.mouseDownCallback = mouseDownCallback;
+
             // console.log(" DETECT end of contructor "+this.avatar.current.label);
         },
         toggleActivation: function(isDetectOn){
@@ -94,10 +108,12 @@ define([
                         topAreaCandidate = this.activeArea;
                     } else {
                         if (this.activeAvatar.isPointInside(x,y)) {
-                            // console.log("cursor entered activated area !!!!");
+                            // console.log("cursor entered activated area !!!! boundaries="+this.activeAvatar.oBoundaries.l+","+
+                            //         this.activeAvatar.oBoundaries.t+","+this.activeAvatar.oBoundaries.w+","+
+                            //         this.activeAvatar.oBoundaries.h+" avatarId="+this.activeAvatar.avatarId);
                             this.avatar.setLanding({l: 0,t: 0,w: 0,h: 0});//undoes eventual PreSelection
                             doesPreSelection = false;
-                       } else {    
+                       } else {
                             // console.log("cursor EXITED activated area !!!! Now cursor is over "+topAreaCandidate.name);
                         }
                     }
@@ -106,9 +122,10 @@ define([
                 // console.log(" does="+doesPreSelection);
                 if (doesPreSelection) {
                     if (this.lastDetectedAreaId != topAreaCandidate.id) { //if cursor changed to a new area
-                        var extraThickness = topAreaCandidate.totalBorderThicknessesBelowArea();
-                        console.log("detect mouseMoveHandler "+this.avatar.avatarId+"-------------------> Change to new area "+topAreaCandidate.name+" x=" + x + " y="+ y +" type="+ topAreaCandidate.type +
-                                " id="+ topAreaCandidate.id + "-->"+topAreaCandidate.left+","+
+                        var extraThickness = topAreaCandidate.totalBorderThicknessesBelowArea()-topAreaCandidate.borderThickness;
+                        console.log("detect mouseMoveHandler "+this.avatar.avatarId+"---> Change to new area "+
+                                topAreaCandidate.name+" cursor(x=" + x + " y="+ y +") type="+ topAreaCandidate.type +
+                                " id="+ topAreaCandidate.id + "-->x,y="+topAreaCandidate.left+","+
                                 topAreaCandidate.top + " totalThicknesses=" + extraThickness+ " =>"+
                                 (topAreaCandidate.left+extraThickness)+","+(topAreaCandidate.top+extraThickness)+" zIndex="+topAreaCandidate.zIndex);
      
@@ -199,8 +216,14 @@ define([
                   this.activeArea.toggleVisible(false);
             });
             this.switchToAlternateAvatar();//if current is avatarA sets current to avatarB otherwise sets current to avatarA
+            // this.avatarA.setBoundaries(this.activeArea.getBoundaries());
+            // this.avatarB.setBoundaries(this.activeArea.getBoundaries());
+            // this.activeAvatar.mouseDownCallback = function () {
+            //     console.log("                                vai garantir que as boundaries são correctas...");
+            // };
             console.log("Caller ====->Mouse down in "+this.avatar.avatarId+" detected by engine " + this.detectorId +
-                     ". The area="+this.activeArea.name + " was clicked ");
+                     ". The area="+this.activeArea.name + " was clicked. Boundaries="+this.avatar.oBoundaries.l+","+
+                     this.avatar.oBoundaries.t+","+this.avatar.oBoundaries.w+","+this.avatar.oBoundaries.h);
             this.switchActivationToCurrentAvatar();
         },
 

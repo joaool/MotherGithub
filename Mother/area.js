@@ -275,18 +275,26 @@ define([
                         w: this.width+3+2*this.borderThickness,
                         h: this.height+3+2*this.borderThickness
                     };
-                    avatarBoundaries = {
-                        l:this.containerParent.left + extraThickness - this.borderThickness,// + this.containerParent.borderThickness,
-                        t:this.containerParent.top + extraThickness - this.borderThickness,// + this.containerParent.borderThickness,
-                        w:this.containerParent.width + 0,
-                        h:this.containerParent.height + 0
-                    };
+                    avatarBoundaries = this.getBoundaries();
+                    // console.log("            _preSelectionOnForEngine area "+ this.name +" x,y="+this.left+","+this.top+
+                    //         " this.avatarId="+this.avatar.avatarId+" engineAvatarId="+engineAvatarId+
+                    //         " boundaries="+avatarBoundaries.l+","+avatarBoundaries.t+","+avatarBoundaries.w+","+avatarBoundaries.h);
                     this.avatar.setLanding(avatarLanding);
                     this.avatar.setBoundaries(avatarBoundaries);
                     this.avatar.setZIndex(this.zIndex+3);//the avatar will be always above the area
                     this.setActivatedStatusTooltip();
                 }
             }
+        },
+        getBoundaries: function() {
+            var extraThickness = this.totalBorderThicknessesBelowArea();//the total thickness to add to area due to the thickness of containers inside containers.
+            var boundaries = {
+                l:this.containerParent.left + extraThickness - this.borderThickness,// + this.containerParent.borderThickness,
+                t:this.containerParent.top + extraThickness - this.borderThickness,// + this.containerParent.borderThickness,
+                w:this.containerParent.width + 0,
+                h:this.containerParent.height + 0
+            };
+            return boundaries;
         },
         setActivatedStatusTooltip: function() {
             var tooltip = null;
