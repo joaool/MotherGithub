@@ -6,7 +6,7 @@
 		<link href="Dojo Toolkit/dojo-release-1.7.1/dijit/themes/claro/claro.css" rel="stylesheet">
 -->
 	<meta http-equiv="Content-Type" content="text/html;charset=utf-8" /> 
-    <title>Teste de resize_move 13.0</title>
+    <title>Test Grid 1.0</title>
 
 <!--		
 	<script>
@@ -40,14 +40,118 @@ require([
 	"dojo/parser",//recomendation from JS
 	"dojo/dom",
 	"dojo/dom-construct",//used outside class
-	"dojo/dom-style",	
-	"dojo/ready",
+	"dojo/dom-style",
+	"dgrid/Grid",
+	"dgrid/Keyboard", 
+	"dgrid/Selection", 	
+	"dojo/request",
+    "dojo/store/Memory",
+    "dgrid/OnDemandGrid",
+	"dgrid/extensions/ColumnResizer",
+	"dojo/domReady!",
 	], 
 	function(ResizeMoveArea,
-	Declare,Win,Lang,Event,On,Parser,Dom,DomConstruct,DomStyle,Ready){ 
-
+	Declare,Win,Lang,Event,On,Parser,Dom,DomConstruct,DomStyle,Grid,Keyboard,Selection,request,Memory,OnDemandGrid,ColumnResizer){ 
+	    var data = [
+	        { first: "Bob", last: "Barker", age: 89 },
+	        { first: "Vanna", last: "White", age: 55 },
+	        { first: "Pat", last: "Sajak", age: 65 }
+	    ];
+	 
+	    // var grid = new Grid({
+	    //     columns: {
+	    //         first: "First Name",
+	    //         last: "Last Name",
+	    //         age: "Age"
+	    //     }
+	    // }, "grid");
+       	// Create a new constructor by mixing in the components
+        var CustomGrid = Declare([ OnDemandGrid, Keyboard, Selection,ColumnResizer]);
+ 
+        // Now, create an instance of our custom grid which
+        // have the features we added!
+        // var grid = new CustomGrid({
+        //     columns: {
+        //         first: "First Name",
+        //         last: "Last Name",
+        //         age: "Age"
+        //     },
+        //     selectionMode: "single", // for Selection; only select a single row at a time
+        //     cellNavigation: false // for Keyboard; allow only row-level keyboard navigation
+        // }, "grid");
+		// var grid = new (Declare([OnDemandGrid, Keyboard, Selection, ColumnResizer]))({
+		//        columns: {
+		//            col1: {
+		//                label: "Column1",
+		//                resizable: false,
+		//                width:100
+		//            },
+		//            col2: "Column 2",
+		//            col3: "Column 3"
+		//        }
+		// }, "grid");
+	    // grid.renderArray(data);	
+	 // request("hof-batting.json", {
+	 //        handleAs: "json"
+	 //    }).then(function (response) {
+	 //        var grid = new OnDemandGrid({
+	 //            store: new Memory({ data: response }),
+	 //            columns: [
+	 //                { field: "first", label: "First" },
+	 //                { field: "last", label: "Last" }
+	 //            ]
+	 //        }, "grid");        
+	 //        grid.startup();
+	 //    });
+	    request("hof-batting.json", {
+	        handleAs: "json"
+	    }).then(function (response) {
+	        var grid = new OnDemandGrid({
+	            store: new Memory({ data: response }),
+	            subRows: [
+	                [
+	                    { field: "first", label: "First", rowSpan: 2 },
+	                    { field: "last", label: "Last", rowSpan: 2 },
+	                    { field: "bats", label: "Bats", rowSpan: 2 },
+	                    { field: "throws", label: "Throws", rowSpan: 2 },
+	                    { field: "totalG", label: "G" },
+	                    { field: "totalAB", label: "AB" },
+	                    { field: "totalR", label: "R" },
+	                    { field: "totalRBI", label: "RBI" },
+	                    { field: "totalBB", label: "BB" },
+	                    { field: "totalK", label: "K" }
+	                ],
+	                [
+	                    { field: "totalGAB", label: "Games as Batter", colSpan: 2 },
+	                    { field: "totalH", label: "H" },
+	                    { field: "total2B", label: "2B" },
+	                    { field: "total3B", label: "3B" },
+	                    { field: "totalHR", label: "HR" }
+	                ]
+	            ]
+	        }, "grid");
+	 
+	        grid.startup();
+	    });
+		// grid.on("dgrid-select", function(event){
+		//     // Report the item from the selected row to the console.
+		//     console.log("Row selected: ", event.rows[0].data);
+		// });
+		// grid.on("dgrid-deselect", function(event){
+		//     console.log("Row de-selected: ", event.rows[0].data);
+		// });	 
+		// grid.on(".dgrid-row:click", function(event){
+		//     var row = grid.row(event);
+		//     console.log("Row clicked:", row.id);
+		// });   	
+	 	//    var columns = {
+		//     first: "First Name",
+		//     last: "Last Name",
+		//     age: "Age"
+		// };
 		//----------------------------------------
-		alert("Hello !!!");
+		// alert("Hello !!!");
+/*		
 		var beginFunction=function(){
 			//alert("beginFunction !!!");
 			//var oF=x2.getDim();
@@ -176,22 +280,8 @@ require([
 			x2.swapCallback=null;
 			mouseDownHandler2.resume(); 
 		}));
-		//x2.resize({l:1000,t:100,w:100,h:100});//to test resize without handles
-	// x1.mouseDownCallback = function() {
-	// 	console.log("oooooooooooooooooooooooooo-> x1.mouseDownCallback !!! l="+x1.current.l+" t="+x1.current.t+
-	// 			" - AREA 2 - x2.avatarId="+x2.avatarId+" x2.l="+x2.current.l+" x2.t="+x2.current.t);
-	// 	x1.toggleHandles(true);
-	// 	console.log("oooooooooooooooooooooooooooooooooooooo-> closeHandles in x2 !!! ");
-	// 	x2.toggleHandles(false);
-	// };
-	// x2.mouseDownCallback = function() {
-	// 	console.log("oooooooooooooooooooooooooo-> x2.mouseDownCallback !!! x1.avatarId="+x1.avatarId);
-	// 	console.log("oooooooooooooooooooooooooo-> x2.mouseDownCallback !!! l="+x2.current.l+" t="+x2.current.t+
-	// 			" - AREA 1 - x1.avatarId="+x1.avatarId+" x1.l="+x1.current.l+" x1.t="+x1.current.t);
-	// 	x2.toggleHandles(true);
-	// 	console.log("oooooooooooooooooooooooooooooooooooooo-> closeHandles in x1 !!! ");
-	// 	x1.toggleHandles(false);
-	// };
+*/
+
 		function test(){
 			alert("test message in function test - this call is defined in menu object exterior to the class...");
 		}
@@ -201,9 +291,9 @@ require([
 </script>
 	</head>
 	<body class="claro">
-		<div id="xwrapper" width="640" height="360" color="red" </div>
+		<div id="xwrapper" width="640" height="360" color="red"></div>
 		<!--<div id="box" style="position: absolute;left:1000px;top:100px;width:100px;height:1030px;border:1px solid red" class="boxes" onmouseover="alert('Red spot - was blue !')">	-->
-		<div id="box" style="position: absolute;left:1000px;top:100px;width:100px;height:100px;border:1px solid red">	
-
+		<div id="box" style="position: absolute;left:1000px;top:100px;width:100px;height:100px;border:1px solid red"></div>
+	    <div id="grid"></div>
 	</body>
 </html>

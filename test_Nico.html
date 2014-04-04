@@ -1,0 +1,61 @@
+<html>
+<head>
+<!--
+		<script type="text/javascript" src="Dojo Toolkit/dojo-release-1.7.1/dojo/dojo.js" djconfig="parseOnLoad: true, isDebug: true" >
+		</script> 
+		<link href="Dojo Toolkit/dojo-release-1.7.1/dijit/themes/claro/claro.css" rel="stylesheet">
+-->
+	<meta http-equiv="Content-Type" content="text/html;charset=utf-8" /> 
+    <title>Test Nico 1.0</title>
+    <script> 
+    	dojoConfig= {
+	        has: {
+	            "dojo-firebug": true
+	        },
+	        parseOnLoad: false,
+	        debugAtAllCosts: true,
+	        foo: "bar",
+	        async: true
+    	};
+    </script> 
+   	<script type="text/javascript" src="../dojo1.9.2/dojo/dojo.js"></script> 
+ 
+	<!--<script src="Mother/jquery-1.8.1.min.js"></script> -->
+	<!--<script src="Mother/bootstrap.js"></script>-->	
+	<link href="../dojo1.9.2/dijit/themes/claro/claro.css" rel="stylesheet"> 
+	<link rel="stylesheet" type="text/css" href="Mother/MotherBuilder.css" /> 
+		<!--- For Mother Forms  A -BlueHills, B-Simple Green C- Tree D-Chess E-light blue F(A+C)=>(fz,f0)-->
+		<!--<link rel="stylesheet" type="text/css" href="Mother1/MotherF.css"/> -->
+	<link rel="stylesheet" type="text/css" href="Mother/Mother.css"/>
+
+<script>
+require([
+	"Mother/fl.js", 
+	"Mother/flCN.js", 
+	"dojo/domReady!"
+	], 
+	function(fl,flCN){ 
+		//TEST DESCRIPTION v1: 
+		var connection = new fl();
+		if(connection.login({username:"nico",password:"12345",application:"kk"}).ctrl.isOk){
+			alert("LOGIN OK");
+
+		}else{
+			conn=connection.login({username:"nico",password:"12345",application:"kk"});
+			alert("LOGIN ERROR "+conn.ctrl.errMsg);
+		}
+
+		
+ 		function test(){
+			alert("test message in function test - this call is defined in menu object exterior to the class...");
+		}
+		//--------------------------------------------------------------------------------------------------------------------------
+		console.log("--------------------------------------- container done.... -----------------------------------------------");		
+		console.log(document.title+"......  END..");		
+	}//closing of main function				
+);//closing of require function
+</script>
+	</head>
+	<body class="claro">
+	</body>
+</html>
