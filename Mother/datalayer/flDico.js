@@ -21,14 +21,14 @@ define([
             return { ctrl:{isOk:false,errNo:23,errMsg:"big error"}, j:{"cn":"23"} };
         },
         entityGet: function (param) {
-            var param1 = {cn:"23"};
+            var param1 = {entityCN:"23"};
             // process..
             return { ctrl:{isOk:true}, j:{singular:"customer",plural:"customers",description:"someone to send invoices"} };
         },
         entityGetAll: function (param) { //cache refresh 
             var param1 = {where:{}};
             // process..
-            return { ctrl:{isOk:true}, j:[{singular:"customer",plural:"customers",description:"someone to send invoices"}] };
+            return { ctrl:{isOk:true}, j:[j:{singular:"customer",plural:"customers",description:"someone to send invoices"}] };   // be careful there is a 'j': in each item of the array
         },
         entityUpdate: function (param) {
             var param1 = {cn:"23", singular:"client"};

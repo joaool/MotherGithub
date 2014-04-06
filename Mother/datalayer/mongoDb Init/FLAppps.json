@@ -1,0 +1,558 @@
+use FLApps;
+db.dropDatabase();
+
+use FLApps;
+
+function add(CN) {
+    return addUnit(CN, "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ");
+};
+function addUnit(CN, strRef)  {
+
+    if (CN == null)
+	throw ("addUnit : can't have a null CN in parameter");
+    if (strRef == null || strRef.length == 0)
+	throw ("addUnit : strRef is null, or empty !");
+    if (CN.length == 0)
+    {
+	return "0";
+    }
+    var lastChar = CN[CN.length -1];
+    var CN2 = CN.substr(0, CN.length -1);
+    
+    var iPos = strRef.indexOf(lastChar, 0);
+
+    if (iPos == -1)
+	    throw ("addUnit: lastChar not found in ref...");
+    if (iPos == strRef.length-1)
+    {
+	    CN2=addUnit (CN2, strRef);
+	    return CN2 + '0';
+    }
+    lastChar = strRef[strRef.indexOf(lastChar, 0) + 1];
+    return CN2 + lastChar;
+};
+
+function getNewCN() {
+	var iLoop = 3;
+	
+	// 3 tries to get a new CN
+	while (iLoop > 0)
+	{
+	    var CN = db.Master_0.findOne( {_id:"0"}, {_id:0, "j.8.J":1} );
+    
+	    if (CN == null || CN == "" ){
+		    return "0";
+	    }
+	    CN=CN['j']["8"]["J"];
+	    
+	    var CN2=add(CN);
+	    
+	    // If another user requested a new CN, rsl.lastErrorObject.n will be 0
+	    var rsl = db.runCommand(
+		    {	findAndModify:'Master_0',
+			    query:{_id:"0", "j.8.J":CN},
+			    update: {$set:{"j.8.J":CN2} }
+		    } );
+	    if (rsl.lastErrorObject.n == 1)
+		return CN2;
+	    
+	    // retry
+	    iLoop = iLoop -1;
+	}
+    throw ("getNewCN: unable to update");
+};
+
+// Variables for field definition
+var MASTER_0=0;
+var JOAO=1;
+var M0_CN= "3";
+var M0_ECN="4";
+var M0_TYPE="5";
+var M0_REALNAME="6";
+var M0_DESCRIPTION="7";
+var M0_info = "8";
+
+var F_TEXTUI="A";
+
+var E_INDEXES="F";
+var E_CACHEDFI="G";
+var E_PLURALNAME="H";
+
+var R_LEFT="K";
+var R_RIGHT="L";
+var R_ENTITYCN="M";
+var R_SIDE="N";
+var R_CARDINALITY="O";
+var R_DESCRIPTION="P";
+var R_STOREINDEX="Q";
+var R_DATACACHED="R";
+var R_FORMAT="S";
+
+// Format JSON
+function jSonToMaster_F(eid, cn, name, desc, textUI){
+    return {
+	    _id: cn,
+	    "3": cn,
+	    "4": eid,
+	    "5": "F",
+	    "6": name,
+	    7: desc,
+	    "8": {
+		    "A":textUI
+	    }
+    };
+}
+
+function jSonToMaster_E(CN, singulier, pluriel, description){
+    if (CN=="0")
+	return {
+		_id: CN,
+		"3": CN,
+		"4": "",
+		"5": "E",
+		"6": singulier,
+		7: description,
+		"8": {
+		    "F":[],
+		    "G":[],
+		    "H": pluriel,
+		    "J": "0"
+		}
+	};
+    
+    return {
+	    _id: CN,
+	    "3": CN,
+	    "4": "",
+	    "5": "E",
+	    "6": singulier,
+	    7: description,
+	    "8": {
+		"F":[],
+		"G":[],
+		"H": pluriel
+	    }
+    };
+}
+   
+function jSonToMaster_R(cn, name, lEid, lDesc, lCard, lStroreHere, lCached, lFormat, rEid, rDesc, rCard, rStoreHere, rCached, rFormat) { 
+    
+    return {
+	    _id: cn,
+	    "3": cn,
+	    "4": "",
+	    "5": "R",
+	    "6": name,
+	    7: lDesc,
+	    "8": [
+		{"K":{
+		    "M": lEid,
+		    "N": 0,
+		    "O": lCard,
+		    "P": lDesc,
+		    "Q": lStroreHere,
+		    "R": lCached,
+		    "S": lFormat
+		}},
+		{"L":{
+		    "M": rEid,
+		    "N": 1,
+		    "O": rCard,
+		    "P": rDesc,
+		    "Q": rStoreHere,
+		    "R": rCached,
+		    "S": rFormat
+		}}
+	    ]
+    };
+}
+
+function entityAdd(name, names, desc){
+	var query={};
+
+	query["j."+M0_REALNAME]=name;
+	if ( db.Master_0.find( query ).toArray() != "")
+		throw ("entityAdd: createNewCollection: Collection " + name + "already exist");
+	    
+	query["j."+M0_REALNAME]=names;
+	if ( db.Master_0.find( query ).toArray() != "")
+		throw ("entityAdd: createNewCollection: Collection " + names + "already exist");
+	
+	var CN = getNewCN();
+
+	var e = jSonToMaster_E(CN, name, names, desc);
+	db.createCollection('Master_'+CN);
+
+	return (dataInsert ( 0, e));
+}
+function formatResponse(ctrl, j){
+	if (ctrl == null)
+	    ctrl = {isOk:false, errNo:100, errMsg:"no ctrl specified"};
+	if (j==null)
+	    j={};
+
+	var rtn = {};
+
+	rtn.ctrl = ctrl;
+	rtn.j = j;
+
+	return rtn;    
+}
+function entityGet(param){
+    try {
+	if (param == null || param.entityCN == null)
+	    throw ("entityGet: invalid parameter");
+	
+	var rsl = db.Master_0.findOne({_id: param.entityCN}, {_id:0, "j":1});
+	if (rsl == null)
+	    throw ("entityGet: no Entity found");
+
+	rsl = decodeJSonDicoEntity(rsl, 0);
+
+	return (formatResponse( {isOk:true}, rsl) );
+    }
+    catch(err)
+    {
+        return { ctrl:{isOk:false, errNo:99, errMsg:"entityGet: " + err}, j:{} };
+    }
+}
+function entityGetAll(param){
+    try {
+	if (param == null )
+	    throw ("entityGetAll: invalid parameter");
+	
+	param["j.5"]="E";
+    
+	var rsl = db.Master_0.find(param, {_id:0, "j":1}).toArray();
+	
+	if (rsl == null)
+	    throw ("entityGetAll: no Entity found");
+
+	var result=[];
+	for(var it in rsl){
+	    result.push(decodeJSonDicoEntity(rsl[it], 0));
+	}
+	return (formatResponse( {isOk:true}, result ) );
+    }
+    catch(err)
+    {
+        return { ctrl:{isOk:false, errNo:99, errMsg:"entityGet: " + err}, j:{} };
+    }
+
+}
+function decodeJSonDico(j, sens){
+    if (sens != 0 && sens != 1)
+	throw ("decodeJSonDico: invalid argument sens");
+    
+    if (j["j"]["5"]== null)
+	throw ("decodeJSonDico: invalid argument j");
+    
+    switch (j["j"]["5"])
+    {
+	case "E":
+	    return decodeJSonDicoEntity(j, sens);
+	case "R":
+	    return decodeJSonDicoRelation(j, sens);
+	case "F":
+	    return decodeJSonDicoField(j, sens);
+    }
+    throw ("decodeJSonDico : Invalid type (5)");
+}
+
+function decodeJSonDicoEntity(jE, sens){
+    var tab={"singular":"6", "plural":"H", "description":"7"};
+    var tabi={"6":"singular", "H":"plural", "7":"description"};
+    
+    if (sens == 0)
+        return decodeJSonDicoGeneric (tabi, jE.j);
+
+    return decodeJSonDicoGeneric (tab, jE.j);
+}
+function decodeJSonDicoField(jF, sens){
+    var tab={"name":"6", "description":"7", "typeUI":"A"};
+    var tabi={"6":"name", "7":"description", "A":"typeUI"};
+    
+    if (sens == 0)
+        return decodeJSonDicoGeneric (tabi, jF.j);
+
+    return decodeJSonDicoGeneric (tab, jF.j);
+}
+function decodeJSonDicoRelation(jR, sens){
+    var tab={"relationCN":"3","left":"K", "right":"L", "entityCN":"M","cardinality":"O","description":"P","storeIndex":"Q", "dataCached":"R", "format":"S"};
+    var tabi={"3":"relationCN","K":"left", "L":"right", "M":"entityCN","O":"cardinality","P":"description","Q":"storeIndex", "R":"dataCached", "S":"format"};
+    
+    if (sens == 0)
+        return decodeJSonDicoGeneric (tabi, jR.j);
+
+    return decodeJSonDicoGeneric (tab, jR.j);
+}
+function decodeJSonDicoGeneric(tab, js){
+    //print("Entering DicoGenerice");
+    //printjson(js);
+    //printjson(tab);
+
+    var jd={};
+
+    for ( var key in js ){
+	//print ("Analyze: " + key + "->" + js[key] + ", test tab[k]: " + tab[key]);
+	if (tab[key] != null)
+	    jd[tab[key]]=js[key];
+    }
+    if (js['8'] != null){
+	for ( var key in js['8'] ){
+	    //print ("Analyze: " + key + "->" + js[key] + ", test tab[k]: " + tab[key]);
+	    if (tab[key] != null)
+		jd[tab[key]]=js['8'][key];
+	}
+    }
+    
+    if (js['info'] != null){
+	for ( var key in js['info'] ){
+	    //print ("Analyze: " + key + "->" + js[key] + ", test tab[k]: " + tab[key]);
+	    if (tab[key] != null)
+		jd[tab[key]]=js['info'][key];
+	}
+    }
+    return jd;
+}
+
+/*
+function createNewRelation(name, lEid, lDesc, lCard, lStroreHere, lProps, rEid, rDesc, rCard, rStoreHere, rProps){
+	if ( db.Master_0.find( { "j.b": name } ).toArray() != "")
+		throw ("createNewRelation: Collection " + leftRel["4"] + "already exist");
+	if ( db.Master_0.find( { "j.b": name }).toArray() != "")
+		throw ("createNewRelation: Collection " + rightRel["4"] + "already exist");
+	
+	var CN = getNewCN();
+
+	if (CN < 4)
+	    throw ("createNewRelation: Impossible to create a new Relation with CN = " + CN);
+
+	var cn = jSonToMaster_2("0", CN, "R", name);
+	dataAdd(2, cn);
+	
+	var r = jSonToMaster_1(CN, name, lEid, lDesc, lCard, lStroreHere, lProps, rEid, rDesc, rCard, rStoreHere, rProps);
+	dataAdd(1, r);
+	
+	return CN;
+}
+*/
+
+function fieldAdd(entityCN, name, description, textUI) {
+    try {
+	if (db.Master_0.find({ _id: entityCN }).toArray() == "")
+		throw ("Collection " + entityId + " not found");
+	
+	var CN = getNewCN();
+
+	var m = jSonToMaster_F(entityCN, CN, name, description, textUI);
+	print ("fieldAdd : ");
+	printjson(m);
+	dataInsert(0, m);
+	
+	var check = db.Master_0.find({ _id: CN}).toArray();
+	if (check == null)
+	    throw ("Document not created !!");
+    }
+	catch(err)
+	{
+            return { ctrl:{isOk:false,errNo:99,errMsg:"fieldAdd: " + err}, j:{} };
+	}
+
+}
+/*
+function addIndex(eId, indexName, keys, props){
+    if ( db.getCollection('system.namespaces').find(  {"name": "FLApps.Master_" + eId } ).length() == 0 ){
+	throw ("addIndex: Collection : Master_" + eId + " not found");
+    }
+    
+    props["name"] = indexName;
+    
+    print ("create idx:  db['Master_" + eId + "'].ensureIndex (" + tojson(keys) + ", " + tojson(props) + "); " );
+
+    db["Master_" + eId].ensureIndex (tojson(keys), tojson(props));
+
+    var strKeys;
+    var tmp;
+    
+    for (var i in keys){
+	tmp = new String ( keys[i] ).replace('.','_');
+	
+	strKeys[i]= tmp;
+    }
+        
+    print ("update: db.Master_0.update({_id:" + eId + "}, {$push: {'j.3':{'4': " + indexName + ", '5': " + tojson(strKeys) + ", '6':" + tojson(props) + " } }});");
+
+    db.Master_0.update({_id:eId},
+		       {$push: {"j.3":{"4": indexName, "5": tojson(strKeys), "6": tojson(props) } }});
+    
+}
+*/
+
+// Add data to a Master_xx collection
+function dataAdd(eId, j){
+	try{
+	    if ( db.getCollection('system.namespaces').find(  {"name": "FLApps.Master_" + eId } ).length() == 0 ){
+		throw ("dataAdd: Collection : Master_" + eId + " not found");
+	    }
+
+	    var id = j["_id"];
+	    if (id == null){
+			id = new ObjectId;
+			j["_id"] = id;
+			print ("New id : " + id);
+			printjson(j);
+	    }
+		    
+	    db["Master_" + eId].save( { _id:j._id, v:1, j:j } );
+
+	    var err = db.getLastError();
+
+	    if (err != null)
+			throw err;
+
+		// Nico : do the work for managing the Relations
+
+	    return ( {isOk:true} );
+    }
+	catch(err)
+	{
+		return ( {isOk:false, errNo:99, errMsg:err} );
+	}
+}
+// Add data to a Master_xx collection
+function dataInsert(eId, j){
+    try{
+	if ( db.getCollection('system.namespaces').find(  {"name": "FLApps.Master_" + eId } ).length() == 0 ){
+	    throw ("dataAdd: Collection : Master_" + eId + " not found");
+	}
+
+	var id = j["_id"];
+	if (id == null){
+		    id = new ObjectId;
+		    j["_id"] = id;
+		    print ("New id : " + id);
+		    printjson(j);
+	}
+		
+	db["Master_" + eId].insert( { _id:j._id, v:1, j:j } );
+
+	var err = db.getLastError();
+
+	if (err != null)
+		    throw err;
+
+	    // Nico : do the work for managing the Relations
+
+	var check=db["Master_" + eId].insert( { _id: id } );
+	if (check == null)
+	    throw ("document not created .... ");
+	    
+        return formatResponse( {isOk:true}, {"cn":id} );
+    }
+	catch(err)
+	{
+            return { ctrl:{isOk:false,errNo:99,errMsg:"dataInsert: " + err}, j:{} };
+	}
+}
+function dataGet(eId, id){
+	try {
+    if ( db.getCollection('system.namespaces').find(  {"name": "FLApps.Master_" + eId } ).length() == 0 ){
+	throw ("dataGet: Collection : Master_" + eId + " unknown");
+    }
+	    
+    var x = db["Master_" + eId].findOne( {_id: id });
+    if (x == "")
+		throw ("dataGet: no data found");
+    
+    return ( {isOk:true, j:x["j"]} );
+	}
+	catch(err)
+	{
+		return ( {isOk:false, errNo:99, errMsg:err} );
+	}
+}
+
+    // Generate our dictionary !
+    db.createCollection('Master_0');
+    
+    // CN:0
+    entityAdd("FLDico", "FLDICOS","FrameLink internal dictionary");
+    //CN:1
+    entityAdd("Joao", "Joaos", "FrameLink application dictionary");
+    //CN:2
+    getNewCN();
+    // CN:3
+    fieldAdd("0", "CN", "Compressed Name","system");
+    // CN:4
+    fieldAdd("0", "entityCN", "Entity compressed name","system");
+    // CN: 5
+    fieldAdd("0", "typeCN", "type of compressed name","system");
+    // CN: 6
+    fieldAdd("0", "realName", "full name - singular","system");
+    // CN: 7
+    fieldAdd("0", "description", "this is a description","system");
+    //CN : 8
+    fieldAdd("0", "info", "information, depending of type","system");
+
+    // CN:9
+    getNewCN();
+    // CN: A
+    fieldAdd("0", "textUI", "UI object associated with a field","system");
+    // CN: B - E
+    getNewCN();
+    getNewCN();
+    getNewCN();
+    getNewCN();
+
+    // CN: F
+    fieldAdd("0", "indexes", "list of indexes for this entity","system");
+    // CN: G
+    fieldAdd("0", "cachedFI", "list of cached fields for this entity","system");
+    // CN: H
+    fieldAdd("0", "pluralName", "plural name","system");
+    // CN: I
+    fieldAdd("0", "lastCNAssigned", "last CN used (only _id=00)","system");
+    // CN :  J
+    getNewCN();
+
+    // CN: K
+    fieldAdd("0", "left", "left definition of relation","system");
+    // CN: L
+    fieldAdd("0", "right", "right definition of relation","system");
+    // CN: M
+    fieldAdd("0", "entityCN", "entity compressed name used in relation","system");
+    // CN: N
+    fieldAdd("0", "side", "side of relation (0 for left, 1 for right)","system");
+    // CN : O
+    fieldAdd("0", "cardinality", "cardinality of this side of relation","system");
+    // CN:P
+    fieldAdd("0", "description", "relation description","system");
+    // CN: Q
+    fieldAdd("0", "storedIndex", "Is index stored on this side of the relation","system");
+    // CN: R
+    fieldAdd("0", "dataCached", "Are the data cached on this side of the relation","system");
+    //CN:S
+    fieldAdd("0", "format", "data cache format","system");
+    //CN :  T-Y
+    getNewCN();
+    getNewCN();
+    getNewCN();
+    getNewCN();
+    getNewCN();
+    getNewCN();
+    // CN: Z
+    fieldAdd("0", "Rels", "relation information","system");
+
+    // CN : "00" => first available CN for user data
+/*
+    addIndex(0, "Entity_unik_name", {"j.1":1}, {"unique": true} );
+    
+    db.createCollection('Master_1');
+    addIndex(1, "Rel_unik_idx_name", {"j.b":1}, {"unique": true} );
+    addIndex(1, "Rel_entity_side", {"j.c":1, "j.d":1}, {"unique": false} );
+    
+    db.createCollection('Master_2');
+    addIndex(2, "MiniN_unik_name", {"j.b":1}, {"unique": true} );
+    addIndex(2, "Rel_entity_side", {"j.c":1, "j.d":1}, {"unique": false} );
+*/
