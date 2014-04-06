@@ -260,8 +260,8 @@ function decodeJSonDico(j, sens){
 }
 
 function decodeJSonDicoEntity(jE, sens){
-    var tab={"singular":"6", "plural":"H", "description":"7"};
-    var tabi={"6":"singular", "H":"plural", "7":"description"};
+    var tab={"entityCN":"3", "singular":"6", "plural":"H", "description":"7"};
+    var tabi={"3":"entityCN", "6":"singular", "H":"plural", "7":"description"};
     
     if (sens == 0)
         return decodeJSonDicoGeneric (tabi, jE.j);
@@ -545,14 +545,3 @@ function dataGet(eId, id){
     fieldAdd("0", "Rels", "relation information","system");
 
     // CN : "00" => first available CN for user data
-/*
-    addIndex(0, "Entity_unik_name", {"j.1":1}, {"unique": true} );
-    
-    db.createCollection('Master_1');
-    addIndex(1, "Rel_unik_idx_name", {"j.b":1}, {"unique": true} );
-    addIndex(1, "Rel_entity_side", {"j.c":1, "j.d":1}, {"unique": false} );
-    
-    db.createCollection('Master_2');
-    addIndex(2, "MiniN_unik_name", {"j.b":1}, {"unique": true} );
-    addIndex(2, "Rel_entity_side", {"j.c":1, "j.d":1}, {"unique": false} );
-*/

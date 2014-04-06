@@ -1,20 +1,19 @@
 var x;
+var y;
 var nbCusts=50;
 var nbOrders=100;
+var nbLinesPerOrder=3;
 var nbProds=10;
 
 // Collection Customers
 var rsl = entityAdd("Customer", "Customers", "All my customers");
-
-/*
-x = 
-    fieldAdd("00", "name", "name of customer","textBox");
-    fieldAdd("00", "city", "where the customer live","textBox");
-    fieldAdd("00", "phone", "phone","textBox");
-
+x = rsl.j.cn;
+fieldAdd(x, "name", "name of customer","textBox");
+fieldAdd(x, "city", "where the customer live","textBox");
+fieldAdd(x, "phone", "phone","textBox");
 for (i=0; i<nbCusts; i++){
 	var j={};
-	j[_id]=i;
+	j["_id"]=i;
 	j[new String(x+1)]= "Client-"+ i;
 	j[new String(x+2)]= "City "+ i;
 	j[new String(x+3)]= "0033 "+ i+i+i+i;
@@ -22,81 +21,55 @@ for (i=0; i<nbCusts; i++){
 	dataInsert(x, j);
 }
 
+var rsl = entityAdd("Order", "Orders", "Order collection");
+x=rsl.j.cn;
+fieldAdd(x, "date", "order's date", "textBox");
+fieldAdd(x, "amount","total amount", "textBox");
+fieldAdd(x, "shipped", "is it shipped", "textBox");
 
-//Eid:4
-var y = createNewCollection("Order", "Orders", "Order collection");
-createNewField(y, "date");
-createNewField(y, "amount");
-createNewField(y, "shipped");
-createNewField(y, "lines");
-createNewField(y, "qty");
-createNewField(y, "product");
-createNewField(y, "price");
-db.Master_4.ensureIndex( {"j.3.5":1 } );
+var rsl = entityAdd("OrderLine", "OrderLines", "Lines of orders");
+y=rsl.j.cn;
+fieldAdd(y, "quantity", "quantity ordered", "textBox");
+fieldAdd(y, "product", "product ID (not linked)", "textBox");
+fieldAdd(y, "price", "total price", "textBox");
 
 for (i=1; i<nbOrders; i++) {
 	dt=new Date("2014/03/27");
-	j={	_id: i,
-		"0":dt,
-		"1":123456.45,
-		"2":"no",
-		"3": [
-		    {"4":"10","5":"prod-"+i,"6":123.00},
-		    {"4":"1","5":"prod-" + i*i/100,"6":13.00},
-		    {"4":"5","5":"apple","6":56.00}
-		    ]
-	    };
-	print (j);
-	dataAdd(y, j);
+	var j={};
+	j["_id"] = i;
+	j[new String (x+1)]= dt;
+	j[new String (x+2)]= 123456.45;
+	j[new String (x+3)]= false;
+	dataInsert(x, j);
+	
+	for (k=1; k<nbLinesPerOrder; k++){
+		var jl={};
+		jl[new String(y+1)]=k;
+		jl[new String(y+2)]="prod-"+(i+k);
+		jl[new String(y+3)]=123.45;
+		
+		dataInsert(y, jl);
+	}
 }
 
-//Eid:5
-var z = createNewCollection("Product", "Products", "Calalog");
-createNewField(z, "name");
-createNewField(z, "family");
-createNewField(z, "price");
+
+var rsl = entityAdd("Product", "Products", "Calalog");
+x=rsl.j.cn;
+fieldAdd(x, "name", "product name", "textBox");
+fieldAdd(x, "family", "product family", "textBox");
+fieldAdd(x, "price", "product price", "textBox");
 
 for (i=1; i<nbProds; i++) {
-	j={_id:i, "0": "test", "1":"prod-"+i, "2":"123.00"};
-	dataAdd(z, j);
+	var j={};
+	var ty = i % 4;
+	j["_id"]=i;
+	j[new String(x+1)]="prod-"+i;
+	j[new String(x+2)]="test-" + ty; 
+	j[new String(x+3)]=456.98;
+
+	dataInsert(x, j);
 }
 
-createNewRelation("Customer to Order", 
-	{	"2":"0",
-		"3":x,
-		"4":"ordered",
-		"5":"1",
-		"7":true,
-		"6":[{"cached":"false"}, {"format":[{"0":1}]} ]
-	},
-	{	"2":"1",
-		"3":y,
-		"4":"was ordered by",
-		"5":"N",
-		"7":false,
-		"6":[{"cached":"false"}, {"format":[{"0":1}]} ]
-	}	);
-
-var dt;
-
-createNewRelation("Product to Order", 
-	{	"2":"0",
-		"3":z,
-		"4":"ordered in",
-		"5":"1",
-		"7":false,
-		"6":[{"cached":"false"}, {"format":[{"0":1}]} ]
-	},
-	{	"2":"1",
-		"3":y,
-		"4":"order",
-		"5":"N",
-		"7":true,
-		"6":[{"cached":"false"}, {"format":[{"0":1}]} ]
-	}	);
-
-var dt;
-*/
 
 entityGet( {"entityCN":"00"} );
 // get an array of user defined Entity
