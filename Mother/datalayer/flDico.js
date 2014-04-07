@@ -47,7 +47,7 @@ define([
             return { ctrl:{isOk:true}, j:{"cn":"23"} };
         },
         fieldGet: function (param) {
-            var param1 = {cn:"23"};
+            var param1 = {entityCN:"23"};
             // process..
             return { ctrl:{isOk:true}, j:{name:"dlvryAddress",description:"place where goods should be delivered",typeUI:"textBox"} };
         },
