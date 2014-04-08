@@ -1,3 +1,7 @@
+//
+// PLEASE CHECK THE SCRIPT FOR NOW; THIS DOC WILL BE UPDATED WHEN THE SCRIPTS WILL BE MORE MATURE. Nico
+//
+
 define([
     "dojo/_base/declare"
 ], function(declare, lang, dom, domStyle, ready) {//Entity CRUD
