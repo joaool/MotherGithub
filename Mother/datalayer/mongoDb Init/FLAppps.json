@@ -11,8 +11,8 @@ var tabCodec=[
 	{"name":"6", "description":"7", "typeUI":"A"},
 	{"6":"name", "7":"description", "A":"typeUI"},
 	// Relation
-	{"relationCN":"_id", "relationName":"6", "left":"K", "right":"L", "linkedCN":"M","cardinality":"O","verb":"P","storeIndex":"Q", "dataCached":"R", "format":"S"},
-	{"_id":"relationCN","6":"relationName","K":"left", "L":"right", "M":"linkedCN","O":"cardinality","P":"verb","Q":"storeIndex", "R":"dataCached", "S":"format"}
+	{"relationCN":"_id", "relationName":"6", "left":"K", "right":"L", "linkedCN":"M", "cardinality":"O", "verb":"P", "storeIndex":"Q", "dataCached":"R", "format":"S"},
+	{"_id":"relationCN", "6":"relationName", "K":"left", "L":"right", "M":"linkedCN", "O":"cardinality", "P":"verb", "Q":"storeIndex", "R":"dataCached", "S":"format"}
 	    ];
 
 function add(CN) {
@@ -218,7 +218,7 @@ function entityGet(param){
 	if (rsl == null)
 	    throw ("no Entity found");
 
-	rsl = decodeJSonDicoEntity(rsl, 0);
+	rsl = decodeJSonDico(rsl, 1);
 
 	return formatResponseOK( rsl );
     }
@@ -236,7 +236,7 @@ function entityGetByName(param){
 	if (rsl == null)
 	    throw ("no Entity found");
 
-	rsl = decodeJSonDicoEntity(rsl, 0);
+	rsl = decodeJSonDico(rsl, 1);
 
 	return formatResponseOK( rsl );
     }
@@ -259,7 +259,7 @@ function entityGetAll(param){
 
 	var result=[];
 	for(var it in rsl){
-	    result.push(decodeJSonDicoEntity(rsl[it], 0));
+	    result.push(decodeJSonDico(rsl[it], 1));
 	}
 	return formatResponseOK( result );
     }
@@ -278,7 +278,7 @@ function fieldGet(param){
 	if (rsl == null)
 	    throw ("no field found");
 
-	return (formatResponseOK( decodeJSonDicoField(rsl, 0) ));
+	return (formatResponseOK( decodeJSonDico(rsl, 1) ));
     }
     catch(err)
     {
@@ -294,7 +294,7 @@ function fieldGetByName(param){
 	if (rsl == null)
 	    throw ("no field found");
 
-	return (formatResponseOK( decodeJSonDicoField(rsl, 0) ));
+	return (formatResponseOK( decodeJSonDico(rsl, 1) ));
     }
     catch(err)
     {
@@ -312,7 +312,7 @@ function fieldGetAll(param){
 
 	var result=[];
 	for(var it in rsl){
-	    result.push( decodeJSonDicoField(rsl[it], 0) );
+	    result.push( decodeJSonDico(rsl[it], 1) );
 	}
 
 	return (formatResponseOK( result ));
@@ -341,7 +341,7 @@ function relationGet(param){
 	if (rsl == null)
 	    throw ("relationGet: no Relation found");
 
-        return formatResponseOK( decodeJSonDicoRelation(rsl, 0) );
+        return formatResponseOK( decodeJSonDico(rsl, 1) );
     }
     catch(err)
     {
@@ -349,65 +349,50 @@ function relationGet(param){
     }    
 }
 
-function relationGetAll(param){
+function relationGetAll(){
     try {
-	if (param == null || param.relationCN == null)
-	    throw ("entityGet: invalid parameter");
-	
-	var rsl = db.Master_0.findOne({_id: param.relationCN, "j.5":"R"}, {_id:0, "j":1});
+	var rsl = db.Master_0.find({"j.5":"R"}, {_id:0, "j":1}).toArray();
 	if (rsl == null)
 	    throw ("relationGet: no Relation found");
 
 	var result=[];
 	for(var it in rsl){
-	    result.push( decodeJSonDicoRelation(rsl[it], 0) );
+	    result.push( decodeJSonDico(rsl[it], 1) );
 	}
 
 	return formatResponseOK(result);
     }
     catch(err)
     {
-        return formatResponseError(99, "entityGet: " + err);
+        return formatResponseError(99, "entityGetAll: " + err);
     }    
 }
 
 function decodeJSonDico(j, sens){
-    if (sens != 0 && sens != 1)
-	throw ("decodeJSonDico: invalid argument sens");
-    
-    if (j["j"]["5"]== null)
-	throw ("decodeJSonDico: invalid argument j");
-    
-    switch (j["j"]["5"])
-    {
-	case "E":
-	    return decodeJSonDicoEntity(j, sens);
-	case "R":
-	    return decodeJSonDicoRelation(j, sens);
-	case "F":
-	    return decodeJSonDicoField(j, sens);
+    try {
+	if (sens != 0 && sens != 1)
+	    throw ("invalid argument sens");
+	
+	if (j["j"]["5"]== null)
+	    throw ("invalid argument j");
+	
+	switch (j["j"]["5"])
+	{
+	    case "E":
+		return decodeJSonDicoGeneric(j.j, sens);
+	    case "F":
+		return decodeJSonDicoGeneric(j.j, sens+2);
+	    case "R":
+		return decodeJSonDicoGeneric(j.j, sens+4);
+	}
+	throw ("Unknown type (5)");
     }
-    throw ("decodeJSonDico : Invalid type (5)");
+    catch(err)
+    {
+        return formatResponseError(99, "decodeJsonDico: " + err);
+    }    
 }
 
-function decodeJSonDicoEntity(jE, sens){
-    if (sens == 0)
-        return decodeJSonDicoGeneric (1, jE.j);
-
-    return decodeJSonDicoGeneric (0, jE.j);
-}
-function decodeJSonDicoField(jF, sens){
-    if (sens == 0)
-        return decodeJSonDicoGeneric (3, jF.j);
-
-    return decodeJSonDicoGeneric (2, jF.j);
-}
-function decodeJSonDicoRelation(jR, sens){
-    if (sens == 0)
-        return decodeJSonDicoGeneric (5, jR.j);
-
-    return decodeJSonDicoGeneric (4, jR.j);
-}
 function jsonConcat(o1, o2, prefix) {
  for (var key in o2) {
   //print ("key: " + prefix+key + " => " + 2[key]);
@@ -416,8 +401,8 @@ function jsonConcat(o1, o2, prefix) {
  return o1;
 }
 
-function decodeJSonDicoGeneric(indTab, js){
-    //print("Entering DicoGenerice");
+function decodeJSonDicoGeneric(js, indTab){
+    //print("Entering DicoGeneric");
     //printjson(js);
     //printjson(tabCodec[indTab]);
 
@@ -429,7 +414,7 @@ function decodeJSonDicoGeneric(indTab, js){
 	// look for sub nodes
 	if (typeof (js[key]) == "object" )
 	{
-		jsonConcat(jd, decodeJSonDicoGeneric(tabCodec[indTab], js[key]), tabCodec[indTab][key]+"_");
+		jsonConcat(jd, decodeJSonDicoGeneric(js[key], indTab), tabCodec[indTab][key]+"_");
 	}
 	else{
 	    if (tabCodec[indTab][key] != null) {
@@ -683,6 +668,7 @@ flDico.prototype.fieldGetAll=function (jj) {  return fieldGetAll(jj); };
 flDico.prototype.relationAdd=function (jj) { return relationAdd(jj.relationName, jj.left.entityCN, jj.left.verb, jj.left.cardinality, jj.left.storeRelation, jj.left.cache, jj.left.format,
 								                 jj.right.entityCN, jj.right.verb, jj.right.cardinality, jj.right.storeRelation, jj.right.cache, jj.right.format); };
 flDico.prototype.relationGet=function (jj) { return relationGet(jj); };
+flDico.prototype.relationGetAll=function () { return relationGetAll(); };
 
 flDico.prototype.indexAdd=function (jj) { return entityAdd(jj.singular, jj.plural, jj.description); };
 
