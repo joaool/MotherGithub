@@ -107,6 +107,49 @@ define([
             var param1 = {relationCN:"23"};
             // process..
             return { ctrl:{isOk:false,errNo:23,errMsg:"not existing"}, j:{} };
-        },               
+        },
+        //------------------------ indexes
+        indexAdd: function (param) {
+
+            var param = 
+                {entityCN:"45","indexName":"idx001",{"_id:1 }
+                storeRelation:true,cached:false,format:null},
+                right:{entityCN:"50",cardinality:"N",description:"has",storeRelation:false,cached:false,format:null}
+            };
+            // process..
+            return { ctrl:{isOk:true}, j:{"indexCN":"23"} };
+        },
+        indexGet: function (param) {
+            var param1 = {indexCN:"23"};
+            // process..
+            return { ctrl:{isOk:true}, j:{
+                left:{entityCN:"45",cardinality:"1",description:"is invoicing ",storeRelation:true,cached:false,format:null},
+                right:{entityCN:"50",cardinality:"N",description:"has",storeRelation:false,cached:false,format:null}
+            };
+         },
+        indexGetAll: function (param) { //cache refresh 
+            var param1 = {where:{}};//
+            // process..
+           return { ctrl:{isOk:true}, j:[{
+                left:{entityCN:"45",cardinality:"1",description:"is invoicing ",storeRelation:true,cached:false,format:null},
+                right:{entityCN:"50",cardinality:"N",description:"has",storeRelation:false,cached:false,format:null}
+            ]};     
+        },
+        indexUpdate: function (param) {
+            var param1 = {
+                indexCN:"23",j:{
+                    left:{entityCN:"45",cardinality:"1",description:"is invoicing ",storeRelation:true,cached:false,format:null},
+                    right:{entityCN:"50",cardinality:"N",description:"has",storeRelation:false,cached:false,format:null}
+                } 
+            };       
+            // process..
+            return { ctrl:{isOk:false,errNo:123,errMsg:"compress name does not exist"} };
+        },
+        indexRemove: function (param) {
+            var param1 = {indexCN:"23"};
+            // process..
+            return { ctrl:{isOk:false,errNo:23,errMsg:"not existing"}, j:{} };
+        },
+        
     });
 }); //end of  module  

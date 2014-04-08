@@ -12,7 +12,7 @@ var nbProds=10;
 
 // Collection Customers
 var rsl = fl.entityAdd({"singular":"Customer", "plural":"Customers", "description":"All my customers" });
-custCN = rsl.j.cn;
+custCN = rsl.j.entityCN;
 fl.fieldAdd({entityCN:custCN, name:"name",description:"name of customer",typeUI:"textBox"});
 fl.fieldAdd({entityCN:custCN, name:"city",description:"city of customer",typeUI:"textBox"});
 fl.fieldAdd({entityCN:custCN, name:"phone",description:"customer's phone",typeUI:"textBox"});
@@ -20,15 +20,16 @@ fl.fieldAdd({entityCN:custCN, name:"phone",description:"customer's phone",typeUI
 for (i=0; i<nbCusts; i++){
 	var j={};
 	j["_id"]=i;
-	j[new String(x+1)]= "Client-"+ i;
-	j[new String(x+2)]= "City "+ i;
-	j[new String(x+3)]= "0033 "+ i+i+i+i;
+	j[new String(nbCusts+1)]= "Client-"+ i;
+	j[new String(nbCusts+2)]= "City "+ i;
+	j[new String(nbCusts+3)]= "0033 "+ i+i+i+i;
 	
+	printjson(j);
 	flD.insert(custCN, j);
 }
 
 var rsl = fl.entityAdd({"singular":"Order", "plural":"Orders", "description":"Order collection" });
-orderCN=rsl.j.cn;
+orderCN=rsl.j.entityCN;
 fl.fieldAdd({entityCN:orderCN, name:"date",description:"order's date",typeUI:"textBox"});
 fl.fieldAdd({entityCN:orderCN, name:"amount",description:"total amount",typeUI:"textBox"});
 fl.fieldAdd({entityCN:orderCN, name:"shipped",description:"is it shipped",typeUI:"textBox"});
@@ -40,7 +41,7 @@ var rlt = fl.relationAdd({"relationName":"CustomerToOrder",
 var relCN=rlt.j.cn;
 
 var rsl = fl.entityAdd({"singular":"orderLine", "plural":"orderLines", "description":"lines of order" });
-lineOrdCN=rsl.j.cn;
+lineOrdCN=rsl.j.entityCN;
 fl.fieldAdd({entityCN:lineOrdCN, name:"quantity",description:"quantity ordered",typeUI:"textBox"});
 fl.fieldAdd({entityCN:lineOrdCN, name:"product",description:"product ID not linked yet",typeUI:"textBox"});
 fl.fieldAdd({entityCN:lineOrdCN, name:"price",description:"total price of the line",typeUI:"textBox"});
@@ -49,16 +50,16 @@ for (i=1; i<nbOrders; i++) {
 	dt=new Date("2014/03/27");
 	var j={};
 	j["_id"] = i;
-	j[new String (x+1)]= dt;
-	j[new String (x+2)]= 123456.45;
-	j[new String (x+3)]= false;
+	j[new String (orderCN+1)]= dt;
+	j[new String (orderCN+2)]= 123456.45;
+	j[new String (orderCN+3)]= false;
 	dataInsert(orderCN, j);
 	
 	for (k=1; k<nbLinesPerOrder; k++){
 		var jl={};
-		jl[new String(y+1)]=k;
-		jl[new String(y+2)]="prod-"+(i+k);
-		jl[new String(y+3)]=123.45;
+		jl[new String(lineOrdCN+1)]=k;
+		jl[new String(lineOrdCN+2)]="prod-"+(i+k);
+		jl[new String(lineOrdCN+3)]=123.45;
 		
 		flD.insert(lineOrdCN, jl);
 	}
@@ -69,7 +70,7 @@ var rlt = fl.relationAdd({"relationName":"OrderToLines",
 			 });
 
 var rsl = fl.entityAdd({"singular":"Product", "plural":"Products", "description":"Catalog" });
-prodCN=rsl.j.cn;
+prodCN=rsl.j.entityCN;
 fl.fieldAdd({entityCN:prodCN, name:"name",description:"product name",typeUI:"textBox"});
 fl.fieldAdd({entityCN:prodCN, name:"family",description:"product family",typeUI:"textBox"});
 fl.fieldAdd({entityCN:prodCN, name:"price",description:"product price",typeUI:"textBox"});
@@ -78,9 +79,9 @@ for (i=1; i<nbProds; i++) {
 	var j={};
 	var ty = i % 4;
 	j["_id"]=i;
-	j[new String(x+1)]="prod-"+i;
-	j[new String(x+2)]="test-" + ty; 
-	j[new String(x+3)]=456.98;
+	j[new String(prodCN+1)]="prod-"+i;
+	j[new String(prodCN+2)]="test-" + ty; 
+	j[new String(prodCN+3)]=456.98;
 
 	flD.insert(prodCN, j);
 }
@@ -94,6 +95,8 @@ fl.entityGet( {"entityCN":"00"} );
 
 fl.entityGetAll( {$where:"this._id.length > 1"} );
 
-fl.fieldGet({entityCN:x});
+fl.fieldGet({entityCN:custCN+1});
 
 fl.relationGet({relationCN:relCN});
+
+flD.get("00", 5);

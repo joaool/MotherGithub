@@ -3,6 +3,18 @@ db.dropDatabase();
 
 use FLApps;
 
+var tabCodec=[
+	// Entity
+	{"entityCN":"_id", "singular":"6", "plural":"H", "description":"7", "index":"F", "cachedFI":"G", "indexName":"8", "indexKeys":"C", "indexProperties":"D"},
+	{"_id":"entityCN", "6":"singular", "H":"plural", "7":"description", "F":"index", "G":"cachedFI", "8":"indexName", "C":"indexKeys", "D":"indexProperties"},
+	// Field
+	{"name":"6", "description":"7", "typeUI":"A"},
+	{"6":"name", "7":"description", "A":"typeUI"},
+	// Relation
+	{"relationCN":"_id", "relationName":"6", "left":"K", "right":"L", "linkedCN":"M","cardinality":"O","verb":"P","storeIndex":"Q", "dataCached":"R", "format":"S"},
+	{"_id":"relationCN","6":"relationName","K":"left", "L":"right", "M":"linkedCN","O":"cardinality","P":"verb","Q":"storeIndex", "R":"dataCached", "S":"format"}
+	    ];
+
 function add(CN) {
     return addUnit(CN, "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ");
 };
@@ -10,12 +22,15 @@ function addUnit(CN, strRef)  {
 
     if (CN == null)
 	throw ("addUnit : can't have a null CN in parameter");
+
     if (strRef == null || strRef.length == 0)
 	throw ("addUnit : strRef is null, or empty !");
+
     if (CN.length == 0)
     {
 	return "0";
     }
+
     var lastChar = CN[CN.length -1];
     var CN2 = CN.substr(0, CN.length -1);
     
@@ -33,6 +48,7 @@ function addUnit(CN, strRef)  {
 };
 
 function getNewCN() {
+    try {
 	var iLoop = 3;
 	
 	// 3 tries to get a new CN
@@ -43,58 +59,39 @@ function getNewCN() {
 	    if (CN == null || CN == "" ){
 		    return "0";
 	    }
-	    CN=CN['j']["J"];
+	    CN=CN["j"]["J"];
 	    
 	    var CN2=add(CN);
 	    
 	    // If another user requested a new CN, rsl.lastErrorObject.n will be 0
-	    var rsl = db.runCommand(
-		    {	findAndModify:'Master_0',
-			    query:{_id:"0", "j.J":CN},
-			    update: {$set:{"j.J":CN2} }
-		    } );
-	    if (rsl.lastErrorObject.n == 1)
+	    var rsl = db.Master_0.findAndModify({
+			query: {_id:"0", "j.J":CN },
+			update: {$set: {"j.J":CN2}} });
+
+	    if (rsl != null)
 		return CN2;
 	    
 	    // retry
 	    iLoop = iLoop -1;
 	}
-    throw ("getNewCN: unable to update");
+        throw ("getNewCN: unable to update");
+    }
+    catch(err)
+    {
+        return formatResponseError(99, "getNewCN: " + err);
+    }
 };
 
-// Variables for field definition
-var MASTER_0=0;
-var JOAO=1;
-var M0_ECN="4";
-var M0_TYPE="5";
-var M0_REALNAME="6";
-var M0_DESCRIPTION="7";
-
-var F_TEXTUI="A";
-
-var E_INDEXES="F";
-var E_CACHEDFI="G";
-var E_PLURALNAME="H";
-
-var R_LEFT="K";
-var R_RIGHT="L";
-var R_ENTITYCN="M";
-var R_SIDE="N";
-var R_CARDINALITY="O";
-var R_DESCRIPTION="P";
-var R_STOREINDEX="Q";
-var R_DATACACHED="R";
-var R_FORMAT="S";
 
 // Format JSON
-function jSonToMaster_F(eid, cn, name, desc, textUI){
+function jSonToMaster_F (eid, cn, name, desc, textUI){
     return {
 	    _id: cn,
-	    "4": eid,
-	    "5": "F",
-	    "6": name,
-	    "7": desc,
-	    "A":textUI
+	    4: eid,
+	    5: "F",
+	    6: name,
+	    7: desc,
+	    A: textUI
     };
 }
 
@@ -154,55 +151,98 @@ function jSonToMaster_R(cn, name, lEid, lDesc, lCard, lStroreHere, lCached, lFor
 }
 
 function entityAdd(name, names, desc){
-    var query={};
-
-    query["j."+M0_REALNAME]=name;
-    if ( db.Master_0.find( query ).toArray() != "")
-	    throw ("entityAdd: createNewCollection: Collection " + name + "already exist");
-	
-    query["j."+M0_REALNAME]=names;
-    if ( db.Master_0.find( query ).toArray() != "")
-	    throw ("entityAdd: createNewCollection: Collection " + names + "already exist");
+    try {
+	var query={};
     
-    var CN = getNewCN();
-
-    var e = jSonToMaster_E(CN, name, names, desc);
-    db.createCollection('Master_'+CN);
-
-    return (dataInsert ( 0, e));
+	query["j.6"]=name;
+	if ( db.Master_0.find( query ).toArray() != "")
+		throw ("Collection " + name + " already exists");
+	    
+	query["j.6"]=names;
+	if ( db.Master_0.find( query ).toArray() != "")
+		throw ("Collection " + names + " already exists");
+	
+	var CN = getNewCN();
+    
+	var e = jSonToMaster_E (CN, name, names, desc);
+	db.createCollection("Master_"+CN);
+    
+	dataInsert(0, e);
+	return formatResponseOK({entityCN:CN});
+    }
+    catch(err)
+    {
+        return formatResponseError(99, "entityAdd: " + err);
+    }
 }
 //
-function formatResponse(ctrl, j){
-    if (ctrl == null)
-	ctrl = {isOk:false, errNo:100, errMsg:"no ctrl specified"};
+function formatResponseOK(j, r){
+    ctrl = {isOk:true};
     
     if (j==null)
 	j={};
+	
+    if (r==null)
+	r={};
 
     var rtn = {};
 
     rtn.ctrl = ctrl;
     rtn.j = j;
+    rtn.r = r;
 
     return rtn;    
 }
-//
+function formatResponseError(errNo, errMsg){
+    if (errMsg == null)
+	errMsg = "formatResponseError: no error message provided";
+	
+    if (errNo == null)
+	ctrl = {isOk:false, errNo:9999, errMsg: errMsg};
+    
+    var rtn = {};
+
+    rtn.ctrl = {isOk:false, errNo: errNo, errMsg:errMsg};
+    rtn.j = {};
+    rtn.r = {};
+
+    return rtn;    
+}
+
 function entityGet(param){
     try {
 	if (param == null || param.entityCN == null)
-	    throw ("entityGet: invalid parameter");
+	    throw ("invalid parameter");
 	
 	var rsl = db.Master_0.findOne({_id: param.entityCN}, {_id:0, "j":1});
 	if (rsl == null)
-	    throw ("entityGet: no Entity found");
+	    throw ("no Entity found");
 
 	rsl = decodeJSonDicoEntity(rsl, 0);
 
-	return (formatResponse( {isOk:true}, rsl) );
+	return formatResponseOK( rsl );
     }
     catch(err)
     {
-        return { ctrl:{isOk:false, errNo:99, errMsg:"entityGet: " + err}, j:{} };
+        return formatResponseError(99, "entityGet: " + err);
+    }
+}
+function entityGetByName(param){
+    try {
+	if (param == null || param.singular == null)
+	    throw ("invalid parameter");
+	
+	var rsl = db.Master_0.findOne({"j.5":"E", "j.6":param.singular}, {_id:0, "j":1});
+	if (rsl == null)
+	    throw ("no Entity found");
+
+	rsl = decodeJSonDicoEntity(rsl, 0);
+
+	return formatResponseOK( rsl );
+    }
+    catch(err)
+    {
+        return formatResponseError(99, "entityGetByName: " + err);
     }
 }
 function entityGetAll(param){
@@ -215,39 +255,71 @@ function entityGetAll(param){
 	var rsl = db.Master_0.find(param, {_id:0, "j":1}).toArray();
 	
 	if (rsl == null)
-	    throw ("entityGetAll: no Entity found");
+	    throw ("No Entity found");
 
 	var result=[];
 	for(var it in rsl){
 	    result.push(decodeJSonDicoEntity(rsl[it], 0));
 	}
-	return (formatResponse( {isOk:true}, result ) );
+	return formatResponseOK( result );
     }
     catch(err)
     {
-        return { ctrl:{isOk:false, errNo:99, errMsg:"entityGet: " + err}, j:{} };
+        return formatResponseError (99, "entityGetAll: " + err);
     }
 
 }
 function fieldGet(param){
     try {
-	if (param == null || param.entityCN == null)
-	    throw ("entityGet: invalid parameter");
+	if (param == null || param.fieldCN == null)
+	    throw ("invalid parameter");
 	
-	var rsl = db.Master_0.find({"j.4": param.entityCN, "j.5":"F"}, {_id:0, "j":1}).toArray();
+	var rsl = db.Master_0.findOne( {_id: param.fieldCN}, {_id:0, "j":1} );
 	if (rsl == null)
-	    throw ("entityGet: no Entity found");
+	    throw ("no field found");
+
+	return (formatResponseOK( decodeJSonDicoField(rsl, 0) ));
+    }
+    catch(err)
+    {
+        return formatResponseError(99, "entityGet: " + err);
+    }
+}
+function fieldGetByName(param){
+    try {
+	if (param == null || param.entityCN == null|| param.name == null)
+	    throw ("invalid parameter");
+	
+	var rsl = db.Master_0.findOne( {"j.4": param.entityCN, "j.6":param.name}, {_id:0, "j":1} );
+	if (rsl == null)
+	    throw ("no field found");
+
+	return (formatResponseOK( decodeJSonDicoField(rsl, 0) ));
+    }
+    catch(err)
+    {
+        return formatResponseError(99, "entityGetByName: " + err);
+    }
+}
+function fieldGetAll(param){
+    try {
+	if (param == null || param.entityCN == null)
+	    throw ("invalid parameter");
+	
+	var rsl = db.Master_0.find( {"j.4": param.entityCN, "j.5":"F"}, {_id:0, "j":1} ).toArray();
+	if (rsl == null)
+	    throw ("no Entity found");
 
 	var result=[];
 	for(var it in rsl){
 	    result.push( decodeJSonDicoField(rsl[it], 0) );
 	}
 
-	return (formatResponse( {isOk:true}, result ));
+	return (formatResponseOK( result ));
     }
     catch(err)
     {
-        return { ctrl:{isOk:false, errNo:99, errMsg:"entityGet: " + err}, j:{} };
+        return formatResponseError(99, "entityGetAll: " + err);
     }
 }
 
@@ -257,7 +329,7 @@ function relationAdd(name, lEid, lDesc, lCard, lStroreHere, lCached, lFormat, rE
 
 	var r = jSonToMaster_R(CN, name, lEid, lDesc, lCard, lStroreHere, lCached, lFormat, rEid, rDesc, rCard, rStoreHere, rCached, rFormat);
 	
-        return (dataInsert ( 0, r));
+        return dataInsert(0, r);
 }
 function relationGet(param){
     try {
@@ -269,11 +341,11 @@ function relationGet(param){
 	if (rsl == null)
 	    throw ("relationGet: no Relation found");
 
-        return (formatResponse( {isOk:true}, decodeJSonDicoRelation(rsl, 0) ));
+        return formatResponseOK( decodeJSonDicoRelation(rsl, 0) );
     }
     catch(err)
     {
-        return { ctrl:{isOk:false, errNo:99, errMsg:"relationGet: " + err}, j:{} };
+        return formatResponseError( 99, "relationGet: " + err);
     }    
 }
 
@@ -291,11 +363,11 @@ function relationGetAll(param){
 	    result.push( decodeJSonDicoRelation(rsl[it], 0) );
 	}
 
-	return (formatResponse( {isOk:true}, result ));
+	return formatResponseOK(result);
     }
     catch(err)
     {
-        return { ctrl:{isOk:false, errNo:99, errMsg:"entityGet: " + err}, j:{} };
+        return formatResponseError(99, "entityGet: " + err);
     }    
 }
 
@@ -319,31 +391,22 @@ function decodeJSonDico(j, sens){
 }
 
 function decodeJSonDicoEntity(jE, sens){
-    var tab={"entityCN":"_id", "singular":"6", "plural":"H", "description":"7", "index":"F", "cachedFI":"G", "indexName":"8", "indexKeys":"C", "indexProperties":"D"};
-    var tabi={"_id":"entityCN", "6":"singular", "H":"plural", "7":"description", "F":"index", "G":"cachedFI", "8":"indexName", "C":"indexKeys", "D":"indexProperties"};
-    
     if (sens == 0)
-        return decodeJSonDicoGeneric (tabi, jE.j);
+        return decodeJSonDicoGeneric (1, jE.j);
 
-    return decodeJSonDicoGeneric (tab, jE.j);
+    return decodeJSonDicoGeneric (0, jE.j);
 }
 function decodeJSonDicoField(jF, sens){
-    var tab={"name":"6", "description":"7", "typeUI":"A"};
-    var tabi={"6":"name", "7":"description", "A":"typeUI"};
-    
     if (sens == 0)
-        return decodeJSonDicoGeneric (tabi, jF.j);
+        return decodeJSonDicoGeneric (3, jF.j);
 
-    return decodeJSonDicoGeneric (tab, jF.j);
+    return decodeJSonDicoGeneric (2, jF.j);
 }
 function decodeJSonDicoRelation(jR, sens){
-    var tab={"relationCN":"_id", "relationName":"6", "left":"K", "right":"L", "linkedCN":"M","cardinality":"O","verb":"P","storeIndex":"Q", "dataCached":"R", "format":"S"};
-    var tabi={"_id":"relationCN","6":"relationName","K":"left", "L":"right", "M":"linkedCN","O":"cardinality","P":"verb","Q":"storeIndex", "R":"dataCached", "S":"format"};
-    
     if (sens == 0)
-        return decodeJSonDicoGeneric (tabi, jR.j);
+        return decodeJSonDicoGeneric (5, jR.j);
 
-    return decodeJSonDicoGeneric (tab, jR.j);
+    return decodeJSonDicoGeneric (4, jR.j);
 }
 function jsonConcat(o1, o2, prefix) {
  for (var key in o2) {
@@ -352,32 +415,26 @@ function jsonConcat(o1, o2, prefix) {
  }
  return o1;
 }
-function decodeJSonDicoGeneric(tab, js){
+
+function decodeJSonDicoGeneric(indTab, js){
     //print("Entering DicoGenerice");
     //printjson(js);
-    //printjson(tab);
+    //printjson(tabCodec[indTab]);
 
     var jd={};
 
     for ( var key in js ){
-	//print ("Analyze: " + key + "->" + js[key] + ", type: " + typeof(js[key]) + ", tab[k] ?: " + tab[key] );
+	//print ("Analyze: " + key + "->" + js[key] + ", type: " + typeof(js[key]) + ", tabCodec[indTab][k] ?: " + tabCodec[indTab][key] );
 
 	// look for sub nodes
 	if (typeof (js[key]) == "object" )
 	{
-	//    if (js[key].length > 0){
-	//	print ("Looping on " + key);
-	//	for (var i =0 ; i < js[key].length; i++){
-	//	    jsonConcat(jd, decodeJSonDicoGeneric(tab, js[key][i]), js[key]+i+"_");
-	//	}
-	//    }
-	//    else
-		jsonConcat(jd, decodeJSonDicoGeneric(tab, js[key]), tab[key]+"_");
+		jsonConcat(jd, decodeJSonDicoGeneric(tabCodec[indTab], js[key]), tabCodec[indTab][key]+"_");
 	}
 	else{
-	    if (tab[key] != null) {
+	    if (tabCodec[indTab][key] != null) {
 		//print (key + ", type : " + typeof(js[key]) );
-		jd[tab[key]]=js[key];
+		jd[tabCodec[indTab][key]]=js[key];
 	    }
 	}
     }
@@ -394,17 +451,19 @@ function fieldAdd(entityCN, name, description, textUI) {
 	var CN = getNewCN();
 
 	var m = jSonToMaster_F(entityCN, CN, name, description, textUI);
-	print ("fieldAdd : ");
 	printjson(m);
-	dataInsert(0, m);
+	var rsl=dataInsert(0, m);
+	printjson(rsl);
 	
 	var check = db.Master_0.find({ _id: CN}).toArray();
 	if (check == null)
 	    throw ("Document not created !!");
+	
+	return formatResponseOK({fieldCN:CN});
     }
 	catch(err)
 	{
-            return { ctrl:{isOk:false,errNo:99,errMsg:"fieldAdd: " + err}, j:{} };
+            return formatResponseError( 99, "fieldAdd: " + err);
 	}
 
 }
@@ -433,15 +492,15 @@ function dataAdd(eId, j){
 
 		// Nico : do the work for managing the Relations
 
-	    return ( {isOk:true} );
+	    return formatResponseOK( {} );
     }
 	catch(err)
 	{
-		return ( {isOk:false, errNo:99, errMsg:err} );
+		return formatResponseError( 99, err);
 	}
 }
 // Add data to a Master_xx collection
-function dataInsert(eId, j){
+function dataInsert(eId, j, r){
     try{
 	if ( db.getCollection('system.namespaces').find(  {"name": "FLApps.Master_" + eId } ).length() == 0 ){
 	    throw ("dataAdd: Collection : Master_" + eId + " not found");
@@ -454,8 +513,11 @@ function dataInsert(eId, j){
 		    print ("New id : " + id);
 		    printjson(j);
 	}
-		
-	db["Master_" + eId].insert( { _id:j._id, v:1, j:j } );
+	
+	if (r == null)
+	    r={};
+	    
+	db["Master_" + eId].insert( { _id:j._id, v:1, j:j, r:r} );
 
 	var err = db.getLastError();
 
@@ -468,29 +530,32 @@ function dataInsert(eId, j){
 	if (check == null)
 	    throw ("document not created .... ");
 	    
-        return formatResponse( {isOk:true}, {"cn":id} );
+        return formatResponseOK( {"cn":id} );
     }
 	catch(err)
 	{
-            return { ctrl:{isOk:false,errNo:99,errMsg:"dataInsert: " + err}, j:{} };
+            return formatResponseError( 99, "dataInsert: " + err);
 	}
 }
 function dataGet(eId, id){
-	try {
-    if ( db.getCollection('system.namespaces').find(  {"name": "FLApps.Master_" + eId } ).length() == 0 ){
-	throw ("dataGet: Collection : Master_" + eId + " unknown");
-    }
+    try {
+	if ( db.getCollection("system.namespaces").find(  {"name": "FLApps.Master_" + eId } ).length() == 0 ){
+	    throw ("Collection : Master_" + eId + " unknown");
+	}
+		
+	var x = db["Master_" + eId].findOne( {_id: id });
+	if (x == "")
+		    throw ("no data found");
+	
+	if(x["r"] == null)
+	    x["r"]={};
 	    
-    var x = db["Master_" + eId].findOne( {_id: id });
-    if (x == "")
-		throw ("dataGet: no data found");
-    
-    return ( {isOk:true, j:x["j"]} );
-	}
-	catch(err)
-	{
-		return ( {isOk:false, errNo:99, errMsg:err} );
-	}
+	return formatResponseOK( x.j, x.r );
+    }
+    catch(err)
+    {
+	    return formatResponseError( 99, "dataGet: " + err);
+    }
 }
 
     // Generate our dictionary !
@@ -583,40 +648,40 @@ function indexAdd(eId, indexName, keys, props){
 	    //print (i);
 	    tmp = new String ( keys[i] ).replace('.','_');
 	    strKeys[i]= tmp;
+	    // print(tmp);
 	}
-	
-	//print ("update: db.Master_0.update({_id:" + eId + "}, {$push: {'j.F': {'8':{" + indexName + ", 'D':" + strKeys + ", 'E'" + props + "}} }} );");
-    
+	//print ("update: db.Master_0.update( {_id:" + eId + "}, {$push: {'j'.'F': '8':" + indexName + ", 'D':" + strKeys + ", 'E'" + props + "}} );");
+	var idx = {"j.F": {"8": indexName, "D": strKeys, "E": props}};
+	// printjson(idx);
 	db.Master_0.update(  {_id: eId},
-			     {  $push:  {	"j.F": {
-						"8": indexName,
-						"D": strKeys,
-						"E": props
-					    }
-				}
-			     }
+			     {  $push:  idx }
 			  );
+	return formatResponseOK( {} );
     }
     catch(err)
     {
-	return { ctrl:{isOk:false,errNo:99,errMsg:"indexAdd: " + err}, j:{} };
+	return formatResponseError (99, "indexAdd: " + err);
     }
 }
-indexAdd("0", "UnikNamesMaster0", {"j.3":1, "j.6":1}, {"unique":true});
 
+var idx = indexAdd("0", "UnikNamesMaster0", {"j.4":1, "j.6":1}, {"unique":true});
+printjson (idx);
 
 // API Simulation
 var flDico=function() {};
 flDico.prototype.entityAdd=function (jj) { return entityAdd(jj.singular, jj.plural, jj.description); };
 flDico.prototype.entityGet=function (jj) { return entityGet(jj); };
-// for entityGetAll : on the where clause, only compressed name can be used in this demo. We'll see on the final implementation...
+flDico.prototype.entityGetByName=function (jj) { return entityGetByName(jj); };
+// for entityGetAll : on the where clause, only compressed name can be used. We'll see on the final implementation...
 flDico.prototype.entityGetAll=function (jj) { return entityGetAll(jj); };
 
 flDico.prototype.fieldAdd=function (jj) { return fieldAdd(jj.entityCN, jj.name, jj.description, jj.typeUI); };
 flDico.prototype.fieldGet=function (jj) {  return fieldGet(jj); };
+flDico.prototype.fieldGetByName=function (jj) {  return fieldGetByName(jj); };
+flDico.prototype.fieldGetAll=function (jj) {  return fieldGetAll(jj); };
 
 flDico.prototype.relationAdd=function (jj) { return relationAdd(jj.relationName, jj.left.entityCN, jj.left.verb, jj.left.cardinality, jj.left.storeRelation, jj.left.cache, jj.left.format,
-								                jj.right.entityCN, jj.right.verb, jj.right.cardinality, jj.right.storeRelation, jj.right.cache, jj.right.format); };
+								                 jj.right.entityCN, jj.right.verb, jj.right.cardinality, jj.right.storeRelation, jj.right.cache, jj.right.format); };
 flDico.prototype.relationGet=function (jj) { return relationGet(jj); };
 
 flDico.prototype.indexAdd=function (jj) { return entityAdd(jj.singular, jj.plural, jj.description); };
