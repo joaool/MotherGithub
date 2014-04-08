@@ -9,6 +9,7 @@ define([
 ], function(declare,registry,domStyle,Form,ValidationTextBox,areaWithText){
     return declare(areaWithText,{
         dojoObj:null,
+        jqObj:null,
         type:"textbox",
         constructor: function (widgetProperties) {
             // The "constructor" method is special: the parent class areaWithText and area constructor are called automatically before this one.
@@ -22,7 +23,7 @@ define([
                 // alert("textbox.constructor this.width="+this.width);
                 widgetProperties.width = this.width;
                 declare.safeMixin(allPossibleProperties,widgetProperties);
-            }    
+            }
             // console.log("INSIDE TEXTBOX id="+this.id+" left="+this.left+" top="+this.top+" width="+this.width+" height="+this.height);
             
             //HACK: To have something to support the widget
@@ -33,15 +34,25 @@ define([
 
             allPossibleProperties.id=this.id;//the area class returns the id for this widget id<this.widgets.lastId>
             var JSON_forValidationTextBox=this.JSON_Default_TextBox(allPossibleProperties);
-            this.dojoObj = new ValidationTextBox(JSON_forValidationTextBox.props,this.id);
-            form.domNode.appendChild(this.dojoObj.domNode);//this places the widget inside the form 
+            
+            // --- dojo widgets code ------------------
+            // this.dojoObj = new ValidationTextBox(JSON_forValidationTextBox.props,this.id);
+            // form.domNode.appendChild(this.dojoObj.domNode);//this places the widget inside the form 
            
-            this.setFontSize(this.fontSize);
-            this.setBorder();
+            //--- jquery widgets code ------------------
+            this.jqObj = $("<input type='text' size='4' id="+this.id+" name='txt1' "+
+                   "style='position:absolute;left:"+this.left+"px;top:"+this.top+"px;width:"+this.width+"px;height:"+this.height+"px'/>");
+            this.jqObj.appendTo("body");
+            alert("1-Inside textbox.js");
+
+            this.setFontSize(this.fontSize);//ok with jquery
+            alert("2-Inside textbox.js");
+
+            // this.setBorder();//problem with jquery
         },
         getValue: function(){
             return this.dojoObj.textbox.value;
-        },         
+        }, 
         resize: function() {
             this.inherited(arguments);//it will call area.resize() and it will follow with next code...
             // alert("hello !!! this is textbox width="+this.width+" height="+this.height);

@@ -1,0 +1,184 @@
+<!--
+* http://download.dojotoolkit.org/release-1.2.3/dojo-release-1.2.3/dojox/form/tests/test_BusyButton.html
+* http://www.sitepen.com/blog/2008/10/17/dojo-building-blocks-of-the-web/
+*
+* <!DOCTYPE html>
+-->
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<!--
+		<meta http-equiv="X-UA-Compatible" content="IE=8" />
+		<script type="text/javascript" src="Dojo Toolkit/dojo-release-1.7.1/dojo/dojo.js" djconfig="parseOnLoad: true, isDebug: true" >
+		</script> 
+		<link href="Dojo Toolkit/dojo-release-1.7.1/dijit/themes/claro/claro.css" rel="stylesheet">
+
+	<meta http-equiv="Content-Type" content="text/html;charset=utf-8" /> 
+-->	
+	<!-- -->
+    <!-- -->
+    <title>Test datatables v2.0</title>
+
+    <script> 
+    	dojoConfig= {
+	        has: {
+	            "dojo-firebug": true
+	        },
+	        parseOnLoad: false,
+	        debugAtAllCosts: true,
+	        foo: "bar",
+	        async: true
+    	};
+    </script> 
+   	<script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
+	<script src="//datatables.net/download/build/nightly/jquery.dataTables.js"></script>
+	<script src="//cdn.datatables.net/plug-ins/505bef35b56/integration/bootstrap/3/dataTables.bootstrap.js"></script>
+	<script type="text/javascript" language="javascript" src="../ColReorder-1.1.0/js/dataTables.colReorder.js"></script>
+
+   	<script type="text/javascript" src="../dojo1.9.2/dojo/dojo.js"></script>
+
+   	<!--<script type="text/javascript"
+      src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>-->
+  <!--
+   	<script type="text/javascript"
+      src="../Jcrop/js/jquery.min.js"></script>
+ 	<script src="//datatables.net/download/build/nightly/jquery.dataTables.js"></script>
+ 	<script src="../DataTables 1.10.0-beta.2/media/js/jquery.dataTables.js"></script>
+ -->
+
+	<!--<script src="Mother/jquery-1.8.1.min.js"></script> -->
+	<!--<script src="Mother/bootstrap.js"></script>-->	
+	<link rel="stylesheet" type="text/css" href="../bootstrap-3.1.1-dist/css/bootstrap.css">
+
+	<link rel="stylesheet" href="../Jcrop/demos/demo_files/main.css" type="text/css" />
+	<link href="../dojo1.9.2/dijit/themes/claro/claro.css" rel="stylesheet"> 
+	<link href="../DataTables 1.10.0-beta.2/media/css/jquery.dataTables.css" rel="stylesheet" type="text/css" />
+
+
+
+	<!--- For Mother Builder  -->
+	<link rel="stylesheet" type="text/css" href="Mother/MotherBuilder.css" /> 
+    <style type="text/css">
+		div.container {
+			min-width: 980px;
+			margin: 0 auto;
+		}
+		div.dataTables_length label {
+		    width: 460px;
+		    float: left;
+		    text-align: left;
+		}
+		 
+		div.dataTables_length select {
+		    width: 75px;
+		}
+		 
+		div.dataTables_filter label {
+		    float: right;
+		    width: 460px;
+		}
+		 
+		div.dataTables_info {
+		    padding-top: 8px;
+		}
+		 
+		div.dataTables_paginate {
+		    float: right;
+		    margin: 0;
+		}
+		 
+		table {
+		    margin: 1em 0;
+		    clear: both;
+		}
+    </style>
+<script>
+oDbg=null;//so that we can use "this" inside this html with embedded script
+// define.amd.jQuery = true;
+require([
+	"dojo/query",
+	"dojo/dom",
+	"dojo/dom-construct",
+	"dijit/registry",
+	"Mother/areasFactory.js",
+	"Mother/textbox.js",
+	"Mother/numberbox.js",
+	"Mother/container.js",
+	], 
+	function(query,dom,domConstruct,registry,canvas,textbox,numberbox,container){ 
+		console.log("Inicio");
+		console.log("--------------------------------------- container done.... -----------------------------------------------");
+		// $(document).ready( function () {
+		$('#example').dataTable( {
+			"ajax": "../DataTables 1.10.0-beta.2/examples/ajax/data/objects.txt",
+			"columns": [//this does the match between the source array of json and client side array od jason
+				{ "data": "name" },
+				{ "data": "position" },
+				{ "data": "office" },
+				{ "data": "extn" },
+				{ "data": "start_date" },
+				{ "data": "salary" }
+			],
+			 "lengthMenu": [[10, 25, 50, -1], [11,26, 50, "All"]],
+			//sDom (with the R) is necessary for column reorder 
+	    	"sDom":'Rlfrtip',//"<'row'<'span8'Rl><'span8'f>r>t<'row'<'span8'i><'span8'p>>",//'Rlfrtip' '<"top"fipl>rt<"bottom"ipl>' 
+			"oColReorder": {
+ 				"aiOrder": [0,1,2,3,4,5]//[ 5, 0 ] //[ 5,4, 3, 2, 1, 0 ]
+			}, 
+        	"oLanguage": {
+	        	"sLengthMenu": "_MENU_ records perpage",
+	        	"sZeroRecords": "Vazio!",
+	        	"sInfo": "FrameLink shows _START_ until _END_ out of _TOTAL_ entries",
+	        	"sInfoEmpty": "No existing records",
+	        	"sInfoFiltered": "(total of _MAX_ records)",
+	        	'sSearch' : "Search your Framelink customer base"
+        	}			
+		} );			
+	  	// var table = $('#example').DataTable({
+	   //  	"sScrollY": "300px", //the high of the scrolling area
+	   //  	"bPaginate": false,
+	   //  	"sDom":"<'row'<'span8'Rl><'span8'f>r>t<'row'<'span8'i><'span8'p>>",//'Rlfrtip' '<"top"fipl>rt<"bottom"ipl>' https://datatables.net/usage/options#sDom
+	   //  	//i - Information =>Showing 1 to 57 of 57 entries 
+	   //  	//f - filtering input =>Search 
+
+	   //  	"oColReorder": {
+    //         	"aiOrder": [ 5, 0 ] //[ 5,4, 3, 2, 1, 0 ]
+    //     	},    
+    //     	"oLanguage": {
+	   //      	"sLengthMenu": "_MENU_ entradas por página",
+	   //      	"sZeroRecords": "Vazio!",
+	   //      	"sInfo": "Exibindo de _START_ até _END_. Total de: _TOTAL_ entradas",
+	   //      	"sInfoEmpty": "Nenhuma entrada",
+	   //      	"sInfoFiltered": "(total de _MAX_ entradas)",
+	   //      	'sSearch' : "Busca"
+    //     	}
+	  	// });
+		console.log(document.title+"......  END..");		
+	}//closing of main function				
+);//closing of require function
+</script>
+	</head>
+	<body class="claro Mother"> 
+		<p id="target">
+	       <b style="display:block; padding: .5em 1em;">
+	          This is an example of FrameLink definition interface using a grid.
+	       </b>
+	    </p>
+		<div class="container">
+			<!--
+			<table id="example" class="display" width="100%"> 
+			-->
+			<table id="example" class="table table-striped table-bordered" cellspacing="0" width="100%">
+				<thead>
+					<tr>
+						<th>Name</th>
+						<th>Position</th>
+						<th>Office</th>
+						<th>Age</th>
+						<th>Start date</th>
+						<th>Salary</th>
+					</tr>
+				</thead>
+			</table>
+		</div>	    
+	</body>
+</html>

@@ -6,7 +6,7 @@
 		<link href="Dojo Toolkit/dojo-release-1.7.1/dijit/themes/claro/claro.css" rel="stylesheet">
 -->
 	<meta http-equiv="Content-Type" content="text/html;charset=utf-8" /> 
-    <title>Test WDetector 1.0</title>
+    <title>Test WDetector 2.0</title>
     <script> 
     	dojoConfig= {
 	        has: {

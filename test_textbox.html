@@ -1,0 +1,113 @@
+<!--
+* http://download.dojotoolkit.org/release-1.2.3/dojo-release-1.2.3/dojox/form/tests/test_BusyButton.html
+* http://www.sitepen.com/blog/2008/10/17/dojo-building-blocks-of-the-web/
+*
+* <!DOCTYPE html>
+-->
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<!--
+		<meta http-equiv="X-UA-Compatible" content="IE=8" />
+		<script type="text/javascript" src="Dojo Toolkit/dojo-release-1.7.1/dojo/dojo.js" djconfig="parseOnLoad: true, isDebug: true" >
+		</script> 
+		<link href="Dojo Toolkit/dojo-release-1.7.1/dijit/themes/claro/claro.css" rel="stylesheet">
+
+	<meta http-equiv="Content-Type" content="text/html;charset=utf-8" /> 
+-->	
+	<!-- -->
+    <!-- -->
+    <title>Test textbox v1.0</title>
+
+    <style type="text/css">
+        #wrapper {
+            height:200px;
+            width:200px;
+            background:#ffffff;/*#ededed */
+            color:#000;
+        }
+        #wrapper p {
+            padding:20px;
+        } 
+    </style>	
+    <script> 
+    	dojoConfig= {
+	        has: {
+	            "dojo-firebug": true
+	        },
+	        parseOnLoad: false,
+	        debugAtAllCosts: true,
+	        foo: "bar",
+	        async: false
+    	};
+    </script> 
+   	<script type="text/javascript" src="../dojo1.9.2/dojo/dojo.js"></script> 
+   	<!--<script type="text/javascript"
+      src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>-->
+   	<script type="text/javascript"
+      src="../Jcrop/js/jquery.min.js"></script>
+ 
+	<!--<script src="Mother/jquery-1.8.1.min.js"></script> -->
+	<!--<script src="Mother/bootstrap.js"></script>-->	
+	<link rel="stylesheet" href="../Jcrop/demos/demo_files/main.css" type="text/css" />
+	<link href="../dojo1.9.2/dijit/themes/claro/claro.css" rel="stylesheet"> 
+
+
+	<style type="text/css" media="all">
+		.claro.Mother {/*prevents text selection highlighting outside current div */
+			-webkit-touch-callout: none;
+			-webkit-user-select: none;
+			-khtml-user-select: none;
+			-moz-user-select: none;
+			-ms-user-select: none;
+			user-select: none;
+		}
+	</style>
+	
+	<!--- For Mother Builder  -->
+	<link rel="stylesheet" type="text/css" href="Mother/MotherBuilder.css" /> 
+		
+<script>
+oDbg=null;//so that we can use "this" inside this html with embedded script
+require([
+	"dojo/query",
+	"dojo/dom",
+	"dojo/dom-construct",
+	"dijit/registry",
+	"Mother/areasFactory.js",
+	"Mother/textbox.js",
+	"Mother/numberbox.js",
+	"Mother/container.js",
+	], 
+	function(query,dom,domConstruct,registry,canvas,textbox,numberbox,container){ 
+		console.log("Inicio");
+		var txt = new textbox({name: "Junkas",left: 130, top: 50, width: 450,height: 100,value: "junkas abc"});
+		alert("returned from textbox call");
+		var selection = {x:200,y:200,w:300,h:30}
+		var txt=$("<input type='text' size='4' id='txt1' name='txt1' "+
+			"style='position:absolute;left:"+selection.x+"px;top:"+selection.y+"px;width:"+selection.w+"px;height:"+selection.h+"px'/>");
+		alert("STOP1");
+
+		txt.appendTo("#target");
+		alert("STOP2");
+		console.log("--------------------------------------- container done.... -----------------------------------------------");		
+		console.log(document.title+"......  END..");		
+
+	}//closing of main function				
+);//closing of require function
+</script>
+	</head>
+	<body class="claro Mother"> 
+		<p id="target">
+	       <b style="display:block; padding: .5em 1em;">
+	          This is an example of FrameLink definition interface using dojo and jquery widgets.
+	       </b>
+	    </p>
+
+		<!--
+		<div id="wrapper" style="position:absolute;left:50;top:100;">
+	           <p>Name: 
+                <input type="text" id="user" name="user"></p>
+	    </div>
+		-->
+	</body>
+</html>

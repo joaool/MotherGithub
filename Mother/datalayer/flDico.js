@@ -71,8 +71,8 @@ define([
             //dDictionary.addRelation("Invoice","Client","is addressed to","1","En");
 
             var param1 = {
-                left:{entityCN:"45",cardinality:"1",description:"is invoicing ",storeRelation:true,cached:false,format:null},
-                right:{entityCN:"50",cardinality:"N",description:"has",storeRelation:false,cached:false,format:null}
+                left:{entityCN:"45",cardinality:"1",verb:"is invoicing ",storeRelation:true,cached:false,format:null},
+                right:{entityCN:"50",cardinality:"N",verb:"has",storeRelation:false,cached:false,format:null}
             };
             // process..
             return { ctrl:{isOk:true}, j:{"relationCN":"23"} };
@@ -81,23 +81,23 @@ define([
             var param1 = {relationCN:"23"};
             // process..
             return { ctrl:{isOk:true}, j:{
-                left:{entityCN:"45",cardinality:"1",description:"is invoicing ",storeRelation:true,cached:false,format:null},
-                right:{entityCN:"50",cardinality:"N",description:"has",storeRelation:false,cached:false,format:null}
+                left:{entityCN:"45",cardinality:"1",verb:"is invoicing ",storeRelation:true,cached:false,format:null},
+                right:{entityCN:"50",cardinality:"N",verb:"has",storeRelation:false,cached:false,format:null}
             };
          },
         relationGetAll: function (param) { //cache refresh 
             var param1 = {where:{}};//
             // process..
            return { ctrl:{isOk:true}, j:[{
-                left:{entityCN:"45",cardinality:"1",description:"is invoicing ",storeRelation:true,cached:false,format:null},
-                right:{entityCN:"50",cardinality:"N",description:"has",storeRelation:false,cached:false,format:null}
+                left:{entityCN:"45",cardinality:"1",verb:"is invoicing ",storeRelation:true,cached:false,format:null},
+                right:{entityCN:"50",cardinality:"N",verb:"has",storeRelation:false,cached:false,format:null}
             ]};     
         },
         relationUpdate: function (param) {
             var param1 = {
                 relationCN:"23",j:{
-                    left:{entityCN:"45",cardinality:"1",description:"is invoicing ",storeRelation:true,cached:false,format:null},
-                    right:{entityCN:"50",cardinality:"N",description:"has",storeRelation:false,cached:false,format:null}
+                    left:{entityCN:"45",cardinality:"1",verb:"is invoicing ",storeRelation:true,cached:false,format:null},
+                    right:{entityCN:"50",cardinality:"N",verb:"has",storeRelation:false,cached:false,format:null}
                 } 
             };       
             // process..

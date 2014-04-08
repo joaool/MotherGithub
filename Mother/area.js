@@ -67,14 +67,15 @@ define([
                 lang.mixin(this, areaProperties);
         },
         setBorder: function(borderProperties) {
-            if(borderProperties){
-                var border = {borderThickness:this.borderThickness,  borderStyle: this.borderStyle, borderColor: this.borderColor};
-                declare.safeMixin(border,borderProperties);
-                lang.mixin(this,border);
-            }
-            var borderString = this.borderThickness+"px "+this.borderStyle+" "+this.borderColor;
-            // console.log("area class setBorder for type="+this.type+" ------------------------>  borderThickness="+this.borderThickness+", borderStyle="+this.borderStyle+", borderColor="+this.borderColor+")");
-            this.updateDOMPropertyWithValue("border", borderString);
+            // if(borderProperties){
+            //     var border = {borderThickness:this.borderThickness,  borderStyle: this.borderStyle, borderColor: this.borderColor};
+            //     declare.safeMixin(border,borderProperties);
+            //     lang.mixin(this,border);
+            // }
+            // var borderString = this.borderThickness+"px "+this.borderStyle+" "+this.borderColor;
+            // // console.log("area class setBorder for type="+this.type+" ------------------------>  borderThickness="+this.borderThickness+", borderStyle="+this.borderStyle+", borderColor="+this.borderColor+")");
+            // this.updateDOMPropertyWithValue("border", borderString);
+            return true;
         },
         resize: function(widthHeight) {
             lang.mixin(this, widthHeight);
