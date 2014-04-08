@@ -34,9 +34,13 @@ fl.fieldAdd({entityCN:orderCN, name:"date",description:"order's date",typeUI:"te
 fl.fieldAdd({entityCN:orderCN, name:"amount",description:"total amount",typeUI:"textBox"});
 fl.fieldAdd({entityCN:orderCN, name:"shipped",description:"is it shipped",typeUI:"textBox"});
 
-var rlt = fl.relationAdd({"relationName":"CustomerToOrder",
-			 "left":{"entityCN":custCN, "verb":"ordered", "side":0, "cardinality":"1", "storeRelation":false, "cache":false, "format":""},
-			 "right":{"entityCN":orderCN, "verb":"ordered by", "side":1, "cardinality":"N", "storeRelation":true, "cache":false, "format":""}
+var rlt = fl.relationAdd({"relationName":"CustomerCanOrder",
+			 "left":{"entityCN":custCN, "verb":"orders", "side":0, "cardinality":"1", "storeRelation":false, "cache":false, "format":""},
+			 "right":{"entityCN":orderCN, "verb":"is ordered by", "side":1, "cardinality":"N", "storeRelation":true, "cache":false, "format":""}
+			 });
+var rlt = fl.relationAdd({"relationName":"CustomerReceiveOrder",
+			 "left":{"entityCN":custCN, "verb":"receives physicel", "side":0, "cardinality":"1", "storeRelation":false, "cache":false, "format":""},
+			 "right":{"entityCN":orderCN, "verb":"ordered to be physical delivered to", "side":1, "cardinality":"N", "storeRelation":true, "cache":false, "format":""}
 			 });
 var relCN=rlt.j.cn;
 
@@ -65,8 +69,8 @@ for (i=1; i<nbOrders; i++) {
 	}
 }
 var rlt = fl.relationAdd({"relationName":"OrderToLines",
-			 "left":{"entityCN":orderCN, "verb":"lined", "side":0, "cardinality":"1", "storeRelation":false, "cache":false, "format":""},
-			 "right":{"entityCN":lineOrdCN, "verb":"lined by", "side":1, "cardinality":"N", "storeRelation":true, "cache":false, "format":""}
+			 "left":{"entityCN":orderCN, "verb":"has", "side":0, "cardinality":"1", "storeRelation":false, "cache":false, "format":""},
+			 "right":{"entityCN":lineOrdCN, "verb":"belongs to", "side":1, "cardinality":"N", "storeRelation":true, "cache":false, "format":""}
 			 });
 
 var rsl = fl.entityAdd({"singular":"Product", "plural":"Products", "description":"Catalog" });
@@ -86,8 +90,8 @@ for (i=1; i<nbProds; i++) {
 	flD.insert(prodCN, j);
 }
 var rlt = fl.relationAdd({"relationName":"ProdToLines",
-			 "left":{"entityCN":prodCN, "verb":"sell to", "side":0, "cardinality":"1", "storeRelation":false, "cache":false, "format":""},
-			 "right":{"entityCN":lineOrdCN, "verb":"product", "side":1, "cardinality":"N", "storeRelation":true, "cache":false, "format":""}
+			 "left":{"entityCN":prodCN, "verb":"belongs to", "side":0, "cardinality":"1", "storeRelation":false, "cache":false, "format":""},
+			 "right":{"entityCN":lineOrdCN, "verb":"has", "side":1, "cardinality":"N", "storeRelation":true, "cache":false, "format":""}
 			 });
 
 fl.entityGet( {"entityCN":"00"} );
