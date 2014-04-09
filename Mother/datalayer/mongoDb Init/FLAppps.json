@@ -237,7 +237,7 @@ function entityGetByName(param){
 	
 	var rsl = db.Master_0.findOne({"j.5":"E", "j.6":param.singular}, {_id:0, "j":1});
 	if (rsl == null)
-	    throw ("no Entity found");
+	    throw ("no singular found");
 
 	rsl = decodeJSonDico(rsl, 1);
 
@@ -290,10 +290,10 @@ function fieldGet(param){
 }
 function fieldGetByName(param){
     try {
-	if (param == null || param.entityCN == null|| param.name == null)
+	if (param == null || param.entityCN == null|| param.fieldName == null)
 	    throw ("invalid parameter");
 	
-	var rsl = db.Master_0.findOne( {"j.4": param.entityCN, "j.6":param.name}, {_id:1, "j":1} );
+	var rsl = db.Master_0.findOne( {"j.4": param.entityCN, "j.6":param.fieldName}, {_id:1, "j":1} );
 	if (rsl == null)
 	    throw ("no field found");
 

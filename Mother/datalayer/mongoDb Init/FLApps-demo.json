@@ -19,7 +19,6 @@ fl.fieldAdd({entityCN:custCN, name:"phone",description:"customer's phone",typeUI
 
 for (i=0; i<nbCusts; i++){
 	var j={};
-	j["_id"]=i;
 	j[new String(nbCusts+1)]= "Client-"+ i;
 	j[new String(nbCusts+2)]= "City "+ i;
 	j[new String(nbCusts+3)]= "0033 "+ i+i+i+i;
