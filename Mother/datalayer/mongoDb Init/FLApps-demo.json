@@ -19,7 +19,7 @@ fl.fieldAdd({entityCN:custCN, name:"phone",description:"customer's phone",typeUI
 
 for (i=0; i<nbCusts; i++){
 	var j={};
-	j["_id"] = i;
+	j['_id'] = i;
 	j[new String(nbCusts+1)]= "Client-"+ i;
 	j[new String(nbCusts+2)]= "City "+ i;
 	j[new String(nbCusts+3)]= "0033 "+ i+i+i+i;
@@ -94,17 +94,20 @@ var rlt = fl.relationAdd({"relationName":"ProdToLines",
 			 "right":{"entityCN":lineOrdCN, "verb":"has", "side":1, "cardinality":"N", "storeRelation":true, "cache":false, "format":""}
 			 });
 
-fl.entityGet( {"entityCN":"00"} );
-// get an array of user defined Entity
+// demos de l'API
+fl.getName({CN:"00"});
+fl.getName({CN:"01"});
 
-fl.entityGetAll( {$where:"this._id.length > 1"} );
+fl.entityGet( {"entityCN":"00"} );
+fl.entityGetByName({singular:"Customer"});
+fl.entityGetAll( );
 
 fl.fieldGet({fieldCN:add(custCN)});
-
-fl.fieldGetAll({entityCN:custCN});
 fl.fieldGetByName({entityCN:custCN, name:"city"});
-fl.fieldGetAllByName({name:"name"})
+fl.fieldGetAll({entityCN:custCN});
+fl.fieldGetAllByName({fieldName:"name"});
 
 fl.relationGet({relationCN:relCN});
+fl.relationGetAll();
 
 flD.get("00", 5);
