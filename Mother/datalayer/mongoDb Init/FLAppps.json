@@ -8,11 +8,14 @@ var tabCodec=[
 	{"entityCN":"_id", "singular":"6", "plural":"H", "description":"7", "index":"F", "cachedFI":"G", "indexName":"8", "indexKeys":"C", "indexProperties":"D"},
 	{"_id":"entityCN", "6":"singular", "H":"plural", "7":"description", "F":"index", "G":"cachedFI", "8":"indexName", "C":"indexKeys", "D":"indexProperties"},
 	// Field
-	{"fieldCN":_id, "name":"6", "description":"7", "typeUI":"A"},
-	{_id:"fieldCN", "6":"name", "7":"description", "A":"typeUI"},
+	{"fieldCN":"_id", "name":"6", "description":"7", "typeUI":"A"},
+	{"_id":"fieldCN", "6":"name", "7":"description", "A":"typeUI"},
 	// Relation
 	{"relationCN":"_id", "relationName":"6", "left":"K", "right":"L", "linkedCN":"M", "cardinality":"O", "verb":"P", "storeIndex":"Q", "dataCached":"R", "format":"S"},
-	{"_id":"relationCN", "6":"relationName", "K":"left", "L":"right", "M":"linkedCN", "O":"cardinality", "P":"verb", "Q":"storeIndex", "R":"dataCached", "S":"format"}
+	{"_id":"relationCN", "6":"relationName", "K":"left", "L":"right", "M":"linkedCN", "O":"cardinality", "P":"verb", "Q":"storeIndex", "R":"dataCached", "S":"format"},
+	// for getName
+	{"6":"name"},
+	{"name":"6"}
 	    ];
 
 function add(CN) {
@@ -274,11 +277,9 @@ function fieldGet(param){
 	if (param == null || param.fieldCN == null)
 	    throw ("invalid parameter");
 	
-	var rsl = db.Master_0.findOne( {_id: param.fieldCN}, {_id:1, "j":1, "r":0} );
+	var rsl = db.Master_0.findOne( {_id: param.fieldCN}, {_id:1, "j":1} );
 	if (rsl == null)
 	    throw ("no field found");
-	
-    printjson(rsl);
 
 	return (formatResponseOK( decodeJSonDico(rsl, 1) ));
     }
@@ -292,11 +293,32 @@ function fieldGetByName(param){
 	if (param == null || param.entityCN == null|| param.name == null)
 	    throw ("invalid parameter");
 	
-	var rsl = db.Master_0.findOne( {"j.4": param.entityCN, "j.6":param.name}, {_id:1, "j":1, "r":0} );
+	var rsl = db.Master_0.findOne( {"j.4": param.entityCN, "j.6":param.name}, {_id:1, "j":1} );
 	if (rsl == null)
 	    throw ("no field found");
 
 	return (formatResponseOK( decodeJSonDico(rsl, 1) ));
+    }
+    catch(err)
+    {
+        return formatResponseError(99, "entityGetByName: " + err);
+    }
+}
+function fieldGetAllByName(param){
+    try {
+	if (param == null || param.fieldName == null)
+	    throw ("invalid parameter");
+	
+	var rsl = db.Master_0.find( {"j.5": "F", "j.6":param.fieldName}, {_id:1, "j":1} ).toArray();
+	if (rsl == null)
+	    throw ("no field found");
+
+	var result=[];
+	for(var it in rsl){
+	    result.push( decodeJSonDico(rsl[it], 1) );
+	}
+
+	return (formatResponseOK( result ));
     }
     catch(err)
     {
@@ -324,7 +346,25 @@ function fieldGetAll(param){
         return formatResponseError(99, "entityGetAll: " + err);
     }
 }
+function getName(param) {
+    try {
+	if (param == null || param.CN == null)
+	    throw ("invalid parameter");
+	
+	var rsl = db.Master_0.findOne( {_id: param.CN}, {_id:0, "j":1} );
+	if (rsl == null)
+	    throw ("no field found");
 
+	return formatResponseOK( decodeJSonDicoGeneric(rsl.j, 6));
+    }
+    catch(err)
+    {
+        return formatResponseError(99, "getName: " + err);
+    }
+}
+   
+    
+}
 function relationAdd(name, lEid, lDesc, lCard, lStroreHere, lCached, lFormat, rEid, rDesc, rCard, rStoreHere, rCached, rFormat){
 	
 	var CN = getNewCN();
@@ -406,6 +446,7 @@ function jsonConcat(o1, o2, prefix) {
 function decodeJSonDicoGeneric(js, indTab){
     //print("Entering DicoGeneric");
     //printjson(js);
+    //print (indTab);
     //printjson(tabCodec[indTab]);
 
     var jd={};
@@ -656,6 +697,9 @@ printjson (idx);
 
 // API Simulation
 var flDico=function() {};
+flDico.prototype.getName=function (jj) { return getName(jj); };
+
+
 flDico.prototype.entityAdd=function (jj) { return entityAdd(jj.singular, jj.plural, jj.description); };
 flDico.prototype.entityGet=function (jj) { return entityGet(jj); };
 flDico.prototype.entityGetByName=function (jj) { return entityGetByName(jj); };
@@ -666,6 +710,7 @@ flDico.prototype.fieldAdd=function (jj) { return fieldAdd(jj.entityCN, jj.name, 
 flDico.prototype.fieldGet=function (jj) {  return fieldGet(jj); };
 flDico.prototype.fieldGetByName=function (jj) {  return fieldGetByName(jj); };
 flDico.prototype.fieldGetAll=function (jj) {  return fieldGetAll(jj); };
+flDico.prototype.fieldGetAllByName=function (jj) {  return fieldGetAllByName(jj); };
 
 flDico.prototype.relationAdd=function (jj) { return relationAdd(jj.relationName, jj.left.entityCN, jj.left.verb, jj.left.cardinality, jj.left.storeRelation, jj.left.cache, jj.left.format,
 								                 jj.right.entityCN, jj.right.verb, jj.right.cardinality, jj.right.storeRelation, jj.right.cache, jj.right.format); };
