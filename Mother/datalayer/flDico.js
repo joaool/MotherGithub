@@ -51,7 +51,7 @@ define([
             return { ctrl:{isOk:true}, j:{"cn":"23"} };
         },
         fieldGet: function (param) {
-            var param1 = {entityCN:"23"};
+            var param1 = {entityCN:"23",name:"deliveryAddress"};
             // process..
             return { ctrl:{isOk:true}, j:{name:"dlvryAddress",description:"place where goods should be delivered",typeUI:"textBox"} };
         },
@@ -66,7 +66,7 @@ define([
             return { ctrl:{isOk:false,errNo:123,errMsg:"compress name does not exist"}, j:{} };
         },
         fieldRemove: function (param) {
-            var param1 = {cn:"23",force:true};//default is false - is force=true relations based on the field will be deleted
+            var param1 = {entityCN:"23",fieldName:"deliveryAddress",force:true};//default is false - is force=true relations based on the field will be deleted
             // process..
             return { ctrl:{isOk:false,errNo:23,errMsg:"not existing"}, j:{} };
         },
