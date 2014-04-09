@@ -251,7 +251,7 @@ function entityGetByName(param){
 function entityGetAll(param){
     try {
 	if (param == null )
-	    throw ("entityGetAll: invalid parameter");
+	    param= {};
 	
 	param["j.5"]="E";
     
