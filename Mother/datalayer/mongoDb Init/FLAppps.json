@@ -8,8 +8,8 @@ var tabCodec=[
 	{"entityCN":"_id", "singular":"6", "plural":"H", "description":"7", "index":"F", "cachedFI":"G", "indexName":"8", "indexKeys":"C", "indexProperties":"D"},
 	{"_id":"entityCN", "6":"singular", "H":"plural", "7":"description", "F":"index", "G":"cachedFI", "8":"indexName", "C":"indexKeys", "D":"indexProperties"},
 	// Field
-	{"name":"6", "description":"7", "typeUI":"A"},
-	{"6":"name", "7":"description", "A":"typeUI"},
+	{"fieldCN":_id, "name":"6", "description":"7", "typeUI":"A"},
+	{_id:"fieldCN", "6":"name", "7":"description", "A":"typeUI"},
 	// Relation
 	{"relationCN":"_id", "relationName":"6", "left":"K", "right":"L", "linkedCN":"M", "cardinality":"O", "verb":"P", "storeIndex":"Q", "dataCached":"R", "format":"S"},
 	{"_id":"relationCN", "6":"relationName", "K":"left", "L":"right", "M":"linkedCN", "O":"cardinality", "P":"verb", "Q":"storeIndex", "R":"dataCached", "S":"format"}
@@ -274,9 +274,11 @@ function fieldGet(param){
 	if (param == null || param.fieldCN == null)
 	    throw ("invalid parameter");
 	
-	var rsl = db.Master_0.findOne( {_id: param.fieldCN}, {_id:0, "j":1} );
+	var rsl = db.Master_0.findOne( {_id: param.fieldCN}, {_id:1, "j":1, "r":0} );
 	if (rsl == null)
 	    throw ("no field found");
+	
+    printjson(rsl);
 
 	return (formatResponseOK( decodeJSonDico(rsl, 1) ));
     }
@@ -290,7 +292,7 @@ function fieldGetByName(param){
 	if (param == null || param.entityCN == null|| param.name == null)
 	    throw ("invalid parameter");
 	
-	var rsl = db.Master_0.findOne( {"j.4": param.entityCN, "j.6":param.name}, {_id:0, "j":1} );
+	var rsl = db.Master_0.findOne( {"j.4": param.entityCN, "j.6":param.name}, {_id:1, "j":1, "r":0} );
 	if (rsl == null)
 	    throw ("no field found");
 
@@ -306,7 +308,7 @@ function fieldGetAll(param){
 	if (param == null || param.entityCN == null)
 	    throw ("invalid parameter");
 	
-	var rsl = db.Master_0.find( {"j.4": param.entityCN, "j.5":"F"}, {_id:0, "j":1} ).toArray();
+	var rsl = db.Master_0.find( {"j.4": param.entityCN, "j.5":"F"}, {_id:1, "j":1} ).toArray();
 	if (rsl == null)
 	    throw ("no Entity found");
 

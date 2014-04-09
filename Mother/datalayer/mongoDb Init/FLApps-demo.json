@@ -99,7 +99,10 @@ fl.entityGet( {"entityCN":"00"} );
 
 fl.entityGetAll( {$where:"this._id.length > 1"} );
 
-fl.fieldGet({entityCN:custCN+1});
+fl.fieldGet({fieldCN:custCN+1});
+
+fl.fieldGetAll({entityCN:custCN});
+fl.fieldGetByName({entityCN:custCN, name:"city"});
 
 fl.relationGet({relationCN:relCN});
 
