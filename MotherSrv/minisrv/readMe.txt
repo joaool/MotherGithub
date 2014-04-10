@@ -1,5 +1,4 @@
-FrameLink v0.10
-
+FrameLink
 
 MiniSrv to get basic data
 
@@ -12,13 +11,15 @@ in a command prompt:
   - copy the directory to a local directory
     (if you install the depencies, it will be too big for gitHub)
 
-  // Install the dependant package by hand
-  // DO NOT USE NPM INSTALL, it will fail with Visual studio...
-  - run : npm install --msvs_version=2012 express
-  - run : npm install --msvs_version=2012 monk
-  - run : npm install --msvs_version=2012 mongodb
+  // Install the dependant package by hand. Those package
+  // will be installed for the all machine (ie you don't have
+  // to reinstall them on each node.js package
+  // AND it will not block git Hub, like I did...
+  - run : npm -g install --msvs_version=2012 express
+  - run : npm -g install --msvs_version=2012 monk
+  - run : npm -g install --msvs_version=2012 mongodb
 
-  - start : node app.js
+  - start run.cmd
 
 in a browser :
   http://localhost:3000/entityGetAll ( => returns all entity)
