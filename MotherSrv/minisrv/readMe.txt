@@ -8,11 +8,15 @@ install node.js
 
 in a command prompt:
   - go to the minisrv directory
+  - copy the directory to a local directory
+    (if you install the depencies, it will be too big for gitHub)
+
   // Install the dependant package by hand
   // DO NOT USE NPM INSTALL, it will fail with Visual studio...
   - run : npm install --msvs_version=2012 express
   - run : npm install --msvs_version=2012 monk
   - run : npm install --msvs_version=2012 mongodb
+
   - start : node app.js
 
 in a browser :
