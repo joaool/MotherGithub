@@ -107,48 +107,59 @@ require([
 	], 
 	function(query,dom,domConstruct,registry,canvas,textbox,numberbox,container){ 
 		var j={};
-		var xhrArgs = {
-	    url: "localhost:3000/JO",
-	    handleAs: "text",
-	    load: function(data){
-	      // Replace newlines with nice HTML tags.
-	      j = JSON.parse(data);
-	      data = data.replace(/\n/g, "<br>");
 
-	      // Replace tabs with spaces.
-	      data = data.replace(/\t/g, "&nbsp;&nbsp;&nbsp;");
+		$.ajax({
+			url: "http://localhost:3000",
+ 			data: '{"data": "TEST"}',
+        	dataType: 'jsonp',
+        	// type:"POST",
+        	jsonpCallback: "_testcb",
+        	cache:false,
+        	// jsonpCallback: 'callback', // this is not relevant to the POST anymore
+		   	// data: "name=John&location=Boston",
+		   	//dataType:"json",
+		   	success: function(data){
+		    	// var ret = jQuery.parseJSON(data);
+		    	console.log(">"+data+"<");
+		    	alert( "2 - Data Saved: "+data);
+		   	},
+		   	error: function(xhr, status, error){
+		   		console.log("!!! return to error !!!");
+		    	alert( "ERROR "+ error.message);
+	    	}
+ 	 	});
 
-	      targetNode.innerHTML = data;
-	    },
-
-		console.log("Inicio");
-		console.log("--------------------------------------- container done.... -----------------------------------------------");
-		// $(document).ready( function () {
-		$('#example').dataTable( {
-			"ajax": "../DataTables 1.10.0-beta.2/examples/ajax/data/objects.txt",
-			"columns": [//this does the match between the source array of json and client side array od jason
-				{ "data": "name" },
-				{ "data": "position" },
-				{ "data": "office" },
-				{ "data": "extn" },
-				{ "data": "start_date" },
-				{ "data": "salary" },
-			],
-			 "lengthMenu": [[10, 25, 50, -1], [11,26, 50, "All"]],
-			//sDom (with the R) is necessary for column reorder 
-			"sDom":'Rlfrtip',//"<'row'<'span8'Rl><'span8'f>r>t<'row'<'span8'i><'span8'p>>",//'Rlfrtip' '<"top"fipl>rt<"bottom"ipl>' 
-			"oColReorder": {
-				"aiOrder": [0,1,2,3,4,5,6]//[ 5, 0 ] //[ 5,4, 3, 2, 1, 0 ]
-			}, 
-        	"oLanguage": {
-	        	"sLengthMenu": "_MENU_ records perpage",
-	        	"sZeroRecords": "Vazio!",
-	        	"sInfo": "FrameLink shows _START_ until _END_ out of _TOTAL_ entries",
-	        	"sInfoEmpty": "No existing records",
-	        	"sInfoFiltered": "(total of _MAX_ records)",
-	        	'sSearch' : "Search your Framelink customer base"
-        	}			
-		} );			
+		// var xhrArgs = {
+		//     url: "localhost:3000/JO",
+		//     handleAs: "text",
+		//     load: function(data){
+		//       	// Replace newlines with nice HTML tags.
+		//       	j = JSON.parse(data);
+		// 		console.log("data="+data);
+		// 		// $(document).ready( function () {
+		// 		$('#example').dataTable( {
+		// 			"aaData": j,
+		// 			 "lengthMenu": [[10, 25, 50, -1], [11,26, 50, "All"]],
+		// 			//sDom (with the R) is necessary for column reorder 
+		// 			"sDom":'Rlfrtip',//"<'row'<'span8'Rl><'span8'f>r>t<'row'<'span8'i><'span8'p>>",//'Rlfrtip' '<"top"fipl>rt<"bottom"ipl>' 
+		// 			"oColReorder": {
+		// 				"aiOrder": [0,1,2,3,4,5,6]//[ 5, 0 ] //[ 5,4, 3, 2, 1, 0 ]
+		// 			}, 
+		//         	"oLanguage": {
+		// 	        	"sLengthMenu": "_MENU_ records perpage",
+		// 	        	"sZeroRecords": "Vazio!",
+		// 	        	"sInfo": "FrameLink shows _START_ until _END_ out of _TOTAL_ entries",
+		// 	        	"sInfoEmpty": "No existing records",
+		// 	        	"sInfoFiltered": "(total of _MAX_ records)",
+		// 	        	'sSearch' : "Search your Framelink customer base"
+		//         	}			
+		// 		} );
+		// 	},
+		//     error: function(error){
+		// 	     console.log("An unexpected error occurred: " + error);
+	 //    	}
+	 //    }
+  //   	dojo.xhrGet(xhrArgs);
 	  	// var table = $('#example').DataTable({
 	   //  	"sScrollY": "300px", //the high of the scrolling area
 	   //  	"bPaginate": false,

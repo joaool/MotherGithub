@@ -16,7 +16,7 @@
 -->	
 	<!-- -->
     <!-- -->
-    <title>Test datatables v2.0</title>
+    <title>Test datatables v3.0</title>
 
     <script> 
     	dojoConfig= {
@@ -36,18 +36,6 @@
 	<script src="//cdn.datatables.net/plug-ins/505bef35b56/integration/bootstrap/3/dataTables.bootstrap.js"></script>
 
    	<script type="text/javascript" src="../dojo1.9.2/dojo/dojo.js"></script>
-
-   	<!--<script type="text/javascript"
-      src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>-->
-  <!--
-   	<script type="text/javascript"
-      src="../Jcrop/js/jquery.min.js"></script>
- 	<script src="//datatables.net/download/build/nightly/jquery.dataTables.js"></script>
- 	<script src="../DataTables 1.10.0-beta.2/media/js/jquery.dataTables.js"></script>
- -->
-
-	<!--<script src="Mother/jquery-1.8.1.min.js"></script> -->
-	<!--<script src="Mother/bootstrap.js"></script>-->	
 	<link rel="stylesheet" type="text/css" href="../bootstrap-3.1.1-dist/css/bootstrap.css">
 
 	<link rel="stylesheet" href="../Jcrop/demos/demo_files/main.css" type="text/css" />
@@ -106,68 +94,40 @@ require([
 	"Mother/container.js",
 	], 
 	function(query,dom,domConstruct,registry,canvas,textbox,numberbox,container){ 
-		var j={};
-		var xhrArgs = {
-	    url: "localhost:3000/JO",
-	    handleAs: "text",
-	    load: function(data){
-	      // Replace newlines with nice HTML tags.
-	      j = JSON.parse(data);
-	      data = data.replace(/\n/g, "<br>");
-
-	      // Replace tabs with spaces.
-	      data = data.replace(/\t/g, "&nbsp;&nbsp;&nbsp;");
-
-	      targetNode.innerHTML = data;
-	    },
+		
 
 		console.log("Inicio");
 		console.log("--------------------------------------- container done.... -----------------------------------------------");
 		// $(document).ready( function () {
 		$('#example').dataTable( {
-			"ajax": "../DataTables 1.10.0-beta.2/examples/ajax/data/objects.txt",
-			"columns": [//this does the match between the source array of json and client side array od jason
-				{ "data": "name" },
-				{ "data": "position" },
-				{ "data": "office" },
-				{ "data": "extn" },
-				{ "data": "start_date" },
-				{ "data": "salary" },
-			],
-			 "lengthMenu": [[10, 25, 50, -1], [11,26, 50, "All"]],
-			//sDom (with the R) is necessary for column reorder 
-			"sDom":'Rlfrtip',//"<'row'<'span8'Rl><'span8'f>r>t<'row'<'span8'i><'span8'p>>",//'Rlfrtip' '<"top"fipl>rt<"bottom"ipl>' 
-			"oColReorder": {
-				"aiOrder": [0,1,2,3,4,5,6]//[ 5, 0 ] //[ 5,4, 3, 2, 1, 0 ]
-			}, 
-        	"oLanguage": {
-	        	"sLengthMenu": "_MENU_ records perpage",
-	        	"sZeroRecords": "Vazio!",
-	        	"sInfo": "FrameLink shows _START_ until _END_ out of _TOTAL_ entries",
-	        	"sInfoEmpty": "No existing records",
-	        	"sInfoFiltered": "(total of _MAX_ records)",
-	        	'sSearch' : "Search your Framelink customer base"
-        	}			
-		} );			
-	  	// var table = $('#example').DataTable({
-	   //  	"sScrollY": "300px", //the high of the scrolling area
-	   //  	"bPaginate": false,
-	   //  	"sDom":"<'row'<'span8'Rl><'span8'f>r>t<'row'<'span8'i><'span8'p>>",//'Rlfrtip' '<"top"fipl>rt<"bottom"ipl>' https://datatables.net/usage/options#sDom
-	   //  	//i - Information =>Showing 1 to 57 of 57 entries 
-	   //  	//f - filtering input =>Search 
-
-	   //  	"oColReorder": {
-    //         	"aiOrder": [ 5, 0 ] //[ 5,4, 3, 2, 1, 0 ]
-    //     	},    
-    //     	"oLanguage": {
-	   //      	"sLengthMenu": "_MENU_ entradas por página",
-	   //      	"sZeroRecords": "Vazio!",
-	   //      	"sInfo": "Exibindo de _START_ até _END_. Total de: _TOTAL_ entradas",
-	   //      	"sInfoEmpty": "Nenhuma entrada",
-	   //      	"sInfoFiltered": "(total de _MAX_ entradas)",
-	   //      	'sSearch' : "Busca"
-    //     	}
-	  	// });
+			// "ajax": "../DataTables 1.10.0-beta.2/examples/ajax/data/objects.txt",
+			//"sAjaxSource": "../DataTables 1.10.0-beta.2/examples/ajax/data/objects.txt",
+			// "bProcessing" : true,
+			// "processing": true,
+			// "serverSide": true,	
+			// "ajax": "http://localhost:3000/JO",
+		
+  			// "bServerSide" : true,
+			"sAjaxSource": "http://localhost:3000/JO",
+			//"sAjaxDataProp": "aaData",
+			//"sServerMethod": "GET"
+			"aoColumns": [
+				{ "sTitle":"name" },
+				{ "sTitle":"position" },
+				{ "sTitle":"salary" },
+				{ "sTitle":"start_date" },
+				{ "sTitle":"office" },
+				{ "sTitle":"extn" }
+			]				
+			// "aoColumns": [
+			// 	{ "mData": "name", "sTitle":"Name" },
+			// 	{ "mData": "position", "sTitle":"Position" },
+			// 	{ "mData": "salary", "sTitle":"Salary" },
+			// 	{ "mData": "start_date", "sTitle":"Start date" },
+			// 	{ "mData": "office" , "sTitle":"Office" },
+			// 	{ "mData": "extn", "sTitle":"Phone" }
+			// ]
+		});	
 		console.log(document.title+"......  END..");		
 	}//closing of main function				
 );//closing of require function
@@ -188,10 +148,10 @@ require([
 					<tr>
 						<th>Name</th>
 						<th>Position</th>
-						<th>Office</th>
-						<th>Age</th>
-						<th>Start date</th>
 						<th>Salary</th>
+						<th>Start date</th>
+						<th>Office</th>
+						<th>Phone</th>
 					</tr>
 				</thead>
 			</table>
