@@ -9,4 +9,6 @@ handle["/upload"] = requestHandlers.upload;
 handle["/grid"] = requestHandlers.grid;
 handle["/dtTable"] = requestHandlers.dtTable;
 handle["/entityGetAll"] = requestHandlers.entityGetAll;
+handle["/entityGet"] = requestHandlers.entityGet;
+
 server.start(router.route,handle);

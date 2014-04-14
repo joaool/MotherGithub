@@ -39,6 +39,11 @@ Currently working examples:
 		in the browser: http://localhost:3000/upload (this will return "Hello upload. Received text:undefined") because no POST data was sent. 
 	/dtTable - returns a json (current example are 3 lines for jquery datatable component)
 
+        Mongodb
+	/entityGetAll - returns json with all existing entities (documented in Framelink2 - Dictionary_3.docx)
+		in the browser: http://localhost:3000/entityGetAll
+	/entityGet- returns json for entity in query string  (documented in Framelink2 - Dictionary_3.docx)
+		in the browser: http://localhost:3000/entityGet?entityCN=00
 
-Next steps - to introduce mongo calls already tested in Nico's Miniserv
+
 Joao

@@ -12,7 +12,7 @@ function start(route,handle){
       console.log("Received POST data chunk '" + postDataChunk + "'.");
     });
     request.addListener("end", function() {
-      route(handle, pathname, response, postData);//the response object is injected through the router 
+      route(handle, pathname, response, postData,query);//the response object is injected through the router 
     });
   }
   http.createServer(onRequest).listen(3000);

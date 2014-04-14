@@ -1,7 +1,7 @@
-function route(handle,pathname,response,postData){
+function route(handle,pathname,response,postData,query){
   console.log("JORouter - Routs to " + pathname );
   if(typeof handle[pathname]==="function"){
-    handle[pathname](response,postData);
+    handle[pathname](response,postData,query);
   }else{
     console.log("JORouter: No request handler found for "+pathname);
     console.log('----------------------------------------------------------------------------');

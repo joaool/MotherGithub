@@ -97,12 +97,24 @@ function entityGetAll(response,postData){
 		console.log("entityGetAll ->"+JSON.stringify(names));
 		response.write(JSON.stringify(names));//OK !!!
 		response.end();
-		console.log('-----------------------------entityGetAll-----------------------------------------------');
+		console.log('-----------------------------entityGetAll-----------------------------------');
 	});
 }
-function entityGet(response,postData){
-	console.log("Request Handler entityGet was called. TO BE COMPLETED");
-
+function entityGet(response,postData,query){
+	console.log("Request Handler entityGet was called with query = "+query);
+	var entityCN = querystring.parse(query)["entityCN"];
+	console.log("Request Handler entityGet will call entityCN = "+entityCN);
+    var collecName = 'Master_' + entityCN;
+	var collection = db.get(collecName);
+	collection.find({},{},function(e,docs){
+		var j=[];
+		for(var it in docs){
+			j.push(docs[it].j);
+		}
+		response.write(JSON.stringify(j));//OK !!!
+		response.end();
+		console.log('-----------------------------entityGet------------------------------------------');
+	});
 }
 exports.start = start;
 exports.dir = dir;
@@ -110,3 +122,4 @@ exports.upload = upload;
 exports.grid = grid;
 exports.dtTable = dtTable;
 exports.entityGetAll = entityGetAll;
+exports.entityGet = entityGet;
