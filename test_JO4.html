@@ -1,0 +1,44 @@
+<!--
+* http://download.dojotoolkit.org/release-1.2.3/dojo-release-1.2.3/dojox/form/tests/test_BusyButton.html
+* http://www.sitepen.com/blog/2008/10/17/dojo-building-blocks-of-the-web/
+*
+* <!DOCTYPE html>
+-->
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>Test JO v4.0</title>
+  	<script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
+  	<!--
+	<script src="//datatables.net/download/build/nightly/jquery.dataTables.js"></script>
+	<script type="text/javascript" charset="utf-8" src="../Data Tables_Editor/media/js/dataTables.editor.js" ></script>
+	<script type="text/javascript" language="javascript" src="../ColReorder-1.1.0/js/dataTables.colReorder.js"></script>
+	<script src="//cdn.datatables.net/plug-ins/505bef35b56/integration/bootstrap/3/dataTables.bootstrap.js"></script>
+	<script src="../jQuery.dataTables.oData-master/media/js/jquery.dataTables.odata.js" type="text/javascript"></script>
+	-->	
+	<script>
+	request=$.ajax({
+		// url: "http://localhost:3000/grid",
+		url: "http://localhost:3000/dtTable",
+    	type:"post",
+		data: '{"data": "TEST"}',
+    	// dataType: 'jsonp',//requires that the response be wrapped in some kind of callback function.
+    	// JSONP is not JSON. A JSONP response would consist of a JavaScript script containing only a function call (to a pre-defined function) with one argument (which is a JavaScript object literal conforming to JSON syntax).
+    	// jsonpCallback: 'grid',
+ 	   	cache:false,
+		success: function(data) {
+			console.log("success !");
+	        console.log("Success... :"+JSON.stringify(data));
+	    },
+	    error: function(jqXHR, textStatus, errorThrown) {
+	        console.log("errorThrown:"+errorThrown);
+	         console.log("textStatus:"+textStatus);
+	    }	   	
+	});   	
+	console.log(document.title+"......  END..");
+
+</script>
+</head>
+	<body class="claro Mother"> 
+
+	</body>
+</html>

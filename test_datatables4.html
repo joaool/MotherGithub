@@ -16,7 +16,7 @@
 -->	
 	<!-- -->
     <!-- -->
-    <title>Test datatables v2.0</title>
+    <title>Test datatables v4.0</title>
 
     <script> 
     	dojoConfig= {
@@ -108,27 +108,36 @@ require([
 	function(query,dom,domConstruct,registry,canvas,textbox,numberbox,container){ 
 		var j={};
 
-		$.ajax({
-			url: "http://localhost:3000",
+		request=$.ajax({
+			url: "http://localhost:3000/grid",
+        	type:"post",
  			data: '{"data": "TEST"}',
         	dataType: 'jsonp',
-        	// type:"POST",
-        	jsonpCallback: "_testcb",
-        	cache:false,
+        	// jsonpCallback: "_testcb",
+        	cache:false
         	// jsonpCallback: 'callback', // this is not relevant to the POST anymore
 		   	// data: "name=John&location=Boston",
 		   	//dataType:"json",
-		   	success: function(data){
-		    	// var ret = jQuery.parseJSON(data);
-		    	console.log(">"+data+"<");
-		    	alert( "2 - Data Saved: "+data);
-		   	},
-		   	error: function(xhr, status, error){
-		   		console.log("!!! return to error !!!");
-		    	alert( "ERROR "+ error.message);
-	    	}
- 	 	});
+		});   	
+	   	request.done(function (response, textStatus, jqXHR){
+	        // log a message to the console
+    		console.log("Hooray, it worked!");
+		});
 
+		// callback handler that will be called on failure
+		request.fail(function (jqXHR, textStatus, errorThrown){
+    		// log the error to the console
+    		console.error( "The following error occured: "+ textStatus + "error:"+ errorThrown);
+    	});
+		   	// success: function(data){
+		    // 	// var ret = jQuery.parseJSON(data);
+		    // 	console.log(">"+data+"<");
+		    // 	alert( "2 - Data Saved: "+data);
+		   	// },
+		   	// error: function(xhr, status, error){
+		   	// 	console.log("!!! return to error !!!");
+		    // 	alert( "ERROR "+ error.message);
+	    	// }
 		// var xhrArgs = {
 		//     url: "localhost:3000/JO",
 		//     handleAs: "text",

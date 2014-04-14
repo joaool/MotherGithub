@@ -107,20 +107,6 @@ require([
 	], 
 	function(query,dom,domConstruct,registry,canvas,textbox,numberbox,container){ 
 		var j={};
-		var xhrArgs = {
-	    url: "localhost:3000/JO",
-	    handleAs: "text",
-	    load: function(data){
-	      // Replace newlines with nice HTML tags.
-	      j = JSON.parse(data);
-	      data = data.replace(/\n/g, "<br>");
-
-	      // Replace tabs with spaces.
-	      data = data.replace(/\t/g, "&nbsp;&nbsp;&nbsp;");
-
-	      targetNode.innerHTML = data;
-	    },
-
 		console.log("Inicio");
 		console.log("--------------------------------------- container done.... -----------------------------------------------");
 		// $(document).ready( function () {

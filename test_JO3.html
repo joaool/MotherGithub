@@ -1,0 +1,35 @@
+<!--
+* http://download.dojotoolkit.org/release-1.2.3/dojo-release-1.2.3/dojox/form/tests/test_BusyButton.html
+* http://www.sitepen.com/blog/2008/10/17/dojo-building-blocks-of-the-web/
+*
+* <!DOCTYPE html>
+-->
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>Test JO v3.0</title>
+  	<script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
+	<script>
+	request=$.ajax({
+		// url: "http://localhost:3000/grid",
+		url: "http://localhost:3000/dtTable",
+    	type:"post",
+		data: '{"data": "TEST"}',
+    	dataType: 'jsonp',//requires that the response be wrapped in some kind of callback function.
+    	jsonpCallback: 'grid',
+ 	   	cache:false,
+		success: function(data) {
+	        console.log("Success... :"+JSON.stringify(data));
+	    },
+	    error: function(jqXHR, textStatus, errorThrown) {
+	        console.log("errorThrown:"+errorThrown);
+	         console.log("textStatus:"+textStatus);
+	    }	   	
+	});   	
+	console.log(document.title+"......  END..");
+
+</script>
+</head>
+	<body class="claro Mother"> 
+
+	</body>
+</html>
