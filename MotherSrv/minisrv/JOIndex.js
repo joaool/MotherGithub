@@ -8,5 +8,5 @@ handle["/dir"] = requestHandlers.dir;
 handle["/upload"] = requestHandlers.upload;
 handle["/grid"] = requestHandlers.grid;
 handle["/dtTable"] = requestHandlers.dtTable;
-
+handle["/entityGetAll"] = requestHandlers.entityGetAll;
 server.start(router.route,handle);

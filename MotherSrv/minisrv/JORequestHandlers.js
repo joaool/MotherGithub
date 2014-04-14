@@ -1,3 +1,6 @@
+var monk = require('monk');
+var db =  monk('localhost:27017/FLApps');
+
 var exec = require("child_process").exec;//executes a shell command from withun node.js
 var querystring = require("querystring");
 function start(response){
@@ -87,8 +90,23 @@ function dtTable(response,postData){
 	console.log('----------------------------------------------------------------------------');
 	// return "Hello upload";
 }
+function entityGetAll(response,postData){
+	console.log("Request Handler entityGetAll was called.");
+	db.driver.collectionNames(function(e,names){
+		response.writeHead(200, {"Content-Type": "application/json", 'Access-Control-Allow-Origin' : '*'});//{"Content-Type": "text/javascript"});
+		console.log("entityGetAll ->"+JSON.stringify(names));
+		response.write(JSON.stringify(names));//OK !!!
+		response.end();
+		console.log('-----------------------------entityGetAll-----------------------------------------------');
+	});
+}
+function entityGet(response,postData){
+	console.log("Request Handler entityGet was called. TO BE COMPLETED");
+
+}
 exports.start = start;
 exports.dir = dir;
 exports.upload = upload;
 exports.grid = grid;
 exports.dtTable = dtTable;
+exports.entityGetAll = entityGetAll;
