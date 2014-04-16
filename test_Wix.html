@@ -1,0 +1,53 @@
+<!--
+* http://download.dojotoolkit.org/release-1.2.3/dojo-release-1.2.3/dojox/form/tests/test_BusyButton.html
+* http://www.sitepen.com/blog/2008/10/17/dojo-building-blocks-of-the-web/
+*
+* <!DOCTYPE html>
+-->
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>Test Wix v1.0</title>
+   	<script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
+  	<script type="text/javascript" src="https://app.box.com/js/static/select.js"></script>
+	<script>
+	// request=$.ajax({
+	// 	// url: "http://localhost:3000/grid",
+	// 	url: "http://localhost:3000/dtTable",
+ //    	type:"post",
+	// 	data: '{"data": "TEST"}',
+ //    	dataType: 'jsonp',//requires that the response be wrapped in some kind of callback function.
+ //    	jsonpCallback: 'grid',
+ // 	   	cache:false,
+	// 	success: function(data) {
+	//         console.log("Success... :"+JSON.stringify(data));
+	//     },
+	//     error: function(jqXHR, textStatus, errorThrown) {
+	//         console.log("errorThrown:"+errorThrown);
+	//          console.log("textStatus:"+textStatus);
+	//     }	   	
+	// });  
+	var options = {
+	    clientId: "hu0DekDdXGCa9aaPHlwPiVaTkvkOeBzq",//YOUR_CLIENT_ID,
+	    linkType: YOUR_LINK_TYPE,
+	    multiselect: YOUR_MULTISELECT
+	};
+var boxSelect = new BoxSelect(options);
+	$(document).ready(function() {
+	    var boxSelect = new BoxSelect();
+	    // Register a success callback handler
+	    boxSelect.success(function(response) {
+	        console.log(response);
+	    });
+	    // Register a cancel callback handler
+	    boxSelect.cancel(function() {
+	        console.log("The user clicked cancel or closed the popup");
+	    });
+	});	 	
+	console.log(document.title+"......  END..");
+</script>
+</head>
+<body>
+    <h1>Box</h1>
+    <div id="box-select" data-link-type="YOUR_LINK_TYPE" data-multiselect="YOUR_MULTISELECT" data-client-id="YOUR_CLIENT_ID"></div>
+</body>
+</html>

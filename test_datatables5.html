@@ -16,7 +16,7 @@
 -->	
 	<!-- -->
     <!-- -->
-    <title>Test datatables v4.0</title>
+    <title>Test datatables v5.0</title>
 
     <script> 
     	dojoConfig= {
@@ -31,13 +31,10 @@
     </script> 
    	<script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
 	<script src="//datatables.net/download/build/nightly/jquery.dataTables.js"></script>
+	<script type="text/javascript" charset="utf-8" src="../DataTables_Editor/media/js/dataTables.editor.js" ></script>
 	<!--
 	<script src="//datatables.net/release-datatables/examples/examples_support/jquery.jeditable.js"></script>
 	-->
-
-
-
-	<script type="text/javascript" charset="utf-8" src="../DataTables_Editor/media/js/dataTables.editor.js" ></script>
 	<script type="text/javascript" language="javascript" src="../ColReorder-1.1.0/js/dataTables.colReorder.js"></script>
 	<script src="//cdn.datatables.net/plug-ins/505bef35b56/integration/bootstrap/3/dataTables.bootstrap.js"></script>
 
@@ -105,38 +102,69 @@ require([
 		console.log("Inicio");
 		console.log("--------------------------------------- container done.... -----------------------------------------------");
 		// $(document).ready( function () {
-		request=$.ajax({//call to get column definitions frist, then data
-			// url: "http://localhost:3000/grid",
-			url: "http://localhost:3000/dtTable",
-	    	type:"post",
-			data: '{"data": "TEST"}',
-	    	// dataType: 'jsonp',//requires that the response be wrapped in some kind of callback function.
-	    	// JSONP is not JSON. A JSONP response would consist of a JavaScript script containing only a function call (to a pre-defined function) with one argument (which is a JavaScript object literal conforming to JSON syntax).
-	    	// jsonpCallback: 'grid',
-	 	   	cache:false,
-			success: function(data) {
-				console.log("success ! "+JSON.stringify(data.aoColumns));
-		        //alert("Success... :"+JSON.stringify(data.aoColumns));
-				$('#example').dataTable( {
-					"bProcessing" : true,
-		  			// "bServerSide" : true,
-					"sAjaxSource": "http://localhost:3000/dtTable",
-					"aoColumns":data.aoColumns, 
-					// data: data.data,	// data comes automatically from a data json coming from server
-				});	
-	            // $('#example tbody td').editable( "http://localhost:3000/dtTable", {
-	            //     "callback": function( sValue, y ) {
-	            //          Redraw the table from the new data on the server 
-	            //         oTable.fnDraw();
-	            //     },
-	            //     "height": "14px"
-	            // } );
-		    },
-		    error: function(jqXHR, textStatus, errorThrown) {
-		        console.log("errorThrown:"+errorThrown);
-		         console.log("textStatus:"+textStatus);
-		    }	   	
-		});   
+		$('#example').dataTable( {
+		    "sAjaxSource": "http://localhost:3000/dtTable",
+		    "aoColumns": [
+				{ "mDataProp": "name", "sTitle":"Name do Gajo" },
+				{ "mDataProp": "position", "sTitle":"Position" },
+				{ "mDataProp": "salary", "sTitle":"Salary" },
+				{ "mDataProp": "start_date", "sTitle":"Start date" },
+				{ "mDataProp": "office" , "sTitle":"Office" },
+				{ "mDataProp": "extn", "sTitle":"Phone" },
+		        {
+		            "mDataProp": null, 
+		            "sClass": "center",
+		            "sDefaultContent": '<a href="" class="editor_edit">Edit</a>',
+		            "bSortable": false,
+		            "bSearchable": false
+		        },
+		        {
+		            "mDataProp": null, 
+		            "sClass": "center",
+		            "sDefaultContent": '<a href="" class="editor_remove">Delete</a>',
+		            "bSortable": false,
+		            "bSearchable": false
+		        }				
+			]
+		} );
+		var editor = new $.fn.dataTable.Editor( {
+		    "ajaxUrl": "/release/DataTables/extras/Editor/examples/php/browsers.php",
+		    "domTable": "#example"
+		} );
+		editor.add( [ 
+		    {
+		        "label": "Name do Gajo:",
+		        "name": "name"
+		    }, {
+		        "label": "Position:",
+		        "name": "position"
+		    }, {
+		        "label": "Salary:",
+		        "name": "salary"
+		    }, {
+		        "label": "Start date:",
+		        "name": "start_date"
+		    }, {
+		        "label": "Office:",
+		        "name": "office"
+		    }, {
+		        "label": "Phone:",
+		        "name": "extn"
+		    }
+		] );
+		$('button.editor_create').on('click', function (e) {
+		    e.preventDefault();
+		 
+		    editor.create(
+		        'Create new record',
+		        {
+		            "label": "Add",
+		            "fn": function () {
+		                editor.submit()
+		            }
+		        }
+		    );
+		} );		
 		console.log(document.title+"......  END..");		
 	}//closing of main function				
 );//closing of require function
@@ -149,6 +177,7 @@ require([
 	       </b>
 	    </p>
 		<div class="container">
+			<button class="editor_create">Create new record</button>
 			<!--
 			<table id="example" class="display" width="100%"> 
 			-->
