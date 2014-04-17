@@ -17,7 +17,40 @@ var tabCodec=[
 	{"name":"6"}
 	    ];
 
+// Entity series
+function entityAdd(name, names, desc){
+    try {
+	var query={};
+    
+	query["j.6"]=name;
+	if ( db.Master_0.find( query ).toArray() != "")
+		throw ("Collection " + name + " already exists");
+	    
+	query["j.6"]=names;
+	if ( db.Master_0.find( query ).toArray() != "")
+		throw ("Collection " + names + " already exists");
+	
+	var CN = getNewCN();
+    
+	var e = jSonToMaster_E (CN, name, names, desc);
+	db.createCollection("Master_"+CN);
+    
+	dataInsert(0, e);
+	return formatResponseOK({entityCN:CN});
+    }
+    catch(err)
+    {
+        return formatResponseError(99, "entityAdd: " + err);
+    }
+}
+
 function dlEntityGetAll( callBack){
+	console.log("Data Layer dlEntityGetAll will be called");
+	dlTableEntityGetAll(function(j){
+		callBack(formatResponseOK( j) );
+	});
+}
+function dlTableEntityGetAll( callBack){
     try {
 	console.log("Data Layer dlEntityGetAll will be called");
 	var collection = db.get("Master_0");
@@ -46,6 +79,12 @@ function dlEntityGetAll( callBack){
     }
 }
 function dlEntityGet(entityCN,callBack){
+	console.log("Data Layer dlEntityGetAll will be called");
+	dlTableEntityGet(entityCN, function(j){
+		callBack(formatResponseOK( j ));
+	});
+}
+function dlTableEntityGet(entityCN,callBack){
     try {
 	if (entityCN== null )
 	    throw ("invalid parameter");
@@ -75,17 +114,23 @@ function dlEntityGet(entityCN,callBack){
         callBack({});
     }
 }
+
 function dlDataGet(params, callBack){
+	console.log("Data Layer dlDataGet will be called");
+	dlTableDataGet(function(j){
+		callBack(formatResponseOK( j) );
+	});
+}
+function dlTableDataGet(params, callBack){
 	var entityCN=params.entityCN;
 	var id=params.id;
-	console.log("Data Layer dlDataGet will be called for entityCN="+entityCN+",id =" + id);
+	console.log("Data Layer dlTableDataGet will be called for entityCN="+entityCN+",id =" + id);
 	
 	try {
 		var collecName = 'Master_' + entityCN;
 		var collection = db.get(collecName);
 		collection.findOne( {_id: id}, {}, function(e, docs){
-			console.log('Mongo access done for :dlDataGet : ' + JSON.stringify(docs));
-			console.log('Mongo access done for :dlDataGet : ' + e);
+			console.log('Mongo access done for :dlTableDataGet : ' + JSON.stringify(docs));
 			if (docs != null){
 				callBack(docs.j);
 			} else{
@@ -95,14 +140,14 @@ function dlDataGet(params, callBack){
 	}
 	catch(err)
 	{
-		console.log("*** !!! Erreur dans dldataGet : " + err + " !!! ***");
+		console.log("*** !!! Erreur dans dlTabledataGet : " + err + " !!! ***");
 		callBack({});
 	}
 }
-function dlDataGetAll(params, callBack){
+function dlTableDataGetAll(params, callBack){
 	var entityCN=params.entityCN;
 	var where = params.where;
-	console.log("Data Layer dlDataGetAll will be called for entityCN="+entityCN);
+	console.log("Data Layer dlTableDataGetAll will be called for entityCN="+entityCN);
 	if (where != null && where != "")
 		console.log("      with where = <" + where + ">");
 	else
@@ -111,7 +156,7 @@ function dlDataGetAll(params, callBack){
 		var collecName = 'Master_' + entityCN;
 		var collection = db.get(collecName);
 		collection.find(where,{},function(e,docs){
-			console.log('Mongo access done for :dlDataGetAll : ' + JSON.stringify(docs));
+			console.log('Mongo access done for :dlTableDataGetAll : ' + JSON.stringify(docs));
 			var j=[];
 			for(var it in docs){
 				j.push(docs[it].j);
@@ -121,10 +166,17 @@ function dlDataGetAll(params, callBack){
 	}
 	catch(err)
 	{
-		console.log("*** !!! Erreur dans dlDataGeAllt : " + err + " !!! ***");
+		console.log("*** !!! Erreur dans dlTableDataGetAll : " + err + " !!! ***");
 		callBack({});
 	}
 }
+function dlDataGetAll(params, callBack){
+	console.log("Data Layer dlDataGetAll will be called");
+	dlTableDataGetAll(params, function(j){
+		callBack(formatResponseOK( j) );
+	});
+}
+
 function dlDummyTableHeader(entityCN,callBack){
 	//NOTE:This will be broken in one access to fields of entity CN and another acesss to corresponding grid titles (depend on the grid)
 	console.log("Data Layer dlTableHeader will be called for entityCN="+entityCN);
@@ -232,9 +284,220 @@ function decodeJSonDicoGeneric(js, indTab){
     return jd;
 }
 
+
+function add(CN) {
+    return addUnit(CN, "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ");
+};
+function addUnit(CN, strRef)  {
+
+    if (CN == null)
+	throw ("addUnit : can't have a null CN in parameter");
+
+    if (strRef == null || strRef.length == 0)
+	throw ("addUnit : strRef is null, or empty !");
+
+    if (CN.length == 0)
+    {
+	return "0";
+    }
+
+    var lastChar = CN[CN.length -1];
+    var CN2 = CN.substr(0, CN.length -1);
+    
+    var iPos = strRef.indexOf(lastChar, 0);
+
+    if (iPos == -1)
+	    throw ("addUnit: lastChar not found in ref...");
+    if (iPos == strRef.length-1)
+    {
+	    CN2=addUnit (CN2, strRef);
+	    return CN2 + '0';
+    }
+    lastChar = strRef[strRef.indexOf(lastChar, 0) + 1];
+    return CN2 + lastChar;
+};
+
+function getVersion(){
+    var ver = db.Master_0.findOne( {_id:"0"}, {_id:0, "j.flInt.ver":1} );
+
+    if (ver == null || ver == "" ){
+	    return 0.00;
+    }
+    return ver["j"]["flInt"]["ver"];
+}
+function getNewCN() {
+    try {
+	var iLoop = 3;
+	
+	// 3 tries to get a new CN
+	while (iLoop > 0)
+	{
+	    var CN = db.Master_0.findOne( {_id:"0"}, {_id:0, "j.flInt.J":1} );
+    
+	    if (CN == null || CN == "" ){
+		    return "0";
+	    }
+	    CN=CN["j"]["flInt"]["J"];
+	    
+	    var CN2=add(CN);
+	    
+	    // If another user requested a new CN, rsl.lastErrorObject.n will be 0
+	    var rsl = db.Master_0.findAndModify({
+			query: {_id:"0", "j.flInt.J":CN },
+			update: {$set: {"j.flInt.J":CN2}} });
+
+	    if (rsl != null)
+		return CN2;
+	    
+	    // retry
+	    iLoop = iLoop -1;
+	}
+        throw ("getNewCN: unable to update");
+    }
+    catch(err)
+    {
+        return formatResponseError(99, "getNewCN: " + err);
+    }
+};
+
+
+// Format JSON
+function jSonToMaster_F (eid, cn, name, desc, textUI){
+    return {
+	    _id: cn,
+	    4: eid,
+	    5: "F",
+	    6: name,
+	    7: desc,
+	    A: textUI
+    };
+}
+
+function jSonToMaster_E(CN, singulier, pluriel, description){
+    if (CN=="0")
+	return {
+		_id: CN,
+		"4": "",
+		"5": "E",
+		"6": singulier,
+		"7": description,
+		"F":[],
+		"G":[],
+		"H": pluriel,
+		"flInt": {"J": "0", "ver": flVersion, "lock":"no"}
+	};
+    
+    return {
+	    _id: CN,
+	    "4": "",
+	    "5": "E",
+	    "6": singulier,
+	    "7": description,
+	    "F":[],
+	    "G":[],
+	    "H": pluriel
+    };
+}
+   
+function jSonToMaster_R(cn, name, lEid, lDesc, lCard, lStroreHere, lCached, lFormat, rEid, rDesc, rCard, rStoreHere, rCached, rFormat) { 
+    
+    return {
+	    _id: cn,
+	    "4": "",
+	    "5": "R",
+	    "6": name,
+	    "7": lDesc,
+	    "K":{
+		"M": lEid,
+		"N": 0,
+		"O": lCard,
+		"P": lDesc,
+		"Q": lStroreHere,
+		"R": lCached,
+		"S": lFormat
+		},
+	    "L":{
+		"M": rEid,
+		"N": 1,
+		"O": rCard,
+		"P": rDesc,
+		"Q": rStoreHere,
+		"R": rCached,
+		"S": rFormat
+		}
+    };
+}
+
+function entityAdd(name, names, desc){
+    try {
+	var query={};
+    
+	query["j.6"]=name;
+	if ( db.Master_0.find( query ).toArray() != "")
+		throw ("Collection " + name + " already exists");
+	    
+	query["j.6"]=names;
+	if ( db.Master_0.find( query ).toArray() != "")
+		throw ("Collection " + names + " already exists");
+	
+	var CN = getNewCN();
+    
+	var e = jSonToMaster_E (CN, name, names, desc);
+	db.createCollection("Master_"+CN);
+    
+	dataInsert(0, e);
+	return formatResponseOK({entityCN:CN});
+    }
+    catch(err)
+    {
+        return formatResponseError(99, "entityAdd: " + err);
+    }
+}
+//
+function formatResponseOK(j, r){
+    ctrl = {isOk:true};
+    
+    if (j==null)
+	j={};
+	
+    if (r==null)
+	r={};
+
+    var rtn = {};
+
+    rtn.ctrl = ctrl;
+    rtn.j = j;
+    rtn.r = r;
+
+    return rtn;    
+}
+function formatResponseError(errNo, errMsg){
+    if (errMsg == null)
+	errMsg = "formatResponseError: no error message provided";
+	
+    if (errNo == null)
+	ctrl = {isOk:false, errNo:9999, errMsg: errMsg};
+    
+    var rtn = {};
+
+    rtn.ctrl = {isOk:false, errNo: errNo, errMsg:errMsg};
+    rtn.j = {};
+    rtn.r = {};
+
+    return rtn;    
+}
+
+
+// API Exports
 exports.dlEntityGetAll = dlEntityGetAll;
 exports.dlEntityGet = dlEntityGet;
 exports.dlDataGet = dlDataGet;
 exports.dlDataGetAll = dlDataGetAll;
+// DtTable calls
+exports.dlTableEntityGet = dlTableEntityGet;
+exports.dlTableEntityGetAll = dlTableEntityGetAll;
+exports.dlTableDataGet = dlTableDataGet;
+exports.dlTableDataGetAll = dlTableDataGetAll;
+// dummy
 exports.dlDummyTableHeader = dlDummyTableHeader;
 exports.dlDummyTableData = dlDummyTableData;

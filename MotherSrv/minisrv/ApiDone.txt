@@ -1,0 +1,13 @@
+datalayer API implemented
+
+API :
+entityGet
+entityGetAll
+dataGet
+dataGetAll
+
+pour les dtTables:
+tableEntityGet
+tableEntityGetAll
+tableDataGet
+tableDataGetAll

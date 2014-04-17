@@ -14,4 +14,8 @@ handle["/entityGet"] = requestHandlers.entityGet;
 handle["/dataGet"] = requestHandlers.dataGet;
 handle["/dataGetAll"] = requestHandlers.dataGetAll;
 
+handle["/tableEntityGet"] = requestHandlers.tableEntityGet;
+handle["/tableEntityGetAll"] = requestHandlers.tableEntityGetAll;
+handle["/tableDataGet"] = requestHandlers.tableDataGet;
+handle["/tableDataGetAll"] = requestHandlers.tableDataGetAll;
 server.start(router.route,handle);

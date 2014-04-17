@@ -57,6 +57,27 @@ function entityGetAll(response,postData,query){
 	};
 	dataLayer.dlEntityGetAll(getJsonForEntityGetAll); // 
 }
+function tableEntityGetAll(response,postData,query){
+	console.log("Handler requested:tableEntityGetAll");
+	var getJsonForEntityGetAll = function( json){
+		response.writeHead(200, {"Content-Type": "application/json", 'Access-Control-Allow-Origin' : '*'});//{"Content-Type": "text/javascript"});
+		response.write(JSON.stringify(json));//OK !!!
+		response.end();
+		console.log('-----------------------------tableEntityGetAll--------------------------------------');
+	};
+	dataLayer.dlTableEntityGetAll(getJsonForEntityGetAll); // 
+}
+function tableEntityGet(response,postData,query){
+	console.log("Handler requested:tableEntityGet with query:"+query);
+	var entityCN = querystring.parse(query)["entityCN"];
+	var getJsonForTableEntityGet = function( json){
+		response.write(JSON.stringify(json));
+		response.end();
+		console.log('-----------------------------tableEntityGet------------------------------------------');
+	};
+	dataLayer.dlTableEntityGet(entityCN,getJsonForTableEntityGet); // 
+}
+
 function entityGet(response,postData,query){
 	console.log("Handler requested:entityGet with query:"+query);
 	var entityCN = querystring.parse(query)["entityCN"];
@@ -78,6 +99,31 @@ function dataGet(response,postData,query){
 		console.log('-----------------------------dataGet------------------------------------------');
 	};
 	dataLayer.dlDataGet(jParam, getJsonForDataGet); // 
+}
+
+function tableDataGet(response,postData,query){
+	console.log("Handler requested:tableDataGet with query:"+query);
+	var jParam={};
+	jParam.entityCN = querystring.parse(query)["entityCN"];
+	jParam.id = querystring.parse(query)["id"];
+	var getJsonForTableDataGet = function( json){
+		response.write(JSON.stringify(json));
+		response.end();
+		console.log('-----------------------------tableDataGet--------------------------------------');
+	};
+	dataLayer.dlTableDataGet(jParam, getJsonForTableDataGet); // 
+}
+function tableDataGetAll(response,postData,query){
+	console.log("Handler requested:tableDataGetAll with query:"+query);
+	var jParam={};
+	jParam.entityCN = querystring.parse(query)["entityCN"];
+	jParam.where = querystring.parse(query)["where"];
+	var getJsonForTableDataGetAll = function( json){
+		response.write(JSON.stringify(json));
+		response.end();
+		console.log('-----------------------------tableDataGetAll----------------------------------');
+	};
+	dataLayer.dlTableDataGetAll(jParam, getJsonForTableDataGetAll); // 
 }
 function dataGetAll(response,postData,query){
 	console.log("Handler requested:dataGet with query:"+query);
@@ -153,3 +199,7 @@ exports.entityGetAll = entityGetAll;
 exports.entityGet = entityGet;
 exports.dataGet = dataGet;
 exports.dataGetAll = dataGetAll;
+exports.tableEntityGetAll = tableEntityGetAll;
+exports.tableEntityGet = tableEntityGet;
+exports.tableDataGetAll = tableDataGetAll;
+exports.tableDataGet = tableDataGet;

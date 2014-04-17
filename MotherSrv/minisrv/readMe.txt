@@ -19,7 +19,7 @@ in a command prompt:
   - run : npm -g install --msvs_version=2012 monk
   - run : npm -g install --msvs_version=2012 mongodb
 
-  - start run.cmd
+  - start run.cmd   // you have to set the NODE_PATH variable
 
 in a browser :
   http://localhost:3000/entityGetAll ( => returns all entity)
