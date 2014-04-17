@@ -2,6 +2,7 @@ use FLApps;
 db.dropDatabase();
 
 use FLApps;
+var flVersion=0.5.1;
 
 var tabCodec=[
 	// Entity
@@ -50,6 +51,14 @@ function addUnit(CN, strRef)  {
     return CN2 + lastChar;
 };
 
+function getVersion(){
+    var ver = db.Master_0.findOne( {_id:"0"}, {_id:0, "j.flInt.ver":1} );
+
+    if (ver == null || ver == "" ){
+	    return 0.00;
+    }
+    return ver["j"]["flInt"]["ver"];
+}
 function getNewCN() {
     try {
 	var iLoop = 3;
@@ -57,19 +66,19 @@ function getNewCN() {
 	// 3 tries to get a new CN
 	while (iLoop > 0)
 	{
-	    var CN = db.Master_0.findOne( {_id:"0"}, {_id:0, "j.J":1} );
+	    var CN = db.Master_0.findOne( {_id:"0"}, {_id:0, "j.flInt.J":1} );
     
 	    if (CN == null || CN == "" ){
 		    return "0";
 	    }
-	    CN=CN["j"]["J"];
+	    CN=CN["j"]["flInt"]["J"];
 	    
 	    var CN2=add(CN);
 	    
 	    // If another user requested a new CN, rsl.lastErrorObject.n will be 0
 	    var rsl = db.Master_0.findAndModify({
-			query: {_id:"0", "j.J":CN },
-			update: {$set: {"j.J":CN2}} });
+			query: {_id:"0", "j.flInt.J":CN },
+			update: {$set: {"j.flInt.J":CN2}} });
 
 	    if (rsl != null)
 		return CN2;
@@ -109,7 +118,7 @@ function jSonToMaster_E(CN, singulier, pluriel, description){
 		"F":[],
 		"G":[],
 		"H": pluriel,
-		"J": "0"
+		"flInt": {"J": "0", "ver": flVersion, "lock":"no"}
 	};
     
     return {
@@ -479,9 +488,9 @@ function fieldAdd(entityCN, name, description, textUI) {
 	var CN = getNewCN();
 
 	var m = jSonToMaster_F(entityCN, CN, name, description, textUI);
-	printjson(m);
+	//printjson(m);
 	var rsl=dataInsert(0, m);
-	printjson(rsl);
+	//printjson(rsl);
 	
 	var check = db.Master_0.find({ _id: CN}).toArray();
 	if (check == null)
@@ -507,8 +516,8 @@ function dataAdd(eId, j){
 	    if (id == null){
 			id = new ObjectId;
 			j["_id"] = id;
-			print ("New id : " + id);
-			printjson(j);
+			//print ("New id : " + id);
+			//printjson(j);
 	    }
 		    
 	    db["Master_" + eId].save( { _id:j._id, v:1, j:j } );
@@ -538,8 +547,8 @@ function dataInsert(eId, j, r){
 	if (id == null){
 		    id = new ObjectId;
 		    j["_id"] = id;
-		    print ("New id : " + id);
-		    printjson(j);
+		    //print ("New id : " + id);
+		    //printjson(j);
 	}
 	
 	if (r == null)
@@ -588,15 +597,18 @@ function dataGet(eId, id){
 
     // Generate our dictionary !
     db.createCollection('Master_0');
+    db.createCollection('Master_1');
     
     // CN:0
     entityAdd("FLDico", "FLDICOS","FrameLink internal dictionary");
+
     //CN:1
     entityAdd("Joao", "Joaos", "FrameLink application dictionary");
     //CN:2
-    getNewCN();
+    fieldAdd("0", "formEntityCN", "entityCN for the form","system");
     // CN:3
-    getNewCN();
+    fieldAdd("0", "formFields", "field properties for a form","system");
+
     // CN:4
     fieldAdd("0", "entityCN", "Entity compressed name","system");
     // CN: 5
@@ -693,10 +705,11 @@ function indexAdd(eId, indexName, keys, props){
 }
 
 var idx = indexAdd("0", "UnikNamesMaster0", {"j.4":1, "j.6":1}, {"unique":true});
-printjson (idx);
+//printjson (idx);
 
 // API Simulation
 var flDico=function() {};
+flDico.prototype.getVersion=function () { return getVersion(); };
 flDico.prototype.getName=function (jj) { return getName(jj); };
 
 

@@ -10,11 +10,14 @@ var nbOrders=100;
 var nbLinesPerOrder=3;
 var nbProds=10;
 
-// Collection Customers
+// Collection Customers entity 00
 var rsl = fl.entityAdd({"singular":"Customer", "plural":"Customers", "description":"All my customers" });
 custCN = rsl.j.entityCN;
+//CN:01
 fl.fieldAdd({entityCN:custCN, name:"name",description:"name of customer",typeUI:"textBox"});
+//CN:02
 fl.fieldAdd({entityCN:custCN, name:"city",description:"city of customer",typeUI:"textBox"});
+//CN:03
 fl.fieldAdd({entityCN:custCN, name:"phone",description:"customer's phone",typeUI:"textBox"});
 
 for (i=0; i<nbCusts; i++){
@@ -94,6 +97,14 @@ var rlt = fl.relationAdd({"relationName":"ProdToLines",
 			 "right":{"entityCN":lineOrdCN, "verb":"has", "side":1, "cardinality":"N", "storeRelation":true, "cache":false, "format":""}
 			 });
 
+// Insert new form
+var js = {_id:"custBrowse", "02":"00", "03":[
+	{"cn":"01", "t":"Name of Customer", "f":"format to be written later"},
+	{"cn":"02", "t":"Where I live", "f":"format to be written later"},
+	{"cn":"03", "t":"How to reach me", "f":"format to be written later"}
+]};
+flD.insert("1", js);
+
 // demos de l'API
 fl.getName({CN:"00"});
 fl.getName({CN:"01"});
@@ -111,3 +122,5 @@ fl.relationGet({relationCN:relCN});
 fl.relationGetAll();
 
 flD.get("00", 5);
+// How to get form information, name = custBrowse
+flD.get("1", "custBrowse");
