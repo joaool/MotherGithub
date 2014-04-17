@@ -2,6 +2,7 @@ var http = require('http');
 var url = require('url');
 function start(route,handle){
   function onRequest(request, response) {
+    // oResponder= new Responder();
     var postData = "";
     var pathname=url.parse(request.url).pathname;
     var query=url.parse(request.url).query;
@@ -12,6 +13,7 @@ function start(route,handle){
       console.log("Received POST data chunk '" + postDataChunk + "'.");
     });
     request.addListener("end", function() {
+      // oResponder.setResponse(response,postData);
       route(handle, pathname, response, postData,query);//the response object is injected through the router 
     });
   }

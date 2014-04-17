@@ -1,5 +1,4 @@
-var monk = require('monk');
-var db =  monk('localhost:27017/FLApps');
+var dataLayer = require('./JODataLayer');
 
 var exec = require("child_process").exec;//executes a shell command from withun node.js
 var querystring = require("querystring");
@@ -48,78 +47,83 @@ function grid(response,postData){
 	console.log('----------------------------------------------------------------------------');
 	// return "Hello upload";
 }
-function dtTable(response,postData){
-	var callback = querystring.parse(callback);
-	console.log("Request Handler dtTable was called with callback id = "+callback.text);
-	var data={
-	    "data": [
-	        {
-	            "name": "Tiger Nixon",
-	            "position": "System Architect",
-	            "salary": "$320,800",
-	            "start_date": "2011\/04\/25",
-	            "office": "Edinburgh",
-	            "extn": "5421"
-	        },
-	        {
-	            "name": "Garrett Winters",
-	            "position": "Accountant",
-	            "salary": "$170,750",
-	            "start_date": "2011\/07\/25",
-	            "office": "Tokyo",
-	            "extn": "8422"
-	        },
-	        {
-	            "name": "Ashton Cox",
-	            "position": "Junior Technical Author",
-	            "salary": "$86,000",
-	            "start_date": "2009\/01\/12",
-	            "office": "San Francisco",
-	            "extn": "1562"
-	        }	
-		]
-	};  
-	var strData = JSON.stringify(data);
-	// response.writeHead(200, {"Content-Type": "application/json"});//{"Content-Type": "text/javascript"});//THIS WORKS WITH test_JO3.html
-	// response.write('grid('+ strData + ');');//THIS WORKS WITH test_JO3.html
-
-	response.writeHead(200, {"Content-Type": "application/json", 'Access-Control-Allow-Origin' : '*'});//{"Content-Type": "text/javascript"});
-
-	response.write(strData);
-	response.end();
-	console.log('----------------------------------------------------------------------------');
-	// return "Hello upload";
-}
-function entityGetAll(response,postData){
-	console.log("Request Handler entityGetAll was called.");
-	db.driver.collectionNames(function(e,names){
+function entityGetAll(response,postData,query){
+	console.log("Handler requested:entityGetAll");
+	var getJsonForEntityGetAll = function( json){
 		response.writeHead(200, {"Content-Type": "application/json", 'Access-Control-Allow-Origin' : '*'});//{"Content-Type": "text/javascript"});
-		console.log("entityGetAll ->"+JSON.stringify(names));
-		response.write(JSON.stringify(names));//OK !!!
+		response.write(JSON.stringify(json));//OK !!!
 		response.end();
-		console.log('-----------------------------entityGetAll-----------------------------------');
-	});
+		console.log('-----------------------------entityGetAll--------------------------------------');
+	};
+	dataLayer.dlEntityGetAll(getJsonForEntityGetAll); // 
 }
 function entityGet(response,postData,query){
-	console.log("Request Handler entityGet was called with query = "+query);
+	console.log("Handler requested:entityGet with query:"+query);
 	var entityCN = querystring.parse(query)["entityCN"];
-	console.log("Request Handler entityGet will call entityCN = "+entityCN);
-    var collecName = 'Master_' + entityCN;
-	var collection = db.get(collecName);
-	collection.find({},{},function(e,docs){
-		var j=[];
-		for(var it in docs){
-			j.push(docs[it].j);
-		}
-		response.write(JSON.stringify(j));//OK !!!
+	var getJsonForEntityGet = function( json){
+		response.write(JSON.stringify(json));
 		response.end();
 		console.log('-----------------------------entityGet------------------------------------------');
-	});
+	};
+	dataLayer.dlEntityGet(entityCN,getJsonForEntityGet); // 
+}
+function dtTable(response,postData,query){
+	console.log("Handler requested:dtTable with query:"+query);
+	var getJsonForTableHeader = function(jsonHeader) {
+		var getJsonForTableData= function(jsonData) {
+			var data={"aoColumns":jsonHeader.header, "data": jsonData.data};
+			var strData = JSON.stringify(data);
+			response.writeHead(200, {"Content-Type": "application/json", 'Access-Control-Allow-Origin' : '*'});//{"Content-Type": "text/javascript"});
+			response.write(strData);
+			response.end();
+			console.log('----------------------------------dtTable---------------------------------------');
+		};
+		dataLayer.dlDummyTableData("Dummy",getJsonForTableData);//first param is a NOP for now
+	};
+	dataLayer.dlDummyTableHeader("Dummy",getJsonForTableHeader );//first param is a NOP for now
+}
+function dtTableCRUD(response,postData,query){
+	var callback = querystring.parse(callback);
+	var action = querystring.parse(postData).action;//sent by POST
+	var id = querystring.parse(postData).id;//sent by POST
+	var postDataJSON=querystring.parse(postData);
+
+	var data = null;
+	console.log("Request Handler dtTableCRUD was called with callback id = "+callback.text+" and postData="+querystring.parse(postData).text);
+	console.log(">>>>Action = "+action);
+
+	var dataEdit={
+		"id": id,
+		"error": "",
+		"fieldErrors": [],
+		"data": [],
+		"row": {
+			"DT_RowId":id,
+			"name":postDataJSON["data[name]"],
+			"position": postDataJSON["data[position]"],
+			"salary": postDataJSON["data[salary]"],
+			"start_date": postDataJSON["data[start_date]"],
+			"office": postDataJSON["data[office]"],
+			"extn": postDataJSON["data[extn]"]
+		}
+	};
+	if(action == "create"){
+		data = dataEdit;
+	}else if(action == "edit"){
+		data = dataEdit;
+		data.row["OBJECTID"]="278";
+	}
+	var strData = JSON.stringify(data);
+	response.writeHead(200, {"Content-Type": "application/json", 'Access-Control-Allow-Origin' : '*'});//{"Content-Type": "text/javascript"});
+	response.write(strData);
+	response.end();
+	console.log('-------------------------------dtTableCRUD--------------------------------------');
 }
 exports.start = start;
 exports.dir = dir;
 exports.upload = upload;
 exports.grid = grid;
 exports.dtTable = dtTable;
+exports.dtTableCRUD = dtTableCRUD;
 exports.entityGetAll = entityGetAll;
 exports.entityGet = entityGet;

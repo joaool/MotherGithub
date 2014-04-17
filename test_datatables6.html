@@ -154,31 +154,7 @@ require([
 		        }				
 			]
 		} );
-		// var editor = new $.fn.dataTable.Editor( {
-		//     "ajaxUrl": "/release/DataTables/extras/Editor/examples/php/browsers.php",
-		//     "domTable": "#example"
-		// } );
-		// editor.add( [ 
-		//     {
-		//         "label": "Name do Gajo:",
-		//         "name": "name"
-		//     }, {
-		//         "label": "Position:",
-		//         "name": "position"
-		//     }, {
-		//         "label": "Salary:",
-		//         "name": "salary"
-		//     }, {
-		//         "label": "Start date:",
-		//         "name": "start_date"
-		//     }, {
-		//         "label": "Office:",
-		//         "name": "office"
-		//     }, {
-		//         "label": "Phone:",
-		//         "name": "extn"
-		//     }
-		// ] );
+
 		$('button.editor_create').on('click', function (e) {
 		    e.preventDefault();
 		 
@@ -191,7 +167,19 @@ require([
 		            }
 		        }
 		    );
-		} );		
+		} );
+		$('#example').on('click', 'a.editor_edit', function (e) {
+		    e.preventDefault();
+		 
+		    editor.edit(
+		        $(this).parents('tr')[0],
+		        'Edit record',
+		        {
+		            "label": "Update",
+		            "fn": function () { editor.submit(); }
+		        }
+		    );
+		} );			
 		console.log(document.title+"......  END..");		
 	}//closing of main function				
 );//closing of require function
