@@ -11,5 +11,7 @@ handle["/dtTable"] = requestHandlers.dtTable;
 handle["/dtTableCRUD"] = requestHandlers.dtTableCRUD;
 handle["/entityGetAll"] = requestHandlers.entityGetAll;
 handle["/entityGet"] = requestHandlers.entityGet;
+handle["/dataGet"] = requestHandlers.dataGet;
+handle["/dataGetAll"] = requestHandlers.dataGetAll;
 
 server.start(router.route,handle);

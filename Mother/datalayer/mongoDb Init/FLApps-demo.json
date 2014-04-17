@@ -22,7 +22,7 @@ fl.fieldAdd({entityCN:custCN, name:"phone",description:"customer's phone",typeUI
 
 for (i=0; i<nbCusts; i++){
 	var j={};
-	j['_id'] = i;
+	j['_id'] = i.toString();
 	j[new String(nbCusts+1)]= "Client-"+ i;
 	j[new String(nbCusts+2)]= "City "+ i;
 	j[new String(nbCusts+3)]= "0033 "+ i+i+i+i;
@@ -56,7 +56,7 @@ fl.fieldAdd({entityCN:lineOrdCN, name:"price",description:"total price of the li
 for (i=1; i<nbOrders; i++) {
 	dt=new Date("2014/03/27");
 	var j={};
-	j["_id"] = i;
+	j["_id"] = i.toString();
 	j[new String (orderCN+1)]= dt;
 	j[new String (orderCN+2)]= 123456.45;
 	j[new String (orderCN+3)]= false;
@@ -85,7 +85,7 @@ fl.fieldAdd({entityCN:prodCN, name:"price",description:"product price",typeUI:"t
 for (i=1; i<nbProds; i++) {
 	var j={};
 	var ty = i % 4;
-	j["_id"]=i;
+	j["_id"]=i.toString();
 	j[new String(prodCN+1)]="prod-"+i;
 	j[new String(prodCN+2)]="test-" + ty; 
 	j[new String(prodCN+3)]=456.98;

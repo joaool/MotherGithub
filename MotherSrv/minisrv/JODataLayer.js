@@ -42,7 +42,7 @@ function dlEntityGetAll( callBack){
     catch(err)
     {
 	console.log("*** !!! Erreur dans dlEntityGetAll : " + err + " !!! ***");
-        throw ("entityGetAll Error: " + err);
+	callBack({});
     }
 }
 function dlEntityGet(entityCN,callBack){
@@ -52,44 +52,56 @@ function dlEntityGet(entityCN,callBack){
 
 	console.log("Data Layer dlEntityGet will be called for entityCN="+entityCN);
 	var collection = db.get("Master_0");
-	collection.findOne({_id: param.entityCN, "j.5":"E"}, {_id:0, "j":1}, function (rsl, docs){
-		if (rsl == null)
-		    throw ("no Entity found");
-		console.log('Mongo access done for :dlEntityGet before decode : ' + JSON.stringify(e));
-		console.log('\n');
-		var j = decodeJSonDico(rsl, 1);
-		console.log('Mongo access done for :dlEntityGet after decode : ' + JSON.stringify(j));
-		console.log('\n');
-		callback( j );
+	collection.findOne({_id: entityCN.toString(), "j.5":"E"}, {_id:0, "j":1}, function (rsl, docs){
+		if (docs != null)
+		{
+			console.log('Mongo access done for :dlEntityGet before decode : docs=' + JSON.stringify(docs));
+			console.log('\n');
+	
+			var j = decodeJSonDico(docs, 1);
+			console.log('Mongo access done for :dlEntityGet after decode : ' + JSON.stringify(j));
+			console.log('\n');
+			callBack( j );
+		}
+		else{
+		    console.log(' no entity found !');
+		    callBack({});
+		}
 	});
     }
     catch(err)
     {
 	console.log("*** !!! Erreur dans dlEntityGet : " + err + " !!! ***");
-        throw ("entityGet Error: " + err);
+        callBack({});
     }
 }
-function dlDataGet(entityCN, id, callBack){
-	console.log("Data Layer dlDataGet will be called for entityCN="+entityCN);
+function dlDataGet(params, callBack){
+	var entityCN=params.entityCN;
+	var id=params.id;
+	console.log("Data Layer dlDataGet will be called for entityCN="+entityCN+",id =" + id);
 	
 	try {
 		var collecName = 'Master_' + entityCN;
 		var collection = db.get(collecName);
-		collection.findOne({_id: id},{},function(e,docs){
-			console.log('Mongo access done for :dlDataGet : ' + JSON.stringify(e));
-			if (e == null || e == {} ) {
-				callback({});
+		collection.findOne( {_id: id}, {}, function(e, docs){
+			console.log('Mongo access done for :dlDataGet : ' + JSON.stringify(docs));
+			console.log('Mongo access done for :dlDataGet : ' + e);
+			if (docs != null){
+				callBack(docs.j);
+			} else{
+				callBack({});
 			}
-			callBack(e.j);
 		});
 	}
 	catch(err)
 	{
 		console.log("*** !!! Erreur dans dldataGet : " + err + " !!! ***");
-		throw ("dlDataGet: " + err);
+		callBack({});
 	}
 }
-function dlDataGetAll(entityCN, where, callBack){
+function dlDataGetAll(params, callBack){
+	var entityCN=params.entityCN;
+	var where = params.where;
 	console.log("Data Layer dlDataGetAll will be called for entityCN="+entityCN);
 	if (where != null && where != "")
 		console.log("      with where = <" + where + ">");
@@ -99,7 +111,7 @@ function dlDataGetAll(entityCN, where, callBack){
 		var collecName = 'Master_' + entityCN;
 		var collection = db.get(collecName);
 		collection.find(where,{},function(e,docs){
-			console.log('Mongo access done for :dlDataGetAll : ' + JSON.stringify(e));
+			console.log('Mongo access done for :dlDataGetAll : ' + JSON.stringify(docs));
 			var j=[];
 			for(var it in docs){
 				j.push(docs[it].j);
@@ -110,7 +122,7 @@ function dlDataGetAll(entityCN, where, callBack){
 	catch(err)
 	{
 		console.log("*** !!! Erreur dans dlDataGeAllt : " + err + " !!! ***");
-		throw ("dlDataGet: " + err);
+		callBack({});
 	}
 }
 function dlDummyTableHeader(entityCN,callBack){
@@ -222,7 +234,7 @@ function decodeJSonDicoGeneric(js, indTab){
 
 exports.dlEntityGetAll = dlEntityGetAll;
 exports.dlEntityGet = dlEntityGet;
-exports.dlDataGet = dlDataGetAll;
+exports.dlDataGet = dlDataGet;
 exports.dlDataGetAll = dlDataGetAll;
 exports.dlDummyTableHeader = dlDummyTableHeader;
 exports.dlDummyTableData = dlDummyTableData;

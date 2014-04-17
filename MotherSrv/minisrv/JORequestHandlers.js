@@ -67,6 +67,30 @@ function entityGet(response,postData,query){
 	};
 	dataLayer.dlEntityGet(entityCN,getJsonForEntityGet); // 
 }
+function dataGet(response,postData,query){
+	console.log("Handler requested:dataGet with query:"+query);
+	var jParam={};
+	jParam.entityCN = querystring.parse(query)["entityCN"];
+	jParam.id = querystring.parse(query)["id"];
+	var getJsonForDataGet = function( json){
+		response.write(JSON.stringify(json));
+		response.end();
+		console.log('-----------------------------dataGet------------------------------------------');
+	};
+	dataLayer.dlDataGet(jParam, getJsonForDataGet); // 
+}
+function dataGetAll(response,postData,query){
+	console.log("Handler requested:dataGet with query:"+query);
+	var jParam={};
+	jParam.entityCN = querystring.parse(query)["entityCN"];
+	jParam.where = querystring.parse(query)["where"];
+	var getJsonForDataGetAll = function( json){
+		response.write(JSON.stringify(json));
+		response.end();
+		console.log('-----------------------------dataGetAll---------------------------------------');
+	};
+	dataLayer.dlDataGetAll(jParam, getJsonForDataGetAll); // 
+}
 function dtTable(response,postData,query){
 	console.log("Handler requested:dtTable with query:"+query);
 	var getJsonForTableHeader = function(jsonHeader) {
@@ -127,3 +151,5 @@ exports.dtTable = dtTable;
 exports.dtTableCRUD = dtTableCRUD;
 exports.entityGetAll = entityGetAll;
 exports.entityGet = entityGet;
+exports.dataGet = dataGet;
+exports.dataGetAll = dataGetAll;
