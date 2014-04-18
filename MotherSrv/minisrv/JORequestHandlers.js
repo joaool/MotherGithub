@@ -88,6 +88,73 @@ function entityGet(response,postData,query){
 	};
 	dataLayer.dlEntityGet(entityCN,getJsonForEntityGet); // 
 }
+// field series
+function fieldGet(response,postData,query){
+	console.log("Handler requested:fieldGet with query:"+query);
+	var fieldCN = querystring.parse(query)["fieldCN"];
+	var getJsonForFieldGet = function( json){
+		response.write(JSON.stringify(json));
+		response.end();
+		console.log('-----------------------------fieldGet------------------------------------------');
+	};
+	dataLayer.dlFieldGet(fieldCN,getJsonForFieldGet); // 
+}
+function fieldGetAll(response,postData,query){
+	console.log("Handler requested:fieldGetAll with query:"+query);
+	var entityCN = querystring.parse(query)["entityCN"];
+	var getJsonForFieldGetAll = function( json){
+		response.write(JSON.stringify(json));
+		response.end();
+		console.log('-----------------------------fieldGetAll---------------------------------------');
+	};
+	dataLayer.dlFieldGetAll(entityCN,getJsonForFieldGetAll); // 
+}
+function fieldGetByName(response,postData,query){
+	console.log("Handler requested:fieldGetByName with query:"+query);
+	var param={};
+	param["entityCN"]= querystring.parse(query)["entityCN"];
+	param["fieldName"]= querystring.parse(query)["fieldName"];
+	var entityCN = querystring.parse(query)["entityCN"];
+	var getJsonForfieldGetByName = function( json){
+		response.write(JSON.stringify(json));
+		response.end();
+		console.log('-----------------------------fieldGetByName------------------------------------');
+	};
+	dataLayer.dlFieldGetByName(param,getJsonForfieldGetByName); // 
+}
+function fieldGetAllByName(response,postData,query){
+	console.log("Handler requested:fieldGetAllByName with query:"+query);
+	var fieldName= querystring.parse(query)["fieldName"];
+	var getJsonForfieldGetAllByName = function( json){
+		response.write(JSON.stringify(json));
+		response.end();
+		console.log('-----------------------------fieldGetAllByName------------------------------------');
+	};
+	dataLayer.dlFieldGetAllByName(fieldName,getJsonForfieldGetAllByName); // 
+}
+// getName series
+function nameGet(response,postData,query){
+	console.log("Handler requested:nameGet with query:"+query);
+	var CN = querystring.parse(query)["CN"];
+	var getJsonForNameGet = function( json){
+		response.write(JSON.stringify(json));
+		response.end();
+		console.log('-----------------------------nameGet------------------------------------------');
+	};
+	dataLayer.dlNameGet(CN,getJsonForNameGet); // 
+}
+function CNGet(response,postData,query){
+	console.log("Handler requested:CNGet with query:"+query);
+	var name = querystring.parse(query)["name"];
+	var getJsonForCNGet = function( json){
+		response.write(JSON.stringify(json));
+		response.end();
+		console.log('-----------------------------CNGet------------------------------------------');
+	};
+	dataLayer.dlCNGet(name,getJsonForCNGet); // 
+}
+
+// data series
 function dataGet(response,postData,query){
 	console.log("Handler requested:dataGet with query:"+query);
 	var jParam={};
@@ -197,6 +264,15 @@ exports.dtTable = dtTable;
 exports.dtTableCRUD = dtTableCRUD;
 exports.entityGetAll = entityGetAll;
 exports.entityGet = entityGet;
+
+exports.fieldGet = fieldGet;
+exports.fieldGetAll = fieldGetAll;
+exports.fieldGetByName = fieldGetByName;
+exports.fieldGetAllByName = fieldGetAllByName;
+
+exports.CNGet = CNGet;
+exports.nameGet = nameGet;
+
 exports.dataGet = dataGet;
 exports.dataGetAll = dataGetAll;
 exports.tableEntityGetAll = tableEntityGetAll;

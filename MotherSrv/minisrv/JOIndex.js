@@ -9,8 +9,18 @@ handle["/upload"] = requestHandlers.upload;
 handle["/grid"] = requestHandlers.grid;
 handle["/dtTable"] = requestHandlers.dtTable;
 handle["/dtTableCRUD"] = requestHandlers.dtTableCRUD;
-handle["/entityGetAll"] = requestHandlers.entityGetAll;
+
 handle["/entityGet"] = requestHandlers.entityGet;
+handle["/entityGetAll"] = requestHandlers.entityGetAll;
+
+handle["/fieldGet"] = requestHandlers.fieldGet;
+handle["/fieldGetAll"] = requestHandlers.fieldGetAll;
+handle["/fieldGetByName"] = requestHandlers.fieldGetByName;
+handle["/fieldGetAllByName"] = requestHandlers.fieldGetAllByName;
+
+handle["/nameGet"] = requestHandlers.nameGet;
+handle["/CNGet"] = requestHandlers.CNGet;
+
 handle["/dataGet"] = requestHandlers.dataGet;
 handle["/dataGetAll"] = requestHandlers.dataGetAll;
 

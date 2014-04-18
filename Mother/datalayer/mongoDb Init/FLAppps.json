@@ -2,7 +2,7 @@ use FLApps;
 db.dropDatabase();
 
 use FLApps;
-var flVersion=0.5.1;
+var flVersion=0.51;
 
 var tabCodec=[
 	// Entity

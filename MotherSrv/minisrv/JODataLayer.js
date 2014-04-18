@@ -13,30 +13,39 @@ var tabCodec=[
 	{"relationCN":"_id", "relationName":"6", "left":"K", "right":"L", "linkedCN":"M", "cardinality":"O", "verb":"P", "storeIndex":"Q", "dataCached":"R", "format":"S"},
 	{"_id":"relationCN", "6":"relationName", "K":"left", "L":"right", "M":"linkedCN", "O":"cardinality", "P":"verb", "Q":"storeIndex", "R":"dataCached", "S":"format"},
 	// for getName
-	{"6":"name"},
-	{"name":"6"}
+	{"5":"typeCN", "6":"name"},
+	{"typeCN":"5", "name":"6"},
+	// for CN
+	{"5":"typeCN", "_id":"CN"},
+	{"typeCN":"5", "CN":"_id"}
 	    ];
 
 // Entity series
-function entityAdd(name, names, desc){
+function entityAdd(params, callBack){
     try {
+	var name =params.name;
+	var names =parmas.names;
+	var desc = params.desc;
 	var query={};
     
-	query["j.6"]=name;
-	if ( db.Master_0.find( query ).toArray() != "")
-		throw ("Collection " + name + " already exists");
+	var collection = db.get("Master_0");
+	query["j.6"]=params.name;
+	collection.find( query, function(e, docs){
+	    if (docs != null)
+		throw ("Collection " + param.name + " already exists");
+	    query["j.6"]=params.names;
+	    collection.find( query, function(ee, doc2s){
+		if (doc2s != null)
+		    throw ("Collection " + param.names + " already exists");
+		var CN = getNewCN();
 	    
-	query["j.6"]=names;
-	if ( db.Master_0.find( query ).toArray() != "")
-		throw ("Collection " + names + " already exists");
-	
-	var CN = getNewCN();
-    
-	var e = jSonToMaster_E (CN, name, names, desc);
-	db.createCollection("Master_"+CN);
-    
-	dataInsert(0, e);
-	return formatResponseOK({entityCN:CN});
+		db.createCollection("Master_"+CN);
+		var e = jSonToMaster_E (CN, name, names, desc);	    
+		dataInsert(0, e);
+
+		return formatResponseOK({entityCN:CN});
+	    });
+	});
     }
     catch(err)
     {
@@ -52,7 +61,7 @@ function dlEntityGetAll( callBack){
 }
 function dlTableEntityGetAll( callBack){
     try {
-	console.log("Data Layer dlEntityGetAll will be called");
+	console.log("Data Layer dlTableEntityGetAll will be called");
 	var collection = db.get("Master_0");
 	var where={};
 	where["j.5"]="E";
@@ -79,7 +88,7 @@ function dlTableEntityGetAll( callBack){
     }
 }
 function dlEntityGet(entityCN,callBack){
-	console.log("Data Layer dlEntityGetAll will be called");
+	console.log("Data Layer dlEntityGet will be called");
 	dlTableEntityGet(entityCN, function(j){
 		callBack(formatResponseOK( j ));
 	});
@@ -114,10 +123,133 @@ function dlTableEntityGet(entityCN,callBack){
         callBack({});
     }
 }
+// field series
+function dlFieldGet(fieldCN, callBack){
+    try {
+	console.log("entering :dlFieldGet");
+	var collection = db.get("Master_0");
+	collection.findOne( {_id: fieldCN}, {_id:1, "j":1}, function(e, docs){
+	    if (docs != null){
+		callBack (formatResponseOK( decodeJSonDico(docs, 1) ));
+	    } else {
+		callBack( formatResponseOK({}) );
+	    }
+	});
+    }
+    catch(err)
+    {
+        console.log("entityGet: " + err);
+	callBack( formatResponseError(99, "entityGet: " + err));
+    }
+}
+function dlFieldGetAll(entityCN, callBack){
+    try {
+	console.log("entering :dlFieldGetAll");
+	var collection = db.get("Master_0");
+	collection.find( {"j.4": entityCN, "j.5":"F"}, {_id:1, "j":1}, function(e,docs){
+	    if (docs != null){
+		var result=[];
+		for(var it in docs){
+		    result.push( decodeJSonDico(docs[it], 1) );
+		}
+		callBack (formatResponseOK( result ));
+	    } else {
+		callBack( formatResponseOK({}) );
+	    }
+	} );
+    }
+    catch(err)
+    {
+        console.log("dtFieldGetAll: " + err);
+	callBack( formatResponseError(99, "dtFieldGetAllByName: " + err));
+    }
+}
 
+function dlFieldGetByName(param, callBack){
+    try {
+	console.log("entering :dlFieldGetByName");
+	var collection = db.get("Master_0");
+	collection.findOne( {"j.4": param.entityCN, "j.6":param.fieldName}, {_id:1, "j":1}, function(e, docs){
+	    if (docs != null){
+		callBack (formatResponseOK( decodeJSonDico(docs, 1) ));
+	    } else {
+		callBack( formatResponseOK({}) );
+	    }
+	} );
+    }
+    catch(err)
+    {
+        console.log("entityGetByName: " + err);
+	callBack( formatResponseError(99, "entityGetByName: " + err));
+    }
+}
+function dlFieldGetAllByName(fieldName, callBack){
+    try {
+	console.log("entering :dlFieldGetAllByName");
+	
+	var collection = db.get("Master_0");
+	collection.find( {"j.5": "F", "j.6":fieldName}, {_id:1, "j":1}, function(e,docs){
+	    if (docs != null){
+		var result=[];
+		for(var it in docs){
+		    result.push( decodeJSonDico(docs[it], 1) );
+		}
+		callBack (formatResponseOK( result ));
+	    } else {
+		callBack( formatResponseOK({}) );
+	    }
+	} );
+    }
+    catch(err)
+    {
+        console.log("entityGetAllByName: " + err);
+	callBack( formatResponseError(99, "entityGetAllByName: " + err));
+    }
+}
+// getName series
+function dlNameGet(CN, callBack) {
+    try {
+	console.log("entering :dlNameGet");
+	var collection = db.get("Master_0");
+	collection.findOne( {_id: CN}, {_id:0, "j.5":1, "j.6":1}, function(e, docs){
+	    if (docs != null){
+		callBack (formatResponseOK( decodeJSonDicoGeneric(docs.j, 6) ));
+	    } else {
+		callBack( formatResponseOK({}) );
+	    }
+	});
+    }
+    catch(err)
+    {
+        console.log("dlNameGet: " + err);
+	callBack( formatResponseError(99, "dlNameGet: " + err));
+    }
+}
+
+function dlCNGet(name, callBack) {
+    try {
+	console.log("entering :dlCNGet");
+	var collection = db.get("Master_0");
+	collection.findOne( {"j.6": name}, {_id:1, "j.5":1}, function(e, docs){
+	    if (docs != null){
+		console.log("before decode: "+ JSON.stringify(docs));
+		callBack (formatResponseOK( decodeJSonDicoGeneric(docs.j, 8) ));
+	    } else {
+		callBack( formatResponseOK({}) );
+	    }
+	});
+    }
+    catch(err)
+    {
+        console.log("dlCNGet: " + err);
+	callBack( formatResponseError(99, "dlCNGet: " + err));
+    }
+}
+
+// data series
 function dlDataGet(params, callBack){
 	console.log("Data Layer dlDataGet will be called");
-	dlTableDataGet(function(j){
+	dlTableDataGet(params, function(j){
 		callBack(formatResponseOK( j) );
 	});
 }
@@ -257,15 +389,15 @@ function jsonConcat(o1, o2, prefix) {
 }
 
 function decodeJSonDicoGeneric(js, indTab){
-    //print("Entering DicoGeneric");
-    //printjson(js);
-    //print (indTab);
-    //printjson(tabCodec[indTab]);
+    console.log("Entering DicoGeneric");
+    console.log(JSON.stringify (js));
+    console.log (indTab);
+    console.log(JSON.stringify( tabCodec[indTab] ));
 
     var jd={};
 
     for ( var key in js ){
-	//print ("Analyze: " + key + "->" + js[key] + ", type: " + typeof(js[key]) + ", tabCodec[indTab][k] ?: " + tabCodec[indTab][key] );
+	console.log ("Analyze: " + key + "->" + js[key] + ", type: " + typeof(js[key]) + ", tabCodec[indTab][k] ?: " + tabCodec[indTab][key] );
 
 	// look for sub nodes
 	if (typeof (js[key]) == "object" )
@@ -274,13 +406,13 @@ function decodeJSonDicoGeneric(js, indTab){
 	}
 	else{
 	    if (tabCodec[indTab][key] != null) {
-		//print (key + ", type : " + typeof(js[key]) );
+		console.log (key + ", type : " + typeof(js[key]) );
 		jd[tabCodec[indTab][key]]=js[key];
 	    }
 	}
     }
-    //print ("returning");
-    //printjson(jd);
+    console.log ("returning");
+    console.log(JSON.stringify( jd ));
     return jd;
 }
 
@@ -489,10 +621,20 @@ function formatResponseError(errNo, errMsg){
 
 
 // API Exports
-exports.dlEntityGetAll = dlEntityGetAll;
 exports.dlEntityGet = dlEntityGet;
+exports.dlEntityGetAll = dlEntityGetAll;
+
+exports.dlFieldGet = dlFieldGet;
+exports.dlFieldGetAll = dlFieldGetAll;
+exports.dlFieldGetByName = dlFieldGetByName;
+exports.dlFieldGetAllByName = dlFieldGetAllByName;
+
 exports.dlDataGet = dlDataGet;
 exports.dlDataGetAll = dlDataGetAll;
+
+exports.dlCNGet = dlCNGet;
+exports.dlNameGet = dlNameGet;
+
 // DtTable calls
 exports.dlTableEntityGet = dlTableEntityGet;
 exports.dlTableEntityGetAll = dlTableEntityGetAll;

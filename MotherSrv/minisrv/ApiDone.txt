@@ -1,10 +1,19 @@
 datalayer API implemented
 
 API :
-entityGet
+entityGet?entityCN=0A
 entityGetAll
-dataGet
-dataGetAll
+dataGet?entityCN=1&id=custBrowse
+dataGetAll?entityCN=10
+
+fieldGet?fiedCN=12
+fieldGetAll?entityCN=00
+fieldGetByName?entityCN=00&fieldName=city
+fieldGetAllByName?fieldName=name
+
+CNGet?name=Joao    // a changer en CNGetAll, car il peut y avoir 2 field avec meme nom
+		   // mais plus de batterie...
+nameGet?CN=01
 
 pour les dtTables:
 tableEntityGet
