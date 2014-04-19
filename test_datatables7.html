@@ -16,7 +16,7 @@
 -->	
 	<!-- -->
     <!-- -->
-    <title>Test datatables v4.0</title>
+    <title>Test datatables v7.0</title>
 
     <script> 
     	dojoConfig= {
@@ -31,13 +31,10 @@
     </script> 
    	<script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
 	<script src="//datatables.net/download/build/nightly/jquery.dataTables.js"></script>
+	<script type="text/javascript" charset="utf-8" src="../DataTables_Editor/media/js/dataTables.editor.js" ></script>
 	<!--
 	<script src="//datatables.net/release-datatables/examples/examples_support/jquery.jeditable.js"></script>
 	-->
-
-
-
-	<script type="text/javascript" charset="utf-8" src="../DataTables_Editor/media/js/dataTables.editor.js" ></script>
 	<script type="text/javascript" language="javascript" src="../ColReorder-1.1.0/js/dataTables.colReorder.js"></script>
 	<script src="//cdn.datatables.net/plug-ins/505bef35b56/integration/bootstrap/3/dataTables.bootstrap.js"></script>
 
@@ -47,6 +44,7 @@
 	<link rel="stylesheet" href="../Jcrop/demos/demo_files/main.css" type="text/css" />
 	<link href="../dojo1.9.2/dijit/themes/claro/claro.css" rel="stylesheet"> 
 	<link href="../DataTables 1.10.0-beta.2/media/css/jquery.dataTables.css" rel="stylesheet" type="text/css" />
+	<link href="../DataTables_Editor/media/css/dataTables.editor.css" rel="stylesheet" type="text/css" />
 
 
 
@@ -104,7 +102,7 @@ require([
 
 		console.log("Inicio");
 		console.log("--------------------------------------- container done.... -----------------------------------------------");
-		// $(document).ready( function () {
+
 		request=$.ajax({//call to get column definitions frist, then data
 			// url: "http://localhost:3000/grid",
 			url: "http://localhost:3000/dtTable",
@@ -116,6 +114,25 @@ require([
 	 	   	cache:false,
 			success: function(data) {
 				console.log("success ! "+JSON.stringify(data.aoColumns));
+				editor = new $.fn.dataTable.Editor( {
+					"ajaxUrl": "http://localhost:3000/dtTableCRUD",
+					"domTable": "#example",
+					"fields": data.fields
+			    });    
+				data.aoColumns.push({
+		            "mDataProp": null, 
+		            "sClass": "center",
+		            "sDefaultContent": '<a href="" class="editor_edit">Edit</a>',
+		            "bSortable": false,
+		            "bSearchable": false
+		        });
+				data.aoColumns.push({
+		            "mDataProp": null, 
+		            "sClass": "center",
+		            "sDefaultContent": '<a href="" class="editor_remove">Delete</a>',
+		            "bSortable": false,
+		            "bSearchable": false
+		        });		        
 		        //alert("Success... :"+JSON.stringify(data.aoColumns));
 				$('#example').dataTable( {
 					"bProcessing" : true,
@@ -124,19 +141,50 @@ require([
 					"aoColumns":data.aoColumns, 
 					// data: data.data,	// data comes automatically from a data json coming from server
 				});	
-	            // $('#example tbody td').editable( "http://localhost:3000/dtTable", {
-	            //     "callback": function( sValue, y ) {
-	            //          Redraw the table from the new data on the server 
-	            //         oTable.fnDraw();
-	            //     },
-	            //     "height": "14px"
-	            // } );
+				$('button.editor_create').on('click', function (e) {
+				    e.preventDefault();
+				 
+				    editor.create(
+				        'Create new record',
+				        {
+				            "label": "Add",
+				            "fn": function () {
+				                editor.submit()
+				            }
+				        }
+				    );
+				} );
+				$('#example').on('click', 'a.editor_edit', function (e) {
+				    e.preventDefault();
+				 
+				    editor.edit(
+				        $(this).parents('tr')[0],
+				        'Edit record',
+				        {
+				            "label": "Update",
+				            "fn": function () { editor.submit(); }
+				        }
+				    );
+				} );		
 		    },
 		    error: function(jqXHR, textStatus, errorThrown) {
 		        console.log("errorThrown:"+errorThrown);
 		         console.log("textStatus:"+textStatus);
 		    }	   	
 		});
+		// $('#example').dataTable( {
+  //                    "aoColumnDefs": aryJSONColTable,
+  //                     "bProcessing": true,
+  //                     "bServerSide": true,
+  //                     "bLengthChange": true,
+  //                     "bFilter": true,
+  //                     "aaSorting": [[ 1, "desc" ]],
+  //                     "sScrollX": "100%",
+  //                     "bScrollCollapse": true,
+  //                     "bJQueryUI": true,
+  //                     "sAjaxSource": "http://localhost:3000/dtTable",
+		// } );
+
 		console.log(document.title+"......  END..");		
 	}//closing of main function				
 );//closing of require function
@@ -149,6 +197,7 @@ require([
 	       </b>
 	    </p>
 		<div class="container">
+			<button class="editor_create">Create new record</button>
 			<!--
 			<table id="example" class="display" width="100%"> 
 			-->
