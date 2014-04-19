@@ -1,0 +1,68 @@
+<html>
+<head>
+<!--
+		<script type="text/javascript" src="Dojo Toolkit/dojo-release-1.7.1/dojo/dojo.js" djconfig="parseOnLoad: true, isDebug: true" >
+		</script> 
+		<link href="Dojo Toolkit/dojo-release-1.7.1/dijit/themes/claro/claro.css" rel="stylesheet">
+-->
+	<meta http-equiv="Content-Type" content="text/html;charset=utf-8" /> 
+    <title>Test enginePair 1.0</title>
+    <script> 
+    	dojoConfig= {
+	        has: {
+	            "dojo-firebug": true
+	        },
+	        parseOnLoad: false,
+	        debugAtAllCosts: true,
+	        foo: "bar",
+	        async: true
+    	};
+    </script> 
+   	<!--<script type="text/javascript" src="../dojo1.9.2/dojo/dojo.js"></script> -->
+ 
+	<script src="jquery-1.8.2/jquery-1.8.2.js"></script>
+	<!--<script src="Mother/bootstrap.js"></script>-->	
+	<!--<link href="../dojo1.9.2/dijit/themes/claro/claro.css" rel="stylesheet">--> 
+	<link rel="stylesheet" type="text/css" href="Mother/MotherBuilder.css" /> 
+		<!--- For Mother Forms  A -BlueHills, B-Simple Green C- Tree D-Chess E-light blue F(A+C)=>(fz,f0)-->
+		<!--<link rel="stylesheet" type="text/css" href="Mother1/MotherF.css"/> -->
+	<link rel="stylesheet" type="text/css" href="Mother/Mother.css"/>
+
+<script>
+    function entityGetAll(callBack){
+	    request=$.ajax({
+		    url: "http://localhost:3000/entityGetAll",
+	    type:"get",
+		    data: '{"data": "TEST"}',
+	    // dataType: 'jsonp',//requires that the response be wrapped in some kind of callback function.
+	    // JSONP is not JSON. A JSONP response would consist of a JavaScript script containing only a function call (to a pre-defined function) with one argument (which is a JavaScript object literal conforming to JSON syntax).
+	    // jsonpCallback: 'grid',
+		    cache:false,
+		    success:
+			if (data["ctrl"]["isOk"] == true){
+			    console.log("entityGetAll Success...");
+			    return (data.j);
+			}
+			console.log("entityGetAll empty !..." + err);
+			return (data.j);
+		},
+		error: function(jqXHR, textStatus, errorThrown) {
+		    console.log("errorThrown:"+errorThrown);
+		     console.log("textStatus:"+textStatus);
+		}	   	
+	    });
+    }
+
+    entityGetAll(function e,docs){
+	alert(docs);
+    }
+
+</script>
+	</head>
+	<body class="claro">
+		<div id="xwrapper" width="640" height="360" color="red" </div>
+		<!--<div id="box" style="position: absolute;left:1000px;top:100px;width:100px;height:1030px;border:1px solid red" class="boxes" onmouseover="alert('Red spot - was blue !')">	-->
+		<div id="box" style="position: absolute;left:1000px;top:100px;width:100px;height:100px;border:1px solid red">	
+
+	</body>
+</html>
