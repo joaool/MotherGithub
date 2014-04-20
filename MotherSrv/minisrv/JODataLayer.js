@@ -21,35 +21,48 @@ var tabCodec=[
 	    ];
 
 // Entity series
-function entityAdd(params, callBack){
+function dlEntityAdd(params, callBack){
     try {
 	var name =params.name;
-	var names =parmas.names;
+	var names =params.names;
 	var desc = params.desc;
 	var query={};
     
 	var collection = db.get("Master_0");
 	query["j.6"]=params.name;
-	collection.find( query, function(e, docs){
-	    if (docs != null)
-		throw ("Collection " + param.name + " already exists");
+	collection.findOne( query, function(e, docs){
+	    if (docs != null ){
+			throw ("Collection " + params.name + " already exists");
+	    }
 	    query["j.6"]=params.names;
-	    collection.find( query, function(ee, doc2s){
-		if (doc2s != null)
-		    throw ("Collection " + param.names + " already exists");
-		var CN = getNewCN();
-	    
-		db.createCollection("Master_"+CN);
-		var e = jSonToMaster_E (CN, name, names, desc);	    
-		dataInsert(0, e);
+	    collection.findOne( query, function(ee, doc2s){
+			if (doc2s != null)
+			    throw ("Collection " + params.names + " already exists");
+		    console.log("entityAdd: " + name + "/" + names + " not found, I got a new CN");
+			getNewCN( function(e, CN) {
+				if (e!= null){
+					console.log ("dlEntityAdd Error in callback from getNewCN: " + e);
+					callBack (formatResponseError(99, "dlEntityAdd: " + e));
+				}
+				console.log ("entityAdd, callbacked by getNewCN, CN = " + JSON.stringify(CN));
+				var coll2 = db.get("Master_"+CN);
+				coll2.insert({_id:0});
+				coll2.remove({_id:0});
+				console.log("entityAdd: entity " + "Master_"+CN + " created");
 
-		return formatResponseOK({entityCN:CN});
+				var e = jSonToMaster_E (CN, name, names, desc);
+				var ee = {_id:CN, j:e, r:{}};
+				collection.insert(ee); 
+				console.log("dlentityAdd: data dictionnary updated");
+				callBack ( formatResponseOK({entityCN:CN}) );			
+			});
 	    });
 	});
     }
     catch(err)
     {
-        return formatResponseError(99, "entityAdd: " + err);
+	console.log( "dlEntityAdd: " + err);
+        callBack( formatResponseError(99, "dlEntityAdd: " + err));
     }
 }
 
@@ -450,41 +463,40 @@ function addUnit(CN, strRef)  {
 };
 
 function getVersion(){
-    var ver = db.Master_0.findOne( {_id:"0"}, {_id:0, "j.flInt.ver":1} );
+    var collection = db.get("Master_0");
+	var ver = collection.findOne( {_id:"0"}, {_id:0, "j.flInt.ver":1} );
 
     if (ver == null || ver == "" ){
 	    return 0.00;
     }
     return ver["j"]["flInt"]["ver"];
 }
-function getNewCN() {
+function getNewCN(callBack) {
     try {
-	var iLoop = 3;
-	
-	// 3 tries to get a new CN
-	while (iLoop > 0)
-	{
-	    var CN = db.Master_0.findOne( {_id:"0"}, {_id:0, "j.flInt.J":1} );
-    
-	    if (CN == null || CN == "" ){
-		    return "0";
-	    }
-	    CN=CN["j"]["flInt"]["J"];
-	    
-	    var CN2=add(CN);
-	    
-	    // If another user requested a new CN, rsl.lastErrorObject.n will be 0
-	    var rsl = db.Master_0.findAndModify({
-			query: {_id:"0", "j.flInt.J":CN },
-			update: {$set: {"j.flInt.J":CN2}} });
+    	//console.log("getNewCN: entering the function");
+		var collection = db.get("Master_0");
+		var CN = {};
+		collection.findOne( {_id:"0"}, {_id:0, "j.flInt.J":1}, function(e, CN){
+		    if (CN == null || CN == "" ){
+			    throw ("getNewCN: Master_0, _id:0 not found");
+		    }
+		    CN=CN["j"]["flInt"]["J"];
+		    //console.log("getNewCN: getNewCN got _id:0, current CN = " + CN);
+		    
+		    var CN2=add(CN);
+		    
+		    // If another user requested a new CN, rsl.lastErrorObject.n will be 0
+		    var collection = db.get("Master_0");
+			var rsl = collection.findAndModify({
+				query: {_id:"0", "j.flInt.J":CN },
+				update: {$set: {"j.flInt.J":CN2}} });
 
-	    if (rsl != null)
-		return CN2;
-	    
-	    // retry
-	    iLoop = iLoop -1;
-	}
-        throw ("getNewCN: unable to update");
+		    //console.log("getNewCN: updated _id:0, with CN = " + CN2);
+		    if (rsl != null)
+				callBack(null, CN2);
+			else
+				callback("Erreur getNewCN", null);
+		});
     }
     catch(err)
     {
@@ -563,13 +575,14 @@ function jSonToMaster_R(cn, name, lEid, lDesc, lCard, lStroreHere, lCached, lFor
 function entityAdd(name, names, desc){
     try {
 	var query={};
-    
+    var collection = db.get("Master_0");
+
 	query["j.6"]=name;
-	if ( db.Master_0.find( query ).toArray() != "")
+	if ( collection.findOne( query ).toArray() != "")
 		throw ("Collection " + name + " already exists");
 	    
 	query["j.6"]=names;
-	if ( db.Master_0.find( query ).toArray() != "")
+	if ( collection.findOne( query ).toArray() != "")
 		throw ("Collection " + names + " already exists");
 	
 	var CN = getNewCN();
@@ -622,6 +635,7 @@ function formatResponseError(errNo, errMsg){
 
 // API Exports
 exports.dlEntityGet = dlEntityGet;
+exports.dlEntityAdd = dlEntityAdd;
 exports.dlEntityGetAll = dlEntityGetAll;
 
 exports.dlFieldGet = dlFieldGet;

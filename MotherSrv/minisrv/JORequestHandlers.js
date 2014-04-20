@@ -88,6 +88,20 @@ function entityGet(response,postData,query){
 	};
 	dataLayer.dlEntityGet(entityCN,getJsonForEntityGet); // 
 }
+
+function entityAdd(response,postData,query){
+	console.log("Handler requested:entityAdd with query:"+query);
+	var param={};
+	param["name"]= querystring.parse(query)["name"];
+	param["names"]= querystring.parse(query)["names"];
+	param["desc"]= querystring.parse(query)["desc"];
+	var getJsonForEntityAdd = function( json){
+		response.write(JSON.stringify(json));
+		response.end();
+		console.log('-----------------------------entityAdd------------------------------------------');
+	};
+	dataLayer.dlEntityAdd(param,getJsonForEntityAdd); // 
+}
 // field series
 function fieldGet(response,postData,query){
 	console.log("Handler requested:fieldGet with query:"+query);
@@ -262,8 +276,10 @@ exports.upload = upload;
 exports.grid = grid;
 exports.dtTable = dtTable;
 exports.dtTableCRUD = dtTableCRUD;
+
 exports.entityGetAll = entityGetAll;
 exports.entityGet = entityGet;
+exports.entityAdd = entityAdd;
 
 exports.fieldGet = fieldGet;
 exports.fieldGetAll = fieldGetAll;

@@ -10,6 +10,7 @@ handle["/grid"] = requestHandlers.grid;
 handle["/dtTable"] = requestHandlers.dtTable;
 handle["/dtTableCRUD"] = requestHandlers.dtTableCRUD;
 
+handle["/entityAdd"] = requestHandlers.entityAdd;
 handle["/entityGet"] = requestHandlers.entityGet;
 handle["/entityGetAll"] = requestHandlers.entityGetAll;
 

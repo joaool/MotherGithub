@@ -35,34 +35,42 @@
 	    type:"get",
 		    data: '{"data": "TEST"}',
 	    // dataType: 'jsonp',//requires that the response be wrapped in some kind of callback function.
-	    // JSONP is not JSON. A JSONP response would consist of a JavaScript script containing only a function call (to a pre-defined function) with one argument (which is a JavaScript object literal conforming to JSON syntax).
+	    // JSONP is not JSON. A JSONP response would consist of a JavaScript script containing only a function call (to a pre-defined function) with one argument (which is a JavaScript
+	    // object literal conforming to JSON syntax).
 	    // jsonpCallback: 'grid',
 		    cache:false,
-		    success:
-			if (data["ctrl"]["isOk"] == true){
-			    console.log("entityGetAll Success...");
-			    return (data.j);
-			}
-			console.log("entityGetAll empty !..." + err);
-			return (data.j);
-		},
-		error: function(jqXHR, textStatus, errorThrown) {
-		    console.log("errorThrown:"+errorThrown);
-		     console.log("textStatus:"+textStatus);
-		}	   	
-	    });
-    }
+		    success: function (data) {
+			    console.log ("ajax callbacked: "+ JSON.stringify( data));
+				if (data["ctrl"]["isOk"] == true){
+				    console.log("entityGetAll Success...");
+				    callBack(null, data.j);
+				}
+				console.log("entityGetAll empty !..." + err);
+				callBack(data, null);
+			},
+			error: function(jqXHR, textStatus, errorThrown) {
+			    console.log("errorThrown:"+errorThrown);
+		     	console.log("textStatus:"+textStatus);
+			} 
+		});
+	};
 
-    entityGetAll(function e,docs){
-	alert(docs);
-    }
+    var flDico=function() {};
+	flDico.prototype.entityGetAll=function (e, docs) { if (e) return( docs); else return e;};
 
+    var flD = new flDico();
+    //var x = flD.entityGetAll();
+    //console.log("direct call : " + JSON.stringify(x));
+
+    flD.entityGetAll(function(e, d){
+    	if (e == null)
+		   	console.log("entityGetAll callbacked got: " +JSON.stringify(d));
+		else
+			console.log("Error : " + e);
+    });
 </script>
-	</head>
-	<body class="claro">
-		<div id="xwrapper" width="640" height="360" color="red" </div>
-		<!--<div id="box" style="position: absolute;left:1000px;top:100px;width:100px;height:1030px;border:1px solid red" class="boxes" onmouseover="alert('Red spot - was blue !')">	-->
-		<div id="box" style="position: absolute;left:1000px;top:100px;width:100px;height:100px;border:1px solid red">	
+</head>
 
+	<body class="claro Mother"> 
 	</body>
 </html>

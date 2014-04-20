@@ -3,6 +3,8 @@ datalayer API implemented
 API :
 entityGet?entityCN=0A
 entityGetAll
+entityAdd?name=newEntity&names=newEntities&desc=test  // node.js trap if name or names exist
+
 dataGet?entityCN=1&id=custBrowse
 dataGetAll?entityCN=10
 
