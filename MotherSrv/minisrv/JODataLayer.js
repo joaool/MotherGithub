@@ -376,6 +376,30 @@ function dlDataGetAll(params, callBack){
 	});
 }
 
+function dlDataInsert(params, callBack){
+	var entityCN=params.entityCN;
+	var j = JSON.parse(params.j);
+	console.log("dlDataInsert called for entityCN="+entityCN+",j =" + JSON.stringify(j));
+	console.log("j: " + j["1E"]);
+	try {
+		var collecName = 'Master_' + entityCN;
+		var collection = db.get(collecName);
+		var ins = {};
+		if (typeof(j['_id']) != "undefined")
+			ins[_id]=j['_id'];
+		ins['j']=j;
+		ins['r']={};
+		collection.insert( ins, {}, function(e, docs){
+			console.log('Mongo access done for :dlTableDataInsert : ' + JSON.stringify(docs));
+			callBack(e, docs);
+		});
+	}
+	catch(err)
+	{
+		console.log("*** !!! Erreur dans dlTabledataInsert : " + err + " !!! ***");
+		callBack("dlDataInsert: " + err, {});
+	}
+}
 function dlDummyTableHeader(entityCN,callBack){
 	//NOTE:This will be broken in one access to fields of entity CN and another acesss to corresponding grid titles (depend on the grid)
 	console.log("Data Layer dlTableHeader will be called for entityCN="+entityCN);
@@ -700,6 +724,7 @@ exports.dlFieldGetAllByName = dlFieldGetAllByName;
 
 exports.dlDataGet = dlDataGet;
 exports.dlDataGetAll = dlDataGetAll;
+exports.dlDataInsert = dlDataInsert;
 
 exports.dlCNGet = dlCNGet;
 exports.dlNameGet = dlNameGet;

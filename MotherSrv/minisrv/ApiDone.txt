@@ -7,6 +7,7 @@ entityAdd?name=newEntity&names=newEntities&desc=test  // node.js trap if name or
 
 dataGet?entityCN=1&id=custBrowse
 dataGetAll?entityCN=10
+dataInsert?entityCN=10&j={"1E"="toto","1F"=3}
 
 fieldGet?fiedCN=12
 fieldAdd?entityCN=1B&name=Nom_Du_Client&desc=this is the name of our customer&textUI=textbox

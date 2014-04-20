@@ -198,6 +198,21 @@ function dataGet(response,postData,query){
 	};
 	dataLayer.dlDataGet(jParam, getJsonForDataGet); // 
 }
+// data series
+function dataInsert(response,postData,query){
+	console.log("Handler requested:dataInsert with query:"+query);
+	var jParam={};
+	jParam.entityCN = querystring.parse(query)["entityCN"];
+	jParam.j = querystring.parse(query)["j"];
+	jParam.r = querystring.parse(query)["r"];
+	
+	var getJsonForDataInsert = function( json){
+		response.write(JSON.stringify(json));
+		response.end();
+		console.log('-----------------------------dataInsert----------------------------------------');
+	};
+	dataLayer.dlDataInsert(jParam, getJsonForDataInsert); // 
+}
 
 function tableDataGet(response,postData,query){
 	console.log("Handler requested:tableDataGet with query:"+query);
@@ -309,6 +324,7 @@ exports.nameGet = nameGet;
 
 exports.dataGet = dataGet;
 exports.dataGetAll = dataGetAll;
+exports.dataInsert = dataInsert;
 exports.tableEntityGetAll = tableEntityGetAll;
 exports.tableEntityGet = tableEntityGet;
 exports.tableDataGetAll = tableDataGetAll;
