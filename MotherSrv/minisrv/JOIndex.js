@@ -15,6 +15,7 @@ handle["/entityGet"] = requestHandlers.entityGet;
 handle["/entityGetAll"] = requestHandlers.entityGetAll;
 
 handle["/fieldGet"] = requestHandlers.fieldGet;
+handle["/fieldAdd"] = requestHandlers.fieldAdd;
 handle["/fieldGetAll"] = requestHandlers.fieldGetAll;
 handle["/fieldGetByName"] = requestHandlers.fieldGetByName;
 handle["/fieldGetAllByName"] = requestHandlers.fieldGetAllByName;

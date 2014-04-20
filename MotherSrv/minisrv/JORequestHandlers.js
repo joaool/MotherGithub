@@ -113,6 +113,23 @@ function fieldGet(response,postData,query){
 	};
 	dataLayer.dlFieldGet(fieldCN,getJsonForFieldGet); // 
 }
+// field series
+function fieldAdd(response,postData,query){
+	console.log("Handler requested:fieldAdd with query:"+query);
+	var param={};
+	param["entityCN"]= querystring.parse(query)["entityCN"];
+	param["name"]= querystring.parse(query)["name"];
+	param["desc"]= querystring.parse(query)["desc"];
+	param["textUI"]= querystring.parse(query)["textUI"];
+	console.log("fieldAdd: entityCN: "+ param["entityCN"] +", name: " + param["name"] + ", desc: "+ param["desc"] + ", textUI: " + param["textUI"]);
+
+	var getJsonForFieldAdd = function( json){
+		response.write(JSON.stringify(json));
+		response.end();
+		console.log('-----------------------------fieldAdd------------------------------------------');
+	};
+	dataLayer.dlFieldAdd(param,getJsonForFieldAdd); // 
+}
 function fieldGetAll(response,postData,query){
 	console.log("Handler requested:fieldGetAll with query:"+query);
 	var entityCN = querystring.parse(query)["entityCN"];
@@ -282,6 +299,7 @@ exports.entityGet = entityGet;
 exports.entityAdd = entityAdd;
 
 exports.fieldGet = fieldGet;
+exports.fieldAdd = fieldAdd;
 exports.fieldGetAll = fieldGetAll;
 exports.fieldGetByName = fieldGetByName;
 exports.fieldGetAllByName = fieldGetAllByName;

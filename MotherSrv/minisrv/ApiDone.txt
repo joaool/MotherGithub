@@ -9,6 +9,7 @@ dataGet?entityCN=1&id=custBrowse
 dataGetAll?entityCN=10
 
 fieldGet?fiedCN=12
+fieldAdd?entityCN=1B&name=Nom_Du_Client&desc=this is the name of our customer&textUI=textbox
 fieldGetAll?entityCN=00
 fieldGetByName?entityCN=00&fieldName=city
 fieldGetAllByName?fieldName=name

@@ -155,6 +155,60 @@ function dlFieldGet(fieldCN, callBack){
 	callBack( formatResponseError(99, "entityGet: " + err));
     }
 }
+function dlFieldAdd(param, callBack) {
+    try {
+    	console.log("dlFieldAdd: entering the dl");
+	   	var entityCN =param.entityCN;
+		var name =param.name;
+		var desc = param.desc;
+		var textUI = param.textUI;
+		console.log("dlFieldAdd: entityCN: "+ entityCN +", name: " + name + ", desc: "+ desc + ", textUI: " + textUI);
+
+		var collection = db.get("Master_0");
+		query={};
+		query["_id"]=entityCN;
+		query["j.5"]="E";
+		collection.findOne( query, function(e, docs){
+	    	console.log("dlFieldAdd: check entity: " + docs);
+			if (docs !=null){
+				query={};
+				query["j.6"]=name;
+				query["j.5"]="E";
+				collection.findOne( query, function(e, docs){
+			    	console.log("dlFieldAdd: check for name for this entity  : " + docs);
+					if (docs == null) {
+						getNewCN( function(e, CN) {
+							if (e!= null){
+								console.log ("dlfieldAdd Error in callback from getNewCN: " + e);
+								callBack (formatResponseError(99, "dlFieldAdd: " + e));
+							}
+							console.log ("dlFieldAdd, callbacked by getNewCN, CN = " + JSON.stringify(CN));
+
+							var m = jSonToMaster_F(entityCN, CN, name, desc, textUI);
+							var mm = {_id:CN, j:m, r:{}};
+							console.log ("dlFieldAdd: json for Dico : " + JSON.stringify(mm));
+							var rsl = collection.insert(mm); 
+							console.log("dlFieldAdd: Dictionary updated: " + rsl);
+							
+							return formatResponseOK({fieldCN:CN});
+						});
+					}
+					else
+						callBack("flEntityAdd: name " + name + "already used for this entity");
+				});
+			}
+			else
+				callBack("dlFieldAdd: wrong entityCN", null);
+		
+	    });
+	}
+	catch(err)
+	{
+            return formatResponseError( 99, "fieldAdd: " + err);
+	}
+
+}
+
 function dlFieldGetAll(entityCN, callBack){
     try {
 	console.log("entering :dlFieldGetAll");
@@ -639,6 +693,7 @@ exports.dlEntityAdd = dlEntityAdd;
 exports.dlEntityGetAll = dlEntityGetAll;
 
 exports.dlFieldGet = dlFieldGet;
+exports.dlFieldAdd = dlFieldAdd;
 exports.dlFieldGetAll = dlFieldGetAll;
 exports.dlFieldGetByName = dlFieldGetByName;
 exports.dlFieldGetAllByName = dlFieldGetAllByName;
