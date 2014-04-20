@@ -21,6 +21,7 @@
    	<!--<script type="text/javascript" src="../dojo1.9.2/dojo/dojo.js"></script> -->
  
 	<script src="jquery-1.8.2/jquery-1.8.2.js"></script>
+	<script src="lib/dataLayerClient.js"></script>
 	<!--<script src="Mother/bootstrap.js"></script>-->	
 	<!--<link href="../dojo1.9.2/dijit/themes/claro/claro.css" rel="stylesheet">--> 
 	<link rel="stylesheet" type="text/css" href="Mother/MotherBuilder.css" /> 
@@ -29,42 +30,12 @@
 	<link rel="stylesheet" type="text/css" href="Mother/Mother.css"/>
 
 <script>
-    function entityGetAll(callBack){
-	    request=$.ajax({
-		    url: "http://localhost:3000/entityGetAll",
-	    type:"get",
-		    data: '{"data": "TEST"}',
-	    // dataType: 'jsonp',//requires that the response be wrapped in some kind of callback function.
-	    // JSONP is not JSON. A JSONP response would consist of a JavaScript script containing only a function call (to a pre-defined function) with one argument (which is a JavaScript
-	    // object literal conforming to JSON syntax).
-	    // jsonpCallback: 'grid',
-		    cache:false,
-		    success: function (data) {
-			    console.log ("ajax callbacked: "+ JSON.stringify( data));
-				if (data["ctrl"]["isOk"] == true){
-				    console.log("entityGetAll Success...");
-				    callBack(null, data.j);
-				}
-				console.log("entityGetAll empty !..." + err);
-				callBack(data, null);
-			},
-			error: function(jqXHR, textStatus, errorThrown) {
-			    console.log("errorThrown:"+errorThrown);
-		     	console.log("textStatus:"+textStatus);
-			} 
-		});
-	};
-
-    var flDico=function() {};
-	flDico.prototype.entityGetAll=function (e, docs) { if (e) return( docs); else return e;};
-
+	// Joao : this is your code, only entityGetAll coded for now
     var flD = new flDico();
-    //var x = flD.entityGetAll();
-    //console.log("direct call : " + JSON.stringify(x));
 
     flD.entityGetAll(function(e, d){
     	if (e == null)
-		   	console.log("entityGetAll callbacked got: " +JSON.stringify(d));
+		   	console.log("entityGetAll callbacked got data " +JSON.stringify(d));
 		else
 			console.log("Error : " + e);
     });
