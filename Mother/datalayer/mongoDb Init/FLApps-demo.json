@@ -10,32 +10,46 @@ var nbOrders=100;
 var nbLinesPerOrder=3;
 var nbProds=10;
 
+var ff;
+var f1;
+var f2;
+var f3;
+var f4;
+var f5;
+var f6;
 // Collection Customers entity 00
 var rsl = fl.entityAdd({"singular":"Customer", "plural":"Customers", "description":"All my customers" });
 custCN = rsl.j.entityCN;
 //CN:01
-fl.fieldAdd({entityCN:custCN, name:"name",description:"name of customer",typeUI:"textBox"});
+ff = fl.fieldAdd({entityCN:custCN, name:"name",description:"name of customer",typeUI:"textBox"});
+f1=ff.j.fieldCN;
 //CN:02
-fl.fieldAdd({entityCN:custCN, name:"city",description:"city of customer",typeUI:"textBox"});
+ff=fl.fieldAdd({entityCN:custCN, name:"city",description:"city of customer",typeUI:"textBox"});
+f2=ff.j.fieldCN;
 //CN:03
-fl.fieldAdd({entityCN:custCN, name:"phone",description:"customer's phone",typeUI:"textBox"});
+ff=fl.fieldAdd({entityCN:custCN, name:"phone",description:"customer's phone",typeUI:"textBox"});
+f3=ff.j.fieldCN;
 
 for (i=0; i<nbCusts; i++){
 	var j={};
 	j['_id'] = i.toString();
-	j[new String(custCN+1)]= "Client-"+ i;
-	j[new String(custCN+2)]= "City "+ i;
-	j[new String(custCN+3)]= "0033 "+ i+i+i+i;
-	
+
+	j[new String(f1)]= "Client-"+ i;
+	j[new String(f2)]= "City "+ i;
+	j[new String(f3)]= "0033 "+ i+i+i+i;
+
 	printjson(j);
 	flD.insert(custCN, j);
 }
 
 var rsl = fl.entityAdd({"singular":"Order", "plural":"Orders", "description":"Order collection" });
 orderCN=rsl.j.entityCN;
-fl.fieldAdd({entityCN:orderCN, name:"date",description:"order's date",typeUI:"textBox"});
-fl.fieldAdd({entityCN:orderCN, name:"amount",description:"total amount",typeUI:"textBox"});
-fl.fieldAdd({entityCN:orderCN, name:"shipped",description:"is it shipped",typeUI:"textBox"});
+ff=fl.fieldAdd({entityCN:orderCN, name:"date",description:"order's date",typeUI:"textBox"});
+f1=ff.j.fieldCN;
+ff=fl.fieldAdd({entityCN:orderCN, name:"amount",description:"total amount",typeUI:"textBox"});
+f2=ff.j.fieldCN;
+ff=fl.fieldAdd({entityCN:orderCN, name:"shipped",description:"is it shipped",typeUI:"textBox"});
+f3=ff.j.fieldCN;
 
 var rlt = fl.relationAdd({"relationName":"CustomerCanOrder",
 			 "left":{"entityCN":custCN, "verb":"orders", "side":0, "cardinality":"1", "storeRelation":false, "cache":false, "format":""},
@@ -49,24 +63,27 @@ var relCN=rlt.j.cn;
 
 var rsl = fl.entityAdd({"singular":"orderLine", "plural":"orderLines", "description":"lines of order" });
 lineOrdCN=rsl.j.entityCN;
-fl.fieldAdd({entityCN:lineOrdCN, name:"quantity",description:"quantity ordered",typeUI:"textBox"});
-fl.fieldAdd({entityCN:lineOrdCN, name:"product",description:"product ID not linked yet",typeUI:"textBox"});
-fl.fieldAdd({entityCN:lineOrdCN, name:"price",description:"total price of the line",typeUI:"textBox"});
+ff=fl.fieldAdd({entityCN:lineOrdCN, name:"quantity",description:"quantity ordered",typeUI:"textBox"});
+f4=ff.j.fieldCN;
+ff=fl.fieldAdd({entityCN:lineOrdCN, name:"product",description:"product ID not linked yet",typeUI:"textBox"});
+f5=ff.j.fieldCN;
+ff=fl.fieldAdd({entityCN:lineOrdCN, name:"price",description:"total price of the line",typeUI:"textBox"});
+f6=ff.j.fieldCN;
 
 for (i=1; i<nbOrders; i++) {
 	dt=new Date("2014/03/27");
 	var j={};
 	j["_id"] = i.toString();
-	j[new String (orderCN+1)]= dt;
-	j[new String (orderCN+2)]= 123456.45;
-	j[new String (orderCN+3)]= false;
+	j[new String (f1)]= dt;
+	j[new String (f2)]= 123456.45;
+	j[new String (f3)]= false;
 	dataInsert(orderCN, j);
 	
 	for (k=1; k<nbLinesPerOrder; k++){
 		var jl={};
-		jl[new String(lineOrdCN+1)]=k;
-		jl[new String(lineOrdCN+2)]="prod-"+(i+k);
-		jl[new String(lineOrdCN+3)]=123.45;
+		jl[new String(f4)]=k;
+		jl[new String(f5)]="prod-"+(i+k);
+		jl[new String(f6)]=123.45;
 		
 		flD.insert(lineOrdCN, jl);
 	}
@@ -78,17 +95,20 @@ var rlt = fl.relationAdd({"relationName":"OrderToLines",
 
 var rsl = fl.entityAdd({"singular":"Product", "plural":"Products", "description":"Catalog" });
 prodCN=rsl.j.entityCN;
-fl.fieldAdd({entityCN:prodCN, name:"name",description:"product name",typeUI:"textBox"});
-fl.fieldAdd({entityCN:prodCN, name:"family",description:"product family",typeUI:"textBox"});
-fl.fieldAdd({entityCN:prodCN, name:"price",description:"product price",typeUI:"textBox"});
+ff=fl.fieldAdd({entityCN:prodCN, name:"name",description:"product name",typeUI:"textBox"});
+f1=ff.j.fieldCN;
+ff=fl.fieldAdd({entityCN:prodCN, name:"family",description:"product family",typeUI:"textBox"});
+f2=ff.j.fieldCN;
+ff=fl.fieldAdd({entityCN:prodCN, name:"price",description:"product price",typeUI:"textBox"});
+f3=ff.j.fieldCN;
 
 for (i=1; i<nbProds; i++) {
 	var j={};
 	var ty = i % 4;
 	j["_id"]=i.toString();
-	j[new String(prodCN+1)]="prod-"+i;
-	j[new String(prodCN+2)]="test-" + ty; 
-	j[new String(prodCN+3)]=456.98;
+	j[new String(f1)]="prod-"+i;
+	j[new String(f2)]="test-" + ty; 
+	j[new String(f3)]=456.98;
 
 	flD.insert(prodCN, j);
 }
