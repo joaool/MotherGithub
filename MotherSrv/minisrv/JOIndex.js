@@ -26,6 +26,7 @@ handle["/CNGet"] = requestHandlers.CNGet;
 handle["/dataGet"] = requestHandlers.dataGet;
 handle["/dataGetAll"] = requestHandlers.dataGetAll;
 handle["/dataInsert"] = requestHandlers.dataInsert;
+handle["/dataUpdate"] = requestHandlers.dataUpdate;
 
 handle["/tableEntityGet"] = requestHandlers.tableEntityGet;
 handle["/tableEntityGetAll"] = requestHandlers.tableEntityGetAll;

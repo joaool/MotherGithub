@@ -132,7 +132,7 @@ function dlTableEntityGet(entityCN,callBack){
     }
     catch(err)
     {
-	console.log("*** !!! Erreur dans dlEntityGet : " + err + " !!! ***");
+		console.log("*** !!! Erreur dans dlEntityGet : " + err + " !!! ***");
         callBack({});
     }
 }
@@ -378,17 +378,22 @@ function dlDataGetAll(params, callBack){
 
 function dlDataInsert(params, callBack){
 	var entityCN=params.entityCN;
-	var j = JSON.parse(params.j);
-	console.log("dlDataInsert called for entityCN="+entityCN+",j =" + JSON.stringify(j));
-	console.log("j: " + j["1E"]);
+	var j = {};
+	var r = {};
 	try {
+		console.log("Entering dlDataInsert");
+		if (params.j != null)
+			j = JSON.parse(params.j);
+		if (params.r != null)
+			r = JSON.parse(params.r);
+		console.log("dlDataUpdate called for entityCN=" + entityCN + ", j =" + JSON.stringify(j) + ", r = " + JSON.stringify(r) );
 		var collecName = 'Master_' + entityCN;
 		var collection = db.get(collecName);
 		var ins = {};
-		if (typeof(j['_id']) != "undefined")
-			ins[_id]=j['_id'];
 		ins['j']=j;
-		ins['r']={};
+		ins['r']=r;
+		if (j["_id"] != null)
+			ins["_id"]=j["_id"];
 		collection.insert( ins, {}, function(e, docs){
 			console.log('Mongo access done for :dlTableDataInsert : ' + JSON.stringify(docs));
 			callBack(e, docs);
@@ -398,6 +403,41 @@ function dlDataInsert(params, callBack){
 	{
 		console.log("*** !!! Erreur dans dlTabledataInsert : " + err + " !!! ***");
 		callBack("dlDataInsert: " + err, {});
+	}
+}
+// params : entityCN,  j, r   j[_id] must be given
+function dlDataUpdate(params, callBack){
+	var entityCN=params.entityCN;
+	var id={};
+	var j = {};
+	var r = {};
+	try {
+		if (params.j != null)
+			var j = JSON.parse(params.j);
+		if (params.r != null)
+			r = JSON.parse(params.r);
+		if (j["_id"] != null)
+			id=j["_id"];
+		else
+			throw("dlDataUpdate : No _id found in json");
+
+		console.log("dlDataUpdate called for entityCN="+entityCN+", _id= " + id + ", j =" + JSON.stringify(j) + ", r = " + JSON.stringify(r) );
+		
+		var collecName = 'Master_' + entityCN;
+		var collection = db.get(collecName);
+		var upd = {};
+		upd['j']=j;
+		upd['r']=r;
+		upd['_id']=id;
+		collection.update({_id:id}, upd, function(e, docs){
+			console.log('Mongo access done for :dlTableDataUpdate : ' + JSON.stringify(docs));
+			callBack(e, docs);
+		});
+	}
+	catch(err)
+	{
+		console.log("*** !!! Erreur dans dlTabledataUpdate : " + err + " !!! ***");
+		callBack("dlDataUpdate: " + err, {});
 	}
 }
 function dlDummyTableHeader(entityCN,callBack){
@@ -725,6 +765,7 @@ exports.dlFieldGetAllByName = dlFieldGetAllByName;
 exports.dlDataGet = dlDataGet;
 exports.dlDataGetAll = dlDataGetAll;
 exports.dlDataInsert = dlDataInsert;
+exports.dlDataUpdate = dlDataUpdate;
 
 exports.dlCNGet = dlCNGet;
 exports.dlNameGet = dlNameGet;
