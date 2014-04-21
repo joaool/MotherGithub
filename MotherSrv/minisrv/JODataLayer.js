@@ -485,6 +485,75 @@ function dlDummyTableData(entityCN,callBack){
 	console.log('Mongo access done for :dlDummyTableData');
 	callBack(tableData);
 }
+// ------------------------ JO grid in data layer
+function getFieldnameFromFieldCN(fieldCN,listOfDictionaryFields){
+	var fieldName = null;
+		for (var i=0; i < listOfDictionaryFields.length; i++ ) {
+			// console.log("getFieldnameFromFieldCN tests if fieldCN="+ fieldCN + " is in " + JSON.stringify(listOfDictionaryFields[i]));
+			if(listOfDictionaryFields[i].fieldCN == fieldCN){
+				fieldName = listOfDictionaryFields[i].name;
+				// console.log("----------------->found fieldName="+fieldName);
+				break;
+			}
+		}
+	return fieldName;
+}
+function dlHalfDummyGrid(entityCN,callBack){
+	console.log("Data Layer dlHalfDummyGrid will be called for entityCN="+entityCN);
+	var gridData = null;
+	var getUIObject = function( UIObject){//UIObject is the json with the return of ex. dataGet?entityCN=1&id=custBrowse
+		var tableCN = UIObject.j["02"];
+		var listOfTableColumns = UIObject.j["03"];//an array
+		console.log('-----------call getUIObject inside DataLayer.dlHalfDummyGrid--------------');
+		console.log('Extrated Table entityCN:'+tableCN+' and header with '+listOfTableColumns.length+' columns.');
+		console.log('Now we use fieldGetAll?entityCN='+tableCN+' to extract field names...');
+		// -------------------------------- header block ------------------------------------------------------------------
+		var header = [];
+		var getDictionaryFieldsForUIObject = function( dictionaryFieldsForUIObject){//
+			console.log("--call getDictionaryFieldsForUIObject for entityCN=" + tableCN + " inside DataLayer.dlHalfDummyGrid");
+			var listOfDictionaryFields = dictionaryFieldsForUIObject.j;//array of Dictionary Fields
+			for (var i=0; i < listOfTableColumns.length; i++ ) {
+				// console.log("column "+ i + " - " + JSON.stringify(listOfTableColumns[i]));
+				var fieldCN = listOfTableColumns[i].cn;
+				var fieldName = getFieldnameFromFieldCN(fieldCN,listOfDictionaryFields);
+				var columnTitle = listOfTableColumns[i].t;
+				header.push({"mData":fieldName,"sTitle":columnTitle});
+				console.log("column "+ i + " has fieldname=" + fieldName + " and title=" + columnTitle);
+			}
+			// -------------------------------- data block ------------------------------------------------------------------
+			console.log("beginning of data block");
+			var data = null;
+			var getAllRecordsFromEntityCN = function( jsonOfRecords){//
+				var listOfRecords = jsonOfRecords.j;
+				console.log("------->jsonOfRecords:\n"+ JSON.stringify(jsonOfRecords));
+
+				console.log("--call getAllRecordsFromEntityCN for entityCN=" + tableCN + "inside DataLayer.dlHalfDummyGrid.getDictionaryFieldsForUIObject");
+				console.log("getAllRecordsFromEntityCN "+ listOfRecords.length + " Records ! ");
+
+				for (var i=0; i < listOfRecords.length; i++ ) {
+					var record = {};
+					for (var i=0; i < listOfTableColumns.length; i++ ){//monting a single record only with fields belonging to listOfTableColumns
+						var fieldCN = listOfTableColumns[i].cn;
+						var fieldName = header[i].mData;
+						var fieldValue = listOfRecords.j[fieldCN];
+						record[fieldName] = fieldValue;
+					}
+					data.push(record); //record is complete and pushed into the data array
+					console.log("record "+ i + " =" + JSON.stringify(data[i]) + " was mounted.");
+				}
+				console.log("data array is formed");
+				gridData = {header:header,data:data};
+				console.log('Mongo access done for :dlHalfDummyGrid');
+				callBack(gridData);
+			};
+			dlDataGetAll(tableCN,getAllRecordsFromEntityCN);//ex dataGetAll?entityCN=00
+		};
+		dlFieldGetAll(tableCN,getDictionaryFieldsForUIObject);//ex localhost:3000/fieldGetAll?entityCN=00
+	};
+	dlDataGet({entityCN:"1",id:"custBrowse"}, getUIObject);
+	// callBack(gridData);
+}
+// ------------------------END OF  JO grid in data layer
 function decodeJSonDico(j, sens){
     try {
 	if (sens != 0 && sens != 1)
@@ -778,3 +847,4 @@ exports.dlTableDataGetAll = dlTableDataGetAll;
 // dummy
 exports.dlDummyTableHeader = dlDummyTableHeader;
 exports.dlDummyTableData = dlDummyTableData;
+exports.dlHalfDummyGrid = dlHalfDummyGrid;

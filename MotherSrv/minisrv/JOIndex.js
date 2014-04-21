@@ -9,6 +9,8 @@ handle["/upload"] = requestHandlers.upload;
 handle["/grid"] = requestHandlers.grid;
 handle["/dtTable"] = requestHandlers.dtTable;
 handle["/dtTableCRUD"] = requestHandlers.dtTableCRUD;
+handle["/dtGrid"] = requestHandlers.dtGrid;
+
 
 handle["/entityAdd"] = requestHandlers.entityAdd;
 handle["/entityGet"] = requestHandlers.entityGet;

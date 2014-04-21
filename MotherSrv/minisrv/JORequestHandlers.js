@@ -280,6 +280,24 @@ function dtTable(response,postData,query){
 	};
 	dataLayer.dlDummyTableHeader("Dummy",getJsonForTableHeader );//first param is a NOP for now
 }
+function dtGrid(response,postData,query){
+	console.log("Handler requested:dtGrid with query:"+query);
+	var getJsonForGrid = function(jsonHeaderAndData) {
+		var fields = [];
+		for (var i=0; i < jsonHeaderAndData.header.length; i++ ) {//this is redundant with aoColumns, but it is necessary for datatables
+			fields.push({
+				"label":jsonHeaderAndData.header[i].sTitle,"name":jsonHeaderAndData.header[i].mData
+			});
+		}
+		var data={"fields":fields, "aoColumns":jsonHeaderAndData.header, "data": jsonHeaderAndData.data};
+		var strData = JSON.stringify(data);
+		response.writeHead(200, {"Content-Type": "application/json", 'Access-Control-Allow-Origin' : '*'});//{"Content-Type": "text/javascript"});
+		response.write(strData);
+		response.end();
+		console.log('----------------------------------dtGrid---------------------------------------');
+	};
+	dataLayer.dlHalfDummyGrid("Dummy",getJsonForGrid );//first param is a NOP for now
+}
 function dtTableCRUD(response,postData,query){
 	var callback = querystring.parse(callback);
 	var action = querystring.parse(postData).action;//sent by POST
@@ -322,6 +340,7 @@ exports.dir = dir;
 exports.upload = upload;
 exports.grid = grid;
 exports.dtTable = dtTable;
+exports.dtGrid = dtGrid;
 exports.dtTableCRUD = dtTableCRUD;
 
 exports.entityGetAll = entityGetAll;
