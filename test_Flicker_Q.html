@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Q promises v1.0</title>
+    <!--<script type="text/javascript" charset="utf-8" src="../rivets/dist/rivets.js" ></script>-->
+   	<script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
+    <script type="text/javascript" charset="utf-8" src="../q-1/q.js" ></script>
+
+</head>
+<script>
+// Uses jQuery and Q.
+ 
+var API_KEY = "whatever";
+// https://api.sendgrid.com/api/newsletter/lists/email/get.json
+// POST Data list=Test&api_user=your_sendgrid_username&api_key=your_sendgrid_password
+// function getFlickrResponseAsync(method, responseProperty, params) {
+$( document ).ready(function() {
+	console.log("Begin...");
+
+    callDir = function(serverRequest){//ex dir
+		var deferred = Q.defer();
+		request=$.ajax({//call to get column definitions frist, then data
+			url: "http://localhost:3000/"+serverRequest, //to force an error make: url: "http://localhost:3000/xdir",
+	     	dataType: 'text'//data type we are expecting from the server
+	    }).done(function(data){
+	    	console.log("OKKKKKKKKKKKKKKKK ");
+	    	deferred.resolve(data);
+	    }).fail(function(){
+	    	console.log("FAILLLLLLLLLLLLLLL");
+	    	var error = new Error("Ajax request to localhost:3000/" + serverRequest + " FAILED");
+	    	deferred.reject(error);
+	    });
+    	return deferred.promise;
+	};
+	// var promise = callDir();
+	console.log("Now we call callDir()");
+	// callDir("dir").then( //testing a simple promise
+	// 	function(data){
+	// 		console.log("This is the data for Dir1:\n" + data);
+	// 		var dirContent = $("<span>" + data + "</span>");
+	// 		dirContent.insertAfter(".content1");
+	// 	},
+	// 	function(error){
+	// 		console.log(error.message);
+	// 		var dirContent = $("<span>" + error.message + "</span>");
+	// 		dirContent.insertAfter(".content1");
+	// 	}
+	// );
+	callDir("dir").then( //testing chained promises
+		function(data){
+			console.log("This is the data for Dir1:\n" + data);
+			var dirContent = $("<span>" + data + "</span>");
+			dirContent.insertAfter(".content1");
+			callDir("xdir").then(
+				function(data){
+					console.log("This is the data for Dir2:\n" + data);
+					var dirContent = $("<span>" + data + "</span>");
+					dirContent.insertAfter(".content2");
+				},
+				function(error){
+					console.log(error.message);
+					var dirContent = $("<span>" + error.message + "</span>");
+					dirContent.insertAfter(".content2");
+				}
+			);					
+		},
+		function(error){
+			console.log(error.message);
+			var dirContent = $("<span>" + error.message + "</span>");
+			dirContent.insertAfter(".content1");
+		}
+	);
+	console.log("Request was done, before displaying this line !!!");
+});
+
+console.log(document.title+"......  END..");
+</script>
+<body>
+	<div class="demo First Dir">
+		<div>Show Dir1</div>
+		<p class="content1" ><b>Dir 1</b> (on next lines):</p>
+	</div>	
+	<div class="demo Second Dir">
+		<div>Show Dir2</div>
+		<p class="content2" ><b>Dir 2</b> (on next lines):</p>
+	</div>	
+</body>
+</html>
