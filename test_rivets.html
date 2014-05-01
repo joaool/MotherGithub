@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>rivets.js example</title>
+    <!--<script src="/application/html/js/mikeric/rivets/rivets.min.js"></script>-->
+    <script type="text/javascript" charset="utf-8" src="../rivets/dist/rivets.js" ></script>
+
+</head>
+<body>
+	<div id="book">
+		<!--<p data-text="xbook.title"></p>-->
+	  	<b>title:{xbook.title}</b>
+	  	<p class='info' data-show='book:available'>Now Available</p>
+	  	<p>-----> Cost: <span style="color:blue">{xbook.cost}</span> US$</p>
+	</div>
+    <script>
+	   	var book1 = {title:'Awesome Book Title',available:true,cost:'$5.15'}
+	   	var book2 = {title:'Tarzan in Pants',available:true,cost:'$6.65'}
+	    rivets.bind(document.getElementById('book'), {xbook: book1});//xbook must match the html key xbook the valu is itself an object
+	    // rivets.bind(document.getElementById('book'), {book: book2})
+	console.log(document.title+"......  END..");		
+    </script>
+</body>
+</html>

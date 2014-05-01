@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>rivets v1.0</title>
+    <!--<script src="/application/html/js/mikeric/rivets/rivets.min.js"></script>-->
+    <script type="text/javascript" charset="utf-8" src="../rivets/dist/rivets.js" ></script>
+
+</head>
+<body>
+	<p>Pure rivets with rv-each</p>
+	<div id="books">
+		<!--<p data-text="xbook.title"></p>-->
+		<ol>
+		    <li rv-each-zbook="template.books"><!-- the books array is scanned fo every "zbook" (array element) - rv-each-"zbook" -->
+		      <h1>{ zbook.title }</h1>
+		      <p>{ zbook.cost }</p>
+		    </li>
+	  	</ol>
+	  	<!--
+	  	<b>title:{template.title}</b>
+	  	<p class='info' data-show='book:available'>Now Available</p>
+	  	<p>-----> Cost: <span style="color:blue">{template.cost}</span> US$</p>
+	  	-->
+	</div>
+    <script>
+	   	var book1 = {title:'Awesome Book Title',available:true,cost:'$5.95'}
+	   	var book2 = {title:'Tarzan in Pants',available:true,cost:'$6.65'}
+	   	var book3 = {title:'The spy',available:true,cost:'$9.95'}
+	   	var booksObj = {books:[book1,book2,book3]}
+	   	el = document.getElementById('books')
+	    rivets.bind(el, {template: booksObj});//template connects to html body. Inside booksObje exists an array (books)
+	    // rivets.bind(document.getElementById('book'), {book: book2})
+	console.log(document.title+"......  END..");		
+    </script>
+</body>
+</html>

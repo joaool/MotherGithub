@@ -115,10 +115,19 @@ require([
 			success: function(data) {
 				console.log("success ! "+JSON.stringify(data.aoColumns));
 				editor = new $.fn.dataTable.Editor( {
-					"ajaxUrl": "http://localhost:3000/dtTableCRUD",
+					"ajaxUrl": "http://localhost:3000/dtTableCRUD",//actions submited has POST
 					"domTable": "#example",
-					"fields": data.fields
-			    });    
+					// "fields": data.fields
+					"events": {
+						"onCreate": function (json, data) {
+							alert( "A new row was created!" );
+						},
+						"onEdit": function (json, data) {
+							alert( "A new row was edited!" );
+						}
+					}
+				});
+				editor.add( data.fields );
 				data.aoColumns.push({
 		            "mDataProp": null, 
 		            "sClass": "center",
@@ -138,16 +147,19 @@ require([
 					"bProcessing" : true,
 		  			// "bServerSide" : true,
 					"sAjaxSource": "http://localhost:3000/dtGrid",
+					"bServerSide": true,
+					"sServerMethod": 'POST',					
 					"aoColumns":data.aoColumns, 
 					// data: data.data,	// data comes automatically from a data json coming from server
 				});	
+				//https://editor.datatables.net/tutorials/api_manipulation
 				$('button.editor_create').on('click', function (e) {
 				    e.preventDefault();
 				 
 				    editor.create(
-				        'Create new record',
+				        'FrameLink Grid new record',
 				        {
-				            "label": "Add",
+				            "label": "Add new record",
 				            "fn": function () {
 				                editor.submit()
 				            }
@@ -165,7 +177,22 @@ require([
 				            "fn": function () { editor.submit(); }
 				        }
 				    );
-				} );		
+				} );
+				$('#example').on('click', 'a.editor_remove', function (e) {
+				    e.preventDefault();
+				 
+				    editor.message( "Are you sure you want to remove this row?" );
+				    editor.remove(
+				        $(this).parents('tr')[0],
+				        'Delete row', 
+				        {
+				            "label": "Remove",
+				            "fn": function () {
+				                editor.submit()
+				            }
+				        }
+				    );
+				} );			
 		    },
 		    error: function(jqXHR, textStatus, errorThrown) {
 		        console.log("errorThrown:"+errorThrown);

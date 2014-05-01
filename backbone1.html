@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+    <title>Backbone v1.0</title>
+</head>
+<body>
+    <!--<script type="text/javascript" charset="utf-8" src="../rivets/dist/rivets.js" ></script>-->
+   	<script type="text/javascript" src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
+    <!--<script type="text/javascript" charset="utf-8" src="../q-1/q.js" ></script>-->
+   	<script type="text/javascript" src="http://documentcloud.github.com/underscore/underscore-min.js"></script>
+   	<script type="text/javascript" src="http://documentcloud.github.com/backbone/backbone-min.js"></script>
+<script type="text/javascript">
+
+	Person = Backbone.Model.extend({
+		initialize: function(){
+			console.log("Hello world");
+			this.bind("change:name", function() { //any time a change happens to the model, we can automatically update the view
+				console.log("Name changed to " + this.get("name"));
+			});
+			this.on("invalid", function(model,error) { //for the error binding we receive the model itself an the error
+				console.log("Error:"+error);
+			});
+		},
+		defaults:{
+			name:"cavaco",
+			height:"1.90"
+		},
+		validate: function( attributes ) {
+			if ( attributes.name == "xMiguel" ) {
+				return "Attention please...you try to change your name to xMiguel - this is invalid !!!";//if nothing is returned, validate will be true. othewrwise it assumes an error in the validation and the string will be the error message
+			}
+		}
+	});
+	// var person = new Person({name:"joao",height:"1.70"});
+	var person = new Person({height:"1.75"});
+	console.log("a) " + person.get("name")+" - "+person.get("height"));
+	person.set({name:"Miguel"},{validate : true});//if -->person.set({name:"xMiguel"},{validate : true}); error will trigger
+	console.log("b) " + person.get("name")+" - "+person.get("height"));
+	console.log(person.toJSON());
+	console.log(document.title+"......  END..");
+</script>
+<p>Model</p>
+</body>
+</html>

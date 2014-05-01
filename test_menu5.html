@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+    <title>Menu json v5.0</title>
+    <!-- Bootstrap core CSS -->
+    <!--
+    <link href="../smartmenus-master/src/libs/demo-assets/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+	-->
+    <link href="../bootstrap/css/cerulean.css" rel="stylesheet">
+
+    <!-- SmartMenus jQuery Bootstrap Addon CSS -->
+    <link href="../smartmenus-master/src/addons/bootstrap/jquery.smartmenus.bootstrap.css" rel="stylesheet">
+ 
+</head>
+<body style="padding-top:40px;">
+	<p><strong>FrameLink Menus: Bootstrap with smartmenus addon (to subport submenus). CSS is bootstrap bootswatch</strong></p> 
+
+	<div class="container">
+		<div class="navbar navbar-default" role="navigation">
+			<div class="navbar-header">
+				<button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+					<span class="sr-only">Toggle navigation</span>
+					<span class="icon-bar"></span>
+					<span class="icon-bar"></span>
+					<span class="icon-bar"></span>
+				</button>
+				<!--
+				<a class="navbar-brand" href="#">Project name</a>
+				-->
+				<a class="navbar-brand" href="./index.html"><img style="height:55px;" src="../bootstrap/img/framelink-logoWithText.png"></a>
+			</div>
+			<div class="navbar-collapse collapse">
+				<!-- Left nav -->
+				<ul class="nav navbar-nav">
+					<li><a href="#">FrameLink</a></li>
+					<li><a href="#">Item 2</a>
+						<ul class="dropdown-menu">
+							<li><a href="#">Item 2-1</a></li>
+							<li><a href="#">Item 2-2</a>
+								<ul class="dropdown-menu">
+									<li><a href="#">Item 2-2-1</a></li>
+									<li><a href="#">Item 2-2-2</a></li>
+									<li><a href="#">Item 2-2-3</a>
+										<ul class="dropdown-menu">
+											<li><a href="http://microsoft.com">Microsoft</a></li>
+											<li><a href="#">Item 2-2-3-2</a></li>
+										</ul>
+									</li>
+								</ul>
+							</li>
+							<li><a href="#">Item 2-3</a></li>
+						</ul>
+					</li>
+					<li><a href="#">Item 3</a></li>
+				</ul>
+			</div>
+		</div>
+	</div>
+	<p>navBuilder</p> 
+	<!--<div id="menu"></div>-->
+
+<script type="text/javascript">
+oMenu = {
+    "menu" : [
+	    {
+	        "title" : "Menu A - Tier 1",
+	        "uri":"http://www.microsoft.com"
+	    },
+	    {
+	        "title" : "Menu B - Tier 1",
+	        "uri" : "#",
+	        "menu" : [
+	            {
+	                "title" : "Menu B - Tier 2 - I",
+	                "uri":"#1"
+	            },
+	            {
+	                "title" : "Menu B - Tier 2 - II",
+	                "uri":"#"
+	            }
+	        ]
+	    }
+	]    
+};
+// navBuilder.init(oMenu,"menu");	//https://github.com/tomatogrease/navBuilder
+// $(function() {
+//   	$('#main-menu').smartmenus();
+// });
+// $(document).ready(
+//   /* This is the function that will get executed after the DOM is fully loaded */
+//   function () {
+//     /* Next part of code handles hovering effect and submenu appearing */
+//     $('.nav li').hover(//$('.nav li')....  $('#menu2').....
+//       function () { //appearing on hover
+//         $('ul', this).fadeIn();
+//       },
+//       function () { //disappearing on hover
+//         $('ul', this).fadeOut();
+//       }
+//     );
+//   }
+// );
+console.log(document.title+"......  END..");
+</script>
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="https://code.jquery.com/jquery-1.10.2.min.js"></script>
+    <script src="../smartmenus-master/src/libs/demo-assets/bootstrap/js/bootstrap.min.js"></script>
+
+    <!--
+   	<script src="http://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.3.3/underscore-min.js" type="text/javascript"></script>
+  	<script src="http://cdnjs.cloudflare.com/ajax/libs/backbone.js/0.9.2/backbone-min.js" type="text/javascript"></script>
+	-->
+
+    <!-- SmartMenus jQuery plugin -->
+    <script type="text/javascript" src="../smartmenus-master/src/jquery.smartmenus.js"></script>
+    <!-- SmartMenus jQuery Bootstrap Addon -->
+    <script type="text/javascript" src="../smartmenus-master/src/addons/bootstrap/jquery.smartmenus.bootstrap.js"></script>
+</body>
+</html>
