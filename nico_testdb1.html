@@ -33,12 +33,29 @@
 	// Joao : this is your code, only entityGetAll coded for now
     var flD = new flDico();
 
-    flD.entityGetAll(function(e, d){
-    	if (e == null)
-		   	console.log("entityGetAll callbacked got data " +JSON.stringify(d));
+    var dataGetAllCallBack= function(e, Custs){
+    	if (e == null){
+		   	console.log("datagetAll callbacked got data " +JSON.stringify(Custs));
+		    var oneCust = Custs[0];
+		    oneCust.j['01']='updated!';
+		    flD.dataUpdate({entityCN:"00"}, oneCust, function(e, d){
+		    	if (e == null)
+				   	console.log("dataUpdate callbacked got data " +JSON.stringify(d));
+				else
+					console.log("Error during dataUpdate: " + e);
+		    });
+    	}
 		else
-			console.log("Error : " + e);
-    });
+			console.log("Error during dataGetAll : " + e);
+    };
+    flD.dataGetAll( {entityCN:"00"}, dataGetAllCallBack);
+
+    flD.dataInsert( {entityCN:"00"}, {"01":"New customer","02":"new city","03":"123456"}, function (e, insBack){
+    	if (e == null)
+	    	console.log('dataInsert returned ok and : ' + insBack);
+	    else
+	    	console.log(e);
+    })
 </script>
 </head>
 

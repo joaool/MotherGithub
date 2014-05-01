@@ -7,6 +7,7 @@ function route(handle,pathname,response,postData,query){
     // handle[pathname](oResponder,query);
     handle[pathname](response,postData,query);
   }else{
+    console.log('----------------------------------------------------------------------------');
     console.log("JORouter: No request handler found for "+pathname);
     console.log('----------------------------------------------------------------------------');
     response.writeHead(404, { 'Content-Type': 'text/plain' });

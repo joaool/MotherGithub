@@ -71,6 +71,7 @@ function tableEntityGet(response,postData,query){
 	console.log("Handler requested:tableEntityGet with query:"+query);
 	var entityCN = querystring.parse(query)["entityCN"];
 	var getJsonForTableEntityGet = function( json){
+		response.writeHead(200, {"Content-Type": "application/json", 'Access-Control-Allow-Origin' : '*'});//{"Content-Type": "text/javascript"});
 		response.write(JSON.stringify(json));
 		response.end();
 		console.log('-----------------------------tableEntityGet------------------------------------------');
@@ -82,6 +83,7 @@ function entityGet(response,postData,query){
 	console.log("Handler requested:entityGet with query:"+query);
 	var entityCN = querystring.parse(query)["entityCN"];
 	var getJsonForEntityGet = function( json){
+		response.writeHead(200, {"Content-Type": "application/json", 'Access-Control-Allow-Origin' : '*'});//{"Content-Type": "text/javascript"});
 		response.write(JSON.stringify(json));
 		response.end();
 		console.log('-----------------------------entityGet------------------------------------------');
@@ -96,6 +98,7 @@ function entityAdd(response,postData,query){
 	param["names"]= querystring.parse(query)["names"];
 	param["desc"]= querystring.parse(query)["desc"];
 	var getJsonForEntityAdd = function( json){
+		response.writeHead(200, {"Content-Type": "application/json", 'Access-Control-Allow-Origin' : '*'});//{"Content-Type": "text/javascript"});
 		response.write(JSON.stringify(json));
 		response.end();
 		console.log('-----------------------------entityAdd------------------------------------------');
@@ -107,6 +110,7 @@ function fieldGet(response,postData,query){
 	console.log("Handler requested:fieldGet with query:"+query);
 	var fieldCN = querystring.parse(query)["fieldCN"];
 	var getJsonForFieldGet = function( json){
+		response.writeHead(200, {"Content-Type": "application/json", 'Access-Control-Allow-Origin' : '*'});//{"Content-Type": "text/javascript"});
 		response.write(JSON.stringify(json));
 		response.end();
 		console.log('-----------------------------fieldGet------------------------------------------');
@@ -124,6 +128,7 @@ function fieldAdd(response,postData,query){
 	console.log("fieldAdd: entityCN: "+ param["entityCN"] +", name: " + param["name"] + ", desc: "+ param["desc"] + ", textUI: " + param["textUI"]);
 
 	var getJsonForFieldAdd = function( json){
+		response.writeHead(200, {"Content-Type": "application/json", 'Access-Control-Allow-Origin' : '*'});//{"Content-Type": "text/javascript"});
 		response.write(JSON.stringify(json));
 		response.end();
 		console.log('-----------------------------fieldAdd------------------------------------------');
@@ -134,6 +139,7 @@ function fieldGetAll(response,postData,query){
 	console.log("Handler requested:fieldGetAll with query:"+query);
 	var entityCN = querystring.parse(query)["entityCN"];
 	var getJsonForFieldGetAll = function( json){
+		response.writeHead(200, {"Content-Type": "application/json", 'Access-Control-Allow-Origin' : '*'});//{"Content-Type": "text/javascript"});
 		response.write(JSON.stringify(json));
 		response.end();
 		console.log('-----------------------------fieldGetAll---------------------------------------');
@@ -147,6 +153,7 @@ function fieldGetByName(response,postData,query){
 	param["fieldName"]= querystring.parse(query)["fieldName"];
 	var entityCN = querystring.parse(query)["entityCN"];
 	var getJsonForfieldGetByName = function( json){
+		response.writeHead(200, {"Content-Type": "application/json", 'Access-Control-Allow-Origin' : '*'});//{"Content-Type": "text/javascript"});
 		response.write(JSON.stringify(json));
 		response.end();
 		console.log('-----------------------------fieldGetByName------------------------------------');
@@ -157,6 +164,7 @@ function fieldGetAllByName(response,postData,query){
 	console.log("Handler requested:fieldGetAllByName with query:"+query);
 	var fieldName= querystring.parse(query)["fieldName"];
 	var getJsonForfieldGetAllByName = function( json){
+		response.writeHead(200, {"Content-Type": "application/json", 'Access-Control-Allow-Origin' : '*'});//{"Content-Type": "text/javascript"});
 		response.write(JSON.stringify(json));
 		response.end();
 		console.log('-----------------------------fieldGetAllByName------------------------------------');
@@ -168,6 +176,7 @@ function nameGet(response,postData,query){
 	console.log("Handler requested:nameGet with query:"+query);
 	var CN = querystring.parse(query)["CN"];
 	var getJsonForNameGet = function( json){
+		response.writeHead(200, {"Content-Type": "application/json", 'Access-Control-Allow-Origin' : '*'});//{"Content-Type": "text/javascript"});
 		response.write(JSON.stringify(json));
 		response.end();
 		console.log('-----------------------------nameGet------------------------------------------');
@@ -178,6 +187,7 @@ function CNGet(response,postData,query){
 	console.log("Handler requested:CNGet with query:"+query);
 	var name = querystring.parse(query)["name"];
 	var getJsonForCNGet = function( json){
+		response.writeHead(200, {"Content-Type": "application/json", 'Access-Control-Allow-Origin' : '*'});//{"Content-Type": "text/javascript"});
 		response.write(JSON.stringify(json));
 		response.end();
 		console.log('-----------------------------CNGet------------------------------------------');
@@ -192,6 +202,7 @@ function dataGet(response,postData,query){
 	jParam.entityCN = querystring.parse(query)["entityCN"];
 	jParam.id = querystring.parse(query)["id"];
 	var getJsonForDataGet = function( json){
+		response.writeHead(200, {"Content-Type": "application/json", 'Access-Control-Allow-Origin' : '*'});//{"Content-Type": "text/javascript"});
 		response.write(JSON.stringify(json));
 		response.end();
 		console.log('-----------------------------dataGet------------------------------------------');
@@ -200,33 +211,57 @@ function dataGet(response,postData,query){
 }
 // data series
 function dataInsert(response,postData,query){
-	console.log("Handler requested:dataInsert with query:"+query);
-	var jParam={};
-	jParam.entityCN = querystring.parse(query)["entityCN"];
-	jParam.j = querystring.parse(query)["j"];
-	jParam.r = querystring.parse(query)["r"];
-	
+	console.log("Handler requested:dataInsert");
+ 	var superJ=JSON.parse(postData);
 	var getJsonForDataInsert = function( json){
+		response.writeHead(200, {"Content-Type": "application/json", 'Access-Control-Allow-Origin' : '*'});//{"Content-Type": "text/javascript"});
 		response.write(JSON.stringify(json));
 		response.end();
 		console.log('-----------------------------dataInsert----------------------------------------');
 	};
-	dataLayer.dlDataInsert(jParam, getJsonForDataInsert); // 
+	dataLayer.dlDataInsert(superJ, getJsonForDataInsert); // 
 }
 // data series
+/*
+$.ajax({
+    type: "post",
+    url: "http://localhost:8888/ajaxRequest", 
+    dataType: "json",
+    contentType: "application/json; charset=UTF-8",
+    data:  JSON.stringify({name: "Manish", address: {city: "BBSR", country: "IN"}})
+}).done(function ( data ) {
+    console.log("ajax callback response:" + data);
+});
+This way, your request body will reach the server with the stringified JSON, so you'll be able to do the following:
+
+request.on('end', function() {
+    store = JSON.parse(store);
+    console.log(store); // ta-daaa, Object!
+    response.end(store);
+});
+*/
 function dataUpdate(response,postData,query){
-	console.log("Handler requested:dataUpdate with query:"+query);
-	var jParam={};
-	jParam.entityCN = querystring.parse(query)["entityCN"];
-	jParam.j = querystring.parse(query)["j"];
-	jParam.r = querystring.parse(query)["r"];
-	
+	console.log("Handler requested:dataUpdate");
+ 	var superJ=JSON.parse(postData);
 	var getJsonForDataUpdate = function( json){
+		response.writeHead(200, {"Content-Type": "application/json", 'Access-Control-Allow-Origin' : '*'});//{"Content-Type": "text/javascript"});
 		response.write(JSON.stringify(json));
 		response.end();
 		console.log('-----------------------------dataUpdate----------------------------------------');
 	};
-	dataLayer.dlDataUpdate(jParam, getJsonForDataInsert); // 
+	dataLayer.dlDataUpdate(superJ, getJsonForDataUpdate); // 
+}
+function dataGetAll(response,postData,query){
+	console.log("Handler requested:dataGet");
+	var superJ=JSON.parse(postData);
+	console.log("       dataGetAll, superJ: "+ JSON.stringify(superJ));
+	var getJsonForDataGetAll = function( json){
+		response.writeHead(200, {"Content-Type": "application/json", 'Access-Control-Allow-Origin' : '*'});//{"Content-Type": "text/javascript"});
+		response.write(JSON.stringify(json));
+		response.end();
+		console.log('-----------------------------dataGetAll---------------------------------------');
+	};
+	dataLayer.dlDataGetAll(superJ, getJsonForDataGetAll); // 
 }
 
 function tableDataGet(response,postData,query){
@@ -235,6 +270,7 @@ function tableDataGet(response,postData,query){
 	jParam.entityCN = querystring.parse(query)["entityCN"];
 	jParam.id = querystring.parse(query)["id"];
 	var getJsonForTableDataGet = function( json){
+		response.writeHead(200, {"Content-Type": "application/json", 'Access-Control-Allow-Origin' : '*'});//{"Content-Type": "text/javascript"});
 		response.write(JSON.stringify(json));
 		response.end();
 		console.log('-----------------------------tableDataGet--------------------------------------');
@@ -243,27 +279,15 @@ function tableDataGet(response,postData,query){
 }
 function tableDataGetAll(response,postData,query){
 	console.log("Handler requested:tableDataGetAll with query:"+query);
-	var jParam={};
-	jParam.entityCN = querystring.parse(query)["entityCN"];
-	jParam.where = querystring.parse(query)["where"];
+	var jParam=JSON.parse(postData);
 	var getJsonForTableDataGetAll = function( json){
+		response.header("Access-Control-Allow-Origin", "*");
+    	response.header("Access-Control-Allow-Headers", "X-Requested-With");
 		response.write(JSON.stringify(json));
 		response.end();
 		console.log('-----------------------------tableDataGetAll----------------------------------');
 	};
 	dataLayer.dlTableDataGetAll(jParam, getJsonForTableDataGetAll); // 
-}
-function dataGetAll(response,postData,query){
-	console.log("Handler requested:dataGet with query:"+query);
-	var jParam={};
-	jParam.entityCN = querystring.parse(query)["entityCN"];
-	jParam.where = querystring.parse(query)["where"];
-	var getJsonForDataGetAll = function( json){
-		response.write(JSON.stringify(json));
-		response.end();
-		console.log('-----------------------------dataGetAll---------------------------------------');
-	};
-	dataLayer.dlDataGetAll(jParam, getJsonForDataGetAll); // 
 }
 function dtTable(response,postData,query){
 	console.log("Handler requested:dtTable with query:"+query);

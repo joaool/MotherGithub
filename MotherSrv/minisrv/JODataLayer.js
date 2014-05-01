@@ -331,7 +331,7 @@ function dlTableDataGet(params, callBack){
 		collection.findOne( {_id: id}, {}, function(e, docs){
 			console.log('Mongo access done for :dlTableDataGet : ' + JSON.stringify(docs));
 			if (docs != null){
-				callBack(docs.j);
+				callBack(docs);
 			} else{
 				callBack({});
 			}
@@ -343,39 +343,45 @@ function dlTableDataGet(params, callBack){
 		callBack({});
 	}
 }
-function dlTableDataGetAll(params, callBack){
-	var entityCN=params.entityCN;
-	var where = params.where;
-	console.log("Data Layer dlTableDataGetAll will be called for entityCN="+entityCN);
-	if (where != null && where != "")
-		console.log("      with where = <" + where + ">");
-	else
-		where = {};
+function dlDataGetAll(superJ, callBack){
+	var entityCN=superJ[0].entityCN;
+	var where = superJ[1];
+	var fields=superJ[2];
+	console.log("Data Layer dlDataGetAll has been called for entityCN="+entityCN);
+	if (where != null)
+		console.log("          , where=" + JSON.stringify(where));
+	if (fields!=null)
+		console.log("          , fields:" + JSON.stringify(fields));
 	try {
 		var collecName = 'Master_' + entityCN;
 		var collection = db.get(collecName);
-		collection.find(where,{},function(e,docs){
-			console.log('Mongo access done for :dlTableDataGetAll : ' + JSON.stringify(docs));
+		collection.find(where,fields,function(e,docs){
+			console.log('Mongo returns from :dlDataGetAll e: ' + e);
+			var jj={};
+			jj.ctrl=formatResponseCtrl(0, e);
+
 			var j=[];
 			for(var it in docs){
-				j.push(docs[it].j);
+				j.push(docs[it]);
 			}
-			callBack(j);
+			jj['j'] = j;
+			callBack(jj);
 		});
 	}
 	catch(err)
 	{
-		console.log("*** !!! Erreur dans dlTableDataGetAll : " + err + " !!! ***");
-		callBack({});
+		console.log("*** !!! dlDataGetAll internal error: " + err + " !!! ***");
+		callBack(formatResponseCtrl(0, 'dlDataGetAll internal error: '+err));
 	}
 }
+/*
 function dlDataGetAll(params, callBack){
 	console.log("Data Layer dlDataGetAll will be called");
 	dlTableDataGetAll(params, function(j){
 		callBack(formatResponseOK( j) );
 	});
 }
-
+*/
 function dlDataInsert(params, callBack){
 	var entityCN=params.entityCN;
 	var j = {};
@@ -386,7 +392,7 @@ function dlDataInsert(params, callBack){
 			j = JSON.parse(params.j);
 		if (params.r != null)
 			r = JSON.parse(params.r);
-		console.log("dlDataUpdate called for entityCN=" + entityCN + ", j =" + JSON.stringify(j) + ", r = " + JSON.stringify(r) );
+		console.log("dlDataInsert called for entityCN=" + entityCN + ", j =" + JSON.stringify(j) + ", r = " + JSON.stringify(r) );
 		var collecName = 'Master_' + entityCN;
 		var collection = db.get(collecName);
 		var ins = {};
@@ -406,38 +412,31 @@ function dlDataInsert(params, callBack){
 	}
 }
 // params : entityCN,  j, r   j[_id] must be given
-function dlDataUpdate(params, callBack){
-	var entityCN=params.entityCN;
-	var id={};
-	var j = {};
-	var r = {};
+function dlDataUpdate(superJ, callBack){
+	var entityCN=superJ[0].entityCN;
+	var j = superJ[1];
+	var id=j['_id'];
 	try {
-		if (params.j != null)
-			var j = JSON.parse(params.j);
-		if (params.r != null)
-			r = JSON.parse(params.r);
-		if (j["_id"] != null)
-			id=j["_id"];
-		else
-			throw("dlDataUpdate : No _id found in json");
-
-		console.log("dlDataUpdate called for entityCN="+entityCN+", _id= " + id + ", j =" + JSON.stringify(j) + ", r = " + JSON.stringify(r) );
+		console.log("dlDataUpdate called for entityCN="+entityCN+", _id= " + id);
 		
 		var collecName = 'Master_' + entityCN;
 		var collection = db.get(collecName);
 		var upd = {};
 		upd['j']=j;
-		upd['r']=r;
 		upd['_id']=id;
-		collection.update({_id:id}, upd, function(e, docs){
-			console.log('Mongo access done for :dlTableDataUpdate : ' + JSON.stringify(docs));
-			callBack(e, docs);
+		collection.update({'_id':id}, upd, function(e, docs){
+			console.log('Mongo access done for :dlDataUpdate, e=' + e);
+			var jj={};
+			jj.ctrl= formatResponseCtrl(0, e);
+			jj.j={};
+			// for now we have nothing returned, later we'll add number of documents updated
+			callBack(jj);
 		});
 	}
 	catch(err)
 	{
 		console.log("*** !!! Erreur dans dlTabledataUpdate : " + err + " !!! ***");
-		callBack("dlDataUpdate: " + err, {});
+		callBack(formatResponseCtrl(0, "dlDataUpdate: " + err));
 	}
 }
 function dlDummyTableHeader(entityCN,callBack){
@@ -818,7 +817,22 @@ function formatResponseError(errNo, errMsg){
 
     return rtn;    
 }
+function formatResponseCtrl(errNo, errMsg){
+	var ctrl={};
+    ctrl.j = {};
+    ctrl.r = {};
 
+    if (errMsg == null){
+		ctrl = {isOk:true};
+    }
+    else {
+	    if (errNo == null || errNo==0)
+			ctrl = {isOk:false, errNo:9999, errMsg: errMsg};
+		else
+		    ctrl.ctrl = {isOk:false, errNo: errNo, errMsg:errMsg};
+    }
+    return ctrl;
+}
 
 // API Exports
 exports.dlEntityGet = dlEntityGet;
@@ -843,7 +857,7 @@ exports.dlNameGet = dlNameGet;
 exports.dlTableEntityGet = dlTableEntityGet;
 exports.dlTableEntityGetAll = dlTableEntityGetAll;
 exports.dlTableDataGet = dlTableDataGet;
-exports.dlTableDataGetAll = dlTableDataGetAll;
+//exports.dlTableDataGetAll = dlTableDataGetAll;
 // dummy
 exports.dlDummyTableHeader = dlDummyTableHeader;
 exports.dlDummyTableData = dlDummyTableData;
