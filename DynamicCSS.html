@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Dynamic CSS v1.0</title>
+    <script src="http://code.jquery.com/jquery-2.0.3.min.js"></script> 
+    <script src="../smartmenus-master/src/libs/demo-assets/bootstrap/js/bootstrap.min.js"></script>
+
+    <!-- Bootstrap core CSS -->
+    <!--
+    <link href="../smartmenus-master/src/libs/demo-assets/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="../bootstrap/css/cerulean.css" rel="stylesheet">
+   	<link href="../bootstrap/css/cosmos.css" rel="stylesheet">
+   	<link href="../bootstrap/css/readable.css" rel="stylesheet">
+   	<link href="../bootstrap/css/spacelab.css" rel="stylesheet">
+   	<link href="../bootstrap/css/amelia.css" rel="stylesheet">
+    <link href="../bootstrap/css/redish.css" rel="stylesheet">
+    <link href="../bootstrap/css/red.css" rel="stylesheet">
+	-->
+    <link href="../bootstrap/css/cerulean.css" rel="stylesheet">
+
+    <!--                          bootstrap-dialog                                -->
+    <link href="FL_ui/css/bootstrap-dialog.css" rel="stylesheet" type="text/css" />
+    <script src="FL_ui/js/bootstrap-dialog.js"></script>  
+
+   	<!--                          X-editable                                -->
+	<link href="../x-editable-master/dist/bootstrap3-editable/css/bootstrap-editable.css" rel="stylesheet">
+	<script src="../x-editable-master/dist/bootstrap3-editable/js/bootstrap-editable.js"></script>  	
+
+	<script src="FL_ui/js/testDynamicCSS.js"></script>
+
+</head>
+<body>
+    <script>
+		console.log("-----------------Dynamic CSS ----------------------------------")
+		// BootstrapDialog.alert("FrameLink"); //http://nakupanda.github.io/bootstrap3-dialog/
+
+		// BootstrapDialog.confirm('Do you want to test Dynamic CSS ?', function(result){
+		// 	if(result) {
+		// 		alert('Yup.');
+		// 	}else {
+		// 		alert('Nope.But...we will continue...anyway');
+		// 	}
+		// },{title:"WARNING",button1:"No, I gave up...",button2:"please please I want !",type:"type-success",cssButton2:"btn-success"});
+
+	console.log(document.title+"......  END..");		
+    </script>
+ 	<!-- <h3 class="red">This red color is from dynamically loaded css file</h3> -->
+ 	<input type="button" value="Change CSS" onclick="changeCSS();"><br>
+ 	<a href="#" id="_css">Select Style</a>
+
+ 	<p class="navbar-default">This color is from dynamically loaded css file</p>
+</body>
+</html>

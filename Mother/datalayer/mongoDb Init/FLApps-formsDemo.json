@@ -6,47 +6,66 @@ var js = {_id:"custBrowse", "02":"00", "03":[
 	{"cn":"01", "t":"Name of Customer", "f":"format to be written later"},
 	{"cn":"02", "t":"Where I live", "f":"format to be written later"},
 	{"cn":"03", "t":"How to reach me", "f":"format to be written later"}
-		],
-	"04":[
-		{
-		     "menu" : [
-		      {
-		          "title" : "Menu A - Tier 1",
-		          "uri":"http://www.microsoft.com"
-		      },
-		      {
-		          "title" : "Menu B - Tier 1",
-		          "uri" : "#",
-		          "menu" : [
-		              {
-		                  "title" : "Menu B - Tier 2 - I",
-		                  "uri":"#1"
-		              },
-		              {
-		                  "title" : "Menu B - Tier 2 - II",
-		                  "uri":"#"
-		              }
-		          ]
-		      },
-		      {
-		          "title" : "Menu C - Tier 1",
-		          "uri":"#3",
-		      },
-		      {
-		          "title" : "Menu D - Tier 1",
-		          "uri":"#3",
-		          "menu":"hjhj"
-		      }           
-		  ]    
-		 },
-		 {
-		 	"menu2":[]
-		 }
-	],
-	"05":[
-		{"n":"regle1", "job":"regle a faire"},
-		{"n":"regle2", "hob":"autre job a faire"}
-	]
-
+		]
 };
 flD.insert("1", js);
+var js = {_id:"mainMenu", 
+		"menus":[
+			{
+				"title" : "Menu A - Tier 1",
+				"uri":"http://www.microsoft.com"
+			},
+			{
+				"title" : "Menu B - Tier 1",
+				"uri" : "#",
+				"menu" : [
+					{
+						"title" : "Menu B - Tier 2 - I",
+						"uri":"#1"
+					},
+		    		{
+						"title" : "Menu B - Tier 2 - II",
+						"uri":"#"
+					}
+				]
+			},
+			{
+				"title" : "Menu C - Tier 1",
+				"uri":"#3",
+			},
+			{
+				"title" : "Menu D - Tier 1",
+				"uri":"#3",
+				"menu" : [
+					{
+						"title" : "Menu D - Tier 2 - I",
+						"uri":"#1"
+					},
+					{
+						"title" : "Menu D - Tier 2 - II",
+		 				"uri":"#"
+					}
+				]
+			}           
+		]    
+	};
+flD.insert("2", js);
+var js = {_id:"form1", "baseTable":"00", "widgets":[//check MotherContainer2_1.docx
+	{"fieldCN":"01", "t":"Name of Customer", "f":"text",//events: preCode, posCode
+		"preCode":function(x){console.log("current value="+x)},
+		"posCode":function(x){console.log("Leaving with "+x)}
+	}
+	{"fieldCN":"02", "t":"Where I live", "f":"combo",//events: preCode, posCode, changeCode
+		"preCode":function(x){console.log("current value="+x)},
+		"posCode":function(x){console.log("Leaving with "+x)},
+		"changeCode":function(x){console.log("Changing to "+x)}
+	},
+	{"fieldCN":"03", "t":"How to reach me", "f":"textArea",
+		"preCode":function(x){console.log("current value="+x)},
+		"posCode":function(x){console.log("Leaving with "+x)},
+	},
+	{"fieldCN":null, "t":"Click Here !", "f":"button",
+		"clickCode":function(){alert("Button Clicked")}
+	}	
+};
+flD.insert("3", js);

@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>X-editable v1.0</title>
+ 	<link href="//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css" rel="stylesheet">
+	<script src="http://code.jquery.com/jquery-2.0.3.min.js"></script> 
+	<script src="//netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.min.js"></script> 
+	<link href="../x-editable-master/dist/bootstrap3-editable/css/bootstrap-editable.css" rel="stylesheet">
+	<script src="../x-editable-master/dist/bootstrap3-editable/js/bootstrap-editable.js"></script>  	
+	<!--
+	-->
+</head>
+<body>
+	<div>
+		<!--
+        <span>Username:</span>
+		-->
+        <a href="#" id="username" data-type="text" data-placement="right" data-title="Enter username">User Name</a>
+        <input type="text" name="fusername"><br>
+    </div>
+      
+    <div>
+		<!--
+		<span>Status:</span>
+		-->
+		<a href="#" id="status"></a>
+        <input type="text" name="fstatus"><br>
+	</div>
+	<a href="#" id="email" data-type="text" data-pk="2" data-url="/post" data-title="Enter Email">joaool@framelink.co</a><br>	
+	<a href="#" id="service" data-type="select" data-pk="3" data-url="/post" data-title="Service type">Premium</a><br>	
+	<a href="#" id="description" data-type="textarea" data-pk="4" data-url="/post" data-title="Description">Descr:</a><br>	
+    <script>
+    	$.fn.editable.defaults.mode = 'inline';
+    	$(document).ready(function() {
+		    $('#username').editable();
+		    $('#status').editable({
+		        type: 'select',
+		        title: 'Select status',
+		        placement: 'right',
+		        value: 2,
+		        source: [
+		            {value: 1, text: 'status 1'},
+		            {value: 2, text: 'status 2'},
+		            {value: 3, text: 'status 3'}
+		        ]
+		        /*
+		        //uncomment these lines to send data on server
+		        ,pk: 1
+		        ,url: '/post'
+		        */
+		    });
+		});
+		console.log(document.title+"......  END..");		
+    </script>
+</body>
+</html>

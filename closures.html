@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Closures  v1.0</title>
+    <script src="http://code.jquery.com/jquery-2.0.3.min.js"></script> 
+ </head>
+<body>
+  <script>
+    function whichLocal(city) {
+      var cityPrefix = "In the city of ";
+      return function(area) {
+        var areaPrefix = " there is an area called ";
+        console.log ("this --->"+this+"<");
+        return cityPrefix + city + areaPrefix + area;
+      }
+    };
+    var local = whichLocal("Lisboa")("Alfama");
+    alert("whichLocal('Lisboa')('Alfama') --->"+local);
+
+    var placeInLisbon = whichLocal("Lisbon");
+    alert("Retention of local variables or arguments to a function ex: placeInLisbon('Alfama') = "+placeInLisbon("Alfama")+" -------------- placeInLisbon('Bairro Alto') = "+placeInLisbon("Bairro Alto"));
+    var placeInSintra = whichLocal("Sintra");
+    // local= place2("Portela");
+    alert("placeInSintra('Portela') = "+placeInSintra("Portela")+" -------------- placeInSintra('S.Pedro') = "+placeInSintra("S.Pedro"));
+
+    // Now we want to add the possibility to change city prefix - by shadowing
+    function whichGreatLocal(city) {
+      var cityPrefix = "In the city of ";
+      return function(area, cityPrefix) { //<-------------- we add a second parameter with the same name as a captured var
+        var areaPrefix = " there is an area called ";
+        console.log ("this --->"+this+"<");
+        return cityPrefix + city + areaPrefix + area;
+      }
+    };    
+    var placeInLisbon = whichGreatLocal("Lisbon");
+    alert("Shadowing: whichGreatLocal('Alfama','Huge: ') = "+placeInLisbon("Alfama","Huge ")+" -------------- placeInLisbon('Bairro Alto','Great ') = "+placeInLisbon("Bairro Alto","Great "));
+
+   // Now the save as previous but we are shadowing the argument
+    function whichGreatLocal2(city) {
+      var cityPrefix = "In the city of ";
+      return function(area, city) { //<-------------- we add a second parameter with the same name as a captured argument
+        var areaPrefix = " there is an area called ";
+        console.log ("this --->"+this+"<");
+        return cityPrefix + city + areaPrefix + area;
+      }
+    };    
+    var placeInLisbon = whichGreatLocal2("Lisbon");
+    alert("Shadowing2: whichGreatLocal2('Alfama','Huge: ') = "+placeInLisbon("Alfama","Huge ")+" -------------- placeInLisbon('Bairro Alto','Great ') = "+placeInLisbon("Bairro Alto","Great "));
+
+
+
+    // ------------ abstraction using closures -
+    function plucker(FIELD) {
+      return function(obj) {
+        return obj && obj[FIELD];
+      };
+    };
+    var getTitle = plucker("title");
+    alert("getTitle({name:'Nico',title:'engineer'}) --->"+getTitle({name:'Nico',title:'engineer'}));
+    alert("getTitle({name:'Nico',xtitle:'engineer'}) --->"+getTitle({name:'Nico',xtitle:'engineer'}));
+    alert("getTitle(27) --->"+getTitle(27));
+
+    console.log(document.title+"......  END..");		
+  </script>
+</body>
+</html>

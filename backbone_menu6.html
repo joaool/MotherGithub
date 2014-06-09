@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Backbone/menu v6.0</title>
+    <!-- Bootstrap core CSS -->
+    <!--
+    <link href="../smartmenus-master/src/libs/demo-assets/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+   	<link href="../bootstrap/css/cosmos.css" rel="stylesheet">
+   	<link href="../bootstrap/css/readable.css" rel="stylesheet">
+   	<link href="../bootstrap/css/spacelab.css" rel="stylesheet">
+   	<link href="../bootstrap/css/amelia.css" rel="stylesheet">
+	-->
+    <link href="../bootstrap/css/cerulean.css" rel="stylesheet">
+
+    <!-- SmartMenus jQuery Bootstrap Addon CSS -->
+    <!--
+    <script src="http://code.jquery.com/jquery-2.0.3.min.js"></script> 
+ 	-->
+    <link href="../smartmenus-master/src/addons/bootstrap/jquery.smartmenus.bootstrap.css" rel="stylesheet">
+    <!--
+	-->  	
+    <link href="../x-editable-master/dist/bootstrap3-editable/css/bootstrap-editable.css" rel="stylesheet">
+
+
+</head>
+<body style="padding-top:40px;">
+
+	<p><strong>FrameLink Menus: Bootstrap with smartmenus addon, Backbone and bootstrap context Menu. Menus 100% json. CSS is bootstrap bootswatch</strong></p> 
+	<div id="list-template">
+		<li><a href=""></a></li>
+	</div>
+	<div id="submenu-template">
+		<li><a href=""></a>
+			<ul class="dropdown-menu">
+				<li><a href="#">Item 2-2-1</a></li>
+			</ul>
+		</li>
+	</div>	
+	<ul id="contextMenu" class="dropdown-menu" role="menu" style="display:none" >
+		<!--
+	    <li><a tabindex="-1" href="#">Rename</a></li>
+	    <li><a tabindex="-1" href="#">Another action</a></li>
+	    <li><a tabindex="-1" href="#">Something else here</a></li>
+	    <li class="divider"></li>
+	    <li><a tabindex="-1" href="#">Separated link</a></li>
+		-->
+	</ul>	
+	<div>
+	    <a href="#" id="username" data-type="text" data-placement="right" data-title="Enter username">User Name</a>
+	</div>    
+
+	<div class="container">
+		<div class="navbar navbar-default" role="navigation">
+			<div class="navbar-header">
+				<button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+					<span class="sr-only">Toggle navigation</span>
+					<span class="icon-bar"></span>
+					<span class="icon-bar"></span>
+					<span class="icon-bar"></span>
+				</button>
+				<a class="navbar-brand" href="./index.html"><img id="brand" style="height:55px;" src="../bootstrap/img/framelink-logoWithText.png"></a>
+			</div>
+			<div class="navbar-collapse collapse">
+				<ul id="begin_menu" class="nav navbar-nav">
+				</ul>
+			</div>
+		</div>
+	</div>
+
+    <!--
+    <script type="text/javascript" charset="utf-8" src="../rivets/dist/rivets.js" ></script>
+	-->
+    <script src="https://code.jquery.com/jquery-1.10.2.min.js"></script>
+    <script src="../smartmenus-master/src/libs/demo-assets/bootstrap/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="../smartmenus-master/src/jquery.smartmenus.js"></script>
+    <script type="text/javascript" src="../smartmenus-master/src/addons/bootstrap/jquery.smartmenus.bootstrap.js"></script>
+   	<script src="http://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.3.3/underscore-min.js" type="text/javascript"></script>
+  	<script src="http://cdnjs.cloudflare.com/ajax/libs/backbone.js/0.9.2/backbone-min.js" type="text/javascript"></script>
+	<script src="../x-editable-master/dist/bootstrap3-editable/js/bootstrap-editable.js"></script>
+
+<script type="text/javascript">
+	var oMenu = {
+	    "menu" : [
+		    {
+		        "title" : "FrameLink",
+		        "uri":"http://framelink.co"
+		    },
+		    {
+		        "title" : "Main2",
+		        "uri" : "#",
+		        "menu" : [
+		            {
+		                "title" : "Item21 ",
+		                "uri":"#",
+		            },
+		            {
+		                "title" : "Item22",
+		                "uri":"#",
+		                "menu" : [
+				            {
+				                "title" : "Item221 ",
+				                "uri":"#"
+				            }
+		                ]
+		            }
+		        ]
+		    },
+		    {
+		        "title" : "Main3",
+		        "uri":"#3",
+		    }
+		]    
+	};
+	setMenuId = function(menuArray,initialOrder){//recursively injects id order and top (true/false) into the nested menu array
+		var idOrder = initialOrder;
+		var topSet = (initialOrder == 0) ? true:false;
+		for(var i=0;i<menuArray.length;i++){
+			menuArray[i]["id"] = idOrder;
+			menuArray[i]["top"] = topSet;
+			idOrder++;
+			if( menuArray[i]["menu"] ) {
+				idOrder = setMenuId(menuArray[i]["menu"],idOrder);
+			}
+		}
+		return idOrder;//return lastOrder+1
+	}
+	insertMenuBeforeId = function(menuArray,beforeId){//inserts a menu position before id=beforeId
+		var matchFound = false;
+		for(var i=0;i<menuArray.length;i++){
+			if( menuArray[i]["id"] == beforeId ) {
+				menuArray.splice(i,0,{ "title":"New","uri":"#" });
+				break;
+			}
+			if( menuArray[i]["menu"] ) {
+				matchFound = insertMenuBeforeId(menuArray[i]["menu"],insertMenuBeforeId);
+				if( matchFound )
+					break;
+			}
+		}
+		return matchFound;
+	}	
+	replaceTitleForMenuId = function(menuArray,updatedTitle,id){//finds id and replace title for updatedTitle
+		var matchFound = false;
+		for(var i=0;i<menuArray.length;i++){
+			if( menuArray[i]["id"] == id ) {
+				menuArray[i]["title"] = updatedTitle;
+				break;
+			}
+			if( menuArray[i]["menu"] ) {
+				matchFound = replaceTitleForMenuId(menuArray[i]["menu"],updatedTitle,id);
+				if( matchFound )
+					break;
+			}
+		}
+		return matchFound;
+	}
+	getTopForMenuId = function(menuArray,id){//returns top flag for id
+		var matchFound = false;
+		var top = null;
+		for(var i=0;i<menuArray.length;i++){
+			if( menuArray[i]["id"] == id ) {
+				matchFound = true;
+				break;
+			}
+		}
+		top = (matchFound) ? true:false; 
+		return top;
+	}
+	menuRefresh = function(menuArray,initialOrder){//sets dom with menuArray definition
+		var $menu = $("#begin_menu");
+		$menu.empty();//removes the child elements of the selected element(s).
+		var currentOrder = 0;
+		var oMenuHTML = null;
+		for (var i=0;i<menuArray.length;i++){//scans top menus
+			oMenuHTML = menuHTML( menuArray[i],currentOrder );//{order:order,html:htmlStr}; scans nested menus in current top menu
+			currentOrder = oMenuHTML.order;//currentOrder becomes next order to use
+			$menu.append( $( oMenuHTML.html) );//with $(htmlStr) we convert htmlStr to a JQuery object
+		}
+	}	
+	menuHTML = function(menuItem,order){//returns HTML string for bootstrap menu with id=order (NOP for the time being)
+		// now we clone the template, and manipulate it finding element "a" and changing attribute "href" to the uri and change the text in the element to title - after that we do an end in order to get back to the li element 
+		// var htmlStr = "<li><a id="+ menuItem.title +" href=" + menuItem.uri + ">" + menuItem.title + "</a></li>";
+		var htmlStr = "<li><a id="+ menuItem.id +" href=" + menuItem.uri + ">" + menuItem.title + "</a></li>";
+		if(menuItem.menu){
+			var htmlStr =  "<li><a id="+ menuItem.id +" href=" + menuItem.uri + ">" + menuItem.title + "</a>";
+				order++;
+				htmlStr +=    "<ul class='dropdown-menu'>";
+				var subMenuItem = menuItem.menu;
+				for (var i=0;i<subMenuItem.length;i++){
+					oMenuHTML = menuHTML( subMenuItem[i],order );//returns {order:order,html:htmlStr};
+					htmlStr += oMenuHTML.html;
+					order = oMenuHTML.order;
+				}
+				htmlStr +=    "</ul>";
+				htmlStr += "</li>";
+		}else{
+			order++;
+		}
+		return {order:order,html:htmlStr};
+	};
+	// ------ tests ----------------
+	// var x = setMenuId(oMenu.menu,0);
+	// z = 32;
+	// replaceTitleForMenuId(oMenu.menu,"Joao",3);
+	// replaceTitleForMenuId(oMenu.menu,"Nico",4);
+	// z = 32;
+	setMenuId(oMenu.menu,0);//injects ids in oMenu.menu
+	// menuRefresh(oMenu.menu,0);
+	Menu = Backbone.Model.extend({
+		initialize: function(){
+			console.log("Initializing menu");
+		},
+		defaults:{
+			title:null,
+			uri:null,
+			id:null,
+			menu:null
+		}
+	});
+	var Menus = Backbone.Collection.extend({
+		model:Menu
+	});
+	var menus = new Menus;//menus is a collection of Menu models
+	for(var i=0;i<oMenu.menu.length;i++){//for each oMenu[i] we build a Menu Model and add it to the collection
+		var menuModel = new Menu({title:oMenu.menu[i].title, uri:oMenu.menu[i].uri,id:oMenu.menu[i].id,menu:oMenu.menu[i].menu});
+		menus.add(menuModel);
+	}
+
+	var MenuView = Backbone.View.extend({
+		initialize: function(){
+			console.log("Initializing menu view "+this.el);
+			this.render();
+		},
+		el: "#begin_menu",
+		render: function(){
+			var data = menus.toJSON();
+			var currentOrder = 0;
+			var oMenuHTML = null;
+			// console.log("Total to Render ====>"+JSON.stringify(data));
+			for (var i=0;i<data.length;i++){//scans top menus
+				console.log("Render menu ====>"+data[i].title);
+				oMenuHTML = menuHTML( data[i],currentOrder );//{order:order,html:htmlStr}; scans nested menus in current top menu
+				currentOrder = oMenuHTML.order;//currentOrder becomes next order to use
+				// this.$el.append( $( menuHTML( data[i] ) ) );//with $(htmlStr) we convert htmlStr to a JQuery object
+				this.$el.append( $( oMenuHTML.html) );//with $(htmlStr) we convert htmlStr to a JQuery object
+				var editId="#"+data[i].id;
+				// $(editId).editable();
+			}
+			$(".container").contextMenu({
+					menuSelector: "#contextMenu",
+					menuSelected: function (invokedOn, selectedMenu) {
+					// context menu clicked
+		    	}
+			});
+		}
+	});
+    // $.fn.contextMenu = function(settings) {  // Rememeber jQuery.fn is just an alias for jQuery.prototype
+    //     return this.each(function() {  
+    //         // Code Goes Here
+    //     });  
+    // };	
+	(function($, window){ //IIFE (Immediately Invoked Function Expression) 
+	    setupContextMenu = function(jsonMenu,e){//changes DOM template according with e.target
+	    	var menuText = "Rename " + $(e.target).text() + " menu";//default is menu
+			var menuTag = $(e.target).get(0).tagName;//A for normal menus <a>menu</a> and IMG for brand
+			var menuId = $(e.target).attr("id");//get id of current line
+			var topMenu = getTopForMenuId(jsonMenu.menu,menuId);
+
+			menuText+="("+menuId+")";//to test only
+			if(topMenu)
+				menuText+="TOP";//to test only
+
+			var $contextMenu = $("#contextMenu");//to test only
+			$contextMenu.empty();//removes the child elements of the selected element(s).
+			if(menuTag == "IMG"){//the brand was clicked
+				$contextMenu.append("<li><a tabindex='-1' href='#'>Update Brand</a></li>");
+				$contextMenu.append("<li class='divider'></li>");
+				$contextMenu.append("<li><a tabindex='-1' href='#'>Cancel</a></li>");
+			}else if(menuTag == "A") {// a menu item was clicked
+				$contextMenu.append("<li><a tabindex='-1' href='#'>" + menuText + "</a></li>");
+				if( topMenu ){
+					$contextMenu.append("<li><a tabindex='-1' href='#'>Add submenu</a></li>");
+				}else{
+					$contextMenu.append("<li><a tabindex='-1' href='#'>Add submenu before</a></li>");
+					$contextMenu.append("<li><a tabindex='-1' href='#'>Add submenu after</a></li>");			
+				}
+				$contextMenu.append("<li><a tabindex='-1' href='#'>Remove submenu</a></li>");
+				$contextMenu.append("<li class='divider'></li>");
+				$contextMenu.append("<li><a tabindex='-1' href='#'>Cancel</a></li>");
+			}else if(menuTag == "DIV") {// the menubar was clicked
+				$contextMenu.append("<li><a tabindex='-1' href='#'>Add top menu</a></li>");
+				$contextMenu.append("<li class='divider'></li>");
+				$contextMenu.append("<li><a tabindex='-1' href='#'>Cancel</a></li>");
+			}
+	    	return menuTag;
+	    }
+	    $.fn.contextMenu = function(settings) {//jQuery.fn is just an alias for jQuery.prototype  
+	        return this.each(function() {  
+	           // Open context menu
+	           var menuTag = null;
+	            $(this).on("contextmenu", function (e) {
+	            	// alert("==== context menu was called for "+ settings.menuSelector +"--->" + $(e.target).html());
+	            	// alert("==== context menu was called for "+ settings.menuSelector +"--->" + $(e.target).text());
+	            	menuTag = setupContextMenu(oMenu,e);
+	                $(settings.menuSelector)
+	                    .data("invokedOn", $(e.target)) //attach data to settings.menuSelector, under the name "invokeOn" 
+	                    .show() //The matched elements will be revealed immediately, with no animation
+	                    .css({
+	                        position: "absolute",
+	                        left: getLeftLocation(e),
+	                        top: getTopLocation(e)
+	                    });
+
+	                return false;
+	            });
+	           // click handler for context menu
+	            $(settings.menuSelector).click(function (e) {
+	                $(this).hide();
+	                var $invokedOn = $(this).data("invokedOn");
+	                var $selectedMenu = $(e.target);
+	                var invoke = $invokedOn.text();
+	                var selMenu = $selectedMenu.text();
+	            	// alert("==== selected Menu = "+ selMenu);
+	            	e.stopPropagation();//necessary for x-editable .editable('show)
+	                settings.menuSelected.call($(this), $invokedOn, $selectedMenu, menuTag);//both parameters are JQuery objects
+	            });
+
+	            //make sure menu closes on any click
+	            $(document).click(function () {
+	                $(settings.menuSelector).hide();
+	            });
+	        });
+	       function getLeftLocation(e) {
+	            var mouseWidth = e.pageX;
+	            var pageWidth = $(window).width();
+	            var menuWidth = $(settings.menuSelector).width();
+	            
+	            // opening menu would pass the side of the page
+	            if (mouseWidth + menuWidth > pageWidth &&
+	                menuWidth < mouseWidth) {
+	                return mouseWidth - menuWidth;
+	            } 
+	            return mouseWidth;
+	        }        
+	        
+	        function getTopLocation(e) {
+	            var mouseHeight = e.pageY;
+	            var pageHeight = $(window).height();
+	            var menuHeight = $(settings.menuSelector).height();
+
+	            // opening menu would pass the bottom of the page
+	            if (mouseHeight + menuHeight > pageHeight &&
+	                menuHeight < mouseHeight) {
+	                return mouseHeight - menuHeight;
+	            } 
+	            return mouseHeight;
+	        }	          
+	    };
+	})(jQuery, window);
+
+	$.fn.editable.defaults.mode = 'popup';
+	$(".container").contextMenu({
+	    menuSelector: "#contextMenu",
+	    menuSelected: function (invokedOn, selectedMenu, menuTag) {
+	    	//menu tag --> IMG=>the brand was clicked, DIV=>the menubar was clicked, A=>a menu was clicked 
+
+	    	// alert(selectedMenu.text());
+	        // var msg = "You selected the menu item [" + selectedMenu.text() +
+	        //     "] on the value [" + invokedOn.text() + "] with Tag="+menuTag;
+	        // alert(msg);
+	        if(menuTag == "A") {
+				var editId="#"+invokedOn.attr("id");//get attribute id from Jquery object
+				$(editId).editable({
+				    type: 'text',
+				    title: 'Enter new menu title:',
+				    placement: 'bottom',
+				  //   display:function(value){
+						// $(this).editable('show');
+				  //   	// alert("value="+value);
+				  //   },
+					validate: function(value) {
+						// alert("value="+value);
+						replaceTitleForMenuId(oMenu.menu,value,invokedOn.attr("id"));
+					    if($.trim(value) == '') {
+					        return 'The menu title is required';
+					    }
+					}			    
+				});
+				$(editId).editable('show');
+			}else if (menuTag == "DIV"){
+				// alert("Menu bar !!!");
+				var lastTopPosition = oMenu.menu.length - 1; 
+				var idOfLastTopPosition = oMenu.menu[lastTopPosition].id;
+				insertMenuBeforeId(oMenu.menu,idOfLastTopPosition);
+				setMenuId(oMenu.menu,0);
+				var z=32;
+			}else if (menuTag == "IMG"){
+				alert("The Brand !!!");
+			}	
+	    }
+	});
+	var menuView = new MenuView({model:Menu});
+console.log(document.title+"......  END..");
+</script>
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+</body>
+</html>

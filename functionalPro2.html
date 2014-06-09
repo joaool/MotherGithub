@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Functional Programming 2 example</title>
+    <script src="http://code.jquery.com/jquery-2.0.3.min.js"></script> 
+	<script src="FL_ui/js/test.js"></script>
+
+</head>
+<body>
+    <script>
+		console.log("----------------- Writing ( function(x) { return (2*x) } ) (3); ----------------------------------")
+		var z=(function(x){return 2*x;})(3);
+		alert("z="+z)
+		console.log("----------------- if funZ=( function(x) { return (2*x) } ); we can do funZ(4) or (funZ)(4)=>8--------------")
+		var funZ=(function(x){return 2*x;});
+		alert("funZ(4) -->"+funZ(4)+" is the same as (funZ)(4)-->"+(funZ)(4));
+		console.log("----------------- if power2=( function(x) { return (x*x) } ); we can do funZ(4) or (funZ)(4)=>8--------------")
+		var power2=(function(x){return x*x;});
+		alert("power2(funZ(4)) -->"+power2(funZ(4))+" is the same as (power2)((funZ)(4))-->"+(power2)((funZ)(4)));
+
+		console.log("----------------- the module pattern --------------")
+		// var mystack= stack;
+		var op = (function(x){
+			return{
+				lastParam:x,
+				opDouble:"double of "+x,
+				opPower2:"power2 of "+x
+			};
+		});
+		alert("op(3).opDouble-->"+op(3).opDouble);
+		//http://www.adequatelygood.com/JavaScript-Module-Pattern-In-Depth.html
+		//http://unixpapa.com/js/dyna.html
+		// var newOp=
+		// var newOp = (function(x){
+		// 	window.stack = window.stack||[];
+		// 	stack.push(x);
+		// 	var len=stack.length;
+		// 	xPrevious = -1;
+		// 	if(len>1)
+		// 		xPrevious =  stack[len-2];
+		// 	return{
+		// 		topOfStack:stack[len-1],
+		// 		previous:xPrevious,
+		// 		opDouble:2*x,
+		// 		opPower2:x*x
+		// 	};
+		// });
+		// var newOp = Module_NewOp;
+		alert("newOp(27).topOfStack-->"+newOp(27).topOfStack+" newOp(28).previous-->"+newOp(28).previous);		
+		alert("newOp(43).previous-->"+newOp(43).previous+" newOp(44).previous-->"+newOp(44).previous);	
+
+		alert("newOp2(27).topOfStack-->"+newOp2(27).topOfStack+" newOp2(28).previous-->"+newOp2(28).previous);		
+		alert("newOp2(43).previous-->"+newOp2(43).previous+" newOp2(44).previous-->"+newOp2(44).previous);	
+
+		alert("Calling abc -->"+abc.name);
+		alert("Calling abc function -->"+abc.doubleOp(2));
+
+		// var gResult=(  function(x) { return (x*x) } ) (3) ;//y=9
+		// var g=function(x) { return (x*x) };//y=9
+		// console.log("Result g="+gResult + " g(3)=" + g(3)  +" CAN ALSO BE WRITTEN AS (g)(3)="+(g)(3) );
+
+		// var fg=(  function(x) { return (2*x) } ) ( (  function(x) { return (x*x) } ) (3) ) ;
+		// console.log("Result of f composed with g => f(g(x))="+ fg + " CAN ALSO BE WRITTEN AS (g)(f(3))="+(f)(g(3)) + " OR (f)((g)(3))="+(f)((g)(3)) );//fg=18
+		// var twice =  function(x) { return (2*x) }; 
+		// var square =  function(x) { return (x*x) };
+		// console.log("Result of twice composed with square is ="+ twice( square(3) ) +" OR (twice)((square)(3))="+(twice)((square)(3)) );
+
+		// x=( ( function(x,y,z) { return (x+y+z) } ) (1, 2, 3)) *2;//X=12
+
+		console.log("----------------------------------------------------------------------------")
+		console.log("----------------- abstracting a for loop -----------------------------------")
+		function displayItem(item) {
+		    	console.log("-->"+item);
+		}
+		function displayArray(array) {//http://eloquentjavascript.net/chapter6.html
+		  	for (var i = 0; i < array.length; i++)
+		    	 displayItem(array[i]);
+		    return true;
+		}
+		console.log("is the result of displayArray([3,5,7]) =>"+displayArray([3,5,7]));
+		console.log("is the result of displayArray(['Wampeter', 'Foma', 'Granfalloon']) =>"+displayArray(["Wampeter", "Foma", "Granfalloon"]));
+		//But what if we want to do something else than print? Since 'doing something' can be represented as a function, and functions are also values, we can pass our action as a function value:
+		console.log(" --------------- Now using a forEach made here... ----------------");
+		function forEach(array, action) {
+		  for (var i = 0; i < array.length; i++)
+		    (action)(array[i]);//or action(array[i]);
+		}
+		forEach(["Wampeter", "Foma", "Granfalloon"], displayItem);
+		console.log(" --------------- is the result of forEach(['Wampeter', 'Foma', 'Granfalloon'], displayItem); -------");
+
+		console.log(" --------------- Now using a forEach made here... ----------------");
+		(forEach)(["Wampeter", "Foma", "Granfalloon"], (displayItem) );
+		console.log(" --------------- that...is the same as (forEach)(['Wampeter', 'Foma', 'Granfalloon'], (displayItem) ); -------");
+
+		function sum(array){
+			var total = 0;
+			forEach(array, function(item){total+=item});
+			return total;
+		}
+		console.log("sum([3,5,7])="+sum([3,5,7]));
+		console.log("forEach(['Wampeter', 'Foma', 'Granfalloon'], function(item){'==>'+item});="+forEach(['Wampeter', 'Foma', 'Granfalloon'], function(item){displayItem(item)} ) );
+
+		//		console.log(" --------------- is the result of forEach(['Wampeter', 'Foma', 'Granfalloon'], displayItem); -------"
+		//But what if the function you want takes more than one argument? You can get access to any arguments passed to a function with the arguments array, but how do you call a function when you do not know how many arguments you have? 
+		//Use someFunction.apply(thisArg, [argsArray]) - this can be null (if no context) and args is an array with all arguments
+		function displayItemWithPrefix(prefix,item) {
+		   	console.log(prefix+item);
+		}
+		// console.log("forEach(['Wampeter', 'Foma', 'Granfalloon'], function(item){'==>'+item});="+forEach(['Wampeter', 'Foma', 'Granfalloon'], displayItemWithPrefix.apply(null,["=====>",item]) ) );
+
+		console.log("----------------- Passing a function as parameter -----------------------------------")
+		//Passing function as a parameter and applying it
+		var doOperation = function (fn,x,y,z) { return fn(x,y,z); };
+		var sum = function(x,y,z) {
+		  return x+y+z;
+		};
+		var prod = function(x,y,z) {
+		  return x*y*z;
+		};
+		var concat = function(x,y,z) {
+		  return ""+x+y+z;
+		};
+		console.log("Result for sum =" + doOperation(sum,1,2,4));//shoud return 7
+		console.log("Result for prod =" + doOperation(prod,1,2,4));//shoud return 8
+		console.log("Result for concat =" + doOperation(concat,1,2,4));//shoud return "124"
+		
+		console.log("----------------- Immediately-invoked function expression (IIFE)---------------------------------");
+		//is a JavaScript design pattern which produces a lexical scope using JavaScript's function scoping
+		//lets assume the function JO() exists
+		JO = function(x,y){return x+y};
+		console.log("JO(3,2)="+JO(3,2));
+		//if we want to assure our own JO
+		var zz=(function(z){
+  			/* code */ 
+  			console.log("inside anonimous function JO(4,9)="+JO(4,9));
+  			return (z+2);
+		}(5));
+		//to make sure that JO() defined in a certain scope doesn't collide with other libraries that might use JO as a function definition it's a best practice to pass JO to an IIFE (Immediately Invoked Function Expression) that maps it to the JO to be used inside the scope 
+		(function(JO){
+  			/* code */ 
+  			console.log("inside IIFE function JO(4,9)="+JO(4,9));
+  			// return (z+2);
+		}(function(x,y){return x*y;}));
+		//this patern is frequently used to assure that we can use $ to jQuery
+		$ = function(x){alert(x)};//to conflict with JQuery - THIS WILL OVERRIDE JQUERY !!!
+		$("Joao TESTING IIFE");
+		// it's a best practice to pass jQuery to an IIFE (Immediately Invoked Function Expression) that maps it to the dollar sign so it can't be overwritten by another library in the scope of its execution.
+		(function($) {//change $ to ZZ to get an error...
+			$.fn.greenify = function() {
+			    this.css( "color", "green" );
+			};
+			$( document ).ready(function() {
+				$("button").click(function(){
+					$("li").greenify();//// Makes all the links green.
+				});
+			});	
+			$("li").greenify();//// Makes all the links green.
+		})( jQuery );
+		// $.fn.greenify = function() {
+		//     this.css( "color", "green" );
+		// };
+		// $( document ).ready(function() {
+		// 	$("button").click(function(){
+		// 		$("li").greenify();//// Makes all the links green.
+		// 	});
+		// });	
+		console.log("zz="+zz);
+		console.log("----------------- Functions can be assigned to variables like other values---------------------------------");
+		var greaterOrEqualThan = function(x,y){//returns true if x>=y
+			return x>=y;
+		};
+		console.log("15 is greaterOrEqualThan 10 =>"+greaterOrEqualThan(15,10));
+		var zzz=greaterOrEqualThan;
+		console.log("15 is zzz 10 =>"+zzz(15,10));	
+
+		var alien = function(){
+			kind:"alien"
+		};
+		console.log("function value = "+alien.kind)
+		var zack = {};
+			
+		// console.log("----------------- Making an array sort -----------------------------------")
+		// person = {fistName:"joao",lastName:"Oliveira"};//JavaScript objects also have one additional attribute: a pointer to another object. We call this pointer the object’s prototype.
+		// proto = Object.getPrototypeOf(person);
+		// console.log("--->"+proto+"<----");
+		// obj = function MyObject() {}; // a first class functional object
+		// obj.prototype.test = function() { alert('OK'); } // OK
+		// proto = Object.getPrototypeOf(obj);
+		// console.log("--->"+proto+"<----");
+		// xArr=[5,2,8,4];
+
+
+		// Array.prototype.JOsort=function(templateFn) {
+		//   var len=this.length;
+		//   var str=' ';
+		//   for (var i=0 ; i<len ; i++) 
+		// 	str+=templateFn(this[i]);
+		//   return str;
+		// }		
+		// arr.sort(function(x,y){return x>=y;});
+
+	console.log(document.title+"......  END..");		
+    </script>
+	    <button>Click to greenify the value of each list item if $ is set to JQuery</button>
+			<ul>
+				<li>Coffee</li>
+				<li>Milk</li>
+				<li>Soda</li>
+			</ul>
+</body>
+</html>

@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>JQuery v1.0</title>
+ 	<script src="http://code.jquery.com/jquery-2.0.3.min.js"></script> 
+	<!--
+	-->
+</head>
+<body>
+   <ul id="nav">
+      <li>
+        <a href="#">Top Level Nav Item1</a>
+        <ul>
+          <li><a href="#">Second Level Nav Item</a></li>
+          <li><a href="#">Second Level Nav Item</a></li>
+          <li><a href="#">Second Level Nav Item</a></li>
+        </ul>
+      </li>
+      <li>
+        <a href="http://www.microsoft.com">Top Level Nav Item2</a>
+        <ul>
+          <li><a href="#">Second Level Nav Item</a></li>
+          <li><a href="#">Second Level Nav Item</a></li>
+          <li><a href="#">Second Level Nav Item</a></li>
+        </ul>
+      </li>
+      <li>
+        <a href="#">Top Level Nav Item3</a>
+        <ul>
+          <li><a href="#">Second Level Nav Item</a></li>
+          <li><a href="#">Second Level Nav Item</a></li>
+          <li><a href="#">Second Level Nav Item</a></li>
+        </ul>
+      </li>
+      <li>
+        <a href="#">Top Level Nav Item4</a>
+        <ul>
+          <li><a href="#">Second Level Nav Item</a></li>
+          <li><a href="#">Second Level Nav Item</a></li>
+          <li><a href="#">Second Level Nav Item</a></li>
+        </ul>
+      </li>
+      <li>
+        <a href="#">Top Level Nav Item5</a>
+        <ul>
+          <li><a href="#">Second Level Nav Item</a></li>
+          <li><a href="#">Second Level Nav Item</a></li>
+          <li><a href="#">Second Level Nav Item</a></li>
+        </ul>
+      </li>
+    </ul>	
+    <script>
+    	// clicking on a list item loads some content using the
+		// list item's ID, and hides content in sibling list items - http://viget.com/inspire/simple-jquery-refactoring
+		//$(document).ready(function() {//VERSION 1
+		// 	  $('#nav > li > a').click(function() {//only direct li of nav are selected and within this only direct a
+		// 	  	//click event setted only at top levels
+		// 	  	// alert($(this).text());//$(this) has the jQuery selected object
+		// 	    if($(this).parent().hasClass('current')) {
+		// 	      // alert("Has current");
+		// 	      $(this).parents('#nav').find('.current').removeClass('current');
+		// 	      $(this).parents('#nav').find('ul:visible').slideUp(500);//hides the selected element
+		// 	    } else {
+		// 	      // alert("Does not have current");
+		// 	      $(this).parents('#nav').find('.current').removeClass('current');
+		// 	      $(this).parents('#nav').find('ul:visible').slideUp(500);
+		// 	      $(this).parent().addClass('current');
+		// 	      $(this).siblings('ul').slideDown(500);//shows the brothers of selected element (if it is hidden)
+		// 	    }
+		// 	    return false;//this will prevent the default action of the link (following the href) http://api.jquery.com/event.preventDefault/
+		// 	    //http://jsfiddle.net/5SC6J/
+		// 	  });
+		// });
+		//    	$(document).ready(function() {//VERSION 2 - remove false and "Caching" jQuery Objects
+		//	  //A common practice when storing a jQuery object inside of a variable is to prefix the variable with a $ sign. 
+		// 	  //$('#nav > li > a').click(function(e) {
+		// 	  $('#nav > li > a').bind('click', function(e) {//the same as previous but saves one function call
+		// 	  	e.preventDefault();//we can remove return false of version1 - see http://jsfiddle.net/5SC6J/
+		// 	  	var $this = $(this), //saves rebuilding of the current Jquery object
+		// 	  		$nav = $this.parents('#nav'),
+		// 	  		$parent = $this.parent();
+		// 	    if($parent.hasClass('current')) {
+		// 	      $nav.find('.current').removeClass('current');
+		// 	      $nav.find('ul:visible').slideUp(500);//hides the selected element
+		// 	    } else {
+		// 	      $nav.find('.current').removeClass('current');
+		// 	      $nav.find('ul:visible').slideUp(500);
+		// 	      $parent.addClass('current');
+		// 	      $this.siblings('ul').slideDown(500);//shows the brothers of selected element (if it is hidden)
+		// 	    }
+		// 	  });
+		// });
+		// function handleNav($el){//VERSION 3 - Making a function that receives a JQuery object
+		// 	var $nav = $el.parents('#nav'),
+		// 	  	$parent = $el.parent();
+		//     if($parent.hasClass('current')) {
+		//       $nav.find('.current').removeClass('current');
+		//       $nav.find('ul:visible').slideUp(500);//hides the selected element
+		//     } else {
+		//       $nav.find('.current').removeClass('current');
+		//       $nav.find('ul:visible').slideUp(500);
+		//       $parent.addClass('current');
+		//       $el.siblings('ul').slideDown(500);//shows the brothers of selected element (if it is hidden)
+		//     }
+		// }
+  		// $(document).ready(function() {
+  		//	  //A common practice when storing a jQuery object inside of a variable is to prefix the variable with a $ sign. 
+		// 	  //$('#nav > li > a').click(function(e) {
+		// 	  $('#nav > li > a').bind('click', function(e) {//the same as previous but saves one function call
+		// 	  	e.preventDefault();//we can remove return false of version1 - see http://jsfiddle.net/5SC6J/
+		// 	  	console.log("calling handleNav()");
+		// 	  	handleNav($(this));
+		// 	  });
+		// });
+		//We don't want to clutter up the global namespace with our function, so we should create an object to store all of our functions.
+		// var JO = JO || {};//VERSION 4 - gathering global functions and appliying DRY (Dont Repeat Yourself)
+		// console.log(typeof JO);
+		// JO.handleNav = function($el){
+		// 	function hideSecondLevelItems($nav){
+		//       $nav.find('.current').removeClass('current');
+		//       $nav.find('ul:visible').slideUp(500);//hides the selected element
+		// 	}
+		// 	var $nav = $el.parents('#nav'),
+		// 	  	$parent = $el.parent();
+		//     hideSecondLevelItems($nav);
+		//     if(!$parent.hasClass('current')) {
+		//     	$parent.addClass('current');
+		//     	$el.siblings('ul').slideDown(500);//shows the brothers of selected element (if it is hidden)
+		//     }
+		// }
+ 		//$(document).ready(function() {
+  		//	  //A common practice when storing a jQuery object inside of a variable is to prefix the variable with a $ sign. 
+		// 	  //$('#nav > li > a').click(function(e) {
+		// 	  $('#nav > li > a').bind('click', function(e) {//the same as previous but saves one function call
+		// 	  	e.preventDefault();//we can remove return false of version1 - see http://jsfiddle.net/5SC6J/
+		// 	  	console.log("calling handleNav()");
+		// 	  	JO.handleNav($(this));
+		// 	  });
+		// });
+		var JO = JO || {};//VERSION 5 - avoid using the anonymous function in the $(document).ready
+		console.log(typeof JO);
+		JO.handleNav = function(e){
+			function hideSecondLevelItems($nav){
+		      $nav.find('.current').removeClass('current');
+		      $nav.find('ul:visible').slideUp(500);//hides the selected element
+			}
+			e.preventDefault();
+			var $el = $(this),
+				$nav = $el.parents('#nav'),
+			  	$parent = $el.parent();
+		    hideSecondLevelItems($nav);
+		    if(!$parent.hasClass('current')) {
+		    	$parent.addClass('current');
+		    	$el.siblings('ul').slideDown(500);//shows the brothers of selected element (if it is hidden)
+		    }
+		}
+     	$(document).ready(function() {
+     		  //A common practice when storing a jQuery object inside of a variable is to prefix the variable with a $ sign. 
+			  //$('#nav > li > a').click(function(e) {
+			  // $('#nav > li > a').bind('click', function(e) {//the same as previous but saves one function call
+			  $('#nav > li > a').bind('click', JO.handleNav);//bind always sends an event paramenter
+		});		
+		console.log(document.title+"......  END..");		
+    </script>
+</body>
+</html>

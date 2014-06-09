@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Classes  v2.0</title>
+    <script src="http://code.jquery.com/jquery-2.0.3.min.js"></script> 
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.5.2/underscore-min.js" type="text/javascript"></script>
+ </head>
+<body>
+  <script>
+    var FL = FL || {};
+    FL["clone"] = function(obj) {
+    return JSON.parse(JSON.stringify(obj));
+    };
+
+    FL["menu"] = function(menuSettings) { //{jsonMenu:null,initialMenu:null,editable:false} 
+      menuSettings = _.extend( {jsonMenu:null,initialMenu:null,editable:false},menuSettings); 
+      this.settings = menuSettings;
+      // this.init = function() { //constructor
+      //   console.log("-------------------------------> a new instance of FL.menu is constructed... ");
+      //   if(menuSettings.jsonMenu){
+      //     if (typeof(Storage) != "undefined") {//browser supports storage
+      //       localStorage.storedMenu = JSON.stringify(menuSettings.jsonMenu);
+      //     }else{
+      //       BootstrapDialog.alert('No menu persistence because your browser does not support Web Storage...');
+      //     }
+      //   }else{
+      //     alert("FL.menu Error menuSettings.jsonMenu is null !!!");
+      //   } 
+      //   this.settings = menuSettings;
+      // }
+      this.displayInitialMenu = function() {
+        console.log("displayInitialMenu -->"+this.settings.initialMenu);
+      };
+      this.init = function() { //constructor
+        console.log("-------------------------------> a new instance of FL.menu was constructed... ");
+      }
+      this.init();
+    };  
+    oMenu={a:1,b:2};
+    var myMenu1 = new FL.menu({jsonMenu:oMenu,initialMenu:"_home",editable:false});
+    myMenu1.displayInitialMenu();
+    console.log("1-myMenu1.settings.jsonMenu.b="+myMenu1.settings.jsonMenu.b);//2 OK
+    myMenu1.settings.jsonMenu.b = 22;
+    console.log("2-myMenu1.settings.jsonMenu.b="+myMenu1.settings.jsonMenu.b);//22 OK
+    oMenu.b=33;
+    console.log("3-myMenu1.settings.jsonMenu.b="+myMenu1.settings.jsonMenu.b);//33 ok
+
+    oMenu2={a:3,b:4};
+    var myMenu2 = new FL.menu({jsonMenu:FL.clone(oMenu2),initialMenu:"_SweetHome",editable:false});
+    myMenu2.displayInitialMenu();
+    myMenu1.settings.initialMenu = "Joaquim Manuel";
+    myMenu1.displayInitialMenu();
+    console.log("myMenu2    1-myMenu2.settings.jsonMenu.b="+myMenu2.settings.jsonMenu.b);//4 OK
+    oMenu.b=44;
+    console.log("myMenu2    2-myMenu2.settings.jsonMenu.b="+myMenu2.settings.jsonMenu.b);//4 OK
+
+
+    console.log(document.title+"......  END..");		
+  </script>
+</body>
+</html>

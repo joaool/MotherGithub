@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>underscore.js tests v1.0</title>
+   	<script src="http://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.3.3/underscore-min.js" type="text/javascript"></script>
+</head>
+<body>
+    <script>
+		console.log("------------------------_times()--------------------------------");		
+
+    	_.times(4,function(index){console.log(index+"- My name is joao")} );
+    	[1,5,7,9].forEach(console.log);//http://zsoltfabok.com/blog/2012/08/javascript-foreach/
+
+    	function splat(fun) {
+			return function(array) {
+				return fun.apply(null, array);
+			};
+		}
+    	function JO(fun) {
+    		console.log("function="+fun);
+			return function(array) {
+				return fun.apply(null, array);
+			};
+		}	
+		sum = function(x,y){
+			return (x+y);
+		}	
+		// alert(JO(sum));
+		var addArrayElements = splat(function(x, y) { return x + y });
+
+		var stringCSV = "name,  age, hair\n,Merble, 35,  red\n,Bob,  64,  blonde";
+		console.log(stringCSV);
+		var arrTransformation = _.map(stringCSV.split("\n"),function(item){return ">>>>"+item+"<<<<";});//_map returns a mapped array of the input array
+		//using named functions for code clarity.
+		var highlight = function(item){return ">>>>"+item+"<<<<";}
+		var resultArray = _.map(stringCSV.split("\n"),highlight);//_map returns a mapped 
+		xArr=stringCSV.split("\n");
+
+		// for (var i=0;i<xArr.length;i++){
+		// 	console.log("line-"+i+" - "+resultArray[i]);//arrTransformation[i]);//xArr[i]);
+		// };
+		_.each(xArr,function(item,index){console.log("line-"+index+"-->"+item+"<<")});
+		// xArr.forEach(console.log(index));
+
+		var reduced = _.reduce(stringCSV.split("\n"),function(memo,element){return memo+="line:"+element+"<EOL>";},"Begin->");
+		console.log("Reduced="+reduced);
+
+		// function lameCSV(str) {
+		// 	return _.reduce(str.split("\n"), function(table,row) {
+		// 		return table.push("line:"+row+"<EOL>");
+		// 	},table=new Array());
+		// };
+		// console.log("Reduced Lame="+lameCSV(stringCSV));
+		// resultArray = lameCSV(stringCSV);
+		// for (var i=0;i<xArr.length;i++){
+		// 	console.log("line-"+i+" - "+resultArray[i]);//arrTransformation[i]);//xArr[i]);
+		// };
+
+
+		console.log(addArrayElements([1,2,3,4]));
+		console.log(document.title+"......  END..");		
+    </script>
+</body>
+</html>
