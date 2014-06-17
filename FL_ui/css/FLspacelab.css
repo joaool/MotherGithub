@@ -3655,7 +3655,7 @@ select[multiple].input-group-sm > .input-group-btn > .btn {
   }
 }
 .navbar-collapse {
-  max-height: 340px;
+  max-height: 400px;
   overflow-x: visible;
   padding-right: 15px;
   padding-left: 15px;
@@ -4788,14 +4788,14 @@ a.list-group-item-danger.active:focus {
   left: -15.625em; /*left or right and the width of your navigation panel*/
   width: 15.625em; /*should match the above value*/
   border-width:3px;
-
+  font-size: 13.6px;/* updated by JO* <--- panel width because unit is em -------*/
   margin-bottom: 20px;
   background-color: #ffffff;
   border: 1px solid transparent;
   border-radius: 4px;
   -webkit-box-shadow: 0 1px 1px rgba(0, 0, 0, 0.05);
   box-shadow: 0 1px 1px rgba(0, 0, 0, 0.05);
-}
+}/*4798*/
 .push { 
   font-size: 14px;/* updated by JO* <--- to position toggle because unit is em -------*/
 }
@@ -6024,40 +6024,62 @@ button.close {
 /*framelink side panel */
 #menu {
   border: 1px solid #dddddd; /* border color for whole side panel */
-  background-color: #ededed;
+  background-color: #ededed; /*#d5070f; ---general color for the side panel - visible above  @2014 Framelink */  
 }
 #menu .framelink-brand  {
   /*border: 2px solid blue;*/
   background-color: white;
 }
-#menu .framelink-text {
+#menu .framelink-text { /*  area for framelink text copyrights */
   margin-left: 0.25em;
   margin-right: 0.25em;
   font-size: 0.8em; /*  side panel bottom text font-size */
+  color: black;
+  background-color: #ffffff;
 } 
-.panel .navbar-collapse{
+.panel .navbar-collapse{/* area bellow options until framelink-text */
   background-color: #ededed;
   background-image: -webkit-linear-gradient(#e6e6e6, #ededed 100%, #ededed);/* -- color around side panel menu */
   background-image: linear-gradient(#e6e6e6, #ededed 100%, #ededed);/* -- color around side panel menu */
   background-repeat: no-repeat;    
   color: #666666;
-  width: 12.98em; /*  12.95em;*/ /*13.25em;*/
+  margin-left:-10px; /* use -17px to make 0 margin  if we change this we should adjust width */
+  width: 13.7em; /*  area including x-editable and under menus - */
   border: 1px solid #dddddd; /* border color for under options */
 }
-.panel .navbar-collapse >ul >li {
-  width: 11.00em; /* -- area around x-editable prompts & links */
+.panel .navbar .navbar-collapse .editableLinksGroup {/* <---------------------------------------first group bellow options */
+  border: 2px solid #d0d0d0; /*1px solid transparent;  ---- new !!!!!!         */
+  background-color: #ededed;  /* #5fb611;*/ /* -- background-color of x-editable links in side panel */
+  border-radius: 7px;
+  margin-top: 0.5em; /* <---------- distance to line below options.. -----------------------*/
+  margin-bottom: none;
+  width: 12.20em; /* -- with of area around x-editable prompts & links */
 }
-.panel .navbar-collapse >ul >li >a {
-  color: #666666; /*  side panel menu bellow x-editable links */
+.linkContainer:first-child{ /* first child of its parent (div with class linkContainerGroup)*/
+  margin-top: 0.2em;
+}
+.linkContainer { /* elements inside linkContainerGroup envolving the x-links */
+  font-size: inherit; /* the font size of linkContainer (inside linkContainer class) */
+  color: black; /* -- color of promts to x-editable links in side panel */ 
+  background-color: #ededed;/* -- background-color of each linkContainer */
+  margin-left: 0.5em; /* margin between border of editableLinksGroup and each linkContainer element */
+}
+.linkContainer:last-child{ /* last child of its parent (div with class linkContainerGroup)*/
+  margin-bottom: 0.2em;
+}
+.linkContainer:hover{ /* mouse over any linkContainer element */
+  color:black;
+  background-color: #d0d0d0;   
+}
+.linkStatus{ /* static presentation of x-editable links inside linkContainer */
+  color:black;
+  font-size: 0.8em; /*  side panel bottom text font-size */
+  background-color: #d0d0d0 !important;/* #dddddd;*/   
 } 
-.panel .btn-info {
-  font-size: 0.8em; /* the font size of x-editable links in side panel */
-}
-.btn-sidepanel {
-  font-size: inherit; /* the font size of x-editable links in side panel */
-  color:  #666666; /* -- color of promts to x-editable links in side panel */ 
-  background-color: #e6e6e6;  /* #5fb611;*/ /* -- background-color of x-editable links in side panel */
-}
-.btn-sidepanel:hover {
-  background-color: #ededed;  /* #5fb611;*/ /* -- color around side panel menu */
-} /*6063*/
+.linkStatus:hover{ /* mouse above x-editable links inside linkContainer */
+  color:black;
+  background-color: #d0d0d0;   
+} 
+.panel .navbar-collapse >ul >li >a {
+  color: #666666; /* static color for li elements below editableLinksGroup */
+} /*6085*/

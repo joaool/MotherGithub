@@ -24,7 +24,8 @@
     <link href="FL_ui/css/bootstrap-dialog.css" rel="stylesheet" type="text/css" />
     <script src="FL_ui/js/bootstrap-dialog.js"></script>
     <script src="FL_ui/js/FLBig-slide.js"></script>
-    <link href="FL_ui/css/bootstrap-tour.min.css" rel="stylesheet">
+    <!-- <link href="FL_ui/css/bootstrap-tour.min.css" rel="stylesheet"> -->
+    <link href="FL_ui/css/bootstrap-tour.css" rel="stylesheet">
 	<!-- <script src="FL_ui/js/bootstrap-tour.min.js"></script> -->
 	<script src="FL_ui/js/bootstrap-tour.js"></script>
 
@@ -142,30 +143,30 @@
 				</button>
 			</div>
 			<div class="navbar-collapse collapse">
-				<ul class="nav navbar-nav">
-					<li>
-						<div id="_globalStyles" class="btn-sidepanel" style="margin-top:18px;">
+				<ul class="nav navbar-nav sidePanel">
+					<li class="editableLinksGroup">
+						<div id="_globalStyles" class="linkContainer">
 							<i class="glyphicon glyphicon-pencil"></i><span> Select style  :</span>
-							<a id="_css" class="btn-info" href="#" >cerulan</a>
-						</div>
-						<div id="_fonts" class="btn-sidepanel">
+							<a id="_css" class="linkStatus" href="#" >cerulan</a>
+						</div>						
+						<div id="_fonts" class="linkContainer">
 							<i class="glyphicon glyphicon-font"></i><span> Select fonts :</span>
-							<a class="btn-info" href="#" >tbi</a>
+							<a class="linkStatus" href="#" >tbi</a>
 						</div>
-						<div class="btn-sidepanel">
+						<div class="linkContainer">
 							<i class="glyphicon glyphicon-off"></i><span> Reset :</span>
-							<a  class="btn-info" href="javascript:FL.clearAllSettings()" id="_reset">login & menu</a>
+							<a  class="linkStatus" href="javascript:FL.clearAllSettings()" id="_reset">login & menu</a>
 						</div>		
 					</li>	
 					<li><a id="_forms" href="#forms"><span class="glyphicon glyphicon-list-alt"></span> Forms/Grids</a></li>
 					<li><a id="_newsLetters" href="#newsLetters"><span class="glyphicon glyphicon-envelope"></span> NewsLetters</a></li>
 					<li><a id="_appointments" href="#appointments"><span class="glyphicon glyphicon-time"></span> Scheduling</a></li>
 					<li><a id="_cart" href="#cart"><span class="glyphicon glyphicon-shopping-cart"></span> Shopping Cart</a></li>
-					<li><a id="_how" href="#how"><span class="glyphicon glyphicon-book"></span> How to</a></li>
+					<li><a id="_invoicePayment" href="#invoicePayment"><span class="glyphicon glyphicon-usd"></span> Invoice/Payment</a></li>
 				</ul>
 			</div>
 		</div>
-		<div class="btn-primary framelink-text">
+		<div class="framelink-text">
 			<p>©2014 FrameLink Co.</p><p>FrameLink is a Do-It-Yourself business application, targeting  micro and small businesses allowing management any time, any where and in any device.</p>
 		</div>
 	</div> <!-- menu -->
@@ -207,6 +208,13 @@
 			<p>©2014 FrameLink Co. <a href="http://www.framelink.co/contacts.html" target="">@support</a>.</p>
 		</div>
 	</footer>	
+	
+<!-- 	<h3>Please enter your phone number, and you will be connected to FrameLink</h3>
+	<form action="makecall.php" method="post">
+	    <span>Your Number: <input type="text" name="called" /></span>
+	    <input type="submit" value="Connect me!" />
+	</form> -->
+
  	<ul id="contextMenu" class="dropdown-menu" role="menu" style="display:none" >
 	</ul>
     <!--
@@ -362,8 +370,32 @@
 		        "uri":"_home"
 		    },		    
 		    {
-		        "title" : "About US",//21
-		        "uri":"_about-us"
+		        "title" : "What it does",//21
+		        "uri":"#",
+		         "menu" : [
+		            {
+		                "title" : "What is it for ?",//14
+		                "uri":"_whatFor"
+		            },
+		            {
+		                "title" : "Usage examples",//14
+		                "uri":"_usage"
+		            }
+		        ]    
+		    },
+		    {
+		        "title" : "Company",//21
+		        "uri":"#",
+		         "menu" : [
+		            {
+		                "title" : "Who we are",//14
+		                "uri":"_whoweare"
+		            },
+		            {
+		                "title" : "Contact us",//14
+		                "uri":"_contacts"
+		            }
+		        ]    
 		    }
 		]    
 	};

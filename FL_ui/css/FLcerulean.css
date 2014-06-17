@@ -1,4 +1,4 @@
-/*!
+!
  * Bootswatch v3.1.1+1
  * Homepage: http://bootswatch.com
  * Copyright 2012-2014 Thomas Park
@@ -3655,7 +3655,7 @@ select[multiple].input-group-sm > .input-group-btn > .btn {
   }
 }
 .navbar-collapse {
-  max-height: 340px;
+  max-height: 400px;
   overflow-x: visible;
   padding-right: 15px;
   padding-left: 15px;
@@ -6034,6 +6034,8 @@ button.close {
   margin-left: 0.25em;
   margin-right: 0.25em;
   font-size: 0.8em; /*  side panel bottom text font-size */
+  color: white;
+  background-color: #0f73b5;
 } 
 .panel .navbar-collapse{
   background-color: #46b0f7;
@@ -6041,23 +6043,43 @@ button.close {
   background-image: linear-gradient(#0f73b5, #46b0f7 100%, #46b0f7);/* -- color around whole under options area */
   background-repeat: no-repeat;    
   color: transparent;
-  width: 12.98em; /*  12.95em;*/ /*13.25em;*/
+  margin-left:-1.0em; /* use -17px to make 0 margin  if we change this we should adjust width */
+  width: 14.15em; /*  12.95em;*/ /*13.25em;*/
   border: 1px solid transparent; /* border color for under options */
 }
-.panel .navbar-collapse >ul >li {
-  width: 11.00em; /* -- area around x-editable prompts & links */
-}
-.panel .navbar-collapse >ul >li >a {
-  color: white; /*  side panel menu bellow x-editable links */
-} 
-.panel .btn-info {
-  font-size: 0.8em; /* the font size of x-editable links in side panel */
-}
-.btn-sidepanel {
-  font-size: inherit; /* the font size of x-editable links in side panel */
-  color: white; /* -- color of promts to x-editable links in side panel */ 
+.panel .navbar .navbar-collapse .editableLinksGroup {/* <---------------------------------------first group bellow options */
+  border: 2px solid #46b0f7; /*1px solid transparent;  ---- new !!!!!!         */
   background-color: #0f73b5;  /* #5fb611;*/ /* -- background-color of x-editable links in side panel */
+  border-radius: 7px;
+  margin-top: 1.25em; /* <---------- distance to line below options.. -----------------------*/
+  margin-bottom: none;
+  width: 12.80em; /* -- with of area around x-editable prompts & links */
 }
-.btn-sidepanel:hover {
-  background-color: #46b0f7;  /* #5fb611;*/ /* -- color around side panel menu */
-} /*6063*/
+.linkContainer:first-child{ /* first child of its parent (div with class linkContainerGroup)*/
+  margin-top: 0.2em;
+}
+.linkContainer { /* elements inside linkContainerGroup envolving the x-links */
+  font-size: inherit; /* the font size of linkContainer (inside linkContainer class) */
+  color: white; /* -- color of promts to x-editable links in side panel */ 
+  background-color:  #0f73b5;/* -- background-color of each linkContainer */
+  margin-left: 0.9em; /* margin between border of editableLinksGroup and each linkContainer element */
+}
+.linkContainer:last-child{ /* last child of its parent (div with class linkContainerGroup)*/
+  margin-bottom: 0.2em;
+}
+.linkContainer:hover{ /* mouse over any linkContainer element */
+  color:white;
+  background-color: #46b0f7;   
+}
+.linkStatus{ /* static presentation of x-editable links inside linkContainer */
+  color:black;
+  font-size: 0.9em; /*  side panel bottom text font-size */
+  background-color: white !important;/*#fd5987; */  
+} 
+.linkStatus:hover{ /* mouse above x-editable links inside linkContainer */
+  color:blue;
+  background-color:red;   
+} 
+.panel .navbar-collapse >ul >li >a {
+  color: white; /* static color for li elements below editableLinksGroup */
+} /*6085*/

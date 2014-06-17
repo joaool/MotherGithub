@@ -14,18 +14,21 @@ jQuery(document).ready(function($){
 			lastLoginStr = localStorage.login;// Retrieve format {email:x1,userName:x2,password:x3};
 			if(lastLoginStr) {
 				var lastLoginObj = JSON.parse(lastLoginStr);
-				htmlToInject = '<span class="aux-text small text-primary" style="margin-left:12em">'+
+				htmlToInject = '<div style="line-height:2.2em;"><span class="aux-text hidden-xs" style="margin-left:12em">'+
 										'Welcome to FrameLink: support@framelink.co'+
 									'</span>'+
-									'<a class="pull-right text-muted" href="javascript:FL.signIn()" style="margin-right:12em">'+
-										'<i id="_loginIcon" class="glyphicon glyphicon-user"></i>'+
-										'<span> '+lastLoginObj.email+'</span>'+
+									// '<a class="pull-right text-muted" href="javascript:FL.signIn()" style="margin-right:12em">'+
+									'<a class="pull-right " href="javascript:FL.signIn()" style="margin-right:12em">'+
+										'<i  class="glyphicon glyphicon-user"></i>'+
+										'<span id="_signIn" style="font-size: 1.2em;"> '+lastLoginObj.email+'</span>'+
 									'</a>'+
-									'<a class="pull-right text-muted" style="margin-right:1.5em" href="javascript:FL.tourIn()" >'+
-										'<i class="glyphicon glyphicon-eye-open"></i>'+
-										'<span> Tour</span>'+
-									'</a>';
-				FL.domInject("_login",htmlToInject );
+									// '<a class="pull-right text-muted" style="margin-right:1.5em" href="javascript:FL.tourIn()" >'+
+									'<a class="pull-right" style="margin-right:1.5em;" href="javascript:FL.tourIn()" >'+
+										'<i class="glyphicon glyphicon-eye-open" style="font-size: 1.5em;color:black;"></i>'+
+										'<span style="font-size: 1.2em;"> Tour</span>'+
+									'</a>'+
+								'</div>';
+					FL.domInject("_login",htmlToInject );
 				var htmlToSidePanel = '<div class="push"> <a id="_toggle" href="#menu" class="menu-link">&#9776;</a>';
 				FL.domInject("_sidePanel",htmlToSidePanel );//shows flyout button
 				$('.menu-link').bigSlide();
@@ -33,17 +36,20 @@ jQuery(document).ready(function($){
 				if(is_recoverLastMenu)
 					FL.recoverLastMenu();//recover locally saved tour status and menu and informs FL.menu about the new menu if any
 			}else{//the satus is signed out
-				htmlToInject = '<span class="aux-text hidden-xs" style="margin-left:12em">'+
+				htmlToInject = '<div style="line-height:2.2em;"><span class="aux-text hidden-xs" style="margin-left:12em">'+
 										'Welcome to FrameLink: support@framelink.co'+
 									'</span>'+
-									'<a class="pull-right text-muted" href="javascript:FL.signIn()" style="margin-right:12em">'+
-										'<i id="_loginIcon" class="glyphicon glyphicon-log-in"></i>'+
-										'<span> Sign In</span>'+
+									// '<a class="pull-right text-muted" href="javascript:FL.signIn()" style="margin-right:12em">'+
+									'<a class="pull-right" href="javascript:FL.signIn()" style="margin-right:12em;">'+
+										'<img src="FL_ui/img/signIn.png">'+
+										'<span id="_signIn" style="font-size: 1.2em;"> Sign In</span>'+
 									'</a>'+
-									'<a class="pull-right text-muted" style="margin-right:1.5em" href="javascript:FL.tourIn()" >'+
-										'<i  class="glyphicon glyphicon-eye-open"></i>'+
-										'<span> Tour</span>'+
-									'</a>';								
+									// '<a class="pull-right text-muted" style="margin-right:1.5em" href="javascript:FL.tourIn()" >'+
+									'<a class="pull-right" style="margin-right:1.5em;" href="javascript:FL.tourIn()" >'+
+										'<i  class="glyphicon glyphicon-eye-open" style="font-size: 1.5em;color:black;"></i>'+
+										'<span style="font-size: 1.2em;"> Tour</span>'+
+									'</a>'+
+								'</div>';
 				FL.domInject("_login",htmlToInject );
 				FL.domInject("_sidePanel");//removes flyout button
 				$.Topic( 'signInDone' ).publish( false ); //informs FL.menu that edition is allowed
@@ -93,7 +99,7 @@ jQuery(document).ready(function($){
 			var fileCss = "FL" + FL.currentStyle + ".css";
 			FL.loadCSS(fileCss);
 		}else{
-			FL.currentStyle = "readable";
+			FL.currentStyle = "red";
 			FL.loadCSS("FL" + FL.currentStyle + ".css");//the default
 		}
 		$("#_css").text(FL.currentStyle);

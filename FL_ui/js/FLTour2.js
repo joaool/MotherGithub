@@ -99,6 +99,12 @@ FL["setNextPrevOfCurrentStep"] = function() {//normally this will return the cur
 			console.log("setNextPrevOfCurrentStep -> currentStep ="+currentStep+" next will be "+next+" and previous will be "+prev);
 			FL.tourSettings.steps[currentStep].next = next;
 			FL.tourSettings.steps[currentStep].prev = prev;
+			
+			// FL.tourSettings.steps[next].backdrop = true;
+
+			// if(currentStep == next) {
+			// 	alert("setNextPrevOfCurrentStep:  Step "+next+" will be blocked !");
+			// }
 		}
 	}
 	return currentStep;	
@@ -134,7 +140,7 @@ FL["onTrueMoveToStep"] = function(onTrue,toStep) {//if actual step toMove equals
 		// FL.tour.start(true);
 	}
 };
-// --------------------------- message hadlers ---------------------------------
+// --------------------------- message handlers ---------------------------------
 FL["suspend_ResumeSequence"] = function(logOnProcess) {
 	// alert("***************************  suspend_ResumeSequence with logOnProcess="+logOnProcess+" FL.stepBeforeEnd="+FL.stepBeforeEnd);
 	if(FL.tourActive) {
@@ -158,7 +164,7 @@ FL["suspend_ResumeSequence"] = function(logOnProcess) {
 FL["adjustSequenceOnLogin"] = function(loggedIn) {//subscribed "signInDone"
 	FL.updatesEventRegister("signInDone",loggedIn);
 	FL.mixinTourMap(FL.currentTourMap);
-	// alert("adjustSequenceOnLogin -received a message !!!");
+	// alert("adjustSequenceOnLogin -received a message !!! login is "+loggedIn);
 	FL.setNextPrevOfCurrentStep();
 
 	FL.is_tourSaveOnEnd = true;
@@ -256,6 +262,7 @@ FL["styleChangeHandler"] = function(newStyle) {//subscribed "styleChange"
 	if(FL.tour.getCurrentStep() == 4) { //a HACK to make a refresh of step 4
 		FL.tour.prev();
 		FL.onTrueMoveToStep( true ,4);
+		FL.onTrueMoveToStep( true ,5);
 		FL.tour.init();
 		FL.tour.start(true);
 	}
@@ -268,9 +275,12 @@ FL["tourIn"] = function() {//called by tour icon
 		FL["tourActive"] = true;//tour exists and is activated
 		// var currentStep = FL.tour.getCurrentStep();
 		var currentStep = FL.setNextPrevOfCurrentStep();
+		// alert("currentStep="+currentStep+" getCurrentStep()->"+FL.tour.getCurrentStep());
+		if(currentStep == 0)
+			FL.showTourStep0 = true;
 		if(FL.showTourStep0) {
 			currentStep = 0;//only runs the first time or after a reset.
-			FL.tour.setCurrentStep(0);			
+			FL.tour.setCurrentStep(0);
 		}
 		FL.getTruePositionFor(currentStep);
 		FL.tourSettings.steps[4].content = "1 - Click '" + FL.currentStyle +"'.<br>2 - Click the down arrow.<br>3 - Choose another style.<br>4 - Click the checkmark &#x2713.";//2 places ! 205/251
@@ -364,18 +374,22 @@ FL["setTourOn"] = function(is_tour) {//if true, creates tour object with steps. 
 	}
 	FL["is_tour"] = is_tour;
 };
+FL["getTourElement"] = function (tour) { //to solve a bootstraptour bug not working in chrome https://github.com/sorich87/bootstrap-tour/issues/166   solution by KyleMit
+	// return tour._steps[tour._current].element //original solution
+    return this.tourSettings.steps[tour._current].element; //dapted to FL
+};  
 FL["tourSettings"] = {
 	container: "body",
 	storage: false,
-	template: "<div class='popover tour btn-primary' style='max-width: 22em;'>"+
-		"<div class='arrow' style='background-color:black;'></div>"+
-			"<h3 class='popover-title'></h3>"+
+	template: "<div class='popover tour' style='max-width: 22em;'>"+
+			"<div class='arrow'></div>"+
+			"<h3 class='popover-title' align='center' style='background-color: #e8f0f5;line-height:1.0em;margin-top:1.0em;'></h3>"+
 			"<div class='popover-content'></div>"+
 			"<div class='popover-navigation'>"+
-				"<button class='btn btn-danger' data-role='prev'>« Prev</button>"+
+				"<button class='btn btn-default' data-role='prev'>« Prev</button>"+
 				"<span data-role='separator'>|</span>"+
-				"<button class='btn btn-success' data-role='next'>Next »</button>"+
-				"<button class='btn btn-info' data-role='end'>End tour</button>"+
+				"<button class='btn' data-role='next' style='background-color: #118bd4;color: white;'>Next »</button>"+
+				"<button class='btn btn-default' data-role='end' >End tour</button>"+
 			"</div>"+
 		"</div>",
 	onEnd : function() {
@@ -389,101 +403,172 @@ FL["tourSettings"] = {
 		}
 		FL.is_tourSaveOnEnd = true;
 	},
-	onShown : function() {
-		FL.setNextPrevOfCurrentStep();
-	},
+	// onShown : function() {
+	// 	FL.setNextPrevOfCurrentStep();
+	// },
+    onShown: function(tour) { //next 3 lines to solve a bootstraptour bug not working in chrome https://github.com/sorich87/bootstrap-tour/issues/166   solution by KyleMit
+        var stepElement = FL.getTourElement(FL.tour);
+        $(stepElement).after($('.tour-step-background'));
+        $(stepElement).after($('.tour-backdrop'));
+
+		FL.setNextPrevOfCurrentStep();//old code
+		// var currentStep = FL.tour.getCurrentStep();
+		// // alert("onShown: currentStep = "+currentStep);
+		// FL.is_tourSaveOnEnd = false;
+		// FL.tour.end();
+		// FL.tour.setCurrentStep(currentStep);
+		// FL.tourSettings.steps[currentStep].backdrop = true;
+    },
 	stepsChangeEvents: [ //these are the events that may change the 'natural' sequence
-		{onEvent: "signInDone",onEventValue: false,suspend: false,     tourMap: [1,1,0,0,0,0,0,0,0,0,0,0]},//if logout, tour only can be in brand or in login
-		{onEvent: "signInDone",onEventValue: true,suspend: false,      tourMap: [1,0,1,1,1,1,1,1,1,1,1,1]},//if logout, tour can be everywhere e except login
-		{onEvent: "sidePanelOpened",onEventValue: true,suspend: false, tourMap: [1,0,1,0,1,1,1,1,1,1,1,1]},
-		{onEvent: "sidePanelOpened",onEventValue: false,suspend: false,tourMap: [1,1,1,1,0,0,0,0,0,0,0,0]},
+		{onEvent: "signInDone",onEventValue: false,suspend: false,     tourMap: [1,1,0,0,0,0,0,0,0,0,0,0,0]},//if logout, tour only can be in brand or in login
+		{onEvent: "signInDone",onEventValue: true,suspend: false,      tourMap: [1,0,1,1,1,1,1,1,1,1,1,1,1]},//if logout, tour can be everywhere e except login
+		{onEvent: "sidePanelOpened",onEventValue: true,suspend: false, tourMap: [1,0,1,0,1,1,1,1,1,1,1,1,1]},
+		{onEvent: "sidePanelOpened",onEventValue: false,suspend: false,tourMap: [1,1,1,1,0,0,0,0,0,0,0,0,1]},
 		{onEvent: "inLogOnProcess",onEventValue: true,suspend: true},
 		{onEvent: "inMenuEdition",onEventValue: false,suspend: true}
 	],
 	steps: [
 		{
-			element: "#brand",//0
+			// element: "#brand",//0
 			placement: "right",
 			backdrop: true,
-			title: "FrameLink presentation",
+			orphan:true,
+			title: "<p align='center' style='line-height:1.0em;margin-top:1.0em;'><strong>FrameLink presentation</strong></p>",
 			content: "<p>FrameLink works by transforming itself into YOUR own business web application.</p><img style='height: 10em;display: block;margin: 0 auto;' src='FL_ui/img/tourFrameLink.jpg'><p>You can change Framelink's menus into the menus that match your needs.</p>",
 		},
 		{
-			element: "#_loginIcon",//1
+			element: "#_signIn",//1
 			placement: "bottom",
-			title: "Sign in as a FrameLink designer",
-			template: "<div class='popover tour btn-primary' style='max-width: 22em;'>"+
-				"<div class='arrow'></div>"+
-					"<h3 class='popover-title'></h3>"+
+			backdrop: true,
+			title: "<p align='center' style='line-height:1.0em;margin-top:1.0em;'><strong>Sign in as a FrameLink designer</strong></p>",
+			template: "<div class='popover tour' style='max-width: 22em;'>"+
+					"<div class='arrow'></div>"+
+					"<h3 class='popover-title' align='center' style='background-color: #e8f0f5;line-height:1.0em;margin-top:1.0em;'></h3>"+
 					"<div class='popover-content'></div>"+
 					"<div class='popover-navigation'>"+
-						"<button class='btn btn-danger' data-role='prev'>« Prev</button>"+
-						"<span data-role='separator'>|</span>"+
-						"<button class='btn btn-success' data-role='next'>Next »</button>"+
-						"<button class='btn btn-info' data-role='end'>End tour</button>"+
+						"<button class='btn btn-default' data-role='prev'>« Prev</button>"+
+						// "<span data-role='separator'>|</span>"+
+						// "<button class='btn' data-role='next' style='background-color: #118bd4;color: white;'>Next »</button>"+
+						"<button class='btn btn-default' data-role='end' >End tour</button>"+
 					"</div>"+
 				"</div>",
-			content: "<p>Click 'Sign In' to change your status from a 'normal' user to a 'DESIGNER' that can change this site.</p><img style='height: 10em;display: block;margin: 0 auto;' src='FL_ui/img/clickSignIn.jpg'>",
+			// template: "<div class='popover tour' style='max-width: 22em;'>"+
+			// 	"<div class='arrow'></div>"+
+			// 		"<h3 class='popover-title'></h3>"+
+			// 		"<div class='popover-content'></div>"+
+			// 		"<div class='popover-navigation'>"+
+			// 			"<button class='btn btn btn-default' data-role='prev'>« Prev</button>"+
+			// 			"<span data-role='separator'>|</span>"+
+			// 			"<button class='btn' data-role='next' style='background-color: #118bd4;color: white;'>Next »</button>"+
+			// 			"<button class='btn btn-default' data-role='end'>End tour</button>"+
+			// 		"</div>"+
+			// 	"</div>",
+			// content: "<img style='width: 19.8em;display: block;margin: 0 auto;' src='FL_ui/img/clickSignIn.jpg'><p>Your status will change from 'normal' user to a 'DESIGNER' that can change this site.</p>",
+			content: "<p>Click Sign In to change from 'normal' user to a 'DESIGNER' that can change this site.</p>",
 		},
 		{
 			element: "#toolbar",//2
 			placement: "bottom",
+			backdrop: true,		
 			title: "Edit this menu",
 			content: "<p>Let's try changing the menu above !</p><p>RIGHT CLICK over any menu item.</p><img style='height: 10em;display: block;margin: 0 auto;' src='FL_ui/img/rightClick.jpg'>",
 		},
 		{
 			element: "#_toggle",//3
 			placement: "right",
+			backdrop: true,
 			title: "Access FrameLink side panel.",
-			content: "<p>Click this icon to access the SIDE PANEL.</p>.<img style='height: 10em; display: block;margin: 0 auto;' src='FL_ui/img/clickSidePanel.jpg'>"
+			template: "<div class='popover tour' style='max-width: 22em;'>"+
+					"<div class='arrow'></div>"+
+					"<h3 class='popover-title' align='center' style='background-color: #e8f0f5;line-height:1.0em;margin-top:1.0em;'></h3>"+
+					"<div class='popover-content'></div>"+
+					"<div class='popover-navigation'>"+
+						"<button class='btn btn-default' data-role='prev'>« Prev</button>"+
+						// "<span data-role='separator'>|</span>"+
+						// "<button class='btn' data-role='next' style='background-color: #118bd4;color: white;'>Next »</button>"+
+						"<button class='btn btn-default' data-role='end' >End tour</button>"+
+					"</div>"+
+				"</div>",	
+			// content: "<p>Click the top left icon to access the SIDE PANEL.</p>.<img style='height: 10em; display: block;margin: 0 auto;' src='FL_ui/img/clickSidePanel.jpg'>"
+			content: "<p>Click the top left icon to access the SIDE PANEL.</p>"
 		},
 		{
 			element: "#_globalStyles",//4
 			placement: "right",
+			backdrop: true,
+			template: "<div class='popover tour' style='max-width: 22em;'>"+
+					"<div class='arrow'></div>"+
+					"<h3 class='popover-title' align='center' style='background-color: #e8f0f5;line-height:1.0em;margin-top:1.0em;'></h3>"+
+					"<div class='popover-content' style='margin-left:2.0em;'></div>"+
+					"<div class='popover-navigation'>"+
+						"<button class='btn btn-default' data-role='prev'>« Prev</button>"+
+						"<span data-role='separator'>|</span>"+
+						"<button class='btn' data-role='next' style='background-color: #118bd4;color: white;'>Next »</button>"+
+						"<button class='btn btn-default' data-role='end' >End tour</button>"+
+					"</div>"+
+				"</div>",			
 			title: "Change the site style",
 			content:""//defined in 199 and 245 !!
 		},
 		{
 			element: "#_fonts",//5
 			placement: "right",
+			backdrop: true,
 			title: "Select Fonts",
 			content: "NOT AVAILABLE - Choose head and paragraph fonts."
 		},
 		{
 			element: "#_reset",//6
 			placement: "right",
+			backdrop: true,
 			title: "Factory defaults",
 			content: "Click to reset original settings."
 		},
 		{
 			element: "#_forms",//7
 			placement: "right",
-			title: "Create/edit Forms",
-			content: "NOT AVAILABLE - Click to create or edit data entry forms into your data."
+			backdrop: true,		
+			title: "Create/edit Forms - Login Service",
+			content: "NOT AVAILABLE - This will allow customization of forms to edit your data. Some of these forms may be accessed by users with permission to edit their own data."
 		},
 						{
 			element: "#_newsLetters",//8
 			placement: "right",
-			title: "Send Mails/Newsletters",
-			content: "NOT AVAILABLE - Click to include the definition and production of newsletters in your site."
+			backdrop: true,		
+			title: "Send Newsletters/SMS/Voice",
+			content: "NOT AVAILABLE - This will add an Email/Newsletters, SMS or Voice service to your FrameLink database."
 		},
 		{
 			element: "#_appointments",//9
 			placement: "right",
+			backdrop: true,		
 			title: "Set appointments",
-			content: "NOT AVAILABLE - Click to add the possibility of setting appointments in your site."
+			content: "NOT AVAILABLE - This will add a service to set appointments with people defined in your data."
 		},
 		{
 			element: "#_cart",//10
 			placement: "right",
-			title: "Shopping cart",
-			content: "NOT AVAILABLE - Click to add a shopping application in your site."
+			backdrop: true,		
+			title: "Shopping cart",	
+			content: "NOT AVAILABLE - This will add a shopping cart service to be used by users who can logon into your site."
 		},
 		{
-			element: "#_how",//11
+			element: "#_invoicePayment",//11
 			placement: "right",
-			title: "FrameLink Guide",
-			content: "NOT AVAILABLE - Click to access the FrameLink Guide."
+			backdrop: true,
+			template: "<div class='popover tour' style='max-width: 22em;'>"+
+					"<div class='arrow'></div>"+
+					"<h3 class='popover-title' align='center' style='background-color: #e8f0f5;line-height:1.0em;margin-top:1.0em;'></h3>"+
+					"<div class='popover-content'></div>"+
+					"<div class='popover-navigation'>"+
+						"<button class='btn btn-default' data-role='prev'>« Prev</button>"+
+						// "<span data-role='separator'>|</span>"+
+						// "<button class='btn' data-role='next' style='background-color: #118bd4;color: white;'>Next »</button>"+
+						"<button class='btn btn-default' data-role='end' >End tour</button>"+
+					"</div>"+
+				"</div>",						
+			title: "Invoicing/Payments",
+			content: "NOT AVAILABLE - This will add a Invoicing/Payment service to your FrameLink database. With this service active a 'Payment' button will be available in Forms/Grid service."
 		},
 	]
 };
