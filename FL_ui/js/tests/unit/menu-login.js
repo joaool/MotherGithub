@@ -9,6 +9,20 @@ $(function () {
     strictEqual(1,1,"they are strictly equal");//non strict assertion
     // deepEqual(item1,item2,"all the elements in the array are equal"); /recursively vompares array elements and objects 
   });
+  // test("login test", function () { //one test can have several assertions
+  //   var lastLoginStr = localStorage.login;// Retrieve format {email:x1,userName:x2,password:x3};
+  //   var actual = null;
+  //   var expected = null;
+  //   if(lastLoginStr) { //login exists
+  //     var lastLoginObj = JSON.parse(lastLoginStr);
+  //     expected = lastLoginObj.email;
+  //   }else{// not signed In
+  //     expected = " Sign In";
+  //   }
+  //   var actual = '1';
+  //   var expected = 1;
+  //   equal(actual,expected,"...are equal");//non strict assertion
+  // });  
   test("FL.menu primitives", function () { //one test can have several assertions
      var oMenu = {
       "menu" : [
@@ -209,7 +223,7 @@ $(function () {
     var expected =[1,0,1,1,1,1,1,1,1,1,1,1];
     deepEqual( actual, expected,"FL.findTourMapFor found FL.tourSettings.stepsChangeEvents[1] !!!" );//1
     actual = FL.findTourMapFor("sidePanelOpened",false);
-    expected = [1,1,1,1,0,0,0,0,0,0,0,0];
+    expected =    [1,1,1,1,0,0,0,0,0,0,0,0];
     deepEqual( actual, expected,"FL.findTourMapFor found FL.tourSettings.stepsChangeEvents[3] !!!" );//2
     actual = FL.findTourMapFor("inMenuEdition",false);
     if(!actual)
@@ -340,4 +354,148 @@ $(function () {
   //     ok($("#repaymentAmount").length != 0, "total repayment amount output element exists");
   //     ok($("#totalToRepay").length != 0, "total amount to repay output button element exists");
   // });
+  test("client Dictionary tests", function () { //one test can have several assertions
+    //client
+    var success = FL.dd.createEntity("client","company we may invoice");
+    ok(success === true , "createEntity operation successfull for first entity !" );
+    actual = FL.dd.entities["client"];
+    ok(actual.csingular == "01", "Compressed code for first entity = '01'");
+    ok(actual.description == "company we may invoice", "description is correct");
+    ok(actual.plural == "clients", "plural is clients");
+    success = FL.dd.createEntity("client","another company we may invoice");
+    ok(success === false , "createEntity refused because client exists already !" );
+
+    //order
+    success = FL.dd.createEntity("order","client's product request");
+    ok(success === true , "createEntity operation successfull for 2nd entity !" );
+    actual = FL.dd.entities["order"];
+    ok(actual.csingular == "02", "Compressed code for 2nd entity = '02'");
+    ok(actual.description == "client's product request", "description is correct for 2nd entity");
+    ok(actual.plural == "orders", "plural is orders");
+
+    success = FL.dd.updateEntityBySingular("client",{plural:"customers",description:"frequent buyer"});
+    ok(success === true , "updateEntityBySingular operation successfull for client" );
+    actual = FL.dd.entities["client"];
+    ok(actual.csingular == "01", "Compressed code for first entity = '01'");
+    ok(actual.description == "frequent buyer", "description was updated correctely");
+    ok(actual.plural == "customers", "plural has changed to customers");
+
+    success = FL.dd.updateEntityByCName("01",{plural:"clients",description:"very frequent buyer"});
+    ok(success === true , "updateEntityByCName operation successfull for client" );
+    actual = FL.dd.entities["client"];
+    ok(actual.csingular == "01", "Compressed code for first entity = '01'");
+    ok(actual.description == "very frequent buyer", "description was updated correctely");
+    ok(actual.plural == "clients", "plural has changed back to clients");
+
+    var entityCN = FL.dd.getCEntity("order");
+    ok(entityCN == "02", "FL.dd.getCEntity ->Compressed code for 'order' is = '02'");
+    entityCN = FL.dd.getCEntity("patolinas");
+    ok(entityCN === null, "FL.dd.getCEntity ->Compressed code for patolinas is null - not existing");
+    
+    FL.dd.addAttribute("order","shipped","expedition status","Shipped","boolean",null);
+    actual = FL.dd.getEntityBySingular("order");
+    ok(actual.attributes.length == 2, "Order has 2 attributes");
+
+    actual = FL.dd.countEntitiesBeginningBy("client");
+    ok(actual == 1, "countEntitiesBeginningBy('client') is 1");
+
+    success = FL.dd.createEntity("client1","another company we may invoice");
+    actual = FL.dd.countEntitiesBeginningBy("client");
+    ok(actual == 2, "countEntitiesBeginningBy('client') is 2");
+    actual = FL.dd.countEntitiesBeginningBy("patolinas");
+    ok(actual === 0, "countEntitiesBeginningBy('patolinas') is 0");
+    actual = FL.dd.nextEntityBeginningBy("client");
+    ok(actual === "client2", "nextEntityBeginningBy('client') is 'client2'");
+    actual = FL.dd.nextEntityBeginningBy("patolinas");
+    ok(actual === "patolinas", "nextEntityBeginningBy('patolinas') is 'patolinas'");
+
+    FL.dd.addAttribute("order","product","unique order item","product","string",null);
+    FL.dd.displayEntities();
+    var rowsArr = [
+      {id:1,shipped:true,product:"Prod 1"},
+      {id:2,shipped:false,product:"Prod 2"},
+      {id:3,shipped:false,product:"Prod 3"},
+      {id:4,shipped:true,product:"Prod 4"}
+    ];
+    utils.csvToStore(rowsArr);
+    console.log("---->"+JSON.stringify(csvStore.csvRows));
+
+    var obj = FL.dd.getSavingRowsFromCsvStoreById("order",1);
+    console.log("---->"+JSON.stringify(obj));
+    deepEqual( obj, {d:{ "00":1,"01":true,"02":"Prod 1" },r:[]}, "FL.dd.getSavingObjFromCsvStoreById correct for id=1" );
+    obj = FL.dd.getSavingRowsFromCsvStoreById("order",3);
+    console.log("---->"+JSON.stringify(obj));
+    deepEqual( obj, {d:{ "00":3,"01":false,"02":"Prod 3" },r:[]}, "FL.dd.getSavingObjFromCsvStoreById correct for id=3" );
+    obj = FL.dd.getSavingRowsForCsvStore("order");
+    console.log("---->"+JSON.stringify(obj));
+    // FL.server.insertCsvStoreDataTo("order");
+
+
+    // ----------- test Nico Login ---------------
+    FL.server.byPass = false; //force server access if false
+    // FL.server.connect("Nico","coLas",...); 
+ 
+    // FL.server.connect("Joao","oLiVeIrA",function(bSuccess){
+    //     // ok(bSuccess === true, "Good connection");
+    //     if(bSuccess){
+    //       console.log("Good connection--> begin createServerEntity_Fields-------------------");
+    //       console.log("   --> before server synch");
+
+    //       FL.dd.displayEntities();
+    //       FL.server.createServerEntity_Fields("order",function(err){
+    //           console.log("createServerEntity_Fields is done !!! Error:"+err);
+    //           console.log("   --> after server synch");
+    //           FL.dd.displayEntities();
+    //           FL.server.disconnect();//Parameter is Bypass         
+    //       });//singular, plural, description
+    //     }else{
+    //       console.log("Connection Error !!!");
+    //     }
+    // });
+ 
+    // FL.server.insertCsvStoreDataTo("order");
+    FL.server.connect("Joao","oLiVeIrA",function(bSuccess){
+        // ok(bSuccess === true, "Good connection");
+        if(bSuccess){
+          console.log("Good connection--> begin insertCsvStoreDataTo(entity)-------------------");
+          FL.server.insertCsvStoreDataTo("order",function(err){
+              console.log("insertCsvStoreDataTo is done !!! Error:"+err);
+              FL.server.disconnect();//Parameter is Bypass         
+          });//singular, plural, description
+        }else{
+          console.log("Connection Error !!!");
+        }
+    });  
+
+    // simulZ = function(id,t,cb){
+    //   setTimeout(function(){
+    //     console.log("Simul --->"+id+" is done.");
+    //     cb();
+    //       }, t);
+    // };
+
+    // FL.server.connect("Joao","oLiVeIrA",false,function(bSuccess){
+    //     // ok(bSuccess === true, "Good connection");
+    //     if(bSuccess){
+    //       console.log("Good connection--> begin createServerEntity_Fields-------------------");
+    //       console.log("   --> before server synch");
+    //       FL.dd.displayEntities();
+    //       var fEnt = new FL.server.fl.entity();
+    //       fEnt = fEnt.getAllWithField({"query":{}},function(err,entities){//standard callback err,data
+    //           if(err){
+    //              alert("fEnt.getAllWithField Error "+err);
+    //              return;
+    //           }
+    //           FL.dd.loadClientDictionary(entities);
+    //           console.log("Server Dictionary is loaded (if no errors)  Error:"+err);
+    //           console.log("   -->entities:"+JSON.stringify(entities));
+    //           FL.dd.displayEntities();
+    //           FL.login.disconnectServer(false);//Parameter is Bypass         
+    //       });//singular, plural, description
+    //     }else{
+    //       // console.log("Connection Error !!!");
+    //       alert("Connection Error !!!");
+    //     }
+    // });
+   });
 });

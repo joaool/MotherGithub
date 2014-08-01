@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>builder v1.0</title>
+    <!-- <link href="FL_ui/css/jquery.smartmenus.bootstrap.css" rel="stylesheet"> -->
+    <script src="FL_ui/js/jquery-1.11.1.min.js" type="text/javascript"></script>
+    <!-- <script src="http://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.js" type="text/javascript"></script> -->
+    <!-- next line is necessary because jquery.slidePanel.js needs $.browser has been removed from JQuery 1.9. -->
+    <script src="http://code.jquery.com/jquery-migrate-1.0.0.js" type="text/javascript"></script>
+    <link href="FL_ui/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
+    <script src="FL_ui/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.9/themes/base/jquery-ui.css" type="text/css" media="all" /> 
+    <script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.22/jquery-ui.min.js" type="text/javascript"></script>
+
+    <!-- <script src="FL_ui/js/angular/angular.min.js"></script> -->
+    <!-- <script src="FL_ui/js/app.js"></script> -->
+</head> 
+<style>
+    /*jQuery.curCSS = jQuery.css;*/
+    $maincolor: red;
+    $hovercolor: #5BC0DE;
+    * {
+      @include box-sizing(border-box);
+    }
+
+    body{
+      margin-top: 10px;
+    }
+
+    .container > div > div{
+      min-height: 225px;
+      background-color: $maincolor;
+    }
+    .FormBuilder{
+      & > ul{
+        width: 100%;
+        padding: 0;
+        margin: 0;
+      }
+    }
+    div.DragTarget{
+      border:3px dashed darken($maincolor, 50%);
+    }
+    div.Dropped{
+      background-color: green;
+    }
+    .affix{
+      width: 100%;
+    }
+
+    div.FormElement{
+      @include border-radius(4px);
+      padding: 10px;
+      padding-top: 30px;
+    }
+    div.FormElement:hover{
+      background-color: rgba($hovercolor, 0.8);
+    }
+
+    .placeHolder{
+      @include border-radius(4px);
+      background-color: rgba($hovercolor, 0.5);
+    }
+
+    .affix{
+    }
+    .affix-top{
+      width: 100%;
+    }
+    .affix-bottom,.affix {
+      width: 263px;
+    }
+    hr{
+      border-color:slategray;
+    }
+</style>
+<body>
+<div class="container">
+  <div class="row">
+    <div class="FormBuilder col-md-9" role="main">
+      <ul></ul>
+    </div>
+    <div class="FormTools col-md-3">
+      <div class="FormElementMenu">
+        <a class="btn btn-info btn-block" data-formtype="Textbox">Textbox</a>
+        <a class="btn btn-info btn-block" data-formtype="Dropdown">Dropdown</a>
+        <a class="btn btn-info btn-block" data-formtype="Textarea">Textarea</a>
+        <a class="btn btn-info btn-block" data-formtype="RadioButtons">Radio Button</a>
+        <a class="btn btn-info btn-block" data-formtype="PageBreak">Page Break</a>
+        </div>
+    </div>
+  </div>
+</div>
+<script>
+    // This makes the Builder Elements Sortable - 
+    //http://codepen.io/fwhenin/pen/aEbhw - uses jquery UI very primitive
+    //http://codepen.io/TimLamber/pen/KaiFg - Adam Moore miniKomi - backbone.js and underscore.js
+    // http://codepen.io/geoffyuen/pen/ervmp - jquery only
+    $( ".FormBuilder ul" ).sortable({
+      placeholder: "placeHolder",
+      opacity: 0.5,
+      start: function(e, ui ){
+         ui.placeholder.height(ui.helper.outerHeight());
+      }
+    });
+
+    $(".FormElementMenu").affix({
+        offset: {
+          top: 0
+        }
+      });
+
+    $(".FormTools .btn").draggable({ 
+      revert: "invalid",
+      opacity: 0.5,
+      helper: "clone",
+      cursor: "crosshair ",
+      start: function( event, ui ) {
+        $(this).css( "z-index", 10);
+        $(".FormBuilder").addClass("DragTarget");
+      },
+      stop: function( event, ui ) {
+        $(".FormBuilder").removeClass("DragTarget");
+      }
+    });
+    $(".FormBuilder").droppable({
+      accept: ".container div a",
+      drop: function( event, ui ) {
+        var element;
+        $( this ).animate({backgroundColor: ["#5BC0DE", "swing"]}, 200);
+        $( this ).animate({backgroundColor: ["#fff", "swing"]}, 200);
+        var ElementType = ui.draggable.data('formtype');
+        $(this).find("ul").append(FormElement(ElementType));
+      }
+    });
+
+    function FormElement(elementID){
+      var ContainerDiv = getMainContainer();
+      var inputElement;
+      var elementString;
+      switch(elementID){
+        case "Textbox":
+          inputElement = getTextBox();
+          break;
+        case "Dropdown":
+          inputElement = getDropDown();
+          break;
+        case "Textarea":
+          inputElement = getTextArea();
+          break;
+        case "RadioButtons":
+          inputElement = getRadioButton();
+          break;
+        case "PageBreak":
+          inputElement = $("<hr>");
+          break;
+      }
+      if (inputElement){
+        ContainerDiv.append(getFormElementHeader(elementID));
+        ContainerDiv.append(inputElement);
+        return ContainerDiv;
+      }
+    }
+
+    function getMainContainer(){
+      return $("<div>", {
+            class: "FormElement"
+          });
+    }
+
+    function getRadioButton(){
+      var RadioContainer = $("<div>");
+      var numberOfElements = $(".FormElement").length + 1;
+      for ( var i = 1; i <= 3; i++ ) {
+        var SingleRadio = $("<div>",{
+          class: "radio"
+        });
+        var RadioLabel = $("<label>");
+        var RadioInput = $("<input>",{
+          type: "radio",
+          name: "optionsRadios" + numberOfElements,
+          value: "option" + i
+        });
+        RadioLabel.append(RadioInput);
+        RadioLabel.append("Option " + i);
+        SingleRadio.append(RadioLabel);
+        RadioContainer.append(SingleRadio);
+      }
+      return RadioContainer;
+    }
+
+    function getTextArea(){
+      return $("<textarea>", {
+            class: "form-control"
+          });
+    }
+
+    function getDropDown(){
+      var inputElement = $("<select>", {
+            class: "form-control",
+            type: "text",
+            placeholder: "TextBox"
+          });
+      var ddlOption = $("option", {
+        html: "Dropdown"
+      });
+      for ( var i = 1; i <= 5; i++ ) {
+        inputElement.append(
+          $('<option></option>').val(i).html("Select " + i)
+        );
+      }
+      return inputElement;
+    }
+
+    function getTextBox(){
+      return $("<input>", {
+            class: "form-control",
+            type: "text",
+            placeholder: "TextBox"
+          });
+    }
+
+    function getFormElementHeader(DisplayText){
+      return $("<label>",{
+        class: "elementHeader",
+        html: DisplayText
+      });
+    }
+</script>
+</body>

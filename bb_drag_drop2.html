@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+    <title>Bbone drag&drop v2.0</title>
+</head>
+<body>
+    <!--<script type="text/javascript" charset="utf-8" src="../rivets/dist/rivets.js" ></script>-->
+   	<!-- <script type="text/javascript" src="http://code.jquery.com/jquery-1.9.1.min.js"></script> -->
+   	<!-- <script src="FL_ui/js/jquery-1.11.1.min.js" type="text/javascript"></script> -->
+	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+	<script src="FL_ui/js/bootstrap.min.js"></script>
+
+	<!-- <script src="http://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.3.3/underscore-min.js" type="text/javascript"></script> -->
+   	<script src="FL_ui/js/underscore-min.js" type="text/javascript"></script>
+  	<script src="http://cdnjs.cloudflare.com/ajax/libs/backbone.js/0.9.2/backbone-min.js" type="text/javascript"></script>
+	<script src="FL_ui/js/jquery.sortable.js"></script>
+	<!-- <link href='http://fonts.googleapis.com/css?family=Droid+Serif' rel='stylesheet' type='text/css'> -->
+	<style>
+		header, section {
+			display: block;
+		}
+		body {
+			font-family: 'Droid Serif';
+		}
+		h1, h2 {
+			text-align: center;
+			font-weight: normal;
+		}
+		#features {
+			margin: auto;
+			width: 460px;
+			font-size: 0.9em;
+		}
+		.connected, .sortable, .exclude, .handles {
+			margin: auto;
+			padding: 0;
+			width: 310px;
+			-webkit-touch-callout: none;
+			-webkit-user-select: none;
+			-khtml-user-select: none;
+			-moz-user-select: none;
+			-ms-user-select: none;
+			user-select: none;
+		}
+		.sortable.grid {
+			overflow: hidden;
+		}
+		.connected li, .sortable li, .exclude li, .handles li {
+			list-style: none;
+			border: 1px solid #CCC;
+			background: #F6F6F6;
+			font-family: "Tahoma";
+			color: #1C94C4;
+			margin: 5px;
+			padding: 5px;
+			height: 22px;
+		}
+		.handles span {
+			cursor: move;
+		}
+		li.disabled {
+			opacity: 0.5;
+		}
+		.sortable.grid li {
+			line-height: 80px;
+			float: left;
+			width: 80px;
+			height: 80px;
+			text-align: center;
+		}
+		li.highlight {
+			background: #FEE25F;
+		}
+		#connected {
+			width: 440px;
+			overflow: hidden;
+			margin: auto;
+		}
+		.connected {
+			float: left;
+			width: 200px;
+		}
+		.connected.no2 {
+			/*float: right;*/
+			margin-right: 50.0em;
+		}
+		li.sortable-placeholder { /*edit this to change the placeholder look...*/
+			border: 2px dashed red;  /*border: 2px dashed blue; original->border: 1px dashed #CCC; */
+			background: cyan; /*background: red;  original--> background: none;*/
+		}
+		li.sortable-dragging { /*edit this to change the dragging look...*/
+			/*border: 2px dashed green;  border: 2px dashed blue; original->border: 1px dashed #CCC; */
+			background: red; /*background: red;  original--> background: none;*/
+		}		
+	</style>
+<!-- 	<section>
+		<h2>Widgets</h2>
+		<ul class="sortable list">
+			<li>Jumbotron</li>
+			<li>TextBox</li>
+			<li>NumberBox</li>
+			<li>ComboBox</li>
+			<li>TextArea</li>
+			<li>CheckBox</li>
+		</ul>
+	</section> -->
+	<div class="container">
+		<h2>FrameLink builder</h2>
+		<div id="sortable1">
+			<ul class="connected">
+				<li>Jumbotron</li>
+				<li>TextBox</li>
+				<li>NumberBox</li>
+				<li>ComboBox</li>
+				<li>TextArea</li>
+				<li>CheckBox</li>
+			</ul>
+		</div>
+		<div id="sortable2">
+			<ul class="connected list no2">
+				<li class="highlight">Item 1</li>
+				<li class="highlight">Item 2</li>
+				<li class="highlight">Item 3</li>
+				<li class="highlight">Item 4</li>
+				<li class="highlight">Item 5</li>
+				<li class="highlight">Item 6</li>
+			</ul>
+		</div>
+		<div>
+			<h1>xxx</h1>
+			<hr />
+			<div class="page"></div>
+		</div>
+	</div>
+	<script type="text/template" id="widgetsList">
+		<div id="sortable1">
+			<ul class="connected">
+				<li>Jumbotron</li>
+				<li>TextBox</li>
+				<li>NumberBox</li>
+				<li>ComboBox</li>
+				<li>TextArea</li>
+				<li>CheckBox</li>
+			</ul>
+		</div>
+	</script>
+	<script type="text/template" id="editWidget">
+		<form class="edit-widget">
+			<legend>Create widget</legend>
+			<label>Text Input</label>
+			<input type="text" name="label" />
+			<label>Help text</label>
+			<input type="text" name="help" />
+			<hr />
+			<button type="submit" class="btn" >Create</button>
+		</form>	
+	</script>	
+<script type="text/javascript">
+	(function($){
+		var Item = Backbone.Model.extend({//Item Class
+			defaults: {
+				part1: 'hello',
+				part2: 'world'
+			}
+		});
+		var List = Backbone.Collection.extend({//a collection of items - an array ready to receive item instances
+			model: Item
+		});
+		var ListView = Backbone.View.extend({
+			el: $('.page'), // attaches `this.el` to an existing element.
+			events: {
+				'click button#add': 'addItem',
+				// "mousedown": "downHandler"
+			},
+			initialize: function(){
+				_.bindAll(this, 'render','addItem'); // fixes loss of context for 'this' within methods
+				this.collection = new List();//instantiates a collection 
+				this.collection.bind('add', this.addItem); // collection event binder				
+				this.counter = 0; // total number of items added thus far
+				this.render(); // not all views are self-rendering. This one is.
+		    },
+			render: function(){
+				console.log("-------------->Render() ");
+				$(this.el).append("<button id='add'>Add list item</button>");
+      			$(this.el).append("<ul></ul>");
+			    $('.connected').sortable({
+					connectWith: '.connected'
+				});
+				// $(this.el).append("<ul> <li>hello world JO</li> </ul>");
+			},
+			addItem: function(){
+				this.counter++;
+				$('ul', this.el).append("<li>hello world"+this.counter+"</li>");
+			},
+			downHandler: function(){
+				alert("mouse down !!!");
+			}						
+		});
+		var listView = new ListView();		    
+		var k=0;
+		$('.connected').sortable().bind('sortupdate', function() {
+				 //Triggered when the user stopped sorting and the DOM position has changed.
+				console.log("FrameLink Builder ->new widget any of the 2 lists -->"+(k++));
+				$("#sortable1 .connected").empty();
+				// $source1 = $("#source1")
+				// $("#sortable1 .connected").append("<li>Jumbotron</li>");
+				var template = _.template($("#widgetsList").html());
+				$("#sortable1 .connected").html(template);
+				listView.render();
+				// $('.connected').sortable({
+				// 	connectWith: '.connected'
+				// });			
+		});
+	})(jQuery);
+	//http://jsfiddle.net/x8WUt/13/
+	// $('.connected').sortable({
+	// 	connectWith: '.connected'
+	// });
+
+	console.log(document.title+"......  END..");
+</script>
+</body>
+</html>

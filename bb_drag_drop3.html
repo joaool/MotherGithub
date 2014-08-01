@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+    <title>Bbone drag&drop v3.0</title>
+</head>
+<body>
+    <!--<script type="text/javascript" charset="utf-8" src="../rivets/dist/rivets.js" ></script>-->
+   	<!-- <script type="text/javascript" src="http://code.jquery.com/jquery-1.9.1.min.js"></script> -->
+   	<!-- <script src="FL_ui/js/jquery-1.11.1.min.js" type="text/javascript"></script> -->
+	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+	<script src="FL_ui/js/bootstrap.min.js"></script>
+
+	<!-- <script src="http://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.3.3/underscore-min.js" type="text/javascript"></script> -->
+   	<script src="FL_ui/js/underscore-min.js" type="text/javascript"></script>
+  	<script src="http://cdnjs.cloudflare.com/ajax/libs/backbone.js/0.9.2/backbone-min.js" type="text/javascript"></script>
+	<!-- <link href='http://fonts.googleapis.com/css?family=Droid+Serif' rel='stylesheet' type='text/css'> -->
+
+	<div class="container">
+		<h2>FrameLink builder</h2>
+		<div id="sortable1">
+			<ul class="connected">
+				<li>textinput</li>
+				<li>jumbotron</li>
+				<li>button</li>
+			</ul>
+		</div>
+		<div>
+			<h1>xxx</h1>
+			<hr />
+			<div class="page"></div>
+		</div>
+	</div>
+	<script type="text/template" id="textinput">
+		<div class="control-group">
+		  <label class="control-label" for="<%= id %>"><%= label %></label>
+		  <div class="controls">
+		    <input id="<%= id %>" name="<%= id %>" type="text" placeholder="<%= placeholder %>" class="<%= inputsize %>" <% if(required) {%> required <% } %> />
+		    <% if (helptext.length > 0) { %><p class="help-block"><%= helptext %></p><% } %>
+		  </div>
+		</div>
+	</script>
+	<script type="text/template" id="jumbotron">
+		<div id="_home">
+			<div class="jumbotron">
+				<h1><%= name %></h1>
+				<p><%= text %></p>
+				<a href="#" class="btn btn-primary btn-large" onclick="FL.showTourStep0 = true; FL.tourIn();"><%= buttonText %></a>
+			</div>
+		</div>	
+	</script>
+	<script type="text/template" id="button">
+		<div class="control-group">
+		  <label class="control-label" for="<%= id %>"><%= label %></label>
+		  <div class="controls">
+		    <button id="<%= id %>" name="<%= id %>" class='btn <%= buttontype %>'><%= buttonlabel %></button>
+		  </div>
+		</div>	
+	</script>	
+<script type="text/javascript">
+	(function($){
+		// var Item = Backbone.Model.extend({//Item Class
+		// 	defaults: {
+		// 		part1: 'hello',
+		// 		part2: 'world'
+		// 	}
+		// });
+		var Item = Backbone.Model.extend({//Item Class
+		    getValues: function(){//a free method...
+				return _.reduce(this.get("fields"), function(o, v, k){
+					alert("bb_drag_drop3.js function returned by getValues...");
+					if (v["type"] == "select") {
+					  o[k] = _.find(v["value"], function(o){return o.selected})["value"];
+					} else {
+					  o[k]  = v["value"];
+					}
+					return o;
+				}, {});
+		    },
+			idFriendlyTitle: function(){
+				return this.get("title").replace(/\W/g,'').toLowerCase();
+			},
+			setField: function(name, value) {
+				var fields = this.get("fields")
+				fields[name]["value"] = value;
+				this.set("fields", fields);
+			}
+		});		
+		var List = Backbone.Collection.extend({//a collection of items - an array ready to receive item instances
+			model: Item
+		});
+		var ListView = Backbone.View.extend({
+			el: $('.page'), // attaches `this.el` to an existing element.
+			events: {
+				'click button#add': 'addItem',
+				// "mousedown": "downHandler"
+			},
+			initialize: function(){
+				_.bindAll(this, 'render','addItem'); // fixes loss of context for 'this' within methods
+				this.collection = new List();//instantiates a collection 
+				this.collection.bind('add', this.addItem); // collection event binder				
+				this.counter = 0; // total number of items added thus far
+				this.render(); // not all views are self-rendering. This one is.
+		    },
+			render: function(){
+				console.log("-------------->Render() ");
+				$(this.el).append("<button id='add'>Add list item</button>");
+      			$(this.el).append("<ul></ul>");
+			    $('.connected').sortable({
+					connectWith: '.connected'
+				});
+				// $(this.el).append("<ul> <li>hello world JO</li> </ul>");
+			},
+			addItem: function(){
+				this.counter++;
+				$('ul', this.el).append("<li>hello world"+this.counter+"</li>");
+			},
+			downHandler: function(){
+				alert("mouse down !!!");
+			}						
+		});
+		var listView = new ListView();	
+		var joList = new List();	
+		alert("JO--->"+Item.getValues);	    
+		var k=0;
+	})(jQuery);
+
+	console.log(document.title+"......  END..");
+</script>
+</body>
+</html>

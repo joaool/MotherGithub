@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+    <title>_.template v1.0</title>
+    <!--<script type="text/javascript" charset="utf-8" src="../rivets/dist/rivets.js" ></script>-->
+   	<script type="text/javascript" src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
+    <!--<script type="text/javascript" charset="utf-8" src="../q-1/q.js" ></script>
+   	<script type="text/javascript" src="http://documentcloud.github.com/underscore/underscore-min.js"></script>
+   	<script type="text/javascript" src="http://documentcloud.github.com/backbone/backbone-min.js"></script>-->
+   	<script src="http://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.3.3/underscore-min.js" type="text/javascript"></script>
+  	<script src="http://cdnjs.cloudflare.com/ajax/libs/backbone.js/0.9.2/backbone-min.js" type="text/javascript"></script>
+</head>
+<body>
+	<p>The greeting is:</p>
+	<div id="target">
+		<p>---</p>
+	</div>
+	<div id="target2">
+		<p>---</p>
+	</div>
+	<div id="target3">
+		<p>---</p>
+	</div>
+	<div id="target4">
+		<p>---</p>
+	</div>	
+<!-- Create your template -->
+<script type="foo/bar" id='usageList'>
+<table cellspacing='0' cellpadding='0' border='1' >
+    <thead>
+      <tr>
+        <th>Id</th>
+        <th>Name</th>
+      </tr>
+    </thead>
+    <tbody>
+      <%
+        // repeat items 
+        _.each(items,function(item,key,list){
+          // create variables
+          var f = item.name.split("").shift().toLowerCase();
+      %>
+        <tr>
+          <!-- use variables -->
+          <td><%= key %></td>
+          <td class="<%= f %>">
+            <!-- use %- to inject un-sanitized user input (see 'Demo of XSS hack') -->
+            <h3><%- item.name %></h3>
+            <p><%- item.interests %></p>
+          </td>
+        </tr>
+      <%
+        });
+      %>
+    </tbody>
+  </table>
+</script>
+	
+<script type="text/javascript">
+	// ---------------------------------- THE BASICS 
+	var compiled = _.template("hello: <%= name %>");//Compiles JavaScript template into function that can be evaluated for rendering. 
+	var content = compiled({name: 'Joao Oliveira'});//the function returns  "hello: Joao Oliveira" - it is a function to insert tags or "free variable"
+	console.log("First content="+content);
+	$("#target").html("<p>" + content + "</p>");
+	// $("#target").html("<p>" + _.template("hello: <%= name %>")({name: 'Joao Oliveira'}) + "</p>");//the same as above
+	
+	//we could also specify a second parameter in template saving the compilation step
+	content = _.template("hello again: <%= name %>",{name: 'Joao Oliveira'});//no compilation needed
+	console.log("Second content="+content);
+	$("#target2").html("<p>" + content + "</p>");
+
+	// ---------------------------------- LEVEL 1 
+	//<%= ...%> inserts a variable in the template string. If we wich to insert a function we can use <%...%> instead. Ex
+	sum = function(a,b){return a+b};
+	console.log("Testing sum(2,3) ==>"+sum(2,3));
+	// var a,b;
+	var a=5;
+	var b=3;
+	content = _.template("The sum of <%=a%> and <%=b%> is <%sum(a,b);%>",{a:5,b:8});
+	// console.log(content);
+
+	//we can add a second parameter to _.template(), a data object with the properties corresponding to the template free variables
+	// compiled = _.template("hello: <%_.each(people, function(name) { %> <li><%= name %></li> <% }); %>");
+	var items = [
+	        {name:"Alexander"},
+	        {name:"Barklay"},
+	        {name:"Chester"},
+	        {name:"Domingo"},
+	        {name:"Edward"},
+	        {name:"..."},
+	        {name:"Yolando"},
+	        {name:"Zachary"}
+	    ];
+	var obj={people: ['moe', 'curly', 'larry']};
+	content = _.template("Greeting the following people:<%_.forEach(items,function(item){%> <li><%= item.name %></li> <%});%>",items);
+	console.log("*******>"+content);
+	$("#target3").html("<p>" + content + "</p>");
+
+	 var items = [
+	    {name:"Alexander", interests:"creating large empires"},
+	    {name:"Edward", interests:"ha.ckers.org <\nBGSOUND SRC=\"javascript:alert('XSS');\">"},
+	    {name:"..."},
+	    {name:"Yolando", interests:"working out"},
+	    {name:"Zachary", interests:"picking flowers for Angela"}
+	  ];
+	  var template = $("#usageList").html();
+	  $("#target4").html(_.template(template,{items:items}));
+	// var template = $("#usageList").html();
+	// $("#target").html(_.template(template,{items:items}));
+
+	console.log(document.title+"......  END..");
+</script>
+	
+</body>
+</html>

@@ -1,0 +1,8 @@
+body,
+input,
+button,
+select,
+textarea,
+.navbar-search .search-query {/*http://stackoverflow.com/questions/11361294/twitter-bootstrap-use-serif-fonts */
+  font-family: "Times New Roman", Helvetica, Arial, sans-serif;
+}

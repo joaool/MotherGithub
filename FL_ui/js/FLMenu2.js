@@ -49,13 +49,19 @@ FL["menu"] = function(menuSettings) { //{jsonMenu:null,initialMenu:null,editable
 		parentThis.menuRefresh();
 	};
 	this.createDatabaseAcess = function (optionTitle) {
-		// alert("Request to create "+optionTitle);
+		alert("Request to create "+optionTitle);
 		parentThis.createMenuEntryLastTop(optionTitle,"__windowOpen(weadvice.knackhq.com/weadvice1)");
+		// parentThis.menuRefresh();
+	};
+	this.createGrid = function (optionTitle, singular) {
+		alert("FLMenus2.js createGrid->Request to create grid "+optionTitle);
+		parentThis.createMenuEntryLastTop(optionTitle,"__grid(" + singular);
 		// parentThis.menuRefresh();
 	};
 	$.Topic( 'signInDone' ).subscribe( this.setEditable );
 	$.Topic( 'jsonMenuUpdate' ).subscribe( this.updateJsonMenu );
 	$.Topic( 'createOption' ).subscribe( this.createDatabaseAcess );
+	$.Topic( 'createGridOption' ).subscribe( this.createGrid );
 	this.test_Add_Id_Top = function() {//only for testing
 		menuEach(this.settings.jsonMenu.menu,add_Id_Top);//any call to menuEach returns the next available idOrder
 	};
@@ -292,6 +298,13 @@ FL["menu"] = function(menuSettings) { //{jsonMenu:null,initialMenu:null,editable
 					// <iframe src="demo_iframe.htm" width="200" height="200"></iframe>
 					// window.open("http://weadvice.knackhq.com/weadvice1","newWindow");
 					z=32;
+				}else if(flMenuFunction.substr(0,6)=="__grid"){
+					var singular = flMenuFunction.substr(7);
+					alert("grid !!! line 302 "+singular);
+					// var columnsArr = utils.backGridColumnsExtractedFromDictionary(singular);
+					// utils.csvToStore(data.results.rows);
+					// csvStore.setGrid(singular);
+ 					// 	utils.mountGridInCsvStore(columnsArr);
 				}
 			}else{
 				alert("dispatchHref Error:FrameLink menu function "+ flMenuFunction + "has no arguments !!!");

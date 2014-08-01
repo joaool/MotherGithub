@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+    <title>Bbone drag&drop v1.0</title>
+</head>
+<body>
+    <!--<script type="text/javascript" charset="utf-8" src="../rivets/dist/rivets.js" ></script>-->
+   	<!-- <script type="text/javascript" src="http://code.jquery.com/jquery-1.9.1.min.js"></script> -->
+   	<!-- <script src="FL_ui/js/jquery-1.11.1.min.js" type="text/javascript"></script> -->
+	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+	<script src="FL_ui/js/bootstrap.min.js"></script>
+
+	<!-- <script src="http://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.3.3/underscore-min.js" type="text/javascript"></script> -->
+   	<script src="FL_ui/js/underscore-min.js" type="text/javascript"></script>
+  	<script src="http://cdnjs.cloudflare.com/ajax/libs/backbone.js/0.9.2/backbone-min.js" type="text/javascript"></script>
+	<script src="FL_ui/js/jquery.sortable.js"></script>
+	<!-- <link href='http://fonts.googleapis.com/css?family=Droid+Serif' rel='stylesheet' type='text/css'> -->
+	<style>
+		header, section {
+			display: block;
+		}
+		body {
+			font-family: 'Droid Serif';
+		}
+		h1, h2 {
+			text-align: center;
+			font-weight: normal;
+		}
+		#features {
+			margin: auto;
+			width: 460px;
+			font-size: 0.9em;
+		}
+		.connected, .sortable, .exclude, .handles {
+			margin: auto;
+			padding: 0;
+			width: 310px;
+			-webkit-touch-callout: none;
+			-webkit-user-select: none;
+			-khtml-user-select: none;
+			-moz-user-select: none;
+			-ms-user-select: none;
+			user-select: none;
+		}
+		.sortable.grid {
+			overflow: hidden;
+		}
+		.connected li, .sortable li, .exclude li, .handles li {
+			list-style: none;
+			border: 1px solid #CCC;
+			background: #F6F6F6;
+			font-family: "Tahoma";
+			color: #1C94C4;
+			margin: 5px;
+			padding: 5px;
+			height: 22px;
+		}
+		.handles span {
+			cursor: move;
+		}
+		li.disabled {
+			opacity: 0.5;
+		}
+		.sortable.grid li {
+			line-height: 80px;
+			float: left;
+			width: 80px;
+			height: 80px;
+			text-align: center;
+		}
+		li.highlight {
+			background: #FEE25F;
+		}
+		#connected {
+			width: 440px;
+			overflow: hidden;
+			margin: auto;
+		}
+		.connected {
+			float: left;
+			width: 200px;
+		}
+		.connected.no2 {
+			float: right;
+		}
+		li.sortable-placeholder { /*edit this to change the placeholder look...*/
+			border: 2px dashed red;  /*border: 2px dashed blue; original->border: 1px dashed #CCC; */
+			background: cyan; /*background: red;  original--> background: none;*/
+		}
+		li.sortable-dragging { /*edit this to change the dragging look...*/
+			/*border: 2px dashed green;  border: 2px dashed blue; original->border: 1px dashed #CCC; */
+			background: red; /*background: red;  original--> background: none;*/
+		}		
+	</style>
+<!-- 	<section>
+		<h2>Widgets</h2>
+		<ul class="sortable list">
+			<li>Jumbotron</li>
+			<li>TextBox</li>
+			<li>NumberBox</li>
+			<li>ComboBox</li>
+			<li>TextArea</li>
+			<li>CheckBox</li>
+		</ul>
+	</section> -->
+	<section id="connected">
+		<h2>FrameLink builder</h2>
+		<ul class="connected list">
+			<li>Jumbotron</li>
+			<li>TextBox</li>
+			<li>NumberBox</li>
+			<li>ComboBox</li>
+			<li>TextArea</li>
+			<li>CheckBox</li>
+		</ul>
+		<ul class="connected list no2">
+			<li class="highlight">Item 1</li>
+			<li class="highlight">Item 2</li>
+			<li class="highlight">Item 3</li>
+			<li class="highlight">Item 4</li>
+			<li class="highlight">Item 5</li>
+			<li class="highlight">Item 6</li>
+		</ul>
+	</section>
+	<div class="container">
+		<h1>User Manager</h1>
+		<div class="page"></div>
+	</div>
+	<script type="text/template" id="widgetsList">
+		<a href="#/new" class="btn btn-primary">New widget</a>
+		<hr />
+		<ul class="xconnected xlist">
+			<li>Jumbotron</li>
+			<li>TextBox</li>
+			<li>NumberBox</li>
+			<li>ComboBox</li>
+			<li>TextArea</li>
+			<li>CheckBox</li>
+		</ul>	
+	</script>
+	<script type="text/template" id="editWidget">
+		<form class="edit-widget">
+			<legend>Create widget</legend>
+			<label>Text Input</label>
+			<input type="text" name="label" />
+			<label>Help text</label>
+			<input type="text" name="help" />
+			<hr />
+			<button type="submit" class="btn" >Create</button>
+		</form>	
+	</script>	
+<script type="text/javascript">
+	Backbone.sync = function(method, model, options) {
+	  switch (method) {
+	    case 'create':
+	      alert("Sync create "+model);
+	      var z=32;
+	    break;
+	    case 'update':
+			alert("Sync update");
+	    break;
+	    case 'delete':
+			alert("Sync delete");
+	    break;
+	    case 'read':
+	      // The model value is a collection in this case
+			alert("Sync read");
+		break;
+		default:
+			// Something probably went wrong
+			console.error('Unknown method:', method);
+		break;
+	  }
+	};
+	var Person = Backbone.Model.extend({
+		initialize: function(){
+			console.log("Person is initialized.");
+			this.bind("change:name", function() { //any time a change happens to the model, we can automatically update the view
+				console.log(this.get("name") + " is now the value for name");
+			});
+		},
+		defaults:{
+			name:"undefined",
+			age:"undefined"
+			// id:0 //id is a special attribute. no 2 models can have the same id
+		}
+	});
+	var People = Backbone.Collection.extend({
+		initialize: function(){
+			console.log("People collection is initialized");
+		},
+		model:Person
+	});
+	k=0;
+	var WidgetsView = Backbone.View.extend({//each backbone view is assigned an alement 
+		el: '.page',
+		render:function(){ //each view has a render function
+			var widgetCollection = new WidgetCollection();
+			var that = this;
+			// widgetCollection.fetch({ //this launches sync.read
+			// 	success:function(widgetCollection){
+			// 		alert("Bem lido!!");
+			// 		that.$el.html("View content !!! ->"+k);
+			// 	}
+			// });
+			var template = _.template($("#widgetsList").html());
+			k++;
+			// this.$el.html("View content !!! ->"+k);
+			this.$el.html(template);
+		}
+	});
+	var EditWidgetView = Backbone.View.extend({//each backbone view is assigned an alement 
+		el: '.page',
+		render:function(){ //each view has a render function
+			var template = _.template($("#editWidget").html());
+			// this.$el.html(template);
+			this.$el.html("Show ----------->Edit Widget !!!!");
+		}
+	});	
+	var Router = Backbone.Router.extend({
+		routes:{
+			'':'home',
+			// 'new':'editWidget'
+		}
+	});
+	var WidgetCollection = Backbone.Collection.extend({
+		url:'/widgets'
+	});	
+	var widgetsViewInstance = new WidgetsView();//an instance of the view
+	var editWidgetViewInstance = new EditWidgetView();//an instance of the view
+	var router = new Router();
+	router.on('route:home',function(){
+		widgetsViewInstance.render();
+	});
+	// router.on('route:editWidget',function(){
+	// 	console.log("show edotWidget Form");
+	// });
+	var person = new Person({name:"Joao"});//person is an instance of the Person class
+	var people = new People(person);//people is an instance of a collection of persons
+	people.add([{name:"Bob"},{name:"Jim"},{name:"Nico"}]);
+	// alert("XXX");
+	person.save();//we save an instance of Person class
+	// people.sync.save();//ERROR
+	console.log(people.toJSON());//this shows the models that are in the collection...
+		//a collection is set of models (ocurrence)s - we call use ajax to populate a whole list of models
+	console.log("By Cid="+people.getByCid("c1"));
+	console.log(people.models);
+	Backbone.history.start();
+
+	// people.remove(person);	
+	// console.log(people.toJSON());//this shows the models that are in the collection...
+	// people.reset([{name:"Bob"},{name:"Jim"},{name:"Nico"},person]);//redo the inicial list after add()
+	// console.log(people.toJSON());
+	// people.on("remove",function(toRemove){
+	// 	alert("You gave a command to remove "+toRemove.get("name"));
+	// });
+	// people.remove(person);	
+	// console.log(people.toJSON());
+	// $('.handle').sortable({
+	//     // handle: '.handle'// NOT WORKING
+	// });
+	$('.connected').sortable({
+		connectWith: '.connected'
+	});	
+	// $('.handles').sortable({
+	// 	handle: 'span'
+	// });
+	// $('.connected').sortable().bind('sortupdate', function() {
+	// 		 //Triggered when the user stopped sorting and the DOM position has changed.
+	// 		 alert("FrameLink Builder ->Order has changed !");
+	// });
+
+
+	console.log(document.title+"......  END..");
+</script>
+<p>Collections</p> 
+</body>
+</html>

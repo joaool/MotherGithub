@@ -269,12 +269,22 @@ FL["styleChangeHandler"] = function(newStyle) {//subscribed "styleChange"
 };
 // -------------------------- end of message handlers ---------------------------
 FL["is_tour"] = false;
+FL["openTour"] = function(open) {//HACK if open is false =>closes, otherwise is a NOP
+	if(!open){
+		FL["tourActive"] = false;
+		FL.tour.end();
+	}
+};
 FL["tourIn"] = function() {//called by tour icon
 	if(FL.is_tour){
 		// alert("FL.tourIn was called !!!! with "+FL.stepBeforeEnd);
 		FL["tourActive"] = true;//tour exists and is activated
 		// var currentStep = FL.tour.getCurrentStep();
 		var currentStep = FL.setNextPrevOfCurrentStep();
+		// mixpanel.track("TourIcon", {//-----------------------------------------------mixpanel
+		// 	"step":FL.setNextPrevOfCurrentStep()
+		// });
+		FL.mix("TourIcon",{step:FL.setNextPrevOfCurrentStep()});
 		// alert("currentStep="+currentStep+" getCurrentStep()->"+FL.tour.getCurrentStep());
 		if(currentStep == 0)
 			FL.showTourStep0 = true;
@@ -360,6 +370,8 @@ FL["setTourOn"] = function(is_tour) {//if true, creates tour object with steps. 
 				$.Topic( 'inLogOnProcess' ).subscribe( FL.suspend_ResumeSequence );
 				$.Topic( 'inMenuEdition' ).subscribe( FL.suspend_ResumeSequence );
 				$.Topic( 'styleChange' ).subscribe( FL.styleChangeHandler );
+				$.Topic( 'setTour' ).subscribe( FL.openTour );
+
 				// FL.mixinTourMap(FL.currentTourMap);
 				// FL.tour.init();// Initialize the tour
 				// FL.tour.start();// Start the tour
@@ -420,10 +432,10 @@ FL["tourSettings"] = {
 		// FL.tourSettings.steps[currentStep].backdrop = true;
     },
 	stepsChangeEvents: [ //these are the events that may change the 'natural' sequence
-		{onEvent: "signInDone",onEventValue: false,suspend: false,     tourMap: [1,1,0,0,0,0,0,0,0,0,0,0,0]},//if logout, tour only can be in brand or in login
-		{onEvent: "signInDone",onEventValue: true,suspend: false,      tourMap: [1,0,1,1,1,1,1,1,1,1,1,1,1]},//if logout, tour can be everywhere e except login
-		{onEvent: "sidePanelOpened",onEventValue: true,suspend: false, tourMap: [1,0,1,0,1,1,1,1,1,1,1,1,1]},
-		{onEvent: "sidePanelOpened",onEventValue: false,suspend: false,tourMap: [1,1,1,1,0,0,0,0,0,0,0,0,1]},
+		{onEvent: "signInDone",onEventValue: false,suspend: false,     tourMap: [1,1,0,0,0,0,0,0,0,0,0,0]},//if logout, tour only can be in brand or in login
+		{onEvent: "signInDone",onEventValue: true,suspend: false,      tourMap: [1,0,1,1,1,1,1,1,1,1,1,1]},//if logout, tour can be everywhere e except login
+		{onEvent: "sidePanelOpened",onEventValue: true,suspend: false, tourMap: [1,0,1,0,1,1,1,1,1,1,1,1]},
+		{onEvent: "sidePanelOpened",onEventValue: false,suspend: false,tourMap: [1,1,1,1,0,0,0,0,0,0,0,0]},
 		{onEvent: "inLogOnProcess",onEventValue: true,suspend: true},
 		{onEvent: "inMenuEdition",onEventValue: false,suspend: true}
 	],
@@ -452,19 +464,7 @@ FL["tourSettings"] = {
 						"<button class='btn btn-default' data-role='end' >End tour</button>"+
 					"</div>"+
 				"</div>",
-			// template: "<div class='popover tour' style='max-width: 22em;'>"+
-			// 	"<div class='arrow'></div>"+
-			// 		"<h3 class='popover-title'></h3>"+
-			// 		"<div class='popover-content'></div>"+
-			// 		"<div class='popover-navigation'>"+
-			// 			"<button class='btn btn btn-default' data-role='prev'>« Prev</button>"+
-			// 			"<span data-role='separator'>|</span>"+
-			// 			"<button class='btn' data-role='next' style='background-color: #118bd4;color: white;'>Next »</button>"+
-			// 			"<button class='btn btn-default' data-role='end'>End tour</button>"+
-			// 		"</div>"+
-			// 	"</div>",
-			// content: "<img style='width: 19.8em;display: block;margin: 0 auto;' src='FL_ui/img/clickSignIn.jpg'><p>Your status will change from 'normal' user to a 'DESIGNER' that can change this site.</p>",
-			content: "<p>Click Sign In to change from 'normal' user to a 'DESIGNER' that can change this site.</p>",
+			content: "<p>Click Sign In to change from 'normal' user to a 'DESIGNER' that can change this site.</p>"
 		},
 		{
 			element: "#toolbar",//2

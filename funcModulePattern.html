@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Functional Programming 3 IIEF</title>
+    <script src="http://code.jquery.com/jquery-2.0.3.min.js"></script> 
+	<script src="FL_ui/js/test.js"></script>
+
+</head>
+<body>
+    <script>
+    	//http://benalman.com/news/2010/11/immediately-invoked-function-expression/
+		console.log("----------------- Immediately-Invoked Function Expression (IIFE) ==>Module Pattern ----------------------------------")
+		function makeCounter() {
+			// `i` is only accessible inside `makeCounter`.
+			var i = 0;
+			return function() {
+				console.log( ++i );
+			};
+		};
+		// Note that `counter` and `counter2` each have their own scoped `i`.
+		var counter = makeCounter();
+		counter(); // logs: 1
+		counter(); // logs: 2	
+		var counter2 = makeCounter();
+		counter2(); // logs: 1
+		counter2(); // logs: 2	
+		console.log("(function(){ /* code */ }()); // Crockford recommends this one");
+		console.log("(function(){ /* code */ })(); // But this one works just as well");
+		//Because variables and functions defined within a function may only be accessed inside, but not outside, that context, invoking a function provides a very easy way to create privacy.	
+		//And because any function defined inside another function can access the outer function’s passed-in arguments and variables (this relationship is known as a closure), an Immediately-Invoked Function Expression can be used to “lock in” values and effectively save state.
+		//------------------- 	The Module Pattern --------------
+		// Create an anonymous function expression that gets invoked immediately, and assign its *return value* to a variable. The parens help clarify that the variable is being set to the function's *result* and not the function itself.	
+		var counterObj = (function(){
+			var i = 0;
+			function mySum(v1,v2) { //private anonymous function
+				return v1+v2;
+			};
+			myProduct = function(v1,v2) { //private named  function
+				return v1*v2;
+			};
+			return {
+				get: function(){
+					return i;
+				},
+				set : function(val){
+					i= val;
+				},
+				increment : function(){
+					return i++;
+				},				
+				doMySum: function(toSum){
+					i=mySum(i,toSum);
+				},		
+				doMyProduct: function(toMultiply){
+					i=myProduct(i,toMultiply);
+				}
+			};
+		}()); //or }(UTIL || {}, jQuery));
+		//'counterObj' is an object with properties, which in this case happen to be methods.
+		//http://www.adequatelygood.com/JavaScript-Module-Pattern-In-Depth.html
+		console.log("counterObj.get() -->"+counterObj.get());//
+		counterObj.set(4)
+		console.log("after set(4) => counterObj.get() -->"+counterObj.get());//
+		counterObj.increment();
+		console.log("after increment => counterObj.get() -->"+counterObj.get());//
+		counterObj.doMySum(10);
+		console.log("after doMySum(10) => counterObj.get() -->"+counterObj.get());//
+		counterObj.doMyProduct(10);
+		console.log("after doMyProduct(10) => counterObj.get() -->"+counterObj.get());//
+
+	console.log(document.title+"......  END..");		
+    </script>
+</body>
+</html>

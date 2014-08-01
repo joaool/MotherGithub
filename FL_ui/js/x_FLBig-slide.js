@@ -47,7 +47,7 @@
       menu._state = 'open';
       $.Topic('sidePanelOpened').publish( true );
       FL.is_sidePanelOpen = true; //HACK
-      FL.editStyles("_css");//prepares x-editable link
+      FL.login.editStyles("_css");//prepares x-editable link
       menu.css(settings.side, '0');
       push.css(settings.side, width);
     };

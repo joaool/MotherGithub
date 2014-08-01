@@ -74,3 +74,26 @@ FL["validateEmail"] = function(email) {
 	var re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
 	return re.test(email);
 };
+FL["mixPanelEnable"]  = false;
+FL["mix"] = function(mixEvent,propObj) {//if FL.mixPanelEnable = true, trigger  events  to mix panel
+	//examples:
+	//		FL.mix("Entering",{});
+	//		FL.mix("ChangeStyle",{"newStyle":FL.currentStyle});
+	//		FL.mix("TourIcon",{step:FL.setNextPrevOfCurrentStep()});
+	if(FL.mixPanelEnable){
+		// mixpanel.track("TourIcon", {//-----------------------------------------------mixpanel
+		// 	"step":FL.setNextPrevOfCurrentStep()
+		// });
+		alert("calls mixpanel.track for event="+mixEvent+" ->props="+JSON.stringify(propObj));
+		//mixpanel.track(mixEvent,propObj);
+	}
+};
+FL["clearSpaceBelowMenus"] = function() {
+	$("#_placeHolder").empty();
+	$("#personContent").empty();
+	$("#csvcontent").empty();
+	$("#grid").empty();
+	$("#paginator").empty();
+	$("#addGrid").empty();
+	$("#addGrid").hide();
+};
