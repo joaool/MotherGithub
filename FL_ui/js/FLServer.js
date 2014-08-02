@@ -72,9 +72,11 @@
 			alert("internalTest() -->"+x);
 		};
 		var disconnectServer = function() {
-			FL.server.fa.disconnect(function(e,d){
-				alert ('bye');
-			});
+			// if(this.fa){
+				FL.server.fa.disconnect(function(e,d){
+					alert ('bye');
+				});			
+			// }
 		};
 		var connectServer = function(userName,password,connectServerCB) {
 			// var fl = new flMain();
@@ -98,30 +100,25 @@
 						return connectServerCB(false);
 						// return console.log ('fla.connect: err=' + JSON.stringify(err2));
 					}
-					// var fEnt = new FL.server.fl.entity();
-					// fEnt.getAll({query:{}}, function (err, data){
-					// 	if(err){
-					// 		alert('error in entity.getAll: ' + err);
-					// 		return ('error in entity.getAll: ' + err);
-					// 	}
-					// 	alert(JSON.stringify(data));
-					// });
-					return connectServerCB(true);
+					return connectServerCB(null);
 				});
 			});
 		};
 		return{
 			fl: new flMain(),//FL.server.fl
 			fa: null,
-			byPass:true,
+			offline:true,
 			connect: function(userName,password,connectServerCB){
 				// alert("connectServer byPass="+byPass);
-				if(!this.byPass)
+				if(!this.offline){
 					connectServer(userName,password,connectServerCB);
+				}else{
+					return connectServerCB({status:"offline"});
+				}
 			},
 			disconnect: function(){
 				// alert("disconnectServer byPass="+byPass);
-				if(!this.byPass)
+				if(!this.offline)
 					disconnectServer();
 			},
 			createServerEntity_Fields: function(entityName,createServerEntity_FieldsCB){
@@ -188,21 +185,25 @@
 						createServerEntity_FieldsCB(err);
 				});
 			},
-			insertCsvStoreDataTo: function(entityName,insertCB){
+			insertCsvStoreDataTo: function(entityName,insertCB){//creates entity=entityName in server and sends csvStore data to server
 				var oEntity =  FL.dd.getEntityBySingular(entityName);
-				var eCN = oEntity.csingular;
-				if(oEntity.sync){
-					var fd=new this.fl.data();
-					fd.insert(eCN, FL.dd.getSavingRowsForCsvStore(entityName),function(err, data){
+				this.createServerEntity_Fields(entityName,function(err){
+					if(err)
+						return insertCB(err);
+					var eCN = oEntity.csingular;
+					//for sure it is sinchronized
+					var fd = new FL.server.fl.data();
+					var arrToSend = FL.server.preparePutAllCsvStore(entityName); 
+					fd.insert(eCN,arrToSend,function(err, data){
 						if (err){
 							alert('insertCsvStoreDataTo: err=' + JSON.stringify(err));
 							return insertCB(false);
 						}
-						var myApp =data.applications[0];
+						console.log("exit from insertCsvStoreDataTo -->"+JSON.stringify(data));
+						return insertCB(null);
+						// var myApp =data.applications[0];
 					});
-				}else{
-					alert("FL.server.insertCsvStoreDataTo() Error: UI Dictionary for entity="+entityName+" is not synchronized !!!");
-				}
+				});
 			},
 			NicoAddAttribute: function(xSingular,xAttribute,xDescription,xLabel,xType,arrEnumerable) {//adds AttributeName,Description, label Type amd enumerable to oEntity of Data Dictionary
 				// if Type != "enumerable" => ArrEnumerable will be forced to null.
@@ -265,6 +266,85 @@
 					//Err.alert("dDictionary.addAttribute",(new Error)," you tried to add attribute "+xAttribute+" to a non existing entity "+xSingular);
 				}
 				// console.log("dDictionary.addAttribute ->" + attributeSemantics(xAttribute,xDescription,oEntity,"En"));
+			},
+			preparePutRowFromCsvStoreById: function(entityName,id){
+				//with the dictionary for entityName translates field logical names in csvStore into compressed field names with csvStore content for id
+				//Ex: from csvStore.csvRows = {"1":{"id":1,"shipped":true,"product":"Prod 1"},"2":{"id":2,"shipped":false,"product":"Prod 2"}}
+				//      FL.dd.preparePutRowFromCsvStoreById("order",1) ==> {d:{ "00":1,"01":true,"02":"Prod 1" },r:[]}
+				//NOTE: the object is not ready to be inserted in server (entity compressed name is missing) !  
+				var csvRow = csvStore.csvRows[id];
+				var retObj = {};
+				var fCN = null;
+				var oEntity =  FL.dd.getEntityBySingular(entityName);
+				var attribute = null;
+				_.each(csvRow, function(value,key){
+					fCN = oEntity.L2C[key];//with key ( a logical name) we get the compressed name
+					retObj[fCN] = value;
+				});
+				// fd.insert("50", {d:{"51":'Nome do cliente', '52':'Cascais', '53': 'Portugal', "54":'cliente@sapo.pt'}, r:[ {r:"59", l:[ {_id: "789fgd89"}]}]
+				//   }, function(err, data){
+				return {d:retObj,r:[]};
+			},
+			preparePutAllCsvStore: function(entityName){
+				var csvRows = csvStore.csvRows;
+				var retArr = _.map(csvRows, function(value,key){
+					return FL.server.preparePutRowFromCsvStoreById(entityName,key);
+				});
+				return retArr;
+			},
+			convertArrC2LForEntity: function(entityName,serverArr){
+				//Use the dictionary for entityName to convert compressed field names in keys in serverArr to into logical field names
+				//Ex: from server [{"d":{"01":true,"02":"Super 1","00":1},"r":[]},{"d":{"01":false,"02":"Super 2","00":2},"r":[]}]
+				//     ==============> [{"shipped":true,"product":"Super 1","id":1},{"shipped":false,"product":"Super 2","id":2}]	
+				var oEntity =  FL.dd.getEntityBySingular(entityName);
+				var arrOfCKeys = null;
+				var arrOfValues = null;
+				var arrOfLKeys = null;
+				var dContent = null;
+
+				var retArr = _.map(serverArr, function(element){//each element is an array line
+					dContent = element.d;
+					arrOfCKeys = _.keys(dContent);
+					arrOfValues = _.values(dContent);
+					arrOfLKeys = _.map(arrOfCKeys, function(element2){ return oEntity.C2L[element2]; });
+					return _.object(arrOfLKeys,arrOfValues);//reassembles the object from two aligned arrays
+				});
+				return retArr;
+			},
+			loadCsvStoreFromEntity: function(entityName,loadCsvStoreFromEntityCB){
+				//For this to run entityName must exist in local Dictionary and must be in sync with server
+				// var arrToStoreLocally = [];
+				//we assume that entityName exists in local Dictionary and is in sync
+				var oEntity =  FL.dd.getEntityBySingular(entityName);
+				oEntity.csingular = "61";
+				if(oEntity){//entityName exists in local Dictionary
+					var eCN =  oEntity.csingular;
+					var sync = oEntity.sync;
+					if(sync){//now we can import from server
+						alert("Entity=" + entityName + " exists and is in sync -->eCN/sync=" + eCN + "/"+sync);
+						var flData = new FL.server.fl.data();
+						// var flData = new FL.server.fl.entity();
+						flData.findAll(eCN, {query:{}},function(err, docs){
+							if (err){
+								alert('FL.server.loadCsvStoreFromEntity: err=' + JSON.stringify(err));
+								return loadCsvStoreFromEntityCB(false);
+							}
+							var arrToStoreLocally = FL.server.convertArrC2LForEntity(entityName,docs);
+							csvStore.store(arrToStoreLocally);
+							alert("import is done");
+							return loadCsvStoreFromEntityCB(true);
+						});
+
+					}else{
+						alert("FL.server.loadCsvStoreFromEntity Error:" + entityName + " exists but is not synchronized with server");
+						return loadCsvStoreFromEntityCB(false);
+					}
+				}else{
+					alert("FL.server.loadCsvStoreFromEntity Error: local Dictionary has no entity="+entityName);
+					return loadCsvStoreFromEntityCB(false);
+				}
+
+				// csvStore.store(arrToStoreLocally);
 			},
 			testFunc: function(x) {
 				alert("FL.server.test() -->"+x);

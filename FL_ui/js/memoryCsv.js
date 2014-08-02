@@ -1,6 +1,6 @@
 // The in-memory Store. Encapsulates logic to access wine data.
 window.csvStore = {
-    csvRows:{}, //a JSON of JSONs  {1:{},2:{}...n:{}};
+    csvRows:{}, //a JSON of JSONs  {1:{},2:{}...n:{}}; //NOTE:each row  should have a boolean sync field to work in offline mode
     lastId:0,
     store: function( arrToStore ) {//arrToStore is an array of objects [{},{},....{}] 
         var arrOfIds = _.map(arrToStore,function(element){return element.id;});

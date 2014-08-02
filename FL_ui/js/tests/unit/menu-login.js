@@ -407,35 +407,63 @@ $(function () {
     actual = FL.dd.nextEntityBeginningBy("client");
     ok(actual === "client2", "nextEntityBeginningBy('client') is 'client2'");
     actual = FL.dd.nextEntityBeginningBy("patolinas");
-    ok(actual === "patolinas", "nextEntityBeginningBy('patolinas') is 'patolinas'");
+    ok(actual === "patolinas", "nextEntityBeginningBy('patolinas') is 'patolinas'");//25
+    
+    actual = FL.dd.getEntityBySingular("order").sync;
+    ok(actual === false, "order sync status is:'not synchronized'");//26
+    FL.dd.setSync("order",true);
+    actual = FL.dd.getEntityBySingular("order").sync;
+    ok(actual === true, "FL.dd.setSync-->order sync status is now:'synchronized'");//27
+    FL.dd.setSync("order",false);
+    actual = FL.dd.getEntityBySingular("order").sync;
+    ok(actual === false, "FL.dd.setSync-->order sync status is again:'not synchronized'");//28
+
 
     FL.dd.addAttribute("order","product","unique order item","product","string",null);
     FL.dd.displayEntities();
     var rowsArr = [
-      {id:1,shipped:true,product:"Prod 1"},
-      {id:2,shipped:false,product:"Prod 2"},
-      {id:3,shipped:false,product:"Prod 3"},
-      {id:4,shipped:true,product:"Prod 4"}
+      // {id:1,shipped:true,product:"Super 1"},
+      // {id:2,shipped:false,product:"Super 2"},
+      // {id:3,shipped:false,product:"Super 3"},
+      // {id:4,shipped:true,product:"Super 4"}
+      {shipped:true,product:"Super 1"},
+      {shipped:false,product:"Super 2"},
+      {shipped:false,product:"Super 3"},
+      {shipped:true,product:"Super 4"}      
     ];
-    utils.csvToStore(rowsArr);
-    console.log("---->"+JSON.stringify(csvStore.csvRows));
+    utils.csvToStore(rowsArr);//id is injected here...
+    console.log("---->csvStore.csvRows="+JSON.stringify(csvStore.csvRows));
 
-    var obj = FL.dd.getSavingRowsFromCsvStoreById("order",1);
-    console.log("---->"+JSON.stringify(obj));
-    deepEqual( obj, {d:{ "00":1,"01":true,"02":"Prod 1" },r:[]}, "FL.dd.getSavingObjFromCsvStoreById correct for id=1" );
-    obj = FL.dd.getSavingRowsFromCsvStoreById("order",3);
-    console.log("---->"+JSON.stringify(obj));
-    deepEqual( obj, {d:{ "00":3,"01":false,"02":"Prod 3" },r:[]}, "FL.dd.getSavingObjFromCsvStoreById correct for id=3" );
-    obj = FL.dd.getSavingRowsForCsvStore("order");
-    console.log("---->"+JSON.stringify(obj));
+    var obj = FL.server.preparePutRowFromCsvStoreById("order",1);
+    console.log("---->preparePutRowFromCsvStoreById="+JSON.stringify(obj));
+    deepEqual( obj, {d:{ "00":1,"01":true,"02":"Super 1" },r:[]}, "FL.server.preparePutRowFromCsvStoreById correct for id=1" );
+    obj = FL.server.preparePutRowFromCsvStoreById("order",3);
+    console.log("---->preparePutRowFromCsvStoreById="+JSON.stringify(obj));
+    deepEqual( obj, {d:{ "00":3,"01":false,"02":"Super 3" },r:[]}, "FL.server.getSavingObjFromCsvStoreById correct for id=3" );
+    arrOfObj = FL.server.preparePutAllCsvStore("order");
+    console.log("---->preparePutAllCsvStore="+JSON.stringify(arrOfObj));
+    
+    csvStore.csvRows = {};
+    FL.dd.setSync("order",true);//force sync
+    console.log("test 0  convertToCsvStore csvStore.csvRows ="+JSON.stringify(csvStore.csvRows));
+    // var simulObjFromServer = _.map(arrOfObj,function(element){return element.d;});
+    var simulObjFromServer = arrOfObj;
+    console.log("test 1 convertArrC2LForEntity ---->before function: simulObjFromServer="+JSON.stringify(simulObjFromServer));
+    var csvStoreArray = FL.server.convertArrC2LForEntity("order",simulObjFromServer);
+    //FL.server.loadCsvStoreFromEntity("order");
+    console.log("test 2  convertArrC2LForEntity csvStoreArray ="+JSON.stringify(csvStoreArray));
+
+    // console.log("---->convertToCsvStore="+JSON.stringify(obj));
+
+
     // FL.server.insertCsvStoreDataTo("order");
+    // FL.dd.setSync("client1",true);//force sync
+    // FL.server.loadCsvStoreFromEntity("client1");
 
 
     // ----------- test Nico Login ---------------
-    FL.server.byPass = false; //force server access if false
-    // FL.server.connect("Nico","coLas",...); 
- 
-    // FL.server.connect("Joao","oLiVeIrA",function(bSuccess){
+    // FL.server.offline = false;
+    // FL.server.connect("Joao","oLiVeIrA",function(bSuccess){//TEST FL.server.createServerEntity_Fields OK
     //     // ok(bSuccess === true, "Good connection");
     //     if(bSuccess){
     //       console.log("Good connection--> begin createServerEntity_Fields-------------------");
@@ -446,35 +474,44 @@ $(function () {
     //           console.log("createServerEntity_Fields is done !!! Error:"+err);
     //           console.log("   --> after server synch");
     //           FL.dd.displayEntities();
-    //           FL.server.disconnect();//Parameter is Bypass         
+    //           FL.server.disconnect();       
     //       });//singular, plural, description
     //     }else{
     //       console.log("Connection Error !!!");
     //     }
     // });
  
-    // FL.server.insertCsvStoreDataTo("order");
-    FL.server.connect("Joao","oLiVeIrA",function(bSuccess){
-        // ok(bSuccess === true, "Good connection");
-        if(bSuccess){
-          console.log("Good connection--> begin insertCsvStoreDataTo(entity)-------------------");
-          FL.server.insertCsvStoreDataTo("order",function(err){
-              console.log("insertCsvStoreDataTo is done !!! Error:"+err);
-              FL.server.disconnect();//Parameter is Bypass         
-          });//singular, plural, description
+    // FL.server.offline = false;
+    // FL.server.connect("Joao","oLiVeIrA",function(bSuccess){//TEST FL.server.insertCsvStoreDataTo OK
+    //     // ok(bSuccess === true, "Good connection");
+    //     if(bSuccess){
+    //       console.log("Good connection--> begin insertCsvStoreDataTo(entity)-------------------");
+    //       FL.server.insertCsvStoreDataTo("order",function(err){//all csvStore will be stored in server as "order" content
+    //           console.log("insertCsvStoreDataTo is done !!! Error:"+err);
+    //           FL.server.disconnect();       
+    //       });//singular, plural, description
+    //     }else{
+    //       console.log("Connection Error !!!");
+    //     }
+    // });
+
+    FL.server.offline = false;
+    FL.server.connect("Joao","oLiVeIrA",function(err){//TEST loadCsvStoreFromEntity
+        // ok(err === true, "Good connection");
+        if(err){
+          if(err.status != "offline")
+            console.log("Connection Error !!!"+err);
         }else{
-          console.log("Connection Error !!!");
+          console.log("Good connection--> begin loadCsvStoreFromEntity(entity)-------------------");
+          FL.server.loadCsvStoreFromEntity("order",function(err){//all csvStore will be stored in server as "order" content
+              console.log("loadCsvStoreFromEntity is done !!! Error:"+err);
+              FL.server.disconnect();
+          });
         }
-    });  
+    });
 
-    // simulZ = function(id,t,cb){
-    //   setTimeout(function(){
-    //     console.log("Simul --->"+id+" is done.");
-    //     cb();
-    //       }, t);
-    // };
 
-    // FL.server.connect("Joao","oLiVeIrA",false,function(bSuccess){
+    // FL.server.connect("Joao","oLiVeIrA",false,function(err){
     //     // ok(bSuccess === true, "Good connection");
     //     if(bSuccess){
     //       console.log("Good connection--> begin createServerEntity_Fields-------------------");
@@ -497,5 +534,42 @@ $(function () {
     //       alert("Connection Error !!!");
     //     }
     // });
-   });
+  });
+  test("FL.server testing server interface functions (no connection need)", function () { //
+    //--------------------- Test Setup ----------------------------------------
+    //We need at least one entity in local dictionary
+    var success = FL.dd.createEntity("order","client's product request");
+    FL.dd.addAttribute("order","shipped","expedition status","Shipped","boolean",null);
+    FL.dd.addAttribute("order","product","unique order item","product","string",null);
+    //rowsArr is the array to be stored in csvStore.csvRows
+    var rowsArr = [
+      {shipped:true,product:"Super 1"},
+      {shipped:false,product:"Super 2"},
+      {shipped:false,product:"Super 3"},
+      {shipped:true,product:"Super 4"}
+    ];
+    utils.csvToStore(rowsArr);// store in csvStore() after converting keys to lowercase and injecting ids
+    //--------------------------------------------------------------------------
+    //Test 1 - Extract a single id from csvStore.csvRows and prepare it to be added to server
+    // extract from format: {"1":{"shipped":true,"product":"Super 1","id":1},"2":{"shipped":false,"product":"Super 2"}}
+    //            returns : {"d":{"01":true,"02":"Super 1","00":1},"r":[]} for id=1  
+    var obj = FL.server.preparePutRowFromCsvStoreById("order",1);
+    deepEqual( obj, {d:{ "00":1,"01":true,"02":"Super 1" },r:[]}, "FL.server.preparePutRowFromCsvStoreById correct for id=1" );
+    obj = FL.server.preparePutRowFromCsvStoreById("order",3);
+    deepEqual( obj, {d:{ "00":3,"01":false,"02":"Super 3" },r:[]}, "FL.server.preparePutRowFromCsvStoreById correct for id=3" );
+    
+    //Test 2 - Extract all lines from csvStore.csvRows and prepare it to be added to server
+    // extract from format: {"1":{"shipped":true,"product":"Super 1","id":1},"2":{"shipped":false,"product":"Super 2"}}
+    //            returns : [{"d":{"01":true,"02":"Super 1","00":1},"r":[]}, {"d":{"01":false,"02":"Super 2","00":2},"r":[]}]
+    var arrOfObj = FL.server.preparePutAllCsvStore("order",1);
+    deepEqual( arrOfObj, [{d:{ "00":1,"01":true,"02":"Super 1" },r:[]}, {d:{ "00":2,"01":false,"02":"Super 2" },r:[]}, {d:{ "00":3,"01":false,"02":"Super 3" },r:[]}, {d:{ "00":4,"01":true,"02":"Super 4" },r:[]} ], "FL.server.preparePutAllCsvStore correct" );
+    
+    //Test 3 - Using local Dictionary Converts array received from server (each line has keys=field compressed names) to equivalent array with logical names
+    //           received from sever : [{d:{"01":true,"02":"Super 1","00":1},r:[]},{d:{"01":false,"02":"Super 2","00":2},r:[]}]
+    //     array to store in csvStore: [{"shipped":true,"product":"Super 1","id":1},{"shipped":false,"product":"Super 2","id":2}]
+    var simulObjFromServer = arrOfObj;
+    var csvStoreArray = FL.server.convertArrC2LForEntity("order",simulObjFromServer);
+    deepEqual( csvStoreArray, [{ "id":1,"shipped":true,"product":"Super 1" }, { "id":2,"shipped":false,"product":"Super 2" }, { "id":3,"shipped":false,"product":"Super 3" }, { "id":4,"shipped":true,"product":"Super 4" } ], "FL.server.convertArrC2LForEntity correct" );
+
+  });
 });

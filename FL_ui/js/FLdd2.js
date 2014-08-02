@@ -49,7 +49,8 @@
 			//				NOTE: if type is "enumerable", the key enumerable must have an array of enumerables
 			//			enumerable - an array of enumerables or null (if key type != "enumerable"
 			//			key - boolean. True means the attribute is the  key field of the entity . (only one allowed)
-			//          fieldCN - field vcompressed name - (NICO)
+			//			
+			//          NOTE: to access the field compressed name use L2C() at entity level.
 			//
 			// each relation (i) is in dDictionary.entities[<sEntity>].relations[i]
 			//     with the format 
@@ -305,30 +306,6 @@
 			plural: function(sWord,xLanguage) {//returns the plural of sWord in language=xLanguage				
 				return plural(sWord,xLanguage);
 			},
-			getSavingRowsFromCsvStoreById: function(entityName,id){
-				//with the dictionary for entityName translates field logical names in csvStore into compressed field names with csvStore content for id
-				//Ex: from csvStore.csvRows = {"1":{"id":1,"shipped":true,"product":"Prod 1"},"2":{"id":2,"shipped":false,"product":"Prod 2"}}
-				//      FL.dd.getSavingObjFromCsvStoreById("order",1) ==> {d:{ "00":1,"01":true,"02":"Prod 1" },r:[]}    
-				var csvRow = csvStore.csvRows[id];
-				var retObj = {};
-				var fCN = null;
-				var oEntity =  FL.dd.getEntityBySingular(entityName);
-				var attribute = null;
-				_.each(csvRow, function(value,key){
-					fCN = oEntity.L2C[key];//with key ( a logical name) we get the compressed name
-					retObj[fCN] = value;
-				});
-				// fd.insert("50", {d:{"51":'Nome do cliente', '52':'Cascais', '53': 'Portugal', "54":'cliente@sapo.pt'}, r:[ {r:"59", l:[ {_id: "789fgd89"}]}]
-				//   }, function(err, data){
-				return {d:retObj,r:[]};
-			},
-			getSavingRowsForCsvStore: function(entityName){
-				var csvRows = csvStore.csvRows;
-				var retArr = _.map(csvRows, function(value,key){
-					return FL.dd.getSavingRowsFromCsvStoreById(entityName,key);
-				});
-				return retArr;
-			},
 			displayEntities: function(){//display all entities with their attributes and relations
 				//Reads dDictionary.entities={} and 
 				//returns a collection of menu structure objects - {book:{},editor:{},..someEntity:{}}
@@ -415,70 +392,6 @@
 					nextEntityName = singularPrefix + count;
 				}
 				return nextEntityName;
-			},
-			xcreateServerEntity_Fields: function(entityName,createServerEntity_FieldsCB){
-				// cb();
-				var oEntity = this.getEntityBySingular(entityName);
-				var eCN = null;
-				async.waterfall([
-					function(waterfallCB1){//waterfallCB1 to be managed by assync
-						var fEntity = new FL.login.fl.entity();
-						fEntity.add({"3": oEntity.singular, "4": oEntity.description, 'E': oEntity.plural}, function (err, data){
-							if(err){
-								alert("createEntity Error: "+JSON.stringify(err));
-								return waterfallCB1(err);//async should exit the waterfall
-							}
-							eCN=data[0]['_id'];
-							return waterfallCB1(null,eCN);//null=>it ok, eCN isd passed to  next function
-						});	
-					},
-					function(eCN,waterfallCB2){
-						var index = 0;
-						var ffield = new FL.login.fl.field();//var ffield = new fl.field();
-						var fCN = null;
-						async.whilst(//whilst needs 3 functions. Func1=>exit criteria, Func2=>repeat function, Funct3=>when complete function 
-							//NICO recommends:
-							//	all callbacks to be used by async must be after a return
-							function(){
-								return index<oEntity.attributes.length;
-							},
-							function(loadAttributeCB){//loadAttributeCB is to be used by async	
-								var enumerableArr = oEntity.attributes[index].enumerable;
-								if(!enumerableArr)
-									enumerableArr = [];
-								ffield.add(	{"1": eCN, "3": oEntity.attributes[index].name, "4":oEntity.attributes[index].description, 'K': oEntity.attributes[index].label, 'M': oEntity.attributes[index].type, 'O':'simple','N':enumerableArr}, function (err, data){
-									if(err){
-										alert("FLdd2.js addAttribute Error:"+JSON.stringify(err));
-										index=oEntity.attributes.length+1;//to exit the loop
-										return loadAttributeCB(err);//inform async that it should exit the loop  
-									}								
-									fCN = data[0]['_id'];
-									var oldCFieldName = oEntity.L2C[oEntity.attributes[index].name]; 
-									delete oEntity.C2L[oldCFieldName];
-									oEntity.L2C[oEntity.attributes[index].name] = fCN;//Logical to Compressed
-									oEntity.C2L[fCN] = oEntity.attributes[index].name;//Compressed to Logical
-									index++;
-									return loadAttributeCB(null);//inform async that it can repeat the loop
-								});
-							},
-							function(err){//The loop is over - this parameter comes from previous callback
-								waterfallCB2(err);//exit waterfall function
-								//when done
-							}
-						);// asyncwhilst
-					}
-				],function(err){ //This function gets called after the two tasks have called their  "task callbacks"
-					console.log("If no error ->entity and fields are in server s over !!! ErroR:"+err);
-					if(!err){
-						console.log("synchronization is done in client dictionary");
-						oEntity.csingular = eCN;
-						oEntity.sync = true;
-					}else{
-						alert("ERROR createServerEntity_Fields unfinished!!!");
-					}
-					if(typeof createServerEntity_FieldsCB == "function")
-						createServerEntity_FieldsCB(err);
-				});
 			},
 			createEntity: function(xSingular,xDescription) {//add an entity entry 
 				//   Whenever a new entity is created a key attribute is also created with:
@@ -602,7 +515,7 @@
 				}
 				return xCEntity;
 			},
-			addAttribute: function(xSingular,xAttribute,xDescription,xLabel,xType,arrEnumerable) {//adds AttributeName,Description, label Type amd enumerable to oEntity of Data Dictionary
+			addAttribute: function(xSingular,xAttribute,xDescription,xLabel,xType,arrEnumerable) {//adds AttributeName,Description, label Type and enumerable to entity = xSingular
 				// if Type != "enumerable" => ArrEnumerable will be forced to null.
 				// if xAttribute already exists it is updated with xDescription, xType (xKey will not be changed)
 				// if xAttribute does not exist it is created with xDescription, xType and xKey forced to false
@@ -711,10 +624,16 @@
 				}
 				// console.log("dDictionary.addAttribute ->" + attributeSemantics(xAttribute,xDescription,oEntity,"En"));
 			},
-			getEntityBySingular: function(xSingular) {//returns an entity abd its attributes
+			getEntityBySingular: function(xSingular) {//returns an entity and its attributes
 				var oEntity = this.entities[xSingular];
 				return oEntity;
-			}
+			},
+			setSync: function(xSingular,bStatus) {//set sync = true for entity= xSingular - nothing is done if entity does not exist
+				var oEntity = this.entities[xSingular];
+				if(oEntity){
+					oEntity.sync = bStatus;
+				}
+			}			
 		};
 	})();
 // });

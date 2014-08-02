@@ -432,7 +432,8 @@ jQuery(document).ready(function($){
 				}
 			},
 			clearAllSettings: function(){//restore original menu in local storage and updates DOM status - called directly from DOM link
-				$.Topic( 'setTour' ).publish( false);//broadcast that will be received by FLTour2 to close tour
+				// alert("XXX");
+				// $.Topic( 'setTour' ).publish( false);//broadcast that will be received by FLTour2 to close tour
 				BootstrapDialog.confirm("Your current edit menu will be lost and you will be logged out. Do you really want this ?", function(result) {
 					if(result){//logedIn
 						localStorage.clear();

@@ -55,7 +55,7 @@ var FL = FL || {};
 		            },
 		            {
 		                "title" : "Menu B - Tier 2 - II",//11
-		                "uri": "_home"
+		                "uri": "javascript:FL.links.test('JOJO')"
 		            }
 		        ]
 		    },
@@ -177,7 +177,7 @@ var FL = FL || {};
 		// var myMenu = new FL.menu({jsonMenu:FL.clone(oMenu)});//"_home"
 		FL.setTourOn(true);
 		FL.mixPanelEnable = false;
-		FL.server.byPass = false;
+		FL.server.offline = true;
 		var loggedIn = FL.login.checkSignIn(true);//recover last saved menu and tour
 		FL.tourBegin();		
 		// myMenu.settings.editable = true;
