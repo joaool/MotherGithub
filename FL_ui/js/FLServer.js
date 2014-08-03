@@ -193,7 +193,7 @@
 					var eCN = oEntity.csingular;
 					//for sure it is sinchronized
 					var fd = new FL.server.fl.data();
-					var arrToSend = FL.server.preparePutAllCsvStore(entityName); 
+					var arrToSend = FL.server.preparePutAllCsvStore(entityName);
 					fd.insert(eCN,arrToSend,function(err, data){
 						if (err){
 							alert('insertCsvStoreDataTo: err=' + JSON.stringify(err));
@@ -316,7 +316,7 @@
 				// var arrToStoreLocally = [];
 				//we assume that entityName exists in local Dictionary and is in sync
 				var oEntity =  FL.dd.getEntityBySingular(entityName);
-				oEntity.csingular = "61";
+				// oEntity.csingular = "61";
 				if(oEntity){//entityName exists in local Dictionary
 					var eCN =  oEntity.csingular;
 					var sync = oEntity.sync;
@@ -329,9 +329,14 @@
 								alert('FL.server.loadCsvStoreFromEntity: err=' + JSON.stringify(err));
 								return loadCsvStoreFromEntityCB(false);
 							}
+							console.log("docs="+JSON.stringify(docs));
+
 							var arrToStoreLocally = FL.server.convertArrC2LForEntity(entityName,docs);
+							console.log("arrToStoreLocally="+JSON.stringify(arrToStoreLocally));
+
 							csvStore.store(arrToStoreLocally);
 							alert("import is done");
+							console.log("import is done");
 							return loadCsvStoreFromEntityCB(true);
 						});
 

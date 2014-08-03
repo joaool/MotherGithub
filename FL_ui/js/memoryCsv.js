@@ -15,7 +15,6 @@ window.csvStore = {
         return parseInt(last,10)+1;
     },
     populate: function () {
-
         this.csvRows[1] = {
             id: 1,
             name: "CHATEAU DE SAINT COSME",

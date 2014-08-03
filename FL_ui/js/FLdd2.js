@@ -42,12 +42,14 @@
 			//     with the format 
 			//		{name:"address",description:"address to send invoices",label:"Address",type:"string",enumerable:null,key:false});
 			//
-			//			name -  is the human (logical) attribute name
+			//			name -  is the human (logical) attribute name or field name
 			//			description - description of attribute (answer to: "what the <name > of a <entity.singular> ?")
 			//			label - defaul value that will appear in UI labeling the attribute
-			//			type - one of:  "number","string","enumerable",email","boolean","object","array","null","undefined"
+			//			type - one of: "string","number","integer","boolean","date","weak" (a json object)
 			//				NOTE: if type is "enumerable", the key enumerable must have an array of enumerables
 			//			enumerable - an array of enumerables or null (if key type != "enumerable"
+			//			typeUI -type of widget that is used with the field
+			//				textbox, email, url, numberbox, textarea, checkbox, datetextbox, combobox, picture
 			//			key - boolean. True means the attribute is the  key field of the entity . (only one allowed)
 			//			
 			//          NOTE: to access the field compressed name use L2C() at entity level.
@@ -633,7 +635,26 @@
 				if(oEntity){
 					oEntity.sync = bStatus;
 				}
-			}			
+			},
+			setFieldCompressedName: function(xSingular,fieldName,fieldCN) {//for entity xSingular and attribute fieldName sets compressed name
+				var oEntity = this.entities[xSingular];
+				if(oEntity){
+					var oldCFieldName = oEntity.L2C[fieldName];
+					if(oldCFieldName){
+						delete oEntity.C2L[oldCFieldName];
+						oEntity.L2C[fieldName] = fieldCN;//Logical to Compressed
+						oEntity.C2L[fieldCN] = fieldName;//Compressed to Logical					
+					}				
+				} 
+			},
+			getFieldCompressedName: function(xSingular,fieldName) {//for entity xSingular and attribute fieldName gets compressed name
+				var oEntity = this.entities[xSingular];
+				var fieldCN = null;
+				if(oEntity){
+					fieldCN = oEntity.L2C[fieldName];
+				}
+				return fieldCN;
+			}						
 		};
 	})();
 // });

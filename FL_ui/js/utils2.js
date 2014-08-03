@@ -167,7 +167,7 @@ window.utils = {
         var re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
         return re.test(email);
     },
-    typeOf: function(xVar) {//returns one of :  "number","string","email","boolean","object","array","null","undefined"
+    typeOf: function(xVar) {//returns one of :  "number","string","email","boolean","object","array","null","undefined","date"
         //exemple of undefined: a variable declared but never defined -->var foo; alert(foo); //undefined.
         var xRet = typeof xVar;
         if(xRet == "object") {

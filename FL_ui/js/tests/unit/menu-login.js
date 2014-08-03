@@ -418,9 +418,17 @@ $(function () {
     actual = FL.dd.getEntityBySingular("order").sync;
     ok(actual === false, "FL.dd.setSync-->order sync status is again:'not synchronized'");//28
 
+    actual = FL.dd.getFieldCompressedName("order","id");
+    ok(actual === "00", "FL.dd.getFieldCompressedName -->compressed name for id='00'");//29
+    actual = FL.dd.getFieldCompressedName("order","shipped");
+    ok(actual === "01", "FL.dd.getFieldCompressedName -->compressed name for shipped='01'");//30
 
     FL.dd.addAttribute("order","product","unique order item","product","string",null);
-    FL.dd.displayEntities();
+    actual = FL.dd.getFieldCompressedName("order","product");
+    ok(actual === "02", "FL.dd.getFieldCompressedName -->compressed name is '02'");//31
+
+
+
     var rowsArr = [
       // {id:1,shipped:true,product:"Super 1"},
       // {id:2,shipped:false,product:"Super 2"},
@@ -443,6 +451,15 @@ $(function () {
     arrOfObj = FL.server.preparePutAllCsvStore("order");
     console.log("---->preparePutAllCsvStore="+JSON.stringify(arrOfObj));
     
+    //now we force compressed names to match those in server 
+    console.log("before setFieldCompressedName ");
+    FL.dd.displayEntities();
+    FL.dd.setFieldCompressedName("order","id","62");
+    FL.dd.setFieldCompressedName("order","shipped","63");
+    FL.dd.setFieldCompressedName("order","product","64");
+    console.log("after setFieldCompressedName ");
+    FL.dd.displayEntities();
+
     csvStore.csvRows = {};
     FL.dd.setSync("order",true);//force sync
     console.log("test 0  convertToCsvStore csvStore.csvRows ="+JSON.stringify(csvStore.csvRows));
@@ -496,6 +513,10 @@ $(function () {
     // });
 
     FL.server.offline = false;
+    var oEntity =  FL.dd.getEntityBySingular("order");
+    oEntity.csingular = "61";//we force entity compressed name for test
+    //we need to force field compressed names for test
+
     FL.server.connect("Joao","oLiVeIrA",function(err){//TEST loadCsvStoreFromEntity
         // ok(err === true, "Good connection");
         if(err){
@@ -506,6 +527,7 @@ $(function () {
           FL.server.loadCsvStoreFromEntity("order",function(err){//all csvStore will be stored in server as "order" content
               console.log("loadCsvStoreFromEntity is done !!! Error:"+err);
               FL.server.disconnect();
+              console.log("show csvStore="+JSON.stringify(csvStore.csvRows));
           });
         }
     });
@@ -541,6 +563,12 @@ $(function () {
     var success = FL.dd.createEntity("order","client's product request");
     FL.dd.addAttribute("order","shipped","expedition status","Shipped","boolean",null);
     FL.dd.addAttribute("order","product","unique order item","product","string",null);
+    //forcing compressed field names
+    FL.dd.setFieldCompressedName("order","id","62");
+    FL.dd.setFieldCompressedName("order","shipped","63");
+    FL.dd.setFieldCompressedName("order","product","64");
+
+
     //rowsArr is the array to be stored in csvStore.csvRows
     var rowsArr = [
       {shipped:true,product:"Super 1"},
@@ -554,15 +582,15 @@ $(function () {
     // extract from format: {"1":{"shipped":true,"product":"Super 1","id":1},"2":{"shipped":false,"product":"Super 2"}}
     //            returns : {"d":{"01":true,"02":"Super 1","00":1},"r":[]} for id=1  
     var obj = FL.server.preparePutRowFromCsvStoreById("order",1);
-    deepEqual( obj, {d:{ "00":1,"01":true,"02":"Super 1" },r:[]}, "FL.server.preparePutRowFromCsvStoreById correct for id=1" );
+    deepEqual( obj, {d:{ "62":1,"63":true,"64":"Super 1" },r:[]}, "FL.server.preparePutRowFromCsvStoreById correct for id=1" );
     obj = FL.server.preparePutRowFromCsvStoreById("order",3);
-    deepEqual( obj, {d:{ "00":3,"01":false,"02":"Super 3" },r:[]}, "FL.server.preparePutRowFromCsvStoreById correct for id=3" );
+    deepEqual( obj, {d:{ "62":3,"63":false,"64":"Super 3" },r:[]}, "FL.server.preparePutRowFromCsvStoreById correct for id=3" );
     
     //Test 2 - Extract all lines from csvStore.csvRows and prepare it to be added to server
     // extract from format: {"1":{"shipped":true,"product":"Super 1","id":1},"2":{"shipped":false,"product":"Super 2"}}
     //            returns : [{"d":{"01":true,"02":"Super 1","00":1},"r":[]}, {"d":{"01":false,"02":"Super 2","00":2},"r":[]}]
     var arrOfObj = FL.server.preparePutAllCsvStore("order",1);
-    deepEqual( arrOfObj, [{d:{ "00":1,"01":true,"02":"Super 1" },r:[]}, {d:{ "00":2,"01":false,"02":"Super 2" },r:[]}, {d:{ "00":3,"01":false,"02":"Super 3" },r:[]}, {d:{ "00":4,"01":true,"02":"Super 4" },r:[]} ], "FL.server.preparePutAllCsvStore correct" );
+    deepEqual( arrOfObj, [{d:{ "62":1, "63":true,"64":"Super 1" },r:[]}, {d:{ "62":2,"63":false,"64":"Super 2" },r:[]}, {d:{ "62":3,"63":false,"64":"Super 3" },r:[]}, {d:{ "62":4,"63":true,"64":"Super 4" },r:[]} ], "FL.server.preparePutAllCsvStore correct" );
     
     //Test 3 - Using local Dictionary Converts array received from server (each line has keys=field compressed names) to equivalent array with logical names
     //           received from sever : [{d:{"01":true,"02":"Super 1","00":1},r:[]},{d:{"01":false,"02":"Super 2","00":2},r:[]}]
