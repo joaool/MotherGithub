@@ -362,6 +362,8 @@
    //     // we have a new entity on the server, need to resync the dictionary
 			// },	
 			syncLocalDictionary: function(syncLocalDictionaryCB){//gets all updated info from server to entity = entityName
+				//fd.insert(’40’,{_id:1, d: json}, function(err, data){…}) pg22
+				//fd.findOne(“40”,{query:{‘_id’:1}}, function(err, data){…})
 				//code here
 				var fEnt = new FL.server.fl.entity();
 				var z= 32;
@@ -383,6 +385,7 @@
 							success = FL.dd.createEntity(entities[i].d["3"],entities[i].d["4"]);//("client","company we may invoice")
 							oEntity = FL.dd.entities[entities[i].d["3"]];
 							oEntity.plural = entities[i].d["E"];
+							oEntity.csingular = entities[i]._id;
 							console.log("--- *** fields *** ---");
 							for( var fieldIndex = 0; fieldIndex < entities[i].fields.length; fieldIndex++){//boucle fields
 								//entities[i].fields[fieldIndex]
@@ -390,11 +393,39 @@
 								FL.dd.addAttribute(entities[i].d["3"],entities[i].fields[fieldIndex].d["3"] ,entities[i].fields[fieldIndex].d["4"],entities[i].fields[fieldIndex].d["K"],entities[i].fields[fieldIndex].d["M"],entities[i].fields[fieldIndex].d["N"]);//("order","shipped","expedition status","Shipped","boolean",null)
 							}
 							console.log("--- *** relations *** ---");
+							var rCN = null;
+							var relationName = null;
+							var withEntityCN = null;
+							var side = null;
+							var verb = null;
+							var cardinality = null;
+							var semantic = null;
+							var storedHere = null;
+							var relation = null;
+
+							oEntity.relations = [];
 							for( var relationIndex = 0; relationIndex < entities[i].relations.length; relationIndex++){//boucle relations
 								//entities[i].relations[relationIndex ]
-								console.log("--->relation  rCN=" + entities[i].relations[relationIndex]._id + " relationName=" + entities[i].relations[relationIndex].d["3"] );
+								//format-> 
+								console.log("--->relation  rCN=" + entities[i].relations[relationIndex]._id );
+								relation = {};
+								relation["rCN"] = entities[i].relations[relationIndex]._id;
+								relation["withEntityCN"] = entities[i].relations[relationIndex].d["00"][0]["U"];
+								relation["withEntity"] = null;
+								relation["verb"] = entities[i].relations[relationIndex].d["00"][0]["V"];
+								relation["cardinality"] = entities[i].relations[relationIndex].d["00"][0]["W"];
+								relation["side"]  = entities[i].relations[relationIndex].d["00"][0]["Z"];
+								relation["storedHere"] = entities[i].relations[relationIndex].d["00"][0]["Y"];//if true this is the side to read the relation from left to rigth
+								relation["semantic"] = null;
+								//semantic = to be formed in local dictionary ex://"customer has many orders"
+								//FL.dd.addRelation(entities[i].d["3"],rCN,withEntity,verb,cardinality,side,storedHere);
+								//we cannot use addRelation() because withEntity is unknown here. we only know its compressed name = withEntityCN
+								//    because of this it is impossible to call FL.dd.relationSemantics
+								//    we need a second pass to fill withEntity and semantic
+								oEntity.relations.push(relation);
 							}
 						}
+						FL.dd.relationPass2();//goes thru all entities and for all relations of each entity fills withEntity and semantic using withEntityCN
 						FL.dd.displayEntities();
 						console.log("&&&&&&&&&&&&&&&&&&&& end syncLocalDictionary &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&");
 						return syncLocalDictionaryCB(null);

@@ -71,6 +71,14 @@
 			//			  cardinality :W ->0,1,N
 			//			  delChildren ->option TBD->"02":[{delChildren:true,....}]
 			//
+			//  ----- relation's object was completely changed to match Nico's approach - April 8, 2014
+			//
+			//		rCN - relation compressed name
+			//		withEntity - the same as rightEntity
+			//	    verb - leftEntity <verb> rightEntity ex. "has"
+			//		cardinality - leftEntity <verb><cardinality> rightEntity ex. "zero or many"
+			//		side - only for Nico's use - convention when  relation was created with relation.add in server side
+			//		storedHere - only for Nico's use - Permission to save defined when  relation was created with relation.add in server side
 
 		var getCompressed = function ( iGenNext ) { //returns a 2 bytes string from number 
 			var sOut="";
@@ -275,6 +283,54 @@
 			var oLanguage=trad[xLanguage];//extracts language code
 			return oLanguage.pre+xAttribute+oLanguage.mid1+oEntity.singular+oLanguage.mid2+xAttrDescription+oLanguage.pos;
 		}; //attributeSemantics
+		cardinalityDecoder=function(sCardinality,xLanguage){//returns semantics to Cardinality - object {cardText:<string or null>,cardPlural:<boolean>}
+			//returns and object with {cardText:<string or null>,cardPlural:<boolean>}
+			//   cardText contains the expression corresponding to the code=sCardinality in the language=xLanguage
+			//  	 if cardinality does not exist - cardText will be null - working as a validator
+			//   cardPlural - contains a boolean such as:
+			//		 if cardinality implies a second member singular in relation semantics - cardPlural will be false
+			//		 if cardinality implies a second member plural in relation semantics - cardPlural will be true
+			//		  ex:in expression - "Invoice Item" "belongs to" "one and only one" "Invoice" ->second member is singular
+			//		    :in expression - "Client" "has" "many" "Invoices"						  ->second member is plural
+			var trad={ //entity+A+description, B.pre+singular+B.mid+plural+B.pos
+				"En":{"0_1":{text:"zero or 1",cardPlural:false},"N":{text:"many",cardPlural:true},"1":{text:"one and only one",cardPlural:false}},
+				"Fr":{"0_1":{text:"zero ou 1",cardPlural:false},"N":{text:"plusieurs",cardPlural:true},"1":{text:"un et seulement un",cardPlural:false}},
+				"Nl":{"0_1":{text:"nul of 1",cardPlural:false},"N":{text:"velen",cardPlural:true},"1":{text:"slechts één",cardPlural:false}},
+				"Pt":{"0_1":{text:"zero or 1",cardPlural:false},"N":{text:"vários",cardPlural:true},"1":{text:"um e só um",cardPlural:false}},
+			};
+			var oLanguage=trad[xLanguage];//extracts language code
+			xCardText=null;
+			xCardPlural=false;
+			if(oLanguage){//the quest is for a known language
+				var xDecoder=oLanguage[sCardinality];
+				if(xDecoder){
+					xCardText=xDecoder.text;
+					xCardPlural=xDecoder.cardPlural;
+				};
+			};
+			return {cardText:xCardText,cardPlural:xCardPlural};//if cardiality does not exist cardText will return null
+		};//cardinalityDecoder		
+		relationSemantics= function(sSingular,sRightEntity,sVerb,sCardinality,xLanguage) {//shows relationsemantics
+		// ex for : sSingular="Client",sRightEntity="Invoice",sVerb="has",sCardinality="0_N",xLanguage="En"
+		// 	  returns : "Client has many invoices"
+		//  dDictionary.attributeSemantics(oEntity.attributes[i].name,oEntity.attributes[i].description,oEntity,"En");
+			var xRet=sSingular+" "+sVerb+" ";
+			var oCard=cardinalityDecoder(sCardinality,xLanguage);
+			if(!oCard.cardText){
+				alert("relationSemantics - Impossible to find semantics for cardinality="+sCardinality+" Language="+xLanguage);
+				//Err.alert("dDictionary.relationSemantics",(new Error),"Impossible to find semantics for cardinality="+sCardinality+" Language="+xLanguage);
+			};
+			xRet+=oCard.cardText+" ";
+			var xRight=sRightEntity;//this will be the singular for thew right entity
+			if(oCard.cardPlural){
+				xRight=FL.dd.entities[sRightEntity].plural;
+				if(!xRight){
+					alert("relationSemantics - RightEntity="+sRightEntity+" does not exist in Data Dictionay");
+					//Err.alert("dDictionary.relationSemantics",(new Error),"RightEntity="+sRightEntity+" does not exist in Data Dictionay");
+				};
+			};
+			return xRet+xRight;
+		}; //relationSemantics			
 		attributeIndex= function(xSingular,xAttribute) {//for entity=xSingular, returns the index of attribute=xAttribute
 			// if attribute exists within xSingular returns it. Returns -1 otherwise
 			// console.log("dd.attributeIndex ->check index for "+xAttribute);
@@ -311,6 +367,9 @@
 			clear: function(){
 				this.entities = {__Last:0,__LastRelation:0};
 			},
+			relationSemantics: function(sSingular,sRightEntity,sVerb,sCardinality,xLanguage) {
+				return relationSemantics(sSingular,sRightEntity,sVerb,sCardinality,xLanguage);
+			},
 			displayEntities: function(){//display all entities with their attributes and relations
 				//Reads dDictionary.entities={} and 
 				//returns a collection of menu structure objects - {book:{},editor:{},..someEntity:{}}
@@ -334,7 +393,7 @@
 						}else if(key=="__LastRelation"){
 							console.log("(__LastRelation) -> Number of relations in dictionary="+oEntities[key]);
 						}else{
-							console.log("Entity="+oEntities[key].singular+"/"+oEntities[key].csingular +" - Plural="+oEntities[key].plural+"- description="+oEntities[key].description + "sync="+oEntities[key].sync );
+							console.log("Entity="+oEntities[key].singular+"/"+oEntities[key].csingular +" - Plural="+oEntities[key].plural+"- description="+oEntities[key].description + " sync="+oEntities[key].sync );
 							//now we display each attribute
 							var oL2C = oEntities[key].L2C;
 							var xArr = oEntities[key].attributes;
@@ -361,10 +420,18 @@
 							xArr=oEntities[key].relations;
 							if(xArr.length>0){//the entity has attribute(s)
 								for (var i=0;i<xArr.length;i++){
-									var xCIdRelation=xArr[i].cIdRelation;
+									// var xCIdRelation=xArr[i].cIdRelation;
 									var xSemantic=xArr[i].semantic;
-									var xCard=xArr[i].cardinality;
-									console.log("-----> relation["+i+"] with compressedId="+xCIdRelation+" -> "+xSemantic+" - #="+xCard);
+									// var xCard=xArr[i].cardinality;
+									var rCN = xArr[i].rCN;
+									var withEntity = xArr[i].withEntity;
+									var verb = xArr[i].verb;
+									var rCN = xArr[i].rCN;
+									var cardinality = xArr[i].cardinality;
+									var side = xArr[i].side;
+									var storeHere = xArr[i].storeHere;
+
+									console.log("-----> relation["+i+"] with compressedId="+rCN+" -> "+xSemantic+" - #="+cardinality);
 								}
 							}else{
 								console.log("----->no relations defined !");
@@ -520,6 +587,20 @@
 				}
 				return xCEntity;
 			},
+			getEntityByCName: function(eCN) {//returns the  logical name for compressed name = eCN. If not found returns null
+				//finds the first all keys of this.entities will be searched looking for key.csingular = eCN 
+				var entityName = null;
+				var valuesArr = _.values(this.entities);
+				//note for _.find: if valuesArr is and array of objects =>element is the value of each key/value and returns value
+				var oEntity = _.find(valuesArr, function(element){//element is each array element. If is an object it returns the value
+					if(typeof element == "number")
+						return false;//necessary to skip __Last:<number> and __LastRelation:<number>
+					return element.csingular == eCN;
+				});
+				if (oEntity) 
+					entityName = oEntity.singular;
+				return entityName;
+			},			
 			addAttribute: function(xSingular,xAttribute,xDescription,xLabel,xType,arrEnumerable) {//adds AttributeName,Description, label Type and enumerable to entity = xSingular
 				// if Type != "enumerable" => ArrEnumerable will be forced to null.
 				// if xAttribute already exists it is updated with xDescription, xType (xKey will not be changed)
@@ -628,6 +709,66 @@
 					//Err.alert("dDictionary.addAttribute",(new Error)," you tried to add attribute "+xAttribute+" to a non existing entity "+xSingular);
 				}
 				// console.log("dDictionary.addAttribute ->" + attributeSemantics(xAttribute,xDescription,oEntity,"En"));
+			},
+			addRelation: function(xSingular,rCN,withEntityName,verb,cardinality,side,storedHere) {//adds a new relation to the array of relations of entity xSingular
+				//ex:FL.dd.addRelation(entities[i].d["3"],rCN,withEntityName,verb,cardinality,side,storedHere);
+				var oEntity = this.entities[xSingular];
+				if(oEntity){
+					// checks if rCN already exists - if it exists it does not add
+					if (FL.dd.isRelation(xSingular,rCN)){
+						alert("FL.dd.addRelation Error: you tried to add a relation with a compressed name "+rCN+" that already exists !");
+					}else{
+						// var xNextRelation=dDictionary.entities["__LastRelation"]+1; ???????????
+						// dDictionary.entities["__LastRelation"]=xNextRelation; ???????????????
+						var relation = {};
+						relation["rCN"] = rCN;
+						relation["withEntity"] = withEntityName;
+						relation["verb"] = verb;
+						relation["cardinality"] = cardinality;
+						if(!side)
+							side = null;
+						if(!storedHere)
+							storedHere = null;
+						relation["side"] = side;
+						relation["storedHere"] = storedHere;
+						// var rightEntityName = 
+						var xSemantics=FL.dd.relationSemantics(xSingular,withEntityName,verb,cardinality,"En");
+
+						relation["semantic"] = xSemantics;
+
+						relation["side"] = side;
+						relation["storedHere"] = storedHere;
+						relation["withEntityCN"] = null;//this is an auxiliary field to support FL.server.syncLocalDictionary() 
+
+						oEntity.relations.push(relation);
+					}
+				}else{
+					alert("FL.dd.addRelation Error: you tried to add a relation "+relationName+" to a non existing entity "+xSingular);
+				}
+			},
+			relationPass2: function() {//goes thru all entities and for all relations of each entity fills withEntity and semantic using withEntityCN
+				var valuesArr = _.values(this.entities);
+				//note for _.find: if valuesArr is and array of objects =>element is the value of each key/value and returns value
+				_.each(valuesArr, function(element){//element is each array element. If is an object it returns the value
+					if(typeof element != "number"){
+						console.log("Pass2 -->"+element.singular);
+						var xSingular = element.singular;
+						_.each(element.relations, function(relation){//relation is a relation from the current entity
+							relation["withEntity"] = FL.dd.getEntityByCName(relation["withEntityCN"]);
+							relation["semantic"] = FL.dd.relationSemantics(xSingular,relation["withEntity"],relation["verb"],relation["cardinality"],"En");//sSingular,sRightEntity,sVerb,sCardinality,xLanguage
+						});	
+					}
+				});
+			},			
+			isRelation: function(xSingular,rCN) {//returns true if relation exists, false otherwise 
+				var exists = false;
+				var oEntity = this.entities[xSingular];
+				if(oEntity){
+					var arrPos = _.find(oEntity.relations, function(element){return element.rCN == rCN;});
+					if (arrPos>=0)
+						exists = true;
+				}
+				return exists;
 			},
 			getEntityBySingular: function(xSingular) {//returns an entity and its attributes
 				var oEntity = this.entities[xSingular];

@@ -427,10 +427,30 @@ $(function () {
     actual = FL.dd.getFieldCompressedName("order","product");
     ok(actual === "02", "FL.dd.getFieldCompressedName -->compressed name is '02'");//31
     actual = FL.dd.isEntityInLocalDictionary("order");
-    ok(actual == true, "FL.dd.isEntityInLocalDictionary -->'order' exists in local dictionary.");//32
+    ok(actual === true, "FL.dd.isEntityInLocalDictionary -->'order' exists in local dictionary.");//32
     actual = FL.dd.isEntityInLocalDictionary("orderz");
-    ok(actual == false, "FL.dd.isEntityInLocalDictionary -->'orderz' does not exists in local dictionary.");//33
+    ok(actual === false, "FL.dd.isEntityInLocalDictionary -->'orderz' does not exists in local dictionary.");//33
+    
+    actual = FL.dd.getEntityByCName("02");
+    ok(actual == "order", "FL.dd.getEntityByCName --> returns 'order' for entity compressed name = '02'");//34
+    actual = FL.dd.getEntityByCName("0A");
+    ok(actual === null, "FL.dd.getEntityByCName --> returns null for entity compressed name = '0A'");//35
+    // FL.dd.displayEntities();
+    actual = FL.dd.getEntityByCName("01");
+    ok(actual === "client", "FL.dd.getEntityByCName --> returns 'client' for entity compressed name = '01'");//36
 
+    //now testing relations functions
+    actual = FL.dd.isRelation("client","01");
+    ok(actual === false, "FL.dd.isRelation --> relation compressed name '01' does not exist");//37
+    FL.dd.addRelation("client","01","order","orders","N");//(xSingular,rCN,withEntityName,verb,cardinality,side,storedHere)
+    obj = FL.dd.entities["client"].relations[0];
+    deepEqual( obj, {"rCN":"01","withEntity":"order","verb":"orders","cardinality":"N","semantic":"client orders many orders","side":null,"storedHere":null,"withEntityCN":null},"FL.dd.addRelation --> added relation client to order ");//38
+
+    //FL.dd.displayEntities();
+
+    // deepEqual( obj, {d:{ "00":3,"01":false,"02":"Super 3" },r:[]}, "FL.server.getSavingObjFromCsvStoreById correct for id=3" );
+
+    //ok(actual === false, "FL.dd.isRelation --> relation compressed name '01' does not exist");//37
 
 
     var rowsArr = [
@@ -441,7 +461,7 @@ $(function () {
       {shipped:true,product:"Super 1"},
       {shipped:false,product:"Super 2"},
       {shipped:false,product:"Super 3"},
-      {shipped:true,product:"Super 4"}      
+      {shipped:true,product:"Super 4"}
     ];
     utils.csvToStore(rowsArr);//id is injected here...
     console.log("---->csvStore.csvRows="+JSON.stringify(csvStore.csvRows));
