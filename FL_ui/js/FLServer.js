@@ -321,7 +321,7 @@
 					var eCN =  oEntity.csingular;
 					var sync = oEntity.sync;
 					if(sync){//now we can import from server
-						alert("Entity=" + entityName + " exists and is in sync -->eCN/sync=" + eCN + "/"+sync);
+						console.log("Entity=" + entityName + " exists and is in sync -->eCN/sync=" + eCN + "/"+sync);
 						var flData = new FL.server.fl.data();
 						// var flData = new FL.server.fl.entity();
 						flData.findAll(eCN, {query:{}},function(err, docs){
@@ -335,7 +335,7 @@
 							console.log("arrToStoreLocally="+JSON.stringify(arrToStoreLocally));
 
 							csvStore.store(arrToStoreLocally);
-							alert("import is done");
+							// alert("import is done");
 							console.log("import is done");
 							return loadCsvStoreFromEntityCB(true);
 						});
@@ -351,6 +351,61 @@
 
 				// csvStore.store(arrToStoreLocally);
 			},
+			// syncLocalEntity: function(entityName,syncLocalEntityCB){//gets all updated info from server to entity = entityName
+			// 	//code here
+			// 	fEnt.getOne({‘query’:{‘3’:’nomEntity’}, projection:{‘_id’:1}}, function(err ,data){//only _id is returned - _id is the compressed name
+			// 	   if(err){ // process error
+			// 	   }	
+			// 	   if(data != null){
+
+			// 	   }
+   //     // we have a new entity on the server, need to resync the dictionary
+			// },	
+			syncLocalDictionary: function(syncLocalDictionaryCB){//gets all updated info from server to entity = entityName
+				//code here
+				var fEnt = new FL.server.fl.entity();
+				var z= 32;
+				fEnt.getAllWithField({"query":{}}, function(err ,entities){
+					try{
+						if(err){ // process error
+							return syncLocalDictionaryCB(err);
+						}
+						//code here
+						var sucess = null;
+						var oEntity = null;
+						console.log("&&&&&&&&&&&&&&&&&&& begin syncLocalDictionary &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&");
+						FL.dd.clear();//clears local dictionary
+						FL.dd.displayEntities();
+						console.log("--- *** Entities *** ---");
+						// console.log("entities = "+JSON.stringify(entities));
+						for( var i = 0; i < entities.length; i++){
+							console.log("Entity eCN=" + entities[i]._id + " singular=" + entities[i].d["3"] );
+							success = FL.dd.createEntity(entities[i].d["3"],entities[i].d["4"]);//("client","company we may invoice")
+							oEntity = FL.dd.entities[entities[i].d["3"]];
+							oEntity.plural = entities[i].d["E"];
+							console.log("--- *** fields *** ---");
+							for( var fieldIndex = 0; fieldIndex < entities[i].fields.length; fieldIndex++){//boucle fields
+								//entities[i].fields[fieldIndex]
+								console.log("--->field fCN=" + entities[i].fields[fieldIndex]._id + " fieldName=" + entities[i].fields[fieldIndex].d["3"] );
+								FL.dd.addAttribute(entities[i].d["3"],entities[i].fields[fieldIndex].d["3"] ,entities[i].fields[fieldIndex].d["4"],entities[i].fields[fieldIndex].d["K"],entities[i].fields[fieldIndex].d["M"],entities[i].fields[fieldIndex].d["N"]);//("order","shipped","expedition status","Shipped","boolean",null)
+							}
+							console.log("--- *** relations *** ---");
+							for( var relationIndex = 0; relationIndex < entities[i].relations.length; relationIndex++){//boucle relations
+								//entities[i].relations[relationIndex ]
+								console.log("--->relation  rCN=" + entities[i].relations[relationIndex]._id + " relationName=" + entities[i].relations[relationIndex].d["3"] );
+							}
+						}
+						FL.dd.displayEntities();
+						console.log("&&&&&&&&&&&&&&&&&&&& end syncLocalDictionary &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&");
+						return syncLocalDictionaryCB(null);
+				   	}
+				   	catch(e){
+				   		console.log("Big error !!!"+e.stack);
+				   		return syncLocalDictionaryCB(e.toString());	
+				   	}
+				});
+			},	
+
 			testFunc: function(x) {
 				alert("FL.server.test() -->"+x);
 			}

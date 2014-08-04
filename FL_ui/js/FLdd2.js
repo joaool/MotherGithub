@@ -45,11 +45,11 @@
 			//			name -  is the human (logical) attribute name or field name
 			//			description - description of attribute (answer to: "what the <name > of a <entity.singular> ?")
 			//			label - defaul value that will appear in UI labeling the attribute
-			//			type - one of: "string","number","integer","boolean","date","weak" (a json object)
+			//			type - one of: "string","string:email","string:url"... (others) ,"number","integer","boolean","date","weak" (a json object)
 			//				NOTE: if type is "enumerable", the key enumerable must have an array of enumerables
 			//			enumerable - an array of enumerables or null (if key type != "enumerable"
 			//			typeUI -type of widget that is used with the field
-			//				textbox, email, url, numberbox, textarea, checkbox, datetextbox, combobox, picture
+			//				textbox, numberbox, textarea, checkbox, datetextbox, combobox, picture
 			//			key - boolean. True means the attribute is the  key field of the entity . (only one allowed)
 			//			
 			//          NOTE: to access the field compressed name use L2C() at entity level.
@@ -307,6 +307,9 @@
 			},
 			plural: function(sWord,xLanguage) {//returns the plural of sWord in language=xLanguage				
 				return plural(sWord,xLanguage);
+			},
+			clear: function(){
+				this.entities = {__Last:0,__LastRelation:0};
 			},
 			displayEntities: function(){//display all entities with their attributes and relations
 				//Reads dDictionary.entities={} and 
@@ -629,6 +632,12 @@
 			getEntityBySingular: function(xSingular) {//returns an entity and its attributes
 				var oEntity = this.entities[xSingular];
 				return oEntity;
+			},
+			isEntityInLocalDictionary: function(entityName) {//returns not null if entityName exists in local dictionary
+				var exists = false;
+				if(this.getEntityBySingular(entityName))//if getEntityBySingular is not null =>exists = true
+					exists = true;
+				return exists;
 			},
 			setSync: function(xSingular,bStatus) {//set sync = true for entity= xSingular - nothing is done if entity does not exist
 				var oEntity = this.entities[xSingular];

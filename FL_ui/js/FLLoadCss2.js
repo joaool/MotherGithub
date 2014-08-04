@@ -410,8 +410,8 @@ jQuery(document).ready(function($){
 								var password = $('#login_password').val();
 								if (FL.validateEmail(email)) {
 									loginAccess({email:email,userName:userName,password:password});
-									// FL.login.connectServer("Nico","coLas",function(err){console.log("connectServer connection is="+err);});//3rd parameter is byPass
-									FL.server.connect("Nico","coLas",function(err){console.log("connectServer connection is="+err);});//3rd parameter is byPass
+									// FL.server.connect("Nico","coLas",function(err){console.log("connectServer connection is="+err);});//3rd parameter is byPass
+									FL.server.connect("Joao","oLiVeIrA",function(err){console.log("connectServer connection is="+err);});//3rd parameter is byPass
 									FL.mix("Sign In",{"email":email});
 								}else{
 									BootstrapDialog.alert("Your Email is incorrect. Please login again and provide a valid email address");

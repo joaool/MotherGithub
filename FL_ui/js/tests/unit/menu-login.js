@@ -426,6 +426,10 @@ $(function () {
     FL.dd.addAttribute("order","product","unique order item","product","string",null);
     actual = FL.dd.getFieldCompressedName("order","product");
     ok(actual === "02", "FL.dd.getFieldCompressedName -->compressed name is '02'");//31
+    actual = FL.dd.isEntityInLocalDictionary("order");
+    ok(actual == true, "FL.dd.isEntityInLocalDictionary -->'order' exists in local dictionary.");//32
+    actual = FL.dd.isEntityInLocalDictionary("orderz");
+    ok(actual == false, "FL.dd.isEntityInLocalDictionary -->'orderz' does not exists in local dictionary.");//33
 
 
 
