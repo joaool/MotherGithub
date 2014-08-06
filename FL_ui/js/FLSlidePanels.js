@@ -168,11 +168,20 @@ jQuery(document).ready(function($){
 								// update dictionary with singular and description
 								var cEntity = FL.dd.getCEntity(entityName);
 								csvStore.insertInArrayOfGrids(singular);
-								FL.dd.updateEntityByCName(cEntity,singular,plural,description);
-								$.Topic( 'createGridOption' ).publish( plural,singular );//broadcast that will be received by FL.menu to add an option
+								FL.dd.updateEntityByCName(cEntity,{singular:singular,plural:plural,description:description});
+								//now we sync the dictionary for the new entity and then we send the content to the server
+								FL.server.insertCsvStoreDataTo(singular,function(err){
+									if(err){
+										console.log("Data from entity "+singular+" Error trying to store on server error="+err);
+										return;
+									}
+									$.Topic( 'createGridOption' ).publish( plural,singular );//broadcast that will be received by FL.menu to add an option
+									console.log("Data from entity "+singular+" stored on server");
+								});
+								
 								// $.Topic( 'createOption' ).publish( plural );//broadcast that will be received by FL.menu to add an option
-
-								FL.dd.displayEntities();
+								console.log("FLSlidePanels.js '#confirm' click -->A new menu " + plural + " was created");
+								// FL.dd.displayEntities();
  
 								// alert("cEntity = "+cEntity);
 

@@ -40,8 +40,10 @@
 					}else{//entity is not in local dictionary =>we force syncLocalDictionary
 						//TEMPORARY local dictionary adjust to force pair in local dictionary
 						
-						FL.server.syncLocalDictionary(function(){ console.log("CB from F.links.setDefaultGrid");
-							// displayDefaultGrid(entityName);
+						FL.server.syncLocalDictionary(function(){
+							console.log("CB from F.links.setDefaultGrid SYNC IS DONE !!!!!!!!!!!!!!!!!!!!!!");
+							FL.dd.displayEntities();
+							displayDefaultGrid(entityName);
 						});
 
 						// var success = FL.dd.createEntity("order","client's product request");

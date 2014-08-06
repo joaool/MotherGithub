@@ -55,7 +55,7 @@ var FL = FL || {};
 		            },
 		            {
 		                "title" : "Menu B - Tier 2 - II",//11
-		                "uri": "javascript:FL.links.setDefaultGrid('order')"
+		                "uri": "javascript:FL.links.setDefaultGrid('Order')"
 		            }
 		        ]
 		    },

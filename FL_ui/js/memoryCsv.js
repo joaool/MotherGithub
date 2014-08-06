@@ -2,7 +2,7 @@
 window.csvStore = {
     csvRows:{}, //a JSON of JSONs  {1:{},2:{}...n:{}}; //NOTE:each row  should have a boolean sync field to work in offline mode
     lastId:0,
-    store: function( arrToStore ) {//arrToStore is an array of objects [{},{},....{}] 
+    store: function( arrToStore ) {//arrToStore is an array of objects [{},{},....{}] where id field is mandatory inside {}
         var arrOfIds = _.map(arrToStore,function(element){return element.id;});
         this.csvRows = _.object(arrOfIds,arrToStore); //becomes ->{1:arrToStore[1],2:arrToSAtore[2]....} 
         // this.csvRows = arrToStore;

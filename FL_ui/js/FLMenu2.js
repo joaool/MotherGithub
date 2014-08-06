@@ -33,9 +33,11 @@ FL["menu"] = function(menuSettings) { //{jsonMenu:null,initialMenu:null,editable
 	// $( "#FL_login" ).change(function() {
 	// 	alert( "Handler for .change() called." );
 	// });
-	this.createMenuEntryLastTop = function(optionTitle,uri) {
+	this.createMenuEntryLastTop = function(optionTitle,singular) {
 		var nextId = menuEach(parentThis.settings.jsonMenu.menu,add_Id_Top);
 		// alert("The menu has the last id="+(nextId-1));
+		var uri ="javascript:FL.links.setDefaultGrid('" + singular + "')";
+		 		//"javascript:FL.links.setDefaultGrid('Order')"
 		var newMenuItem = { "title": optionTitle, "uri": uri,top:true, id:nextId };
 		parentThis.settings.jsonMenu.menu.push(newMenuItem);
 		parentThis.menuRefresh();
@@ -55,7 +57,7 @@ FL["menu"] = function(menuSettings) { //{jsonMenu:null,initialMenu:null,editable
 	};
 	this.createGrid = function (optionTitle, singular) {
 		alert("FLMenus2.js createGrid->Request to create grid "+optionTitle);
-		parentThis.createMenuEntryLastTop(optionTitle,"__grid(" + singular);
+		parentThis.createMenuEntryLastTop(optionTitle,singular);
 		// parentThis.menuRefresh();
 	};
 	$.Topic( 'signInDone' ).subscribe( this.setEditable );

@@ -45,9 +45,11 @@
 			//			name -  is the human (logical) attribute name or field name
 			//			description - description of attribute (answer to: "what the <name > of a <entity.singular> ?")
 			//			label - defaul value that will appear in UI labeling the attribute
-			//			type - one of: "string","string:email","string:url"... (others) ,"number","integer","boolean","date","weak" (a json object)
+			//	OLD>>	type - one of: "string","string:email","string:url"... (others) ,"number","integer","boolean","date","weak" (a json object)
+			//			type - string, integer, number, Boolean, date, or json (this will be Nico's "M")
 			//				NOTE: if type is "enumerable", the key enumerable must have an array of enumerables
-			//			enumerable - an array of enumerables or null (if key type != "enumerable"
+			//				NOTE: type "enumerable" is invalid for server. "enumerable" will be send as type="string" to server
+			//			enumerable - an array of enumerables or null (if key type != "enumerable")
 			//			typeUI -type of widget that is used with the field
 			//				textbox, numberbox, textarea, checkbox, datetextbox, combobox, picture
 			//			key - boolean. True means the attribute is the  key field of the entity . (only one allowed)
@@ -348,7 +350,7 @@
 					}
 					// console.log("-------------- dd.attributeIndex  existing attribute names ------------END");
 				}else{
-					console.log("dd.attributeIndex ->no attributes defined !");
+					console.log("FL.dd.attributeIndex ->no attributes defined !");
 				}
 				// console.log("dd.attributeIndex ->for attribute="+xAttribute+" returns position="+xRet);
 			}
@@ -482,14 +484,14 @@
 				var xPlural = null;
 				var xRet = false;
 				if(!this.entities[xSingular]){//xSingular does not exist in dictionary
-					console.log("FL.dd.createEntity ----------------->"+xSingular+" new!!!");
+					// console.log("FL.dd.createEntity ----------------->"+xSingular+" new!!!");
 					var xNext = this.entities["__Last"]+1;
 					this.entities["__Last"] = xNext;
 					var xCSingular = getCompressed(xNext);
 					xPlural = plural(xSingular,"En");  //+"s";
 					oEntity = {singular:xSingular,csingular:xCSingular,plural:xPlural,description:xDescription,sync:false,lastId:0,L2C:{},C2L:{},attributes:[],relations:[]};
 					this.entities[xSingular] = oEntity;
-					this.addAttribute(xSingular,"id",xSingular+"'s id","id","textBox");//we need to set key=true !!!
+					this.addAttribute(xSingular,"id",xSingular+"'s id","id","string");//we need to set key=true !!!
 					this.entities[xSingular].attributes[0].key=true;
 					xRet = true;
 				}else{//xSingular already exists in dictionary
@@ -497,7 +499,7 @@
 				}
 				return xRet;
 			},	
-			updateEntityBySingular: function(xSingular,xOptions) {//updates an existing entity 
+			updateEntityBySingular: function(xSingular,xOptions) {//updates an existing entity with xOptions object
 				//Ex: updateEntityBySingular("client",{plural:"clients",description:"company that buys from us"});
 				var oEntity=null;
 				var oEntityUpdate = null;
@@ -512,70 +514,25 @@
 				}
 				return xRet;
 			},
-			updateEntityByCName: function(xCName,xOptions) {//updates xSingular,xPlural,xDescription
+			updateEntityByCName: function(xCName,xOptions) {//updates entity with compressed name = xCName with xOptions object
 				//Ex: updateEntityByCName("02",false,{plural:"clients",description:"company that buys from us"});
 				//Note - that xCName may not exist because sync has changed to true- temporary compresede number was changed !
 				var xRet = false;
 				var oEntityUpdate = null;
-				var xSingular = null;
+				var oldSingular = null;
 				var arrOfRightSide = _.values(this.entities);//an array of JSONs
 				var oEntity = _.find(arrOfRightSide, function(element) {return element.csingular == xCName;});
 				if(oEntity){
-					xSingular = oEntity.singular;
+					oldSingular = oEntity.singular;
 					oEntityUpdate = _.extend(oEntity, xOptions);
-					this.entities[xSingular] = oEntityUpdate;
+					delete this.entities[oldSingular];
+					var newSingular =  oEntityUpdate.singular;
+					this.entities[newSingular] = oEntityUpdate;
 					xRet = true;
 				}else{//xCName does not exists in dictionary
-					alert("FL.dd.updateEntityByCName Error: you tried update compressedName="+xCName+" but it does not exists in Dictionary");
+					alert("FL.dd.updateEntityByCName Error: you tried to update an entity with compressedName="+xCName+" but it does not exists in local Dictionary");
 				}
 				return xRet;
-			},
-			NicoCreateEntity: function(xSingular,xDescription) {//add or updates an entity entry 
-				//This may create a new entity (if xSingular does not exist) or update an existing entity /if xSingular exists).
-				//   Whenever a new entity is created a key attribute is also created with:
-				//		dDictionary.addAttribute(xSingular,"id",xSingular+"'s id","textBox",true);
-				//      Note:The key attribute is glued to the entity - (it may be editable, but not deleted)
-				//			if the entity exists the key attribute also exist
-				//			it only can be removed if we remove the entity
-				//ex. var oEntity=dDictionary.createEntity("Client","Individual or Company to whom we may send invoices");
-				//checks if entity already exists - creates if entity does not exist
-				// NOTE:plural is calculated by dDictionary.plural(xSingular,"En");
-				//alert("dDictionary.createEntity xSingular="+xSingular);
-
-				// console.log("BEGIN ############################ FL.dd.createEntity ##############################");
-				var oEntity=null;
-				var xPlural = null;
-				var eCN = null;
-				if(!entities[xSingular]){//xSingular does not exist in dictionary
-					console.log("FL.dd.createEntity ----------------->"+xSingular+" new!!!");			
-					// var xNext = entities["__Last"]+1;
-					// entities["__Last"] = xNext;
-					// var xCSingular = getCompressed(xNext);
-
-					xPlural = plural(xSingular,"En");  //+"s";
-					var fEntity = new FL.login.fl.entity();//var fEntity = new fl.entity();
-
-					fEntity.add({"3": xSingular, "4": xDescription, 'E': xPlural}, function (err, data){
-						if(err){
-							alert("createEntity Error: "+JSON.stringify(err));
-							return;
-						}
-						eCN=data[0]['_id'];
-						oEntity = {singular:xSingular,csingular:eCN,plural:xPlural,description:xDescription,lastId:0,L2C:{},C2L:{},attributes:[],relations:[]};
-						entities[xSingular] = oEntity;
-						this.addAttribute(xSingular,"id",xSingular+"'s id","id","textBox");//we need to set key=true !!!
-						entities[xSingular].attributes[0].key=true;
-					});
-				}else{//xSingular already exists in dictionary
-					alert("FL.dd.createEntity "+xSingular+" already exists !!! TO BE DONE");
-					console.log("FL.dd.createEntity "+xSingular+" already exists !!!");
-					oEntity = entities[xSingular];
-					xPlural = oEntity.plural;
-					this.updateEntity(xSingular,xPlural,xDescription);
-				}
-				// console.log("dd.createEntity end1----------------->"+entitySemantics(oEntity,"A","En"));
-				// console.log("dd.createEntity end2----------------->"+entitySemantics(oEntity,"B","En"));
-				// console.log("END ############################ dd.createEntity ##############################");
 			},
 			getCEntity: function(xEntity) {//returns the compressed name of a logical name xEntity
 				//returns the compressed name of the logical name xEntity. The method is a NOP if xEntity is null;
@@ -614,6 +571,7 @@
 				//		
 				//		If we are updating a key attribute we force the type to "number" independently of the xType parameter
 				//	
+				// NOTE: type is mandatory and must be one of: string, integer, number, Boolean, date, or json (this will be Nico's "M") 
 				//oEntity={singular:"Client",plural:"clients",description:"Company to send invoices",lastId:0,L2C:{},C2L:{},attributes:[]};
 				//checks if attribute already exists. If it exists updates, otherwise create it !!!
 				//console.clear();
@@ -647,68 +605,6 @@
 					alert("FL.dd.addAttribute Error: you tried to add attribute "+xAttribute+" to a non existing entity "+xSingular);
 					//Err.alert("dDictionary.addAttribute",(new Error)," you tried to add attribute "+xAttribute+" to a non existing entity "+xSingular);
 				}
-			},
-			NicoAddAttribute: function(xSingular,xAttribute,xDescription,xLabel,xType,arrEnumerable) {//adds AttributeName,Description, label Type amd enumerable to oEntity of Data Dictionary
-				// if Type != "enumerable" => ArrEnumerable will be forced to null.
-				// if xAttribute already exists it is updated with xDescription, xType (xKey will not be changed)
-				// if xAttribute does not exist it is created with xDescription, xType and xKey forced to false
-				//		
-				// NOTE on xKey - the only attribute that has xKey=true is always created or removed when the entity is created or removed
-				//    To update the name and description of the key attribute of a just created attribute:
-				//		dDictionary.createEntity("Client","clients","Individual or Company to whom we may send invoices");//singular, plural, description
-				//		dDictionary.renameAttribute("Client","id","name");//renaming the key attribute
-				//		dDictionary.addAttribute("Client","name","client's id","Name",string",null);//xEntity,xAttribute,xDescription,xType,xKey
-				//		
-				//		If we are updating a key attribute we force the type to "number" independently of the xType parameter
-				//	
-				//oEntity={singular:"Client",plural:"clients",description:"Company to send invoices",lastId:0,L2C:{},C2L:{},attributes:[]};
-				//checks if attribute already exists. If it exists updates, otherwise create it !!!
-				//console.clear();
-				var oEntity = this.entities[xSingular];
-				var ffield = null;
-				var sComp = null;
-				if(oEntity){
-					var xIndex = attributeIndex(xSingular,xAttribute);
-					if(xIndex<0){//if it does not exists creates it
-
-						// var nId = oEntity.lastId++;
-						// var sComp = getCompressed(nId++);
-
-						ffield = new FL.login.fl.field();//var ffield = new fl.field();
-	
-						ffield.add(	{"1": oEntity.csingular , "3": xAttribute, "4":xDescription, 'K': xLabel, 'M': xType, 'O':'simple','N':arrEnumerable}, function (err, data){
-							if(err){
-								alert("FLdd2.js addAttribute Error:"+JSON.stringify(err));
-								return;
-							}
-							sComp = data[0]['_id'];
-							if(xType !="enumerable")
-								arrEnumerable = null;
-							oEntity.attributes.push({name:xAttribute,description:xDescription,label:xLabel,type:xType,enumerable:arrEnumerable,key:false});
-							oEntity.L2C[xAttribute] = sComp;//Logical to Compressed
-							oEntity.C2L[sComp] = xAttribute;//Compressed to Logical
-							// oEntity.lastId = nId;
-
-						});
-					}else{//updates the existing attribute - if xKey is true (it will continue to be true)
-						alert("XXXXXXXXX to be done");
-						oEntity.attributes[xIndex].description = xDescription;
-						oEntity.attributes[xIndex].label = xLabel;
-						if(oEntity.attributes[xIndex].key)//if we are updating a key attribute we force the type to "string"
-							xType="number";
-						oEntity.attributes[xIndex].type = xType;
-						if(xType !="enumerable")
-							arrEnumerable = null;
-						oEntity.attributes[xIndex].enumerable = arrEnumerable;
-
-						//oEntity.attributes[xIndex].key=xKey;
-					}
-					//dDictionary.save(xSingular,oEntity);
-				}else{
-					alert("FL.dd.addAttribute Error: you tried to add attribute "+xAttribute+" to a non existing entity "+xSingular);
-					//Err.alert("dDictionary.addAttribute",(new Error)," you tried to add attribute "+xAttribute+" to a non existing entity "+xSingular);
-				}
-				// console.log("dDictionary.addAttribute ->" + attributeSemantics(xAttribute,xDescription,oEntity,"En"));
 			},
 			addRelation: function(xSingular,rCN,withEntityName,verb,cardinality,side,storedHere) {//adds a new relation to the array of relations of entity xSingular
 				//ex:FL.dd.addRelation(entities[i].d["3"],rCN,withEntityName,verb,cardinality,side,storedHere);
@@ -746,17 +642,18 @@
 					alert("FL.dd.addRelation Error: you tried to add a relation "+relationName+" to a non existing entity "+xSingular);
 				}
 			},
-			relationPass2: function() {//goes thru all entities and for all relations of each entity fills withEntity and semantic using withEntityCN
+			relationPass2: function() {//goes thru all entities and for all relations of each entity fills withEntity and semantic using withEntityCN. Finally it sets sync = true for entity
 				var valuesArr = _.values(this.entities);
 				//note for _.find: if valuesArr is and array of objects =>element is the value of each key/value and returns value
 				_.each(valuesArr, function(element){//element is each array element. If is an object it returns the value
 					if(typeof element != "number"){
-						console.log("Pass2 -->"+element.singular);
+						// console.log("Pass2 -->"+element.singular);
 						var xSingular = element.singular;
 						_.each(element.relations, function(relation){//relation is a relation from the current entity
 							relation["withEntity"] = FL.dd.getEntityByCName(relation["withEntityCN"]);
 							relation["semantic"] = FL.dd.relationSemantics(xSingular,relation["withEntity"],relation["verb"],relation["cardinality"],"En");//sSingular,sRightEntity,sVerb,sCardinality,xLanguage
-						});	
+						});
+						FL.dd.setSync(xSingular,true);
 					}
 				});
 			},			

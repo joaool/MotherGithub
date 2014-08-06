@@ -354,7 +354,6 @@ $(function () {
   //     ok($("#repaymentAmount").length != 0, "total repayment amount output element exists");
   //     ok($("#totalToRepay").length != 0, "total amount to repay output button element exists");
   // });
-
   test("client Dictionary tests", function () { //one test can have several assertions
     //client
     var success = FL.dd.createEntity("client","company we may invoice");
@@ -629,5 +628,4 @@ $(function () {
     csvStoreArray = FL.server.convertArrC2LForEntity("order",simulObjFromServer);
     deepEqual( csvStoreArray, [{ "id":1,"shipped":true,"product":"Super 1" }, { "id":2,"shipped":false,"product":"Super 2" }, { "id":3,"shipped":false,"product":"Super 3" }, { "id":4,"shipped":true,"product":"Super 4" } ], "FL.server.convertArrC2LForEntity correct in case no field is translatable into 'id'" );
   });
-
 });
