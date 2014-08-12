@@ -71,12 +71,14 @@
 		var internalTest = function(x) {//for entity=xSingular, returns the index of attribute=xAttribute
 			alert("internalTest() -->"+x);
 		};
+		var getPageNo = function(pagName){ //to be used by savePage and restorePage
+			var pageNoObj = {"home":1};
+			return  pageNoObj[pagName];
+		};
 		var disconnectServer = function() {
-			// if(this.fa){
-				FL.server.fa.disconnect(function(e,d){
-					alert ('bye');
-				});			
-			// }
+			FL.server.fa.disconnect(function(e,d){
+				alert ('bye');
+			});
 		};
 		var connectServer = function(userName,password,connectServerCB) {
 			// var fl = new flMain();
@@ -121,70 +123,70 @@
 				if(!this.offline)
 					disconnectServer();
 			},
-			xcreateServerEntity_Fields: function(entityName,createServerEntity_FieldsCB){
-				// cb();
-				var oEntity = FL.dd.getEntityBySingular(entityName);
-				var eCN = null;
-				async.waterfall([
-					function(waterfallCB1){//waterfallCB1 to be managed by assync
-						var fEntity = new FL.server.fl.entity();
-						fEntity.add({"3": oEntity.singular, "4": oEntity.description, 'E': oEntity.plural}, function (err, data){
-							if(err){
-								alert("createEntity Error: "+JSON.stringify(err));
-								return waterfallCB1(err);//async should exit the waterfall
-							}
-							eCN=data[0]['_id'];
-							return waterfallCB1(null,eCN);//null=>it ok, eCN isd passed to  next function
-						});	
-					},
-					function(eCN,waterfallCB2){
-						var index = 0;
-						var ffield = new FL.server.fl.field();//var ffield = new fl.field();
-						var fCN = null;
-						async.whilst(//whilst needs 3 functions. Func1=>exit criteria, Func2=>repeat function, Funct3=>when complete function 
-							//NICO recommends:
-							//	all callbacks to be used by async must be after a return
-							function(){
-								return index<oEntity.attributes.length;
-							},
-							function(loadAttributeCB){//loadAttributeCB is to be used by async	
-								var enumerableArr = oEntity.attributes[index].enumerable;
-								if(!enumerableArr)
-									enumerableArr = [];
-								ffield.add(	{"1": eCN, "3": oEntity.attributes[index].name, "4":oEntity.attributes[index].description, 'K': oEntity.attributes[index].label, 'M': oEntity.attributes[index].type, 'O':'simple','N':enumerableArr}, function (err, data){
-									if(err){
-										alert("FLdd2.js addAttribute Error:"+JSON.stringify(err));
-										index=oEntity.attributes.length+1;//to exit the loop
-										return loadAttributeCB(err);//inform async that it should exit the loop  
-									}								
-									fCN = data[0]['_id'];
-									var oldCFieldName = oEntity.L2C[oEntity.attributes[index].name]; 
-									delete oEntity.C2L[oldCFieldName];
-									oEntity.L2C[oEntity.attributes[index].name] = fCN;//Logical to Compressed
-									oEntity.C2L[fCN] = oEntity.attributes[index].name;//Compressed to Logical
-									index++;
-									return loadAttributeCB(null);//inform async that it can repeat the loop
-								});
-							},
-							function(err){//The loop is over - this parameter comes from previous callback
-								waterfallCB2(err);//exit waterfall function
-								//when done
-							}
-						);// asyncwhilst
-					}
-				],function(err){ //This function gets called after the two tasks have called their  "task callbacks"
-					console.log("If no error ->entity and fields are in server s over !!! ErroR:"+err);
-					if(!err){
-						console.log("synchronization is done in client dictionary");
-						oEntity.csingular = eCN;
-						oEntity.sync = true;
-					}else{
-						alert("ERROR createServerEntity_Fields unfinished!!!");
-					}
-					if(typeof createServerEntity_FieldsCB == "function")
-						createServerEntity_FieldsCB(err);
-				});
-			},
+			// xcreateServerEntity_Fields: function(entityName,createServerEntity_FieldsCB){
+			// 	// cb();
+			// 	var oEntity = FL.dd.getEntityBySingular(entityName);
+			// 	var eCN = null;
+			// 	async.waterfall([
+			// 		function(waterfallCB1){//waterfallCB1 to be managed by assync
+			// 			var fEntity = new FL.server.fl.entity();
+			// 			fEntity.add({"3": oEntity.singular, "4": oEntity.description, 'E': oEntity.plural}, function (err, data){
+			// 				if(err){
+			// 					alert("createEntity Error: "+JSON.stringify(err));
+			// 					return waterfallCB1(err);//async should exit the waterfall
+			// 				}
+			// 				eCN=data[0]['_id'];
+			// 				return waterfallCB1(null,eCN);//null=>it ok, eCN isd passed to  next function
+			// 			});	
+			// 		},
+			// 		function(eCN,waterfallCB2){
+			// 			var index = 0;
+			// 			var ffield = new FL.server.fl.field();//var ffield = new fl.field();
+			// 			var fCN = null;
+			// 			async.whilst(//whilst needs 3 functions. Func1=>exit criteria, Func2=>repeat function, Funct3=>when complete function 
+			// 				//NICO recommends:
+			// 				//	all callbacks to be used by async must be after a return
+			// 				function(){
+			// 					return index<oEntity.attributes.length;
+			// 				},
+			// 				function(loadAttributeCB){//loadAttributeCB is to be used by async	
+			// 					var enumerableArr = oEntity.attributes[index].enumerable;
+			// 					if(!enumerableArr)
+			// 						enumerableArr = [];
+			// 					ffield.add(	{"1": eCN, "3": oEntity.attributes[index].name, "4":oEntity.attributes[index].description, 'K': oEntity.attributes[index].label, 'M': oEntity.attributes[index].type, 'O':'simple','N':enumerableArr}, function (err, data){
+			// 						if(err){
+			// 							alert("FLdd2.js addAttribute Error:"+JSON.stringify(err));
+			// 							index=oEntity.attributes.length+1;//to exit the loop
+			// 							return loadAttributeCB(err);//inform async that it should exit the loop  
+			// 						}								
+			// 						fCN = data[0]['_id'];
+			// 						var oldCFieldName = oEntity.L2C[oEntity.attributes[index].name]; 
+			// 						delete oEntity.C2L[oldCFieldName];
+			// 						oEntity.L2C[oEntity.attributes[index].name] = fCN;//Logical to Compressed
+			// 						oEntity.C2L[fCN] = oEntity.attributes[index].name;//Compressed to Logical
+			// 						index++;
+			// 						return loadAttributeCB(null);//inform async that it can repeat the loop
+			// 					});
+			// 				},
+			// 				function(err){//The loop is over - this parameter comes from previous callback
+			// 					waterfallCB2(err);//exit waterfall function
+			// 					//when done
+			// 				}
+			// 			);// asyncwhilst
+			// 		}
+			// 	],function(err){ //This function gets called after the two tasks have called their  "task callbacks"
+			// 		console.log("If no error ->entity and fields are in server s over !!! ErroR:"+err);
+			// 		if(!err){
+			// 			console.log("synchronization is done in client dictionary");
+			// 			oEntity.csingular = eCN;
+			// 			oEntity.sync = true;
+			// 		}else{
+			// 			alert("ERROR createServerEntity_Fields unfinished!!!");
+			// 		}
+			// 		if(typeof createServerEntity_FieldsCB == "function")
+			// 			createServerEntity_FieldsCB(err);
+			// 	});
+			// },
 			createServerEntity_Fields: function(entityName,createServerEntity_FieldsCB){
 				// cb();
 				var oEntity = FL.dd.getEntityBySingular(entityName);
@@ -470,6 +472,7 @@
 								//    we need a second pass to fill withEntity and semantic
 								oEntity.relations.push(relation);
 							}
+
 						}
 						//When we sync in a serial way we are creating relations before having the other side entity. S
 						//Synchronizing relations needs 2 steps. Step 1 is done above saving  the auxiliary "withEntityCN" without filling "withEntity"
@@ -485,12 +488,108 @@
 					}
 				});
 			},
-			saveMainMenu: function() {
+			x_saveMainMenu: function(oMenu,p1,p2,saveMainMenuCB) {
 				alert("FL.server.saveMainMenu() -->");
+				var fd = new FL.server.fl.data();
+				fd.insert("40",{_id:1, d:{"45":oMenu,"46":p1,"47":p2}}, function(err, data){
+					if (err){
+						alert('FL.server.saveMainMenu: err=' + JSON.stringify(err));
+						return saveMainMenuCB(false);
+					}
+					console.log("exit from saveMainMenu with success -->"+JSON.stringify(data));
+					return saveMainMenuCB(null);
+				});
 			},
-			restoreMainMenu: function() {
+			saveMainMenu: function(oMenu,style,fontFamily,saveMainMenuCB) {
+				//it tries to update if it fails (because _id:1  does not exist) then inserts
 				alert("FL.server.saveMainMenu() -->");
+				var fd = new FL.server.fl.data();
+				fd.update("40", {"query":{"_id":1},"update":{"45":oMenu,"46":style,"47":fontFamily}}, function(err, data){
+					if (err){
+						alert('FL.server.saveMainMenu: err=' + JSON.stringify(err));
+						return saveMainMenuCB(false);
+					}
+					console.log("exit from update with success -->"+JSON.stringify(data));
+					if(data.count == 0){//data.count == 0 =>we need to insert
+						fd.insert("40",{_id:1, d:{"45":oMenu,"46":style,"47":fontFamily}}, function(err, data){
+							if (err){
+								alert('FL.server.saveMainMenu: err=' + JSON.stringify(err));
+								return saveMainMenuCB(false);
+							}
+							console.log("exit from saveMainMenu insert after failling update. Success -->"+JSON.stringify(data));
+							return saveMainMenuCB(null);
+						});
+					}
+					return saveMainMenuCB(null);
+				});	
 			},
+			NextVersionSaveMainMenu: function(oMenu,p1,p2,saveMainMenuCB) {
+				alert("FL.server.saveMainMenu() -->");
+				var fd = new FL.server.fl.data();
+				fd.findAndModify("40", {"query":{"_id":1},"sort":{},option:{upsert:true},"update":{"45":oMenu,"46":p1,"47":p2}}, function(err, data){
+					if (err){
+						alert('FL.server.saveMainMenu: err=' + JSON.stringify(err));
+						return saveMainMenuCB(false);
+					}
+					console.log("exit from saveMainMenu with success -->"+JSON.stringify(data));
+					return saveMainMenuCB(null);
+				});
+			},			
+			restoreMainMenu: function(restoreMainMenuCB) {//restores main menu, style and fontFamily
+				alert("FL.server.restoreMainMenu() -->");
+				var fd = new FL.server.fl.data();
+				fd.findOne("40",{"query":{"_id":1}}, function(err, data){
+					if (err){
+						alert('FL.server.restoreMainMenu: err=' + JSON.stringify(err));
+						return restoreMainMenuCB(false);
+					}
+					// console.log("restoreMainMenu -->")
+					var oMenu= data.d["45"];
+					var style= data.d["46"];
+					var fontFamily= data.d["47"];
+					var retData = {oMenu: oMenu,style: style,fontFamily: fontFamily};
+					console.log("FL.server.restoreMainMenu exit with success -->"+JSON.stringify(data));
+					return restoreMainMenuCB(null,retData);
+				});
+			},
+			savePage: function(pagName,htmlContent,savePageCB) {
+			    // ex FL.server.savePage("home",homeHTML,function(err){});
+				alert("FL.server.saveMainMenu() -->");
+				var pagNo = getPageNo(pagName);
+				if (pagNo){
+					var fd = new FL.server.fl.data();
+					fd.insert("43",{_id:pagNo, d: htmlContent}, function(err, data){
+						if (err){
+							alert('FL.server.saveMainMenu: err=' + JSON.stringify(err));
+							return savePage(false);
+						}
+						console.log("exit from saveMainMenu with success -->"+JSON.stringify(data));
+						return savePage(null);
+					});
+				}else{
+					alert('FL.server.savePage Error: pagName=' + pagName + ' unavailable to be saved.');
+					return savePage({status:pagName + "unavailable"});
+				}
+			},
+			restorePage: function(pagName,savePageCB) {
+				alert("FL.server.restorePage() -->");
+				var htmlContent = null;
+				var pagNo = getPageNo(pagName);
+				if (pagNo){
+					var fd = new FL.server.fl.data();
+					fd.findOne("43",{"query":{"_id":pagNo}}, function(err, data){
+						if (err){
+							alert('FL.server.restorePage: err=' + JSON.stringify(err));
+							return savePageCB(false);
+						}
+						console.log("exit from restorePage with success -->"+JSON.stringify(data));
+						return savePageCB(null);
+					});
+				}else{
+					alert('FL.server.savePage Error: pagName=' + pagName + ' unavailable to be restored.');
+					return savePageCB({status:pagName + "unavailable"});
+				}
+			},		
 			testFunc: function(x) {
 				alert("FL.server.test() -->"+x);
 			}

@@ -143,6 +143,18 @@ var FL = FL || {};
 	// var FL = FL || {};
 	FL.oMenu = oMenu;
 	$(document).ready(function() {
+		var fullUrl = window.location.href;
+		if(fullUrl){//gets domain from irl string ->http://localhost/pdojo/MotherGithub/test_menu13.html?d=myDomain1#
+			//ex. http://www.framelink.co/app?d=myDomain1 Nico's definition
+			//this is equivalent to  http://localhost/pdojo/MotherGithub/test_menu13.html?d=myDomain1
+			//
+			//alternative mode ->it could be ex. http://www.framelink.co/app#myDomain1 
+			//      equivalent to  http://localhost/pdojo/MotherGithub/test_menu13.html#myDomain1
+			// alert("url="+fullUrl+"\n urlParam="+FL.common.stringAfterLast(fullUrl,"="));//instead of "=", use "#" for alternative mode
+			// alert("url="+fullUrl+"\n urlParam="+FL.common.getLastTagInString(fullUrl,"=","#"));//instead of "=", use "#" for alternative mode
+			FL["domain"] = FL.common.getLastTagInString(fullUrl,"=","#");//FL.domain is globally defined - the last # is disregarded
+			// alert("FL.domain="+FL.domain);
+		}
 		$('#panel1').slidePanel({
 			triggerName: '#trigger1',
 			position: 'fixed',
@@ -173,12 +185,12 @@ var FL = FL || {};
 		$('#trigger1').hide();
 		$('#trigger2').hide();
 		$('#trigger3').hide();
-		var myMenu = new FL.menu({jsonMenu:FL.clone(oMenu),initialMenu:"_home",editable:true});
-		// var myMenu = new FL.menu({jsonMenu:FL.clone(oMenu)});//"_home"
+		var myMenu = FL.menu.createMenu({jsonMenu:FL.clone(oMenu),initialMenu:"_home",editable:true});
+		// var myMenu = FL.menu.createMenu({jsonMenu:FL.clone(oMenu)});
 		FL.setTourOn(true);
 		FL.mixPanelEnable = false;
 		FL.server.offline = false;
-		var loggedIn = FL.login.checkSignIn(true);//recover last saved menu and tour
+		var loggedIn = FL.login.checkSignIn(true);//recover last saved menu and tour - is_recoverLastMenu = true =>LastMenu will be recovered and will be passed to FL.menu
 		FL.tourBegin();		
 		// myMenu.settings.editable = true;
 		// myMenu.menuRefresh([//receives a menu array and displays it. If empty assumes settings.jsonMenu.menu

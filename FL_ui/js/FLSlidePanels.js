@@ -6,97 +6,8 @@ jQuery(document).ready(function($){
 		'FL_ui/sidepanel/fl_services.html'
 	*/
 	// var FL = FL || {};
-	FL["slidePanels"] = (function(){//name space FL.login
-		var currentStyle = null; //currentStyle is set at launch by resetStyle(true) inside FL.login.checkSignIn(true);
-		var selectBox = function(options, onSelection) {
-			//fills the content of dropdown box with id=options.boxId with array=options.boxArr presenting options.boxCurrent as default
-			//example: selectBox({boxId:"#styleSet", boxCurrent:currentStyle, boxArr:stylesForSelection}, function(selected){
-			//             //code with what to do on selection
-			//             alert(selected); //selected is the selected element 
-			//         });
-			// Drop box needs a format like:
-				// <div class="btn-group">
-				// 	<a class="btn btn-primary dropdown-toggle" data-toggle="dropdown" style="font-size:14px;font-weight:bold;margin-right:-4.0em" href="#"> Style Set <span class="caret"></span></a>
-				// 	<ul id="styleSet" class="dropdown-menu">
-				// 		<li><a href="#">xxcerulean</a></li>
-				// 		<li><a href="#">xxxcosmos</a></li>
-				// 		....
-				// 	</ul>
-				// </div>
-			//var $styleSet = $("#styleSet");
-			var $dropDownSelect = $(options.boxId);
-			// $dropDownSelect.parents('.btn-group').find('.dropdown-toggle').html(options.boxCurrent+' <span class="caret"></span>');//shows current value
-			//... and we load the select box with the current available values
-			$dropDownSelect.empty();//removes the child elements of #styleSet.
-			// _.each(stylesForSelection,function(element){
-			_.each(options.boxArr,function(element){
-				$dropDownSelect.append("<li><a href='#'>" + element.text + "</a></li>");
-			});
-			// $("#styleSet li a").click(function(){
-			$( options.boxId + " li a").click(function(){
-				var selText = $(this).text();
-				// alert("the choice was:"+selText);
-				// $(this).parents('.btn-group').find('.dropdown-toggle').html(selText+' <span class="caret"></span>');
-				$dropDownSelect.parents('.btn-group').find('.dropdown-toggle').html(selText+' <span class="caret"></span>');
-				onSelection(selText);//runs the callback function
-			});
-		};
-		var messageEnabler = (function(){ //a singleton (to be instantiated by checkSignIn) to receive and dispatch topic messages.http://addyosmani.com/resources/essentialjsdesignpatterns/book/#singletonpatternjavascript
-			var instantiated;
-			function init() {
-				var lastMessage = null;
-				var receiver =  function(triggerName,enter){//enter true means ENTERING the slide panel trigger, false means EXITING
-					lastMessage = triggerName;//triggerName is the id of the slide panel "#trigger1" or "#trigger2" or "#trigger3"
-					// alert("messageEnabler.receiver received message="+lastMessage+" enter="+enter+" style="+currentStyle+" font="+currentFontFamily);
-					// alert("messageEnabler.receiver triggerName="+triggerName+" enter="+enter);
-
-					if(triggerName == "#trigger1") {//user entered or exited slide panel fl_settings.html
-						// alert("messageEnabler.receiver received message from trigger1="+lastMessage+" currentStyle="+currentStyle+" font="+currentFontFamily);
-						// $("#styleSet").parents('.btn-group').find('.dropdown-toggle').html(currentStyle +' <span class="caret"></span>');//shows current value
-						//the values that appear before any selection....
-						$("#styleSet").parents('.btn-group').find('.dropdown-toggle').html(currentStyle +' <span class="caret"></span>');//shows current value
-						$("#fontFamily").parents('.btn-group').find('.dropdown-toggle').html(currentFontFamily +' <span class="caret"></span>');//shows current value
-
-						selectBox({boxId: "#styleSet",boxCurrent: currentStyle,boxArr: stylesForSelection},function(selected){
-							//following code is what is done on selection
-							currentStyle = selected;
-							localStorage.style = currentStyle;
-							$.Topic( 'styleChange' ).publish( currentStyle);//broadcast that will be received by FL.tour
-							FL.mix("ChangeStyle",{"newStyle":currentStyle});
-							FL.currentStyle = currentStyle;//compatibility with touring - before code review
-							resetStyle(true);
-						});
-						selectBox({boxId:"#fontFamily", boxArr:fontFamilyForSelection},function(selected){
-							//following code is what is done on selection
-							// alert("font "+selected+" was selected !");
-							currentFontFamily = selected;
-							localStorage.fontFamily = currentFontFamily;
-							FL.mix("ChangeFontFamily",{"newFont":currentFontFamily});
-							resetStyle(true);
-						});
-					}else if(triggerName == "#trigger2") {//user entered or exited slide panel fl_builder.html
-						alert("FLSlidePanel.js init.receiver() -->Entered trigger2");
-						// FL.login.managePanel3();
-						// window.zz="firstTime.csv";
-					}else if(triggerName == "#trigger3") {//user entered or exited slide panel fl_service.html
-						// alert("FLLoadCss.js init.receiver() -->Entered trigger3");		
-					}
-				};
-				$.Topic( 'slidePanel' ).subscribe( receiver );
-
-				return {//the singleton
-					lastMessage: lastMessage
-				};
-			}
-			return {
-				getInstance: function(){
-					if(!instantiated) {
-						instantiated = init();
-					}
-					return instantiated;
-				}
-			};
-		})();
+	FL["slidePanels"] = (function(){//name space FL.slidePanels
+		//NOTE: the management of panel 1 - Global Definitions (styles and font changes...) is done in module FLLoadCss2.js to minimize calls across modules
 		return{
 			managePanel2: function() {//code to fl_builder.html
 				// alert("managePanel2 ! in FLSlidePanels.js");
@@ -107,7 +18,7 @@ jQuery(document).ready(function($){
 						"<div class='form-group'>" +
 							"<input type='file' id='input1'>" +
 							"<label>" +
-								"<div id='confirmStatment'" + 
+								"<div id='confirmStatment'" +
 									"<h4 style='color:white;'>" +
 										// "Do you confirm " + zz + " " +
 										"If <%= fileName %> is the file you want to import, press the OK button " +
@@ -176,6 +87,8 @@ jQuery(document).ready(function($){
 										return;
 									}
 									$.Topic( 'createGridOption' ).publish( plural,singular );//broadcast that will be received by FL.menu to add an option
+									console.log("save menu goes here");
+									// var z = FL.menu
 									console.log("Data from entity "+singular+" stored on server");
 								});
 								

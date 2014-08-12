@@ -1,13 +1,43 @@
 $(function () {
   module("menu-login");
 
-  test("basic test", function () { //one test can have several assertions
+  test("basic test & FL.common", function () { //one test can have several assertions
     var actual = '1';
     var expected = 1;
     ok( actual == expected,"Validated !!!" ); //bolean expression
     equal(actual,expected,"...are equal");//non strict assertion
     strictEqual(1,1,"they are strictly equal");//non strict assertion
     // deepEqual(item1,item2,"all the elements in the array are equal"); /recursively vompares array elements and objects 
+    actual =  FL.common.stringAfterLast('http://www.framelink.co/app?d=myDomain1','='); 
+    ok( actual == "myDomain1","FL.common.stringAfterLast('http://www.framelink.co/app?d=myDomain1','=') -> 'myDomain'");//4 
+    actual =  FL.common.stringAfterLast('test phrase: my name is john','phrase:');
+    ok( actual == " my name is john","FL.common.stringAfterLast('test phrase: my name is john','phrase:') -> ' my name is john'");//5
+    actual =  FL.common.getLastTagInString('http://www.framelink.co/app?d=myDomain1#','=','#'); //(str,separator,tagTerminator)
+    ok( actual == "myDomain1","FL.common.getLastTagInString('http://www.framelink.co/app?d=myDomain1','=','#') -> 'myDomain1'");//6
+    actual =  FL.common.getLastTagInString('test phrase: my name is john/ the phrase is over','phrase:','/');
+    ok( actual == " my name is john","FL.common.getLastTagInString('test phrase: my name is john/ the phrase is over','phrase:','/') -> ' my name is john'");//7
+    actual =  FL.common.getLastTagInString('http://abc.com#myDomain1@abc','#','#@/'); //(str,separator,tagTerminator)
+    ok( actual == "myDomain1"," FL.common.getLastTagInString('http://abc.com#myDomain1@abc','#','#@/') -> 'myDomain1'");//8
+    actual =  FL.common.getLastTagInString('http://abc.com#myDomain1/abc/','#','*z/@'); //(str,separator,setOfTagTerminators)
+    ok( actual == "myDomain1"," FL.common.getLastTagInString('http://abc.com#myDomain1/abc/','#','*z/@') -> 'myDomain1'");//9
+    actual =  FL.common.getLastTagInString('http://abc.com#myDomain1@abc','@','#@/'); //(str,separator,tagTerminator)
+    ok( actual == "abc"," FL.common.getLastTagInString('http://abc.com#myDomain1@abc','@','#@/') -> 'abc'");//10
+
+    actual =  FL.common.getLastTagInString('http://abc.com#myDomain1/abc','#','#@/'); //(str,separator,tagTerminator)
+    ok( actual == "myDomain1"," FL.common.getLastTagInString('http://abc.com#myDomain1/abc','#','#@/') -> 'myDomain1'");//11
+
+    actual =  FL.common.getLastTagInString('the brown(fox) jumped the fence','(',')'); //(str,separator,tagTerminator)
+    ok( actual == "fox"," FL.common.getLastTagInString('the brown(fox) jumped the fence','(',')') -> 'fox'");//12   
+    actual =  FL.common.getLastTagInString('the brown(fox) and the white(rabbit) jumped the fence','(',')'); //(str,separator,tagTerminator)
+    ok( actual == "rabbit"," FL.common.getLastTagInString('the brown(fox) and the white(rabbit) jumped the fence','(',')') -> 'rabbit'");//13
+
+    // console.log("<--------------test------------>");
+    actual =  FL.common.getLastTagInString('the brown*fox* is there','(',')'); //(str,separator,tagTerminator)
+    ok( actual === null," FL.common.getLastTagInString('the brown*fox* is there','(',')') -> null");//14
+    // console.log("------------------------------->"+actual);
+
+
+
   });
   // test("login test", function () { //one test can have several assertions
   //   var lastLoginStr = localStorage.login;// Retrieve format {email:x1,userName:x2,password:x3};
@@ -50,6 +80,32 @@ $(function () {
           }
       ]
     };
+    var actual = '1';
+    var expected = 1;
+    ok( actual == expected,"Validated !!!" ); //bolean expression
+    var car1 = FL.menu.createCar("Fiat","1990");
+    ok( car1.model == "Fiat","car is Fiat Validated !!!" );
+    console.log(car1.phrase());
+    ok( car1.phrase() == "Fiat of 1990","phrase function Validated !!!" );
+    var myMenu1 = FL.menu.createMenu({jsonMenu:oMenu,initialMenu:"_home",editable:false});
+    console.log(myMenu1.toString());
+    ok( myMenu1.toString() == JSON.stringify(oMenu) + " has editable=false", "myMenu1.to String() is correct!" );
+    console.log( JSON.stringify(myMenu1.jsonMenu) );
+    ok( myMenu1.jsonMenu.menu[1].title == "MenuB/T1","Getting menu title 'MenuB/T1' (at root)" );
+    ok( myMenu1.jsonMenu.menu[1].menu[1].title == "MenuB/T2-II","Getting menu title 'MenuB/T2-II' at second level" );
+    myMenu1.jsonMenu.menu[1].menu[1].title = "Joachim";
+    ok( myMenu1.jsonMenu.menu[1].menu[1].title == "Joachim","Setting menu 'MenuB/T2-II' to 'Joachim'");
+    myMenu1.test_Add_Id_Top();
+    ok( myMenu1.jsonMenu.menu[1].menu[1].id == 3,"testAdd_Id_Top placed id=3 in menu 'Joachim'");
+    ok( myMenu1.jsonMenu.menu[2].id == 4,"testAdd_Id_Top placed id=4 in last menu");
+    ok( myMenu1.jsonMenu.menu[1].menu[1].top === false,"testAdd_Id_Top placed top = false in menu 'Joachim'");
+    ok( myMenu1.jsonMenu.menu[2].top === true,"testAdd_Id_Top placed top = true in last menu");
+    var oEl = myMenu1.test_menuFindById(4);//previous myMenu1.test_menuFindById(oMenu.menu,4);
+    deepEqual(myMenu1.jsonMenu.menu[2],oEl,"menuFindById() got last menu element");
+    oEl = myMenu1.test_menuFindById(3);
+    deepEqual(myMenu1.jsonMenu.menu[1].menu[1],oEl,"menuFindById() got menu element 'Joachim'");
+
+    /*
     var myMenu1 = new FL.menu({jsonMenu:oMenu,initialMenu:"_home",editable:false});
     ok( myMenu1.settings.jsonMenu.menu[1].title == "MenuB/T1","Getting menu title 'MenuB/T1' (at root)" );
     ok( myMenu1.settings.jsonMenu.menu[1].menu[1].title == "MenuB/T2-II","Getting menu title 'MenuB/T2-II' at second level" );
@@ -60,26 +116,11 @@ $(function () {
     ok( myMenu1.settings.jsonMenu.menu[2].id == 4,"testAdd_Id_Top placed id=4 in last menu");
     ok( myMenu1.settings.jsonMenu.menu[1].menu[1].top === false,"testAdd_Id_Top placed top = false in menu 'Joachim'");
     ok( myMenu1.settings.jsonMenu.menu[2].top === true,"testAdd_Id_Top placed top = true in last menu");
-
-    // // var oEl = myMenu1.test_menuFindById(myMenu1.settings.jsonMenu.menu,4);
     var oEl = myMenu1.test_menuFindById(oMenu.menu,4);
-    // var strOEl = JSON.stringify(oEl);
-    // var strId4 = JSON.stringify(myMenu1.settings.jsonMenu.menu[2]);
-    // alert("Compares " + strOEl + " ---> " + strId4);
-    // ok( JSON.stringify(myMenu1.settings.jsonMenu.menu[2]) == strOEl,"menuFindById() got the last element");//OK
-    // propEqual(myMenu1.settings.jsonMenu.menu[2],oEl,"menuFindById() got the last element");//OK
     deepEqual(myMenu1.settings.jsonMenu.menu[2],oEl,"menuFindById() got last menu element");
     oEl = myMenu1.test_menuFindById(oMenu.menu,3);
     deepEqual(myMenu1.settings.jsonMenu.menu[1].menu[1],oEl,"menuFindById() got menu element 'Joachim'");
-
-    // oMenu.b = 34;
-    // ok( myMenu1.settings.jsonMenu.menu[b == 34,"Updating original by reference " ); //bolean expression
-    // myMenu1.settings.jsonMenu.b = 22;
-    // ok( myMenu1.settings.jsonMenu.b == 22,"Setting jsonMenu.b " ); //bolean expression
-    // oMenu={a:1,b:34};
-    // var myMenu2 = new FL.menu({jsonMenu:{a:10,b:20},initialMenu:"_home",editable:false});
-    // ok( myMenu2.settings.jsonMenu.b == 20,"Getting jsonMenu.b of a second instance " ); //bolean expression
-
+    */
   });
   test("FL.menu DOM editable=false", function () {
      var oMenu = {
@@ -108,6 +149,9 @@ $(function () {
           }
       ]
     };
+    var actual = '1';
+    var expected = 1;
+    ok( actual == expected,"Validated !!!" ); //bolean expression
     // ---- example for DOM testing --------------------------------------
     $('<input id="ResultTestBox" type="text"/>').appendTo('#qunit-fixture');//#qunit-fixture is the invisible DOM sandbox
     var add = function (a, b) { var result = a + b; $("input#ResultTestBox").val(result);};
@@ -117,6 +161,51 @@ $(function () {
     // $('<ul id="begin_menu" class="nav navbar-nav"></ul>').appendTo('#qunit-fixture');//necessary for menuRefresh()
     $('<div id="menuContainer"><div id="toolbar"><ul id="main-menu"></ul><div></div>').appendTo('#qunit-fixture');//necessary for menuRefresh() and 
     $('<div id="_placeHolder"></div>').appendTo('#qunit-fixture');//necessary for menuRefresh()
+    var myMenu1 = FL.menu.createMenu({jsonMenu:oMenu,initialMenu:"_home",editable:false});
+    myMenu1.menuRefresh([//receives a menu array and displays it. If empty assumes settings.jsonMenu.menu
+        {
+          "title" : "MenuA/T1",//0
+          "uri":"http://www.microsoft.com"
+        },
+        {
+          "title" : "MenuB/T1",//1
+          "uri" : "#",
+          "menu" : [
+            {
+              "title" : "MenuB/T2-I",//2
+              "uri":"_home"
+            }
+          ]
+        },
+        {
+          "title" : "MenuC/T1",//3
+          "uri":"#"
+        }
+    ]);
+    equal("MenuA/T1", $('#0').text(), "menuRefresh() with argument ->title 'MenuA/T1' was placed in DOM id=0");
+    equal("MenuB/T2-I", $('#2').text(), "menuRefresh() title with argument ->'MenuA/T1' was placed in DOM id=2");
+    myMenu1.menuRefresh();
+    equal("MenuB/T2-II", $('#3').text(), "menuRefresh() no args ->title 'MenuB/T2-II' is on DOM id=3");
+    equal("MenuC/T1", $('#4').text(), "menuRefresh() no args ->title 'MenuC/T1' is on DOM id=4");
+    // -----------------------------------------------------------------------
+    //test internal page loading 
+    //  - ALL TESTS REFER TO THE oMenu STRUCTURE - (THE FIRST IN THIS CODE...)
+    $('<div id="_placeHolder"></div>').appendTo('#qunit-fixture');//necessary to place FrameLink internal pages
+    var $itemClicked = $( "#2" );
+    $itemClicked.trigger( {type:"click"} );//the same as clicking the mouse on #2 OK !!!
+    // the test need some type to wait for the page "_home.html" to load before checking for id="_home" 
+    stop();//waits for a start() before continuing
+    setTimeout(function(){
+      ok($("#_home").length !== 0, "the internal page '_home.html' was loaded");
+      start();//stops test runner and waits for start to continue
+      var $itemClicked = $( "#4" );
+      $itemClicked.trigger( {type:"click"} );//the same as clicking the mouse on #4 OK !!!
+      // the test need some type to wait for the page "_mission.html" to load before checking for id="_mission" 
+      stop();
+      setTimeout(function(){ok($("#_mission").length !== 0, "the internal page '_mission.html' was loaded");start();},100);
+    },100);
+
+    /*    
     var myMenu1 = new FL.menu({jsonMenu:oMenu,initialMenu:"_home",editable:false});
     // ok( myMenu1.settings.jsonMenu.menu[1].title == "MenuB/T1","Getting menu title 'MenuB/T1' (at root)" );
     myMenu1.menuRefresh([//receives a menu array and displays it. If empty assumes settings.jsonMenu.menu
@@ -145,10 +234,10 @@ $(function () {
     myMenu1.menuRefresh();
     equal("MenuB/T2-II", $('#3').text(), "menuRefresh() no args ->title 'MenuB/T2-II' is on DOM id=3");
     equal("MenuC/T1", $('#4').text(), "menuRefresh() no args ->title 'MenuC/T1' is on DOM id=4");
-
     // -----------------------------------------------------------------------
     //test internal page loading 
     //  - ALL TESTS REFER TO THE oMenu STRUCTURE - (THE FIRST IN THIS CODE...)
+
     $('<div id="_placeHolder"></div>').appendTo('#qunit-fixture');//necessary to place FrameLink internal pages
     var $itemClicked = $( "#2" );
     // alert("for #2 $itemClicked.length=" + $itemClicked.length + " -->"+ $itemClicked.text());
@@ -167,6 +256,7 @@ $(function () {
       stop();
       setTimeout(function(){ok($("#_mission").length !== 0, "the internal page '_mission.html' was loaded");start();},100);
     },100);
+    */
   });
   test("FL.menu DOM editable=true", function () {
      var oMenu = {
@@ -195,6 +285,22 @@ $(function () {
           }
       ]
     };
+    var actual = '1';
+    var expected = 1;
+    ok( actual == expected,"Validated !!!" ); //bolean expression
+    $('<div id="menuContainer"><ul id="main-menu"></ul></div>').appendTo('#qunit-fixture');
+    var myMenu1 = FL.menu.createMenu({jsonMenu:oMenu,initialMenu:"_home",editable:true});
+    var $itemClicked = $( "#toolbar" );
+    console.log("before click myMenu1.is_menuHide="+myMenu1.is_menuHide);
+    console.log("before click myMenu1.is_contextOn="+myMenu1.is_contextOn);
+
+    $itemClicked.trigger( {type:"mousedown",which:3} );//the same as pressing the right mouse on toolbar OK !!!
+    console.log("after click myMenu1.is_menuHide="+myMenu1.is_menuHide);
+    console.log("after click myMenu1.is_contextOn="+myMenu1.is_contextOn);
+    equal(true, myMenu1.is_menuHide, "right click in toolbar => myMenu1.is_menuHide=true ");
+    equal(false, myMenu1.is_contextOn, "right click in toolbar => myMenu1.is_contextOn=false ");
+    $itemClicked.trigger( {type:"mousedown",which:2} );//the same as pressing the right mouse on toolbar OK !!!
+     /*
     // -----------------------------------------------------------------------
     // $('<ul id="begin_menu" class="nav navbar-nav"></ul>').appendTo('#qunit-fixture');//necessary for menuRefresh()
     $('<div id="menuContainer"><ul id="main-menu"></ul></div>').appendTo('#qunit-fixture');//necessary for menuRefresh() and 
@@ -202,13 +308,16 @@ $(function () {
     // alert("--->"+$('#0').text());
     var $itemClicked = $( "#toolbar" );
     // alert("for #2 $itemClicked.length=" + $itemClicked.length + " -->"+ $itemClicked.text());
+
     $itemClicked.trigger( {type:"mousedown",which:3} );//the same as pressing the right mouse on toolbar OK !!!
     // alert("is_menuHide="+myMenu1.is_menuHide+" is_contextOn="+myMenu1.is_contextOn);
     equal(true, myMenu1.is_menuHide, "right click in toolbar => myMenu1.is_menuHide=true ");
+
     equal(false, myMenu1.is_contextOn, "right click in toolbar => myMenu1.is_contextOn=false ");
     $itemClicked = $( "#2" );
     $itemClicked.trigger( {type:"mousedown",which:3} );//the same as pressing the right mouse on id=2 a 2nd level menu !!!
     // alert("is_menuHide="+myMenu1.is_menuHide+" is_contextOn="+myMenu1.is_contextOn);
+    */
   });
   test("FL.tour primitives", function () {
     // stepsChangeEvents: [ //these are the events that may change the 'natural' sequence

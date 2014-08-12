@@ -4,8 +4,46 @@
 	http://stackoverflow.com/questions/950087/how-to-include-a-javascript-file-in-another-javascript-file
 */
 var FL = FL || {};
+FL["common"] = (function(){//name space FL.common
+	return{
+		stringAfterLast: function(str,separator) {//returns the content of str after the last separator character or string - no separator found  =>null
+			//ex. FL.common.stringAfter("http://www.framelink.co/app?d=myDomain1","=") -->returns  "myDomain1"
+			var retStr = null;
+			var pos = str.lastIndexOf(separator);
+			var separatorLen = separator.length;
+			if(pos>=0)
+				retStr = str.substring(pos+separatorLen);
+			return retStr;
+		},
+		getLastTagInString: function(str,separator,tagTerminator) {//returns the content after the last separator until end or terminal char
+			// str - string that will be processed
+			// separator - last ocurrence to be identified in string
+			// tagTermionator - character (or set of caracters) that define the end-of-tag
+			//		if tagTerminator is a string any of the string chars will be considered a tag terminator ex "/#"
+			//		if no tagTerminator is found the full string after the separator is returned
+			//		ex. getTagInString("http://www.framelink.co/app?d=myDomain1#","=","#") -->returns  "myDomain1" (the "#" is excluded)
+			var retStr = this.stringAfterLast(str,separator);
+			var terminatorChar = null;
+			var terminatorPos = null;
+			if(retStr){	
+				for(var i=0;i<tagTerminator.length;i++){
+					terminatorChar = tagTerminator[i];
+					// console.log("getLastTagInString -> char="+terminatorChar);
+					terminatorPos = retStr.indexOf(terminatorChar);
+					if(terminatorPos>=0){
+						retStr = retStr.substring(0,terminatorPos);
+						break;
+					}
+				}
+			}
+			return retStr;
+		},
+		testFunc: function(x) {
+			alert("FL.common.test() -->"+x);
+		}
+	};
+})();
 FL["topics"] = {};
-
 jQuery.Topic = function( id ) {//https://gist.github.com/addyosmani/1321768 publisher/subscriber
 	//publishing ex.	$.Topic( 'signInDone' ).publish( 'hello Sign In !!!' );
 	//subscribe example:
@@ -74,6 +112,7 @@ FL["validateEmail"] = function(email) {
 	var re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
 	return re.test(email);
 };
+FL["domain"]  = null;
 FL["mixPanelEnable"]  = false;
 FL["mix"] = function(mixEvent,propObj) {//if FL.mixPanelEnable = true, trigger  events  to mix panel
 	//examples:

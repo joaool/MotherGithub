@@ -23,7 +23,7 @@ jQuery(document).ready(function($){
 					{value: 4, text: 'lucida'},
 					{value: 5, text: 'tahoma'},
 					{value: 6, text: 'elite'}
-				];			
+				];	
 		var selectBox = function(options, onSelection) {
 			//fills the content of dropdown box with id=options.boxId with array=options.boxArr presenting options.boxCurrent as default
 			//example: selectBox({boxId:"#styleSet", boxCurrent:currentStyle, boxArr:stylesForSelection}, function(selected){
@@ -41,7 +41,7 @@ jQuery(document).ready(function($){
 				// </div>
 			//var $styleSet = $("#styleSet");
 			var $dropDownSelect = $(options.boxId);
-			// $dropDownSelect.parents('.btn-group').find('.dropdown-toggle').html(options.boxCurrent+' <span class="caret"></span>');//shows current value
+			$dropDownSelect.parents('.btn-group').find('.dropdown-toggle').html(options.boxCurrent+' <span class="caret"></span>');//shows current value
 			//... and we load the select box with the current available values
 			$dropDownSelect.empty();//removes the child elements of #styleSet.
 			// _.each(stylesForSelection,function(element){
@@ -64,7 +64,7 @@ jQuery(document).ready(function($){
 				var receiver =  function(triggerName,enter){//enter true means ENTERING the slide panel trigger, false means EXITING
 					lastMessage = triggerName;//triggerName is the id of the slide panel "#trigger1" or "#trigger2" or "#trigger3"
 					// alert("messageEnabler.receiver received message="+lastMessage+" enter="+enter+" style="+currentStyle+" font="+currentFontFamily);
-					// alert("messageEnabler.receiver triggerName="+triggerName+" enter="+enter);
+					// alert("FLLoadCss2.js messageEnabler.receiver triggerName="+triggerName+" enter="+enter);
 
 					if(triggerName == "#trigger1") {//user entered or exited slide panel fl_settings.html
 						// alert("messageEnabler.receiver received message from trigger1="+lastMessage+" currentStyle="+currentStyle+" font="+currentFontFamily);
@@ -73,7 +73,8 @@ jQuery(document).ready(function($){
 						$("#styleSet").parents('.btn-group').find('.dropdown-toggle').html(currentStyle +' <span class="caret"></span>');//shows current value
 						$("#fontFamily").parents('.btn-group').find('.dropdown-toggle').html(currentFontFamily +' <span class="caret"></span>');//shows current value
 
-						selectBox({boxId: "#styleSet",boxCurrent: currentStyle,boxArr: stylesForSelection},function(selected){
+						var xStyle = localStorage.style;
+						selectBox({boxId: "#styleSet",boxCurrent: xStyle,boxArr: stylesForSelection},function(selected){
 							//following code is what is done on selection
 							currentStyle = selected;
 							localStorage.style = currentStyle;
@@ -82,7 +83,8 @@ jQuery(document).ready(function($){
 							FL.currentStyle = currentStyle;//compatibility with touring - before code review
 							resetStyle(true);
 						});
-						selectBox({boxId:"#fontFamily", boxArr:fontFamilyForSelection},function(selected){
+						var xFont = localStorage.fontFamily;
+						selectBox({boxId:"#fontFamily",boxCurrent: xFont, boxArr:fontFamilyForSelection},function(selected){
 							//following code is what is done on selection
 							// alert("font "+selected+" was selected !");
 							currentFontFamily = selected;
@@ -125,9 +127,33 @@ jQuery(document).ready(function($){
 			}
 			$.Topic( 'sidePanelOpened' ).publish( false ); //informs FL.menu that sidePanel is closed 
 		};
+		var loadAppDataForSignInUser = function(loadAppDataForSignInUserCB) {//load dictionary, menu, style and fontFamily from server
+			FL.server.syncLocalDictionary(function(err){
+				if (err){
+					alert('FLLoadCss.js loadAppDataForSignInUser Error returning from FL.server.syncLocalDictionary');
+					return loadAppDataForSignInUserCB(false);
+				}else{//no error in syncLocalDictionary =>err==null. We move on loading menu,style and font
+					console.log("FLLoadCss2.js loadAppDataForSignInUser DICTIONARY SYNC IS DONE. Now loads menu,style and font");
+					FL.server.restoreMainMenu(function(err,data) {
+						if (err){
+							alert('FLLoadCss.js loadAppDataForSignInUser Error returning from FL.server.restoreMainMenu');
+							return loadAppDataForSignInUserCB(false);
+						}else{//no error in restoreMainMenu =>err==null . data object has menu,style and font
+							// var oMenu = data.oMenu;//style stored on server
+							var	currentStyle = data.style;//style stored on server
+							var	currentFontFamily = data.fontFamily;//default stored on server
+							// alert("loadAppDataForSignInUser restored: style=" + currentStyle + " fontFamily=" + currentFontFamily);
+							//we may move on loading the welcome page
+							return loadAppDataForSignInUserCB(null,data);
+						}
+					});
+				}
+				// FL.dd.displayEntities();
+			});
+		};
 		var displaySignInUser = function(user) {//if user is null displays signIn icon+"Sign In" otherwise displays user
 			var htmlToInject = '<div style="line-height:2.2em;"><span class="small hidden-xs" style="margin-left:6.5em">'+
-									'Welcome to FrameLink: support@framelink.co'+
+									'Welcome to FrameLink: support@framelink.co App:'+  FL.domain +
 								'</span>'+
 								// '<a class="pull-right text-muted" href="javascript:FL.signIn()" style="margin-right:12em">'+
 								'<a class="pull-right" href="javascript:FL.login.signIn()" style="margin-right:12em;">'+
@@ -142,7 +168,7 @@ jQuery(document).ready(function($){
 							'</div>';
 			if(user) {
 				htmlToInject = '<div style="line-height:2.2em;"><span class="small hidden-xs" style="margin-left:6.5em">'+
-										'Welcome to FrameLink: support@framelink.co'+
+										'Welcome to FrameLink: support@framelink.co App:' + FL.domain +
 									'</span>'+
 									// '<a class="pull-right text-muted" href="javascript:FL.signIn()" style="margin-right:12em">'+
 									'<a class="pull-right " href="javascript:FL.login.signIn()" style="margin-right:12em">'+
@@ -206,14 +232,55 @@ jQuery(document).ready(function($){
 		};
 		var loginAccess = function(loginObject){//when login email is valid and other data acceptable - {email:email,userName:userName,password:password};
 			// loginObject = {email:email,userName:userName,password:password};
-			localStorage.login = JSON.stringify(loginObject);
-			$.Topic( 'signInDone' ).publish( true );
-			// FL.recoverLastMenu();//recover locally saved menu and informs FL.menu about the new menu if any
-			recoverLastMenu();//recover locally saved menu and informs FL.menu about the new menu if any
-			FL.login.checkSignIn();
-			// this.checkSignIn();
-			console.log("------------------------------>On signIn() (log OK) FL.loggedIn="+FL.loggedIn);
-			vUser(loginObject);//comment this line to remove vUser and aKey access
+			// FL.server.connect("Nico","coLas",function(err){console.log("connectServer connection is="+err);});//3rd parameter is byPass
+			FL.server.connect("Joao","oLiVeIrA",function(err){
+				console.log("connectServer connection is="+err);
+				if(err){
+					if(err.status != "offline"){
+						alert("FLLoadCss2.js loginAccess ERROR err="+err);
+					}else{//offline
+						alert("FLLoadCss2.js loginAccess IT IS OFFLINE process will go on");
+						localStorage.login = JSON.stringify(loginObject);
+						$.Topic( 'signInDone' ).publish( true );
+						recoverLastMenu();//recover locally saved menu and informs FL.menu about the new menu if any
+						FL.login.checkSignIn();
+						console.log("----------OFFLINE-------------------->On signIn() (log OK) FL.loggedIn="+FL.loggedIn);
+						vUser(loginObject);//comment this line to remove vUser and aKey access				
+					}
+				}else{//no error on connect we move on to retrieve dictionary menu, style and fonts
+					alert("FLLoadCss2.js loginAccess SUCCESSFULL CONNECT process will go on loading dictionary,menu,style &fonts");
+					loadAppDataForSignInUser(function(err,data){
+						if (err){
+							alert('FLLoadCss.js loadAppDataForSignInUser Error Err='+err);
+						}else{//no error =>err==null . data object has menu,style and font
+							var oMenu = data.oMenu;//style stored on server
+							var	currentStyle = data.style;//style stored on server
+							var	currentFontFamily = data.fontFamily;//default stored on server
+							// alert("FLLoadCss2.js loginAccess style=" + currentStyle + "fontFamily=" + currentFontFamily);
+							alert("FLLoadCss2.js loginAccess menu, style and fonts SUCCESSFULL retrieved oMenu="+JSON.stringify(oMenu));
+							FL.menu.currentMenuObj.updateJsonMenu(oMenu);
+							localStorage.style = currentStyle;
+							localStorage.fontFamily = currentFontFamily;
+							resetStyle(true);
+
+							localStorage.login = JSON.stringify(loginObject);
+							$.Topic( 'signInDone' ).publish( true );
+							recoverLastMenu();//recover locally saved menu and informs FL.menu about the new menu if any
+							FL.login.checkSignIn();
+							console.log("-------------ONLINE----------------->On signIn() (log OK) FL.loggedIn="+FL.loggedIn);
+							vUser(loginObject);//comment this line to remove vUser and aKey access
+						}
+					});
+
+				}
+			});//3rd parameter is byPass
+			// localStorage.login = JSON.stringify(loginObject);
+			// $.Topic( 'signInDone' ).publish( true );
+			// // FL.recoverLastMenu();//recover locally saved menu and informs FL.menu about the new menu if any
+			// recoverLastMenu();//recover locally saved menu and informs FL.menu about the new menu if any
+			// FL.login.checkSignIn();
+			// console.log("------------------------------>On signIn() (log OK) FL.loggedIn="+FL.loggedIn);
+			// vUser(loginObject);//comment this line to remove vUser and aKey access
 			// alert("email="+email+" pos(0)="+email.substring(0,0)+" pos(3)="+email.substring(3,3)+" pos(4)="+email.substring(4,4));
 			// $.Topic( 'inLogOnProcess' ).publish( false );
 		};
@@ -232,75 +299,40 @@ jQuery(document).ready(function($){
 			}
 		};
 		var resetStyle = function(is_logIn) {//if is_login = true display last locally saved style else display FLreadable.css
+			//if is_LogIn = true =>soft reset - this method recovers style and fontFamily from  localStorage and sets it on use
+			//if is_LogIn = false =>hard reset - this method forces currentStyle = "readable" and currentFontFamily = "helvetica" settinmg it to use
 			var lastStyleStr = localStorage.style;// Retrieve last saved style ex.red or spacelab
 			var lastFontFamilyStr = localStorage.fontFamily;// Retrieve last saved fontFamily ex.impact or georgia
-			if (!is_logIn) {//the defaults
-				lastStyleStr = null;//to force defaults
-				lastFontFamilyStr = null;//to force defaults
-				currentStyle = "readable";
-				currentFontFamily = "helvetica";
+			var	currentStyle = "readable";//default style
+			var	currentFontFamily = "helvetica";//default font
+			if (!is_logIn) {//a hard reset - the factory defaults will be used 
+				// lastStyleStr = null;//to force defaults
+				// lastFontFamilyStr = null;//to force defaults
 				loadCSS("FL" + currentStyle + ".css");//the default
 				// loadCSS("FLfont_" + currentFontFamily + ".css");//the default
-			}else{
-				if(lastStyleStr) {
+			}else{//a soft reset recovering style and font from localStorage
+				if(lastStyleStr) 
 					currentStyle = lastStyleStr;
-					var fileCss = "FL" + currentStyle + ".css";
-					loadCSS(fileCss);
-				}
-				if(lastFontFamilyStr) {
+				var fileCss = "FL" + currentStyle + ".css";
+				loadCSS(fileCss);
+				if(lastFontFamilyStr)
 					currentFontFamily = lastFontFamilyStr;
-					var fileCss = "FLfont_" + currentFontFamily + ".css";
-					loadCSS(fileCss);
-				}
+				var fileCss = "FLfont_" + currentFontFamily + ".css";
+				loadCSS(fileCss);
 			}
+			localStorage.style = currentStyle;
+			localStorage.fontFamily = currentFontFamily; 
 			FL.currentStyle = currentStyle; //to be compatible with touring - before code review
+			FL.currentFontFamily = currentFontFamily; //to be compatible with touring - before code review
 			$("#_css").text(FL.currentStyle);
 			$.Topic( 'styleChange' ).publish( FL.currentStyle );//broadcast that will be received by FL.tour
-		};
+			$.Topic( 'fontChange' ).publish( FL.currentFontFamily );//broadcast that will be received by FL.tour
+		};	
 		var loadCSS = function(href) {
 			var cssLink = $("<link rel='stylesheet' type='text/css' href='FL_ui/css/"+href+"'>");
 			//    <link href="../bootstrap/css/cerulean.css" rel="stylesheet">
 			$("head").append(cssLink);
 			// $('#_css').editable("activate");
-		};
-		var xdisconnectServer = function() {
-			FL.login.fa.disconnect(function(e,d){
-				alert ('bye');
-			});
-		};
-		var xconnectServer = function(userName,password,connectServerCB) {
-			// var fl = new flMain();
-			if(!FL.login.fa)
-				FL.login.fa = new FL.login.fl.app();
-			var fa = FL.login.fa;
-			// var fa = new FL.login.fl.app();
-			FL.login.fl.setTraceClient(2);
-			FL.login.fl.serverName('flServer');
-			FL.login.fl.login({"username": userName, "password": password}, function (err, data){
-				if (err){
-					alert('flLoging: err=' + JSON.stringify(err));
-					return connectServerCB(false);
-					// return console.log ('flLoging: err=' + JSON.stringify(err));
-				}
-				var myApp =data.applications[0];
-					alert ('connecting to '+myApp.name);
-					fa.connect(myApp, function(err2, data2){
-					if (err2){
-						alert('fla.connect: err=' + JSON.stringify(err2));
-						return connectServerCB(false);
-						// return console.log ('fla.connect: err=' + JSON.stringify(err2));
-					}
-					// var fEnt = new FL.login.fl.entity();
-					// fEnt.getAll({query:{}}, function (err, data){
-					// 	if(err){
-					// 		alert('error in entity.getAll: ' + err);
-					// 		return ('error in entity.getAll: ' + err);
-					// 	}
-					// 	alert(JSON.stringify(data));
-					// });
-					return connectServerCB(true);
-				});
-			});
 		};
 		return{
 			fl: new flMain(),//FL.login.fl
@@ -319,9 +351,9 @@ jQuery(document).ready(function($){
 				loadCSS("FLreadable.css");
 				displaySignInUser();//displays no user, just icon and "Sign In" link
 			},
-			checkSignIn:function(is_recoverLastMenu) {//updates DOM login line with local saved status. If logged in shows flyout button - returns true/false acording with logIn/logOut
+			checkSignIn:function(is_recoverLastMenu) {//updates DOM login line with local saved status. If logged in shows slidePanels -  returns true/false acording with logIn/logOut
 				//if is_recoverLastMenu = true =>LastMenu will be recovered and will be passed to FL.menu
-				messageEnabler.getInstance();
+				messageEnabler.getInstance();//a singleton to listen for "slidePanel" broadcasts 
 				var loggedIn = false;
 				var lastLogin = null;
 				var htmlToInject = null;
@@ -330,29 +362,15 @@ jQuery(document).ready(function($){
 					if(lastLoginStr) {
 						var lastLoginObj = JSON.parse(lastLoginStr);
 						displaySignInUser(lastLoginObj.email);
-
-						// var htmlToSidePanel = '<div class="push"> <a id="_toggle" href="#menu" class="menu-link">&#9776;</a>';
-						// FL.domInject("_sidePanel",htmlToSidePanel );//shows flyout button
-						// $('.menu-link').bigSlide();
-						$('#trigger1').show();
-						$('#trigger2').show();
-						$('#trigger3').show();
-
+						$('#trigger1').show();$('#trigger2').show();$('#trigger3').show();
 						$.Topic( 'signInDone' ).publish( true ); //informs FL.menu that edition is allowed
 						if(is_recoverLastMenu)
 							recoverLastMenu();//recover locally saved tour status and menu and informs FL.menu about the new menu if any
-					}else{//the satus is signed out
+					}else{//the status is signed out
 						displaySignInUser();//displays no user, just icon and "Sign In" link
-						
-						// FL.domInject("_sidePanel");//removes flyout button
-						$('#trigger1').hide();
-						$('#trigger2').hide();
-						$('#trigger3').hide();
-						
+						$('#trigger1').hide();$('#trigger2').hide();$('#trigger3').hide();
 						$.Topic( 'signInDone' ).publish( false ); //informs FL.menu that edition is allowed
 						$.Topic( 'sidePanelOpened' ).publish( false ); //informs FL.menu that sidePanel is closed 
-						// mixpanel.track("Entering", {
-						// });
 						FL.mix("Entering",{});
 					}
 					recoverLastTourActiveStatus();
@@ -360,19 +378,8 @@ jQuery(document).ready(function($){
 				}else{
 					BootstrapDialog.alert('No login persistence because your browser does not support Web Storage...');
 				}
-				// console.log("------------------------------>On checkSignIn() (log OK) FL.loggedIn="+FL.loggedIn);
 				return loggedIn;
 			},
-			xconnectServer: function(userName,password,connectServerCB){
-				// alert("connectServer ServerByPass="+ServerByPass);
-				if(!this.ServerByPass)
-					connectServer(userName,password,connectServerCB);
-			},
-			xdisconnectServer: function(){
-				// alert("disconnectServer ServerByPass="+ServerByPass);
-				if(!this.ServerByPass)
-					disconnectServer();
-			},			
 			signIn: function() {//called from href in first line
 				// alert("Signing In !!!!");
 
@@ -411,7 +418,7 @@ jQuery(document).ready(function($){
 								if (FL.validateEmail(email)) {
 									loginAccess({email:email,userName:userName,password:password});
 									// FL.server.connect("Nico","coLas",function(err){console.log("connectServer connection is="+err);});//3rd parameter is byPass
-									FL.server.connect("Joao","oLiVeIrA",function(err){console.log("connectServer connection is="+err);});//3rd parameter is byPass
+									// FL.server.connect("Joao","oLiVeIrA",function(err){console.log("connectServer connection is="+err);});//3rd parameter is byPass
 									FL.mix("Sign In",{"email":email});
 								}else{
 									BootstrapDialog.alert("Your Email is incorrect. Please login again and provide a valid email address");
@@ -439,7 +446,7 @@ jQuery(document).ready(function($){
 						localStorage.clear();
 						$.Topic( 'signInDone' ).publish( false );//broadcast that will be received by FL.menu to update .editable to false
 						$.Topic( 'jsonMenuUpdate' ).publish( FL.clone(FL.oMenu) );//broadcast that will be received by FL.menu to update jsonMenu
-						BootstrapDialog.alert('The full reset was done. <strong>Please refresh your browser</strong>.');
+						BootstrapDialog.alert('The full reset was done. <strong>Please Sign In again</strong>.');
 						FL.login.checkSignIn(true);
 					}
 				},{title:"Reset Login and edited menu",button1:"Cancel",button2:"Confirm Reset",type:'type-danger',cssButton2:"btn-danger"});
@@ -447,44 +454,6 @@ jQuery(document).ready(function($){
 			selectStyle: function() {
 				alert("selectStyle !");
 			}
-			// editStyles: function(id){//called from link - big-slide.js
-			// 	// alert("toggle clicked !!!");
-			// 	// var stylesForSelection = [
-			// 	// 	{value: 0, text: 'cerulean'},
-			// 	// 	{value: 1, text: 'cosmos'},
-			// 	// 	{value: 2, text: 'readable'},
-			// 	// 	{value: 3, text: 'red'},
-			// 	// 	{value: 4, text: 'spacelab'}
-			// 	// ];
-			// 	var getStyleValue = function(styleText){
-			// 		var value = null;
-			// 		var optionObj = _.findWhere( stylesForSelection,{text:styleText} );
-			// 		if(optionObj)
-			// 			value = optionObj.value;
-			// 		return value;
-			// 	};
-			// 	console.log("Side Panel elements are immediately placed in DOM");
-			// 	$.fn.editable.defaults.mode = 'popup';
-			// 	var editId="#"+id;
-			// 	var style = FL.currentStyle;
-			// 	var styleValue = getStyleValue(style);
-			// 	// alert(editId+" -->"+$(editId).length+ " FL.currentStyle=" + FL.currentStyle + " value=" + FL.getStyleValue(FL.currentStyle));
-			// 	$(editId).editable({
-			// 		type: 'select',
-			// 		title: 'Select Style:',
-			// 		placement: 'bottom',
-			// 		value: styleValue, //was 0,
-			// 		source:stylesForSelection,
-			// 		validate: function(value) {
-			// 			var fileCss = "FL"+ stylesForSelection[value].text + ".css";
-			// 			loadCSS(fileCss);
-			// 			FL.currentStyle = stylesForSelection[value].text;
-			// 			localStorage.style = stylesForSelection[value].text;
-			// 			$.Topic( 'styleChange' ).publish( FL.currentStyle );//broadcast that will be received by FL.tour
-			// 			FL.mix("ChangeStyle",{"newStyle":FL.currentStyle});
-			// 		}
-			// 	});
-			// }
 		};
 	})();
 	FL["showTourStep0"] = false;

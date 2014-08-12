@@ -41,7 +41,7 @@
 						//TEMPORARY local dictionary adjust to force pair in local dictionary
 						
 						FL.server.syncLocalDictionary(function(){
-							console.log("CB from F.links.setDefaultGrid SYNC IS DONE !!!!!!!!!!!!!!!!!!!!!!");
+							console.log("F.links.setDefaultGrid CB from  SYNC IS DONE !!!!!!!!!!!!!!!!!!!!!!");
 							FL.dd.displayEntities();
 							displayDefaultGrid(entityName);
 						});
