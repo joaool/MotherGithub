@@ -499,7 +499,7 @@
 				}
 				return xRet;
 			},	
-			updateEntityBySingular: function(xSingular,xOptions) {//updates an existing entity with xOptions object
+			updateEntityBySingular: function(xSingular,xOptions) {//updates an existing entity 
 				//Ex: updateEntityBySingular("client",{plural:"clients",description:"company that buys from us"});
 				var oEntity=null;
 				var oEntityUpdate = null;

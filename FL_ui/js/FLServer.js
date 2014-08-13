@@ -502,7 +502,7 @@
 			},
 			saveMainMenu: function(oMenu,style,fontFamily,saveMainMenuCB) {
 				//it tries to update if it fails (because _id:1  does not exist) then inserts
-				alert("FL.server.saveMainMenu() -->");
+				// alert("FL.server.saveMainMenu() -->");
 				var fd = new FL.server.fl.data();
 				fd.update("40", {"query":{"_id":1},"update":{"45":oMenu,"46":style,"47":fontFamily}}, function(err, data){
 					if (err){
@@ -523,6 +523,17 @@
 					return saveMainMenuCB(null);
 				});	
 			},
+			syncLocalStoreToServer: function(){//saves menu,style and font to server in LocalStore to server
+				var lastMenuStr  = localStorage.storedMenu
+				var lastStyleStr = localStorage.style;// Retrieve last saved style ex.red or spacelab
+				var lastFontFamilyStr = localStorage.fontFamily;// Retrieve last saved fontFamily ex.impact or georgia
+				var oMenu = JSON.parse(lastMenuStr);
+				// FL.menu.currentMenuObj.jsonMenu = FL.menu.currentOptions.jsonMenu;//HACK - because FL.menu.currentMenuObj.jsonMenu does not reflect the last menu update
+				FL.server.saveMainMenu(oMenu,lastStyleStr,lastFontFamilyStr,function(err){
+					console.log("FL.server sincLocalStoreToServer() -> menu style and font saved on server -->"+err);
+					// alert("FLMenu2.js saveMenuToLocalAndServer called FL.server.saveMainMenu with style="+lastStyleStr+ " font="+lastFontFamilyStr);
+				});
+			},
 			NextVersionSaveMainMenu: function(oMenu,p1,p2,saveMainMenuCB) {
 				alert("FL.server.saveMainMenu() -->");
 				var fd = new FL.server.fl.data();
@@ -536,7 +547,7 @@
 				});
 			},			
 			restoreMainMenu: function(restoreMainMenuCB) {//restores main menu, style and fontFamily
-				alert("FL.server.restoreMainMenu() -->");
+				// alert("FL.server.restoreMainMenu() -->");
 				var fd = new FL.server.fl.data();
 				fd.findOne("40",{"query":{"_id":1}}, function(err, data){
 					if (err){

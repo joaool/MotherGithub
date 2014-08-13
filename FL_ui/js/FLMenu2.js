@@ -434,18 +434,33 @@ FL["menu"] = (function(){//name space FL.menu
 			topmenu.splice(index, 1);
 		}
 	};
-	var saveMenuToLocalAndServer = function() {//saves current menu and resave style and fontFamily
+	var xxxxxsaveMenuToLocalAndServer = function() {//saves current menu and resave style and fontFamily
 		// localStorage.storedMenu  = JSON.stringify(parentThis.settings.jsonMenu);
+		// alert("enter FLMenu2 saveMenuToLocalAndServer !!!");
 		localStorage.storedMenu  = JSON.stringify(FL.menu.currentOptions.jsonMenu);
+		FL.menu.currentMenuObj.jsonMenu = FL.menu.currentOptions.jsonMenu;//HACK - because FL.menu.currentMenuObj.jsonMenu does not reflect the last menu update
 		//gets style and fontFamily
+
+		// var menu0 = FL.menu.currentOptions.jsonMenu.menu[0].title;
+		// var menu = FL.menu.currentMenuObj.jsonMenu.menu[0].title;
 		var lastStyleStr = localStorage.style;// Retrieve last saved style ex.red or spacelab
 		var lastFontFamilyStr = localStorage.fontFamily;// Retrieve last saved fontFamily ex.impact or georgia
+		// alert("FLMenu2.js saveMenuToLocalAndServer called FL.server.saveMainMenu with menu0=" + menu0 + " menu=" + menu +" style="+lastStyleStr+ " font="+lastFontFamilyStr);
+
 
 		FL.server.saveMainMenu(FL.menu.currentOptions.jsonMenu,lastStyleStr,lastFontFamilyStr,function(err){
 			console.log("FL.menu saveMenuToLocalAndServer() -> menu was saved on server -->"+err);
+			// alert("FLMenu2.js saveMenuToLocalAndServer called FL.server.saveMainMenu with style="+lastStyleStr+ " font="+lastFontFamilyStr);
 		});
 		// alert("Menu was Saved to local !!!");
 	};
+	var saveMenuToLocalAndServer = function() {//saves current menu and resave style and fontFamily
+		// localStorage.storedMenu  = JSON.stringify(parentThis.settings.jsonMenu);
+		// alert("enter FLMenu2 saveMenuToLocalAndServer !!!");
+		localStorage.storedMenu  = JSON.stringify(FL.menu.currentOptions.jsonMenu);
+		FL.menu.currentMenuObj.jsonMenu = FL.menu.currentOptions.jsonMenu;//HACK - because FL.menu.currentMenuObj.jsonMenu does not reflect the last menu update
+		FL.server.syncLocalStoreToServer();
+	};	
 	var insideContextMenu = function(event) {
 
 		// console.log("insideContextMenu was clicked ----->"+JSON.stringify(thizz.jsonMenu));
@@ -760,13 +775,17 @@ FL["menu"] = (function(){//name space FL.menu
 		// console.log("set editable was called inside object !!!! with status="+status +" before ->this.editable="+this.editable +" ->" + this.test);
 		this.jsonMenu = jsonMenu;
 		this.menuRefresh();
-	};	
+	};
 	menu.prototype.createMenuEntryLastTop = function(optionTitle,uri) {//adds optionTitle with uri to the last position on top menu
 		var nextId = menuEach(this.jsonMenu.menu,add_Id_Top);
 		var newMenuItem = { "title": optionTitle, "uri": uri,top:true, id:nextId };
 		this.jsonMenu.menu.push(newMenuItem);
 		this.menuRefresh();
-		saveMenuToLocalAndServer();
+		localStorage.storedMenu  = JSON.stringify(this.jsonMenu);
+
+
+		// saveMenuToLocalAndServer();
+		FL.server.syncLocalStoreToServer();
 	};
 	return{
 		menuArray: null,
@@ -777,14 +796,10 @@ FL["menu"] = (function(){//name space FL.menu
 		},
 		createMenu: function(options) {
 			//ex:var myMenu = new FL.menu({jsonMenu:FL.clone(oMenu),initialMenu:"_home",editable:true});
-			var newMenuObj = new menu(options);
-			// $.Topic( 'signInDone' ).subscribe( this.setEditable );
-			
+			var newMenuObj = new menu(options);	
 			console.log("createMenu ->begin");
 			$.Topic( 'signInDone' ).subscribe( FL.menu.topicSetEditable );
-			// $.Topic( 'jsonMenuUpdate' ).subscribe( this.updateJsonMenu );
 			$.Topic( 'jsonMenuUpdate' ).subscribe( FL.menu.topicUpdateJsonMenu );
-			// $.Topic( 'createOption' ).subscribe( this.createDatabaseAcess );
 			$.Topic( 'createOption' ).subscribe( FL.menu.topicCreateDatabaseAcess );
 			// $.Topic( 'createGridOption' ).subscribe( this.createGrid );
 			$.Topic( 'createGridOption' ).subscribe( FL.menu.topicCreateGrid );
@@ -805,16 +820,12 @@ FL["menu"] = (function(){//name space FL.menu
 			// alert("FL.menu.topicSetEditable status="+status);
 		},
 		topicUpdateJsonMenu: function(jsonMenu) {//this method is used to subscribe topics on createMenu
-			//$.Topic( 'jsonMenuUpdate' ).subscribe( FL.menu.topicUpdateJsonMenu );
-
-			// parentThis.settings.jsonMenu = jsonMenu;
-			// parentThis.menuRefresh();
 			FL.menu.currentMenuObj.updateJsonMenu(jsonMenu);
 		},
 		topicCreateDatabaseAcess: function(optionTitle) {//this method is used to subscribe topics on createMenu
 			// $.Topic( 'createOption' ).subscribe( FL.menu.topicCreateDatabaseAcess );
 			// parentThis.createMenuEntryLastTop(optionTitle,"__windowOpen(weadvice.knackhq.com/weadvice1)");
-			FL.menu.currentMenuObj.createMenuEntryLastTop(optionTitle,"__windowOpen(weadvice.knackhq.com/weadvice1)zz");
+			FL.menu.currentMenuObj.createMenuEntryLastTop(optionTitle,"__windowOpen(weadvice.knackhq.com/weadvice1)");
 
 			console.log("======================================================================");
 			// console.log(FL.menu.currentMenuObj.toString());

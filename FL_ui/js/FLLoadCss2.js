@@ -81,6 +81,8 @@ jQuery(document).ready(function($){
 							$.Topic( 'styleChange' ).publish( currentStyle);//broadcast that will be received by FL.tour
 							FL.mix("ChangeStyle",{"newStyle":currentStyle});
 							FL.currentStyle = currentStyle;//compatibility with touring - before code review
+							// alert("FL.loadCss2  receiver... STYLE CHANGE will call FL.server.syncLocalStoreToServer()");
+							FL.server.syncLocalStoreToServer();
 							resetStyle(true);
 						});
 						var xFont = localStorage.fontFamily;
@@ -90,6 +92,8 @@ jQuery(document).ready(function($){
 							currentFontFamily = selected;
 							localStorage.fontFamily = currentFontFamily;
 							FL.mix("ChangeFontFamily",{"newFont":currentFontFamily});
+							// alert("FL.loadCss2  receiver... STYLE CHANGE will call FL.server.syncLocalStoreToServer()");
+							FL.server.syncLocalStoreToServer();
 							resetStyle(true);
 						});
 					}else if(triggerName == "#trigger2") {//user entered or exited slide panel fl_builder.html
@@ -248,7 +252,7 @@ jQuery(document).ready(function($){
 						vUser(loginObject);//comment this line to remove vUser and aKey access				
 					}
 				}else{//no error on connect we move on to retrieve dictionary menu, style and fonts
-					alert("FLLoadCss2.js loginAccess SUCCESSFULL CONNECT process will go on loading dictionary,menu,style &fonts");
+					// alert("FLLoadCss2.js loginAccess SUCCESSFULL CONNECT process will go on loading dictionary,menu,style &fonts");
 					loadAppDataForSignInUser(function(err,data){
 						if (err){
 							alert('FLLoadCss.js loadAppDataForSignInUser Error Err='+err);
@@ -257,8 +261,10 @@ jQuery(document).ready(function($){
 							var	currentStyle = data.style;//style stored on server
 							var	currentFontFamily = data.fontFamily;//default stored on server
 							// alert("FLLoadCss2.js loginAccess style=" + currentStyle + "fontFamily=" + currentFontFamily);
-							alert("FLLoadCss2.js loginAccess menu, style and fonts SUCCESSFULL retrieved oMenu="+JSON.stringify(oMenu));
 							FL.menu.currentMenuObj.updateJsonMenu(oMenu);
+							FL.menu.currentMenuObj.menuRefresh();
+
+							localStorage.storedMenu  = JSON.stringify(data.oMenu);
 							localStorage.style = currentStyle;
 							localStorage.fontFamily = currentFontFamily;
 							resetStyle(true);
@@ -267,6 +273,9 @@ jQuery(document).ready(function($){
 							$.Topic( 'signInDone' ).publish( true );
 							recoverLastMenu();//recover locally saved menu and informs FL.menu about the new menu if any
 							FL.login.checkSignIn();
+
+							// alert("FLLoadCss2.js loginAccess menu, style and fonts SUCCESSFULL retrieved oMenu="+JSON.stringify(oMenu));
+
 							console.log("-------------ONLINE----------------->On signIn() (log OK) FL.loggedIn="+FL.loggedIn);
 							vUser(loginObject);//comment this line to remove vUser and aKey access
 						}

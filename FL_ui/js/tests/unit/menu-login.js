@@ -82,16 +82,14 @@ $(function () {
     };
     var actual = '1';
     var expected = 1;
-    ok( actual == expected,"Validated !!!" ); //bolean expression
+    ok( actual == expected,"Validated !!!" ); //1
     var car1 = FL.menu.createCar("Fiat","1990");
-    ok( car1.model == "Fiat","car is Fiat Validated !!!" );
+    ok( car1.model == "Fiat","car is Fiat Validated !!!" );//2
     console.log(car1.phrase());
-    ok( car1.phrase() == "Fiat of 1990","phrase function Validated !!!" );
+    ok( car1.phrase() == "Fiat of 1990","phrase function Validated !!!" );//3
     var myMenu1 = FL.menu.createMenu({jsonMenu:oMenu,initialMenu:"_home",editable:false});
     console.log(myMenu1.toString());
-    ok( myMenu1.toString() == JSON.stringify(oMenu) + " has editable=false", "myMenu1.to String() is correct!" );
-    console.log( JSON.stringify(myMenu1.jsonMenu) );
-    ok( myMenu1.jsonMenu.menu[1].title == "MenuB/T1","Getting menu title 'MenuB/T1' (at root)" );
+    ok( myMenu1.jsonMenu.menu[1].title == "MenuB/T1","Getting menu title 'MenuB/T1' (at root)" );//4
     ok( myMenu1.jsonMenu.menu[1].menu[1].title == "MenuB/T2-II","Getting menu title 'MenuB/T2-II' at second level" );
     myMenu1.jsonMenu.menu[1].menu[1].title = "Joachim";
     ok( myMenu1.jsonMenu.menu[1].menu[1].title == "Joachim","Setting menu 'MenuB/T2-II' to 'Joachim'");
