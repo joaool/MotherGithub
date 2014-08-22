@@ -239,8 +239,8 @@ FL["menu"] = (function(){//name space FL.menu
 				console.log("------------------------------------>Is going to leave to  ->"+href);
 				// ---> temporary suspended --->localStorage.storedMenu = JSON.stringify(menuSettings.jsonMenu);//stores before leaving
 				// alert("SAI com:"+JSON.stringify(oMenu) );
+				// alert(" FLMenu2 dispatchHref ->"+href);
 				location.href = href;
-				// alert("Chegou aqui 150 !!!");
 			}
 		}
 	};	
@@ -782,9 +782,6 @@ FL["menu"] = (function(){//name space FL.menu
 		this.jsonMenu.menu.push(newMenuItem);
 		this.menuRefresh();
 		localStorage.storedMenu  = JSON.stringify(this.jsonMenu);
-
-
-		// saveMenuToLocalAndServer();
 		FL.server.syncLocalStoreToServer();
 	};
 	return{

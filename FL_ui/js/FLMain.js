@@ -4,7 +4,8 @@ var FL = FL || {};
 		"menu" : [
 			{
 				"title" : "Menu A - Tier 1",//0
-				"uri":"http://www.microsoft.com"
+				// "uri":"http://www.microsoft.com"
+				"uri":"./page_editor.html?d=joao"
 				// "uri":"microsoft"
 			},
 			{
@@ -141,8 +142,14 @@ var FL = FL || {};
 	// return;
 	
 	// var FL = FL || {};
+	var testObject = localStorage.testObject;
+	var z = null;
+	if(testObject)
+		z=testObject.one;
+	console.log("FLMain.js begin z=" + z );
 	FL.oMenu = oMenu;
 	$(document).ready(function() {
+		console.log("FLMain.js begin inside document.ready");
 		var fullUrl = window.location.href;
 		if(fullUrl){//gets domain from irl string ->http://localhost/pdojo/MotherGithub/test_menu13.html?d=myDomain1#
 			//ex. http://www.framelink.co/app?d=myDomain1 Nico's definition
@@ -190,6 +197,7 @@ var FL = FL || {};
 		FL.setTourOn(true);
 		FL.mixPanelEnable = false;
 		FL.server.offline = false;
+		localStorage.connection = '';
 		var loggedIn = FL.login.checkSignIn(true);//recover last saved menu and tour - is_recoverLastMenu = true =>LastMenu will be recovered and will be passed to FL.menu
 		FL.tourBegin();		
 		// myMenu.settings.editable = true;
