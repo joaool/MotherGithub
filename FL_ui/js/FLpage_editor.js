@@ -45,7 +45,7 @@ var FL = FL || {};
 			// isolate with http://localhost/pdojo/MotherGithub/page_editor.html?=cs#page=home
 			//this is equivalent to  http://localhost/pdojo/MotherGithub/test_menu13.html?d=myDomain1
 			//
-			var page = FL.common.getTag(fullUrl,"page","#");//FL.domain is globally defined - the last # is disregarded
+			page = FL.common.getTag(fullUrl,"page","#");//FL.domain is globally defined - the last # is disregarded
 			var connectionString = FL.common.getTag(fullUrl,"connectionString","#");//FL.domain is globally defined - the last # is disregarded
 			var style = FL.common.getTag(fullUrl,"style","#");//FL.domain is globally defined - the last # is disregarded
 			var font = FL.common.getTag(fullUrl,"font","#");//FL.domain is globally defined - the last # is disregarded
@@ -66,21 +66,22 @@ var FL = FL || {};
 					alert('FLpage_editor.js connect: err=' + JSON.stringify(err2));
 					return;
 				}
+				FL.server.offline = false;
 				FL.server.restorePage(page, function(err,data){
 					if (err){
-						alert('FLpage_editor.js FL.server.restorePage after connect: err=' + JSON.stringify(err2));
+						alert('FLpage_editor.js FL.server.restorePage after connect: err=' + JSON.stringify(err));
 						return;
 					}
 					alert('FLpage_editor.js FL.server.restorePage after connect: PAGE RESTORED SUCCESSFULLY data=' + JSON.stringify(data));
-					var htmlStr0 = data.d.html;
+					var htmlStr = data.d.html;
 					// localStorage.connection = JSON.stringify(myApp);
-					var htmlStr="<div class='jumbotron'>" + 
-									"<h1>FrameLink Platform</h1>" + 
-									"<p>This site has no functionality as it is. <strong>Sign In</strong> as a designer (upper right corner) to transform this site into the backend of your business. No need for email/password initially. Introduce them later on, to continue the design or give access to someone else.</p><p><strong>'Tour'</strong> will give you an idea how to redesign this site into your business information system.</p>" +
-									"<p>" + 
-										"<a href='#' class='btn btn-primary btn-large' onclick='FL.showTourStep0 = true; FL.tourIn();'>Tour</a>" +
-									"</p>" + 
-								"</div>";
+					// var htmlStr="<div class='jumbotron'>" + 
+					// 				"<h1>FrameLink Platform</h1>" + 
+					// 				"<p>This site has no functionality as it is. <strong>Sign In</strong> as a designer (upper right corner) to transform this site into the backend of your business. No need for email/password initially. Introduce them later on, to continue the design or give access to someone else.</p><p><strong>'Tour'</strong> will give you an idea how to redesign this site into your business information system.</p>" +
+					// 				"<p>" + 
+					// 					"<a href='#' class='btn btn-primary btn-large' onclick='FL.showTourStep0 = true; FL.tourIn();'>Tour</a>" +
+					// 				"</p>" + 
+					// 			"</div>";
 					editPage(page,htmlStr);
 				});
 				// return connectServerCB(null);
@@ -113,7 +114,7 @@ var FL = FL || {};
 
 		}
 		var editPage = function(pageName,htmlStr){
-			alert("continueFunction !!!! code to develop here !!! pageName="+pageName);
+			// alert("continueFunction !!!! code to develop here !!! pageName="+pageName);
 			tinymce.init({
 				mode : "textareas",
 				selector: "textarea",
@@ -139,8 +140,7 @@ var FL = FL || {};
 					ed.on("init",function(ed) {
 						tinyMCE.get('my_editor').setContent(htmlStr);
 						tinyMCE.execCommand('mceRepaint');
-                    	}
-                    );
+					});
 				}
 			});
 			console.log("-->"+htmlStr);
@@ -149,11 +149,46 @@ var FL = FL || {};
 		};
 	});
 	exitSaving = function(){
-		var sHTML = $('#summernote').code();
-		alert("exitSaving sHTML="+sHTML);
+		sHTML = tinyMCE.get('my_editor').getContent();
+		// alert("exitSaving page="+page+" sHTML="+sHTML);
+		FL.server.savePage(page,sHTML,function(err){//"43" must exist
+			if (err){
+				alert('FL_pageEditor FL.server.savePage: ERROR err=' + JSON.stringify(err));
+				return ;
+			}
+			// alert('FL_pageEditor FL.server.savePage: page was successfully saved !!!');
+			FL.server.disconnect();
+		});
+		closeWindows();
 	};
 	exitNoSave = function(){
-		alert("exitNoSave");
+		// alert("exitNoSave");
+		console.log("exitNoSave ");
+		// window.close();
+		// open(location, '_self').close();
+		// window.open('','_self').close();
+		FL.server.disconnect();
+		closeWindows();
+	};
+	window.onbeforeunload = function (e) {//works for close tab - and for close browser because:
+		// TESTED Chrome 36 -try to close all tabs on by one, so it will fall back in this code. OK
+		// TESTED FireFox 31 - try to close all tabs on by one, so it will fall back in this code. OK
+		// TESTED IE 11 - try to close all tabs on by one, so it will fall back in this code. OK
+		// TESTED Opera 9.80 - NOT WORKING - It is supported only after version 15 (Feb 2013 - In house Presto was phased ouyt in favour of WebKit)
+		//TESTED Safari 5.1.7 - try to close all tabs on by one, so it will fall back in this code. OK
+		// http://smallbusiness.chron.com/detecting-browser-windows-closing-firefox-49700.html
+		//Chrome - detect tab close event ok - disconnect message ok - exiting message ok.
+		//Firefox - detect tab close event ok - disconnect message ok - exiting message NOT OK. 
+		//IE - detect tab close event ok - disconnect message ok - exiting message ok.
+		//Safari - detect tab close event ok - disconnect message ok - exiting message ok.
+		//OPERA 9.80 - Not working see comment above
+		e = e || window.event;
+		if (e) {
+			console.log("disconnect here");
+			FL.server.diconnect();
+			e.returnValue = 'test returnValue...';
+		}
+		return 'You are exiting FrameLink page editor...';
 	};
 	console.log(document.title+"......  END..");
 })();

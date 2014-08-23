@@ -6,8 +6,20 @@
 var FL = FL || {};
 FL["common"] = (function(){//name space FL.common
 	return{
+		getTag: function(str,tagName,tagTerminator) {//returns the content of str after the last separator character or string - no separator found  =>null
+			//get tag with name tagName embeded in string str - if several exist it takes the last one
+			//ex. FL.common.getTag(fullUrl,"connectionString","#") -->returns  "abc" for fullUrl="#connectionString=abc#pag=home"
+			var retTag = null;
+			retTag = this.getLastTagInString(str,tagName+"=",tagTerminator);
+			var firstChar = retTag.substring(0,1);
+			if(firstChar == "{"){//tag is the string format of a JSON
+				retTag=retTag.replace(/%22/g,'"');
+				retTag=retTag.replace(/%20/g,' ');
+			}
+			return retTag;
+		},
 		stringAfterLast: function(str,separator) {//returns the content of str after the last separator character or string - no separator found  =>null
-			//ex. FL.common.stringAfter("http://www.framelink.co/app?d=myDomain1","=") -->returns  "myDomain1"
+			//ex. FL.common.stringAfterLast("http://www.framelink.co/app?d=myDomain1","=") -->returns  "myDomain1"
 			var retStr = null;
 			var pos = str.lastIndexOf(separator);
 			var separatorLen = separator.length;
@@ -15,6 +27,16 @@ FL["common"] = (function(){//name space FL.common
 				retStr = str.substring(pos+separatorLen);
 			return retStr;
 		},
+		stringBeforeLast: function(str,separator) {//simply returns the content of str before the last separator character or string - no separator found  =>null
+			//ex. FL.common.stringBeforeLast("this is (one) or (two) values","(") -->returns  "this is (one) or "
+			var retStr = null;
+			var pos = str.lastIndexOf(separator);
+			var separatorLen = separator.length;
+			if(pos>=0)
+				retStr = str.substring(0,pos);
+			return retStr;
+		},
+
 		getLastTagInString: function(str,separator,tagTerminator) {//returns the content after the last separator until end or terminal char
 			// str - string that will be processed
 			// separator - last ocurrence to be identified in string

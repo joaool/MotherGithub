@@ -5,7 +5,8 @@ var FL = FL || {};
 			{
 				"title" : "Menu A - Tier 1",//0
 				// "uri":"http://www.microsoft.com"
-				"uri":"./page_editor.html?d=joao"
+				// "uri":"./page_editor.html?d=joao"
+				"uri":"#"
 				// "uri":"microsoft"
 			},
 			{
@@ -192,7 +193,8 @@ var FL = FL || {};
 		$('#trigger1').hide();
 		$('#trigger2').hide();
 		$('#trigger3').hide();
-		var myMenu = FL.menu.createMenu({jsonMenu:FL.clone(oMenu),initialMenu:"_home",editable:true});
+		// var myMenu = FL.menu.createMenu({jsonMenu:FL.clone(oMenu),initialMenu:"_home",editable:true});
+		var myMenu = FL.menu.createMenu({jsonMenu:FL.clone(oMenu),initialMenu:"_mission",editable:true});
 		// var myMenu = FL.menu.createMenu({jsonMenu:FL.clone(oMenu)});
 		FL.setTourOn(true);
 		FL.mixPanelEnable = false;

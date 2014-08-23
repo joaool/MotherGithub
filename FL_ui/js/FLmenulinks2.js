@@ -33,6 +33,24 @@
 				internalTest(x);
 				alert("Fl.link.test(x) x="+x);
 			},
+			pageEditor: function(xPage) {//call with menu key "uri": "javascript:FL.links.test('JOJO')"
+				var connectionString = localStorage.connection;
+				if(connectionString.length === 0){
+					alert("Fl.link.pageEditor PLEASE CONNECT TO THE DATABASE ");
+					return;
+				}
+			alert("Fl.link.pageEditor call with:\npage=" + xPage + "\nconnectionString="+connectionString);
+				// "uri":"./page_editor.html?d=joao"
+				// location.href = "./page_editor.html?d=joao";
+				localStorage.connection = connectionString;
+				FL.server.disconnect();
+				var style = localStorage.style;
+				var font = localStorage.fontFamily;
+				// location.href = "./page_editor.html?connectionString="+connectionString+"#page=" + xPage + "#style=" + style + "#font="+font;
+				// location.href = "./page_editor.html?connectionString="+connectionString+"#page=" + xPage + "#style=" + style + "#font="+font;
+				window.open("./page_editor.html?connectionString="+connectionString+"#page=" + xPage + "#style=" + style + "#font="+font, 'TheWindow');
+				// document.getElementById('TheForm').submit();
+			},
 			setDefaultGrid: function(entityName) {//call with menu key "uri": "javascript:FL.links.setDefaultGrid('JOJO')"
 				if(!FL.server.offline){
 					if(FL.dd.isEntityInLocalDictionary(entityName)){
@@ -45,20 +63,6 @@
 							FL.dd.displayEntities();
 							displayDefaultGrid(entityName);
 						});
-
-						// var success = FL.dd.createEntity("order","client's product request");
-						// FL.dd.addAttribute("order","shipped","expedition status","Shipped","boolean",null);
-						// FL.dd.addAttribute("order","product","unique order item","product","string",null);
-						// var oEntity =  FL.dd.getEntityBySingular("order");
-						// oEntity.csingular = "61";//we force entity compressed name for test
-						// FL.dd.setFieldCompressedName("order","id","62");
-						// FL.dd.setFieldCompressedName("order","shipped","63");
-						// FL.dd.setFieldCompressedName("order","product","64");
-						// FL.dd.setSync("order",true);
-						// // -------------------------------------------------
-						// // alert("FL.links.setDefaultGrid - cannot display grid " + entityName + " because entity is not in local dictionary");
-						// displayDefaultGrid(entityName);
-
 					}
 				}else{
 					alert("FL.links.setDefaultGrid - cannot display grid " + entityName + " because FrameLink is offline.");

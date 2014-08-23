@@ -146,9 +146,18 @@ jQuery(document).ready(function($){
 							// var oMenu = data.oMenu;//style stored on server
 							var	currentStyle = data.style;//style stored on server
 							var	currentFontFamily = data.fontFamily;//default stored on server
-							// alert("loadAppDataForSignInUser restored: style=" + currentStyle + " fontFamily=" + currentFontFamily);
-							//we may move on loading the welcome page
-							return loadAppDataForSignInUserCB(null,data);
+							// alert("loadAppDataForSignInUser restored: style=" + currentStyle + " fontFamily=" + currentFontFamily);					
+							FL.server.restorePage("home", function(err,restData){
+								if (err){
+									alert('FLLoadCss.js loadAppDataForSignInUser FL.server.restorePage ERROR : err=' + JSON.stringify(err));
+									return loadAppDataForSignInUserCB(null,data);
+								}
+								alert('FLLoadCss.js loadAppDataForSignInUser FL.server.restorePage : PAGE RESTORED SUCCESSFULLY data=' + JSON.stringify(restData));
+								var htmlStr = restData.d.html;
+								//we may move on loading the welcome page
+								return loadAppDataForSignInUserCB(null,data,restData);
+							});
+
 						}
 					});
 				}
@@ -253,7 +262,7 @@ jQuery(document).ready(function($){
 					}
 				}else{//no error on connect we move on to retrieve dictionary menu, style and fonts
 					// alert("FLLoadCss2.js loginAccess SUCCESSFULL CONNECT process will go on loading dictionary,menu,style &fonts");
-					loadAppDataForSignInUser(function(err,data){
+					loadAppDataForSignInUser(function(err,data,restData){
 						if (err){
 							alert('FLLoadCss.js loadAppDataForSignInUser Error Err='+err);
 						}else{//no error =>err==null . data object has menu,style and font
@@ -261,7 +270,12 @@ jQuery(document).ready(function($){
 							var	currentStyle = data.style;//style stored on server
 							var	currentFontFamily = data.fontFamily;//default stored on server
 							// alert("FLLoadCss2.js loginAccess style=" + currentStyle + "fontFamily=" + currentFontFamily);
+							var htmlStr = restData.d.html;
+							alert('FLLoadCss.js loginAccess: PAGE RESTORED SUCCESSFULLY data=' + JSON.stringify(htmlStr));
+
+							FL.menu.homeMemory = htmlStr; //this means that this will be displayed
 							FL.menu.currentMenuObj.updateJsonMenu(oMenu);
+							// FL.menu.currentMenuObj.updateInitialMenu(htmlStr);
 							FL.menu.currentMenuObj.menuRefresh();
 
 							localStorage.storedMenu  = JSON.stringify(data.oMenu);
@@ -271,6 +285,7 @@ jQuery(document).ready(function($){
 
 							localStorage.login = JSON.stringify(loginObject);
 							$.Topic( 'signInDone' ).publish( true );
+							
 							recoverLastMenu();//recover locally saved menu and informs FL.menu about the new menu if any
 							FL.login.checkSignIn();
 

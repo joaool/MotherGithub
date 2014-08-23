@@ -72,7 +72,7 @@
 			alert("internalTest() -->"+x);
 		};
 		var getPageNo = function(pagName){ //to be used by savePage and restorePage
-			var pageNoObj = {"home":1};
+			var pageNoObj = {"home":1,"about":2};
 			return  pageNoObj[pagName];
 		};
 		var disconnectServer = function() {
@@ -90,18 +90,21 @@
 			FL.server.fl.serverName('flServer');
 			FL.server.fl.login({"username": userName, "password": password}, function (err, data){
 				if (err){
+					localStorage.connection = null;
 					alert('flLoging: err=' + JSON.stringify(err));
 					return connectServerCB(false);
 					// return console.log ('flLoging: err=' + JSON.stringify(err));
 				}
 				var myApp =data.applications[0];
-					alert ('connecting to '+myApp.name);
-					fa.connect(myApp, function(err2, data2){
+				alert ('connecting to '+myApp.name + JSON.stringify(myApp));
+				fa.connect(myApp, function(err2, data2){
 					if (err2){
-						alert('fla.connect: err=' + JSON.stringify(err2));
+						alert('fa.connect: err=' + JSON.stringify(err2));
+						localStorage.connection = null;
 						return connectServerCB(false);
 						// return console.log ('fla.connect: err=' + JSON.stringify(err2));
 					}
+					localStorage.connection = JSON.stringify(myApp);
 					return connectServerCB(null);
 				});
 			});
@@ -488,18 +491,6 @@
 					}
 				});
 			},
-			x_saveMainMenu: function(oMenu,p1,p2,saveMainMenuCB) {
-				alert("FL.server.saveMainMenu() -->");
-				var fd = new FL.server.fl.data();
-				fd.insert("40",{_id:1, d:{"45":oMenu,"46":p1,"47":p2}}, function(err, data){
-					if (err){
-						alert('FL.server.saveMainMenu: err=' + JSON.stringify(err));
-						return saveMainMenuCB(false);
-					}
-					console.log("exit from saveMainMenu with success -->"+JSON.stringify(data));
-					return saveMainMenuCB(null);
-				});
-			},
 			saveMainMenu: function(oMenu,style,fontFamily,saveMainMenuCB) {
 				//it tries to update if it fails (because _id:1  does not exist) then inserts
 				// alert("FL.server.saveMainMenu() -->");
@@ -564,26 +555,40 @@
 				});
 			},
 			savePage: function(pagName,htmlContent,savePageCB) {
+				//it tries to update if it fails (because _id:pagNo  does not exist) then inserts
 			    // ex FL.server.savePage("home",homeHTML,function(err){});
-				alert("FL.server.saveMainMenu() -->");
+				// alert("FL.server.saveMainMenu() -->");
 				var pagNo = getPageNo(pagName);
 				if (pagNo){
 					var fd = new FL.server.fl.data();
-					fd.insert("43",{_id:pagNo, d: htmlContent}, function(err, data){
+					fd.update("43", {"query":{"_id":pagNo},"update":{html:htmlContent}}, function(err, data){
+					// fd.update("43", {"query":{"_id":pagNo},d: htmlContent}, function(err, data){ //ERROR IN flClient 269
+					// fd.update("43", {"query":{"_id":pagNo},"update":{d:{d:htmlContent}}}, function(err, data){
 						if (err){
-							alert('FL.server.saveMainMenu: err=' + JSON.stringify(err));
-							return savePage(false);
+							alert('FL.server.savePage: ERROR ON UPDATE err=' + JSON.stringify(err));
+							return savePageCB(false);
+						}					
+						console.log("FL.server.savePage: exit from update with success -->"+JSON.stringify(data));
+						if(data.count == 0){//data.count == 0 =>we need to insert
+
+							fd.insert("43",{_id:pagNo, d:{html:htmlContent}}, function(err, data){
+								if (err){
+									alert('FL.server.savePage: ERROR ON INSERT err=' + JSON.stringify(err));
+									return savePageCB(false);
+								}
+								console.log("FL.server.savePage: exit with success after insert -->"+JSON.stringify(data));
+								return savePageCB(null);
+							});
 						}
-						console.log("exit from saveMainMenu with success -->"+JSON.stringify(data));
-						return savePage(null);
+						return savePageCB(null);
 					});
 				}else{
-					alert('FL.server.savePage Error: pagName=' + pagName + ' unavailable to be saved.');
-					return savePage({status:pagName + "unavailable"});
+					alert('FL.server.savePage Error: pagName=' + pagName + ' unavailable to be saved. Please check getPageNo()');
+					return savePageCB({status:pagName + " is unavailable"});
 				}
-			},
+			},			
 			restorePage: function(pagName,savePageCB) {
-				alert("FL.server.restorePage() -->");
+				// alert("FL.server.restorePage() -->");
 				var htmlContent = null;
 				var pagNo = getPageNo(pagName);
 				if (pagNo){
@@ -594,7 +599,7 @@
 							return savePageCB(false);
 						}
 						console.log("exit from restorePage with success -->"+JSON.stringify(data));
-						return savePageCB(null);
+						return savePageCB(null,data);
 					});
 				}else{
 					alert('FL.server.savePage Error: pagName=' + pagName + ' unavailable to be restored.');

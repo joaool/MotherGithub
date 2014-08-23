@@ -105,19 +105,6 @@ FL["menu"] = (function(){//name space FL.menu
 		}
 		return {order:0,html:htmlStr};
 	};
-	// var xgetMenuTag = function(path){ // return the content after the last "/" disregarding a terminal "/"
-	// 	var menuTag = path.substring(path.lastIndexOf("/"));
-	// 	var pos = null;
-	// 	if(menuTag=="/"){//if path is "/" terminated. - menutag 
-	// 		var pathWithoutLast = path.substring(0,path.length-1);//removes last "/"
-	// 		pos=pathWithoutLast.lastIndexOf("/");
-	// 		menuTag = pathWithoutLast.substring(pos+1);
-	// 	}else{
-	// 		pos=path.lastIndexOf("/");
-	// 		menuTag = path.substring(pos+1);
-	// 	}
-	// 	return menuTag;
-	// };
 	var getMenuTag = function(path){ // return the content after the last "/" disregarding a terminal "/"
 		var pos = path.lastIndexOf("/");
 		if( path.length == (pos+1) ){
@@ -186,7 +173,7 @@ FL["menu"] = (function(){//name space FL.menu
 					// var columnsArr = utils.backGridColumnsExtractedFromDictionary(singular);
 					// utils.csvToStore(data.results.rows);
 					// csvStore.setGrid(singular);
- 					// 	utils.mountGridInCsvStore(columnsArr);
+					//	utils.mountGridInCsvStore(columnsArr);
 				}
 			}else{
 				alert("dispatchHref Error:FrameLink menu function "+ flMenuFunction + "has no arguments !!!");
@@ -243,7 +230,7 @@ FL["menu"] = (function(){//name space FL.menu
 				location.href = href;
 			}
 		}
-	};	
+	};
 	var refHandler = function(event) {
 		console.log("refHandler called by click inside id main-menu with target "+event.target.nodeName);
 		// alert("refHandler  called by click inside id main-menu with target "+event.target.nodeName+" and href="+event.target.href);
@@ -344,7 +331,7 @@ FL["menu"] = (function(){//name space FL.menu
 		}
 	};
 	var getParentIdOfId = function(menuArray,id) {//returns Id of the parent menuitem containing a given Id.If id is toplevel return -1
-		id =parseInt(id);
+		id =parseInt(id,10);
 		var retId = -1;
 		var isFoundElement=!(_.isUndefined(_.findWhere( menuArray,{id:id} )));//at top level ->true if found false if not found
 		console.log("isFoundElement="+isFoundElement);
@@ -460,7 +447,7 @@ FL["menu"] = (function(){//name space FL.menu
 		localStorage.storedMenu  = JSON.stringify(FL.menu.currentOptions.jsonMenu);
 		FL.menu.currentMenuObj.jsonMenu = FL.menu.currentOptions.jsonMenu;//HACK - because FL.menu.currentMenuObj.jsonMenu does not reflect the last menu update
 		FL.server.syncLocalStoreToServer();
-	};	
+	};
 	var insideContextMenu = function(event) {
 
 		// console.log("insideContextMenu was clicked ----->"+JSON.stringify(thizz.jsonMenu));
@@ -544,7 +531,7 @@ FL["menu"] = (function(){//name space FL.menu
 			is_menuHide = true;
 			// parentThis.menuRefresh(parentThis.settings.jsonMenu.menu);
 			FL.menu.currentMenuObj.menuRefresh(FL.menu.menuArray);
-			saveMenuToLocalAndServer();			
+			saveMenuToLocalAndServer();
 			console.log("******************************> insideContextMenu 'addSubmenuAfter' was the selection !");
 		}else if(contextSelection == "Create inside submenu") {//2nd level+ only. Makes an inside gate to a menu
 			onId(idBeingEdited,changeToSubmenuInside);
@@ -554,7 +541,7 @@ FL["menu"] = (function(){//name space FL.menu
 			is_menuHide = true;
 			// parentThis.menuRefresh(parentThis.settings.jsonMenu.menu);
 			FL.menu.currentMenuObj.menuRefresh(FL.menu.menuArray);
-			saveMenuToLocalAndServer();			
+			saveMenuToLocalAndServer();	
 			console.log("******************************> insideContextMenu 'changeToSubmenuInside' was the selection !");
 		}else if(contextSelection == "Remove this menu item") {//2nd level+ only
 			onId(idBeingEdited,removeSubmenu);
@@ -564,7 +551,7 @@ FL["menu"] = (function(){//name space FL.menu
 			is_menuHide = true;
 			// parentThis.menuRefresh(parentThis.settings.jsonMenu.menu);
 			FL.menu.currentMenuObj.menuRefresh(FL.menu.menuArray);
-			saveMenuToLocalAndServer();			
+			saveMenuToLocalAndServer();		
 			console.log("******************************> insideContextMenu 'removeSubmenu' was the selection !");
 		}else if(contextSelection == "Remove inside submenus") {//2nd level+ only
 			// var menuItem = menuFindById(parentThis.settings.jsonMenu.menu,idBeingEdited);
@@ -581,7 +568,7 @@ FL["menu"] = (function(){//name space FL.menu
 					is_menuHide = true;
 					// parentThis.menuRefresh(parentThis.settings.jsonMenu.menu);
 					FL.menu.currentMenuObj.menuRefresh(FL.menu.menuArray);
-					saveMenuToLocalAndServer();	
+					saveMenuToLocalAndServer();
 					$.Topic( 'inMenuEdition' ).publish( false );
 				},{title:"DELETE OPERATION",button1:"Do not delete",button2:"OK to delete",type:'type-danger',cssButton2:"btn-danger"});
 			}
@@ -601,7 +588,7 @@ FL["menu"] = (function(){//name space FL.menu
 					is_menuHide = true;
 					// parentThis.menuRefresh(parentThis.settings.jsonMenu.menu);
 					FL.menu.currentMenuObj.menuRefresh(FL.menu.menuArray);
-					saveMenuToLocalAndServer();	
+					saveMenuToLocalAndServer();
 					$.Topic( 'inMenuEdition' ).publish( false );
 				},{title:"TOP MENU DELETE OPERATION !",button1:"Do not delete",button2:"OK to delete",type:'type-danger',cssButton2:"btn-danger"});
 			}else{//menu without subitems no confirmation required - removes immediately
@@ -644,14 +631,14 @@ FL["menu"] = (function(){//name space FL.menu
 	car.prototype.phrase = function(){ //do not use var HERE !!!
 		return this.model +" of "+this.year;
 	};
-	car.prototype.update = function(model){ 
+	car.prototype.update = function(model){
 		this.model = model;
-	};	
+	};
 	var menu = function(options){//options was menuSettings
 		var options = _.extend( {jsonMenu:null,initialMenu:null,editable:false},options);
 		FL.menu.currentOptions = options;
 		this.jsonMenu = options.jsonMenu;
-		this.initialMenu = options.initialMenu;//welcome text - content to display initially bellow menu
+		this.initialMenu = options.initialMenu;//welcome text - content to display initially bellow menu ex:"_home"
 		this.editable = options.editable;
 		this.is_menuHide = true;//To control if menu is hidding or not
 		this.is_contextOn = false;//informs if contextmenu is On/Off
@@ -684,7 +671,19 @@ FL["menu"] = (function(){//name space FL.menu
 		}
 		$menu.smartmenus('refresh');//necessary to show submenus if dom is changed
 		if(this.initialMenu){ //if initialMenu (welcome page) is defined 
-			loadInternalPage(this.initialMenu);
+			//if variable FL.menu.homeMemory != null ->displays it...
+			if(FL.menu.homeMemory) {//places html string in id="_placeHolder"
+				var $placeHolder = $("#_placeHolder");
+				if (!$placeHolder.length ) {
+					alert("FrameLink Menus Error. Undefined _placeHolder in DOM");
+				}else{//"#_placeHolder" exists in DOM
+					console.log("menu.prototype.menuRefresh load memory home page -> the id placeHolder exists and homeMemory will be displayed");
+					$placeHolder.empty();//removes the child elements in placeHolder.
+					$placeHolder.append(FL.menu.homeMemory);
+				}
+			}else{
+				loadInternalPage(this.initialMenu);
+			}
 		}
 		var k=0;
 		// var settings = this.settings; //to make settings accessible to anonimous function...
@@ -737,7 +736,7 @@ FL["menu"] = (function(){//name space FL.menu
 			// return FL.menu.is_menuHide;//submenu will not be hidden if is_menuHide=false
 			return is_menuHide;//submenu will not be hidden if is_menuHide=false
 		});
-		var $mainMenu = $("#menuContainer");	
+		var $mainMenu = $("#menuContainer");
 		// var thiz = this;
 		$mainMenu.on("contextmenu", function (e) {//Set of DOM elements #menuContainer got a click handler
 			console.log("contextmenu was clicked inside contextmenu event with thiz.editable="+thiz.editable);
@@ -772,8 +771,11 @@ FL["menu"] = (function(){//name space FL.menu
 		// console.log("set editable after ->this.editable="+this.editable +" ->" + this.test);
 	};
 	menu.prototype.updateJsonMenu = function(jsonMenu) {
-		// console.log("set editable was called inside object !!!! with status="+status +" before ->this.editable="+this.editable +" ->" + this.test);
 		this.jsonMenu = jsonMenu;
+		this.menuRefresh();
+	};
+	menu.prototype.updateInitialMenu = function(initialMenu) {
+		this.initialMenu = initialMenu;//welcome text - content to display initially bellow menu ex:"_home"
 		this.menuRefresh();
 	};
 	menu.prototype.createMenuEntryLastTop = function(optionTitle,uri) {//adds optionTitle with uri to the last position on top menu
@@ -788,12 +790,13 @@ FL["menu"] = (function(){//name space FL.menu
 		menuArray: null,
 		currentOptions: null,
 		currentMenuObj: null,
+		homeMemory: null,
 		createCar: function(model,year) {
 			return new car(model,year);
 		},
 		createMenu: function(options) {
 			//ex:var myMenu = new FL.menu({jsonMenu:FL.clone(oMenu),initialMenu:"_home",editable:true});
-			var newMenuObj = new menu(options);	
+			var newMenuObj = new menu(options);
 			console.log("createMenu ->begin");
 			$.Topic( 'signInDone' ).subscribe( FL.menu.topicSetEditable );
 			$.Topic( 'jsonMenuUpdate' ).subscribe( FL.menu.topicUpdateJsonMenu );
@@ -833,14 +836,14 @@ FL["menu"] = (function(){//name space FL.menu
 			// FL.menu.currentMenuObj.X_createMenuEntryLastTop(optionTitle,singular);
 
 			var uri ="javascript:FL.links.setDefaultGrid('" + singular + "')";
-		 		//"javascript:FL.links.setDefaultGrid('Order')"
+			//"javascript:FL.links.setDefaultGrid('Order')"
 
 			FL.menu.currentMenuObj.createMenuEntryLastTop(optionTitle,uri);
 
 			console.log("======================================================================");
 			// console.log(FL.menu.currentMenuObj.toString());
 			// alert("FL.menu.topicCreateGrid with optionTitle="+optionTitle+ " singular="+singular);
-		},						
+		},
 		set: function(x) {
 			alert("FL.menu.test() -->"+x);
 		},
