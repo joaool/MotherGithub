@@ -42,14 +42,33 @@
 			alert("Fl.link.pageEditor call with:\npage=" + xPage + "\nconnectionString="+connectionString);
 				// "uri":"./page_editor.html?d=joao"
 				// location.href = "./page_editor.html?d=joao";
-				localStorage.connection = connectionString;
+				//localStorage.connection = connectionString; //this was already done in FL.server.connectServer()
 				FL.server.disconnect();
 				var style = localStorage.style;
 				var font = localStorage.fontFamily;
 				// location.href = "./page_editor.html?connectionString="+connectionString+"#page=" + xPage + "#style=" + style + "#font="+font;
 				// location.href = "./page_editor.html?connectionString="+connectionString+"#page=" + xPage + "#style=" + style + "#font="+font;
-				window.open("./page_editor.html?connectionString="+connectionString+"#page=" + xPage + "#style=" + style + "#font="+font, 'TheWindow');
+				var child = window.open("./page_editor.html?connectionString="+connectionString+"#page=" + xPage + "#style=" + style + "#font="+font, 'TheWindow');
+				
+				var timer = setInterval(checkChild, 500);
+				function checkChild() {
+					if (child.closed) {
+						alert("FrameLink Page Editor was closed \nconnectionString="+connectionString);
+						clearInterval(timer);
+						//restore home page
+						FL.server.restorePageFromConnectionString("home",connectionString,function(err,htmlStr){
+							if (err){
+								alert('FLmenulinks2.js after closing page_editor window ERROR restoring home page err=' + JSON.stringify(err));
+							}
+							FL.menu.homeMemory = htmlStr; //this means that this will be displayed
+							FL.menu.currentMenuObj.menuRefresh();
+						});
+					}
+				}
+
 				// document.getElementById('TheForm').submit();
+
+				// alert("this an alert after calling PageEditor");
 			},
 			setDefaultGrid: function(entityName) {//call with menu key "uri": "javascript:FL.links.setDefaultGrid('JOJO')"
 				if(!FL.server.offline){

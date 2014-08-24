@@ -143,6 +143,7 @@ var FL = FL || {};
 	// return;
 	
 	// var FL = FL || {};
+	alert("FLMain BEGINS !");
 	var testObject = localStorage.testObject;
 	var z = null;
 	if(testObject)

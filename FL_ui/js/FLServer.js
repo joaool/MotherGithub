@@ -587,7 +587,7 @@
 					return savePageCB({status:pagName + " is unavailable"});
 				}
 			},			
-			restorePage: function(pagName,savePageCB) {
+			restorePage: function(pagName,restorePageCB) {
 				// alert("FL.server.restorePage() -->");
 				var htmlContent = null;
 				var pagNo = getPageNo(pagName);
@@ -596,19 +596,41 @@
 					fd.findOne("43",{"query":{"_id":pagNo}}, function(err, data){
 						if (err){
 							alert('FL.server.restorePage: err=' + JSON.stringify(err));
-							return savePageCB(false);
+							return restorePageCB(false);
 						}
 						console.log("exit from restorePage with success -->"+JSON.stringify(data));
-						return savePageCB(null,data);
+						return restorePageCB(null,data);
 					});
 				}else{
-					alert('FL.server.savePage Error: pagName=' + pagName + ' unavailable to be restored.');
-					return savePageCB({status:pagName + "unavailable"});
+					alert('FL.server.restorePage Error: pagName=' + pagName + ' unavailable to be restored.');
+					return restorePageCB({status:pagName + "unavailable"});
 				}
 			},		
+			restorePageFromConnectionString: function(pagName,connectionString,restorePageFromConnectionStringCB) {
+				FL.server.fa = new FL.server.fl.app();
+				var myApp = JSON.parse(connectionString);
+				FL.server.fl.setTraceClient(2);
+				FL.server.fa.connect(myApp, function(err2, data2){
+					if (err2){
+						localStorage.connection = null;
+						alert('FL.server.restorePageFromConnectionString: reconnecting ERROR err=' + JSON.stringify(err2));
+						return restorePageFromConnectionStringCB(false);
+					}
+					FL.server.offline = false;
+					FL.server.restorePage(pagName, function(err,data){
+						if (err){
+							alert('FL.server.restorePageFromConnectionString: after reconnect ERROR: err=' + JSON.stringify(err));
+							return restorePageFromConnectionStringCB(false);
+						}
+						// alert('FL.server.restorePageFromConnectionString: after connect: PAGE RESTORED SUCCESSFULLY data=' + JSON.stringify(data));
+						var htmlStr = data.d.html;	
+						return restorePageFromConnectionStringCB(null,htmlStr);
+					});
+				});
+			},
 			testFunc: function(x) {
 				alert("FL.server.test() -->"+x);
-			}
+			}			
 		};
 	})();
 // });

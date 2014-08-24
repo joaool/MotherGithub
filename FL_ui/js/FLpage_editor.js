@@ -51,42 +51,45 @@ var FL = FL || {};
 			var font = FL.common.getTag(fullUrl,"font","#");//FL.domain is globally defined - the last # is disregarded
 			$("#pageTitle").empty();
 			$("#pageTitle").text("FrameLink - editing " + page +" page");
-			// alert("Test getTag(fullUrl,'connectionString','#')="+FL.common.getTag(fullUrl,'connectionString','#'));
-			// alert("Test getTag(fullUrl,'page','#')="+FL.common.getTag(fullUrl,'page','#'));
-			// alert("Test getTag(fullUrl,'style','#')="+FL.common.getTag(fullUrl,'style','#'));
-			// alert("Test getTag(fullUrl,'font','#')="+FL.common.getTag(fullUrl,'font','#'));
-
 		
-			FL.server.fa = new FL.server.fl.app();
-			var myApp = JSON.parse(connectionString);
-			FL.server.fl.setTraceClient(2);
-			FL.server.fa.connect(myApp, function(err2, data2){
-				if (err2){
-					localStorage.connection = null;
-					alert('FLpage_editor.js connect: err=' + JSON.stringify(err2));
-					return;
+			// FL.server.fa = new FL.server.fl.app();
+			// var myApp = JSON.parse(connectionString);
+			// FL.server.fl.setTraceClient(2);
+			// FL.server.fa.connect(myApp, function(err2, data2){
+			// 	if (err2){
+			// 		localStorage.connection = null;
+			// 		alert('FLpage_editor.js connect: err=' + JSON.stringify(err2));
+			// 		return;
+			// 	}
+			// 	FL.server.offline = false;
+			// 	FL.server.restorePage(page, function(err,data){
+			// 		if (err){
+			// 			alert('FLpage_editor.js FL.server.restorePage after connect: err=' + JSON.stringify(err));
+			// 			return;
+			// 		}
+			// 		alert('FLpage_editor.js FL.server.restorePage after connect: PAGE RESTORED SUCCESSFULLY data=' + JSON.stringify(data));
+			// 		var htmlStr = data.d.html;
+			// 		// localStorage.connection = JSON.stringify(myApp);
+			// 		// var htmlStr="<div class='jumbotron'>" + 
+			// 		// 				"<h1>FrameLink Platform</h1>" + 
+			// 		// 				"<p>This site has no functionality as it is. <strong>Sign In</strong> as a designer (upper right corner) to transform this site into the backend of your business. No need for email/password initially. Introduce them later on, to continue the design or give access to someone else.</p><p><strong>'Tour'</strong> will give you an idea how to redesign this site into your business information system.</p>" +
+			// 		// 				"<p>" + 
+			// 		// 					"<a href='#' class='btn btn-primary btn-large' onclick='FL.showTourStep0 = true; FL.tourIn();'>Tour</a>" +
+			// 		// 				"</p>" + 
+			// 		// 			"</div>";
+			// 		editPage(page,htmlStr);
+			// 	});
+			// 	// return connectServerCB(null);
+			// });
+
+			alert("before calling FL.server.restorePageFromConnectionString()");
+			FL.server.restorePageFromConnectionString(page,connectionString,function(err,htmlStr){
+				if (err){
+					alert('FLpage_editor.js FL.server.restorePageFromConnectionString() after ERROR restoring ' + page +' page err=' + JSON.stringify(err));
 				}
-				FL.server.offline = false;
-				FL.server.restorePage(page, function(err,data){
-					if (err){
-						alert('FLpage_editor.js FL.server.restorePage after connect: err=' + JSON.stringify(err));
-						return;
-					}
-					alert('FLpage_editor.js FL.server.restorePage after connect: PAGE RESTORED SUCCESSFULLY data=' + JSON.stringify(data));
-					var htmlStr = data.d.html;
-					// localStorage.connection = JSON.stringify(myApp);
-					// var htmlStr="<div class='jumbotron'>" + 
-					// 				"<h1>FrameLink Platform</h1>" + 
-					// 				"<p>This site has no functionality as it is. <strong>Sign In</strong> as a designer (upper right corner) to transform this site into the backend of your business. No need for email/password initially. Introduce them later on, to continue the design or give access to someone else.</p><p><strong>'Tour'</strong> will give you an idea how to redesign this site into your business information system.</p>" +
-					// 				"<p>" + 
-					// 					"<a href='#' class='btn btn-primary btn-large' onclick='FL.showTourStep0 = true; FL.tourIn();'>Tour</a>" +
-					// 				"</p>" + 
-					// 			"</div>";
-					editPage(page,htmlStr);
-				});
-				// return connectServerCB(null);
+				// alert("STEP 0");
+				editPage(page,htmlStr);
 			});
-			
 			
 			/*
 			//Things to do:
@@ -185,7 +188,7 @@ var FL = FL || {};
 		e = e || window.event;
 		if (e) {
 			console.log("disconnect here");
-			FL.server.diconnect();
+			FL.server.disconnect();
 			e.returnValue = 'test returnValue...';
 		}
 		return 'You are exiting FrameLink page editor...';
