@@ -153,7 +153,28 @@ jQuery(document).ready(function($){
 									return loadAppDataForSignInUserCB(null,data);
 								}
 								alert('FLLoadCss.js loadAppDataForSignInUser FL.server.restorePage : PAGE RESTORED SUCCESSFULLY data=' + JSON.stringify(restData));
-								var htmlStr = restData.d.html;
+								var htmlStr = null;
+								if(restData){
+									htmlStr = restData.d.html;
+								}else{//this means that there is no home page available in server. For instance, after a mongo drop
+									htmlStr="<div class='jumbotron'>" +
+												"<h1>zzFrameLink Platform</h1>" +
+												"<p>This site has no functionality as it is. <strong>Sign In</strong> as a designer (upper right corner) to transform this site into the backend of your business. No need for email/password initially. Introduce them later on, to continue the design or give access to someone else.</p><p><strong>'Tour'</strong> will give you an idea how to redesign this site into your business information system.</p>" +
+												"<p>" +
+													"<a href='#' class='btn btn-primary btn-large' onclick='FL.showTourStep0 = true; FL.tourIn();'>Tour</a>" +
+												"</p>" +
+											"</div>";
+									var restData = {d:htmlStr};
+									FL.server.savePage("home",htmlStr,function(err){//"43" must exist
+										if (err){
+											alert('FL_pageEditor FL.server.savePage: ERROR err=' + JSON.stringify(err));
+										}
+										// alert('FL_pageEditor FL.server.savePage: page was successfully saved !!!');
+										// FL.server.disconnect();
+										// closeWindows();
+									});
+								}
+								FL.dd.displayEntities();
 								//we may move on loading the welcome page
 								return loadAppDataForSignInUserCB(null,data,restData);
 							});
@@ -326,37 +347,23 @@ jQuery(document).ready(function($){
 			//if is_LogIn = true =>soft reset - this method recovers style and fontFamily from  localStorage and sets it on use
 			//if is_LogIn = false =>hard reset - this method forces currentStyle = "readable" and currentFontFamily = "helvetica" settinmg it to use
 			var lastStyleStr = localStorage.style;// Retrieve last saved style ex.red or spacelab
-			var lastFontFamilyStr = localStorage.fontFamily;// Retrieve last saved fontFamily ex.impact or georgia
+			var lastFontFamilyStr = localStorage.fontFamily;// Retrieve last saved fontFamily ex.impact or georgia	
 			var	currentStyle = "readable";//default style
 			var	currentFontFamily = "helvetica";//default font
-			if (!is_logIn) {//a hard reset - the factory defaults will be used 
-				// lastStyleStr = null;//to force defaults
-				// lastFontFamilyStr = null;//to force defaults
-				loadCSS("FL" + currentStyle + ".css");//the default
-				// loadCSS("FLfont_" + currentFontFamily + ".css");//the default
-			}else{//a soft reset recovering style and font from localStorage
-				if(lastStyleStr) 
+			if (is_logIn) {//a soft reset - the content from local storage will be used. Otherwise force default values
+				if(lastStyleStr)
 					currentStyle = lastStyleStr;
-				var fileCss = "FL" + currentStyle + ".css";
-				loadCSS(fileCss);
 				if(lastFontFamilyStr)
 					currentFontFamily = lastFontFamilyStr;
-				var fileCss = "FLfont_" + currentFontFamily + ".css";
-				loadCSS(fileCss);
 			}
+			FL.common.setStyleAndFont(currentStyle,currentFontFamily);
 			localStorage.style = currentStyle;
-			localStorage.fontFamily = currentFontFamily; 
+			localStorage.fontFamily = currentFontFamily;
 			FL.currentStyle = currentStyle; //to be compatible with touring - before code review
 			FL.currentFontFamily = currentFontFamily; //to be compatible with touring - before code review
 			$("#_css").text(FL.currentStyle);
 			$.Topic( 'styleChange' ).publish( FL.currentStyle );//broadcast that will be received by FL.tour
 			$.Topic( 'fontChange' ).publish( FL.currentFontFamily );//broadcast that will be received by FL.tour
-		};	
-		var loadCSS = function(href) {
-			var cssLink = $("<link rel='stylesheet' type='text/css' href='FL_ui/css/"+href+"'>");
-			//    <link href="../bootstrap/css/cerulean.css" rel="stylesheet">
-			$("head").append(cssLink);
-			// $('#_css').editable("activate");
 		};
 		return{
 			fl: new flMain(),//FL.login.fl

@@ -102,18 +102,40 @@ $(function () {
     var myMenu1 = FL.menu.createMenu({jsonMenu:oMenu,initialMenu:"_home",editable:false});
     console.log(myMenu1.toString());
     ok( myMenu1.jsonMenu.menu[1].title == "MenuB/T1","Getting menu title 'MenuB/T1' (at root)" );//4
-    ok( myMenu1.jsonMenu.menu[1].menu[1].title == "MenuB/T2-II","Getting menu title 'MenuB/T2-II' at second level" );
+    ok( myMenu1.jsonMenu.menu[1].menu[1].title == "MenuB/T2-II","Getting menu title 'MenuB/T2-II' at second level" );//5
     myMenu1.jsonMenu.menu[1].menu[1].title = "Joachim";
-    ok( myMenu1.jsonMenu.menu[1].menu[1].title == "Joachim","Setting menu 'MenuB/T2-II' to 'Joachim'");
+    ok( myMenu1.jsonMenu.menu[1].menu[1].title == "Joachim","Setting menu 'MenuB/T2-II' to 'Joachim'");//6
     myMenu1.test_Add_Id_Top();
-    ok( myMenu1.jsonMenu.menu[1].menu[1].id == 3,"testAdd_Id_Top placed id=3 in menu 'Joachim'");
-    ok( myMenu1.jsonMenu.menu[2].id == 4,"testAdd_Id_Top placed id=4 in last menu");
-    ok( myMenu1.jsonMenu.menu[1].menu[1].top === false,"testAdd_Id_Top placed top = false in menu 'Joachim'");
-    ok( myMenu1.jsonMenu.menu[2].top === true,"testAdd_Id_Top placed top = true in last menu");
+    ok( myMenu1.jsonMenu.menu[1].menu[1].id == 3,"testAdd_Id_Top placed id=3 in menu 'Joachim'");//7
+    ok( myMenu1.jsonMenu.menu[2].id == 4,"testAdd_Id_Top placed id=4 in last menu");//8
+    ok( myMenu1.jsonMenu.menu[1].menu[1].top === false,"testAdd_Id_Top placed top = false in menu 'Joachim'");//9
+    ok( myMenu1.jsonMenu.menu[2].top === true,"testAdd_Id_Top placed top = true in last menu");//10
     var oEl = myMenu1.test_menuFindById(4);//previous myMenu1.test_menuFindById(oMenu.menu,4);
-    deepEqual(myMenu1.jsonMenu.menu[2],oEl,"menuFindById() got last menu element");
+    deepEqual(myMenu1.jsonMenu.menu[2],oEl,"menuFindById() got last menu element");//11
     oEl = myMenu1.test_menuFindById(3);
-    deepEqual(myMenu1.jsonMenu.menu[1].menu[1],oEl,"menuFindById() got menu element 'Joachim'");
+    deepEqual(myMenu1.jsonMenu.menu[1].menu[1],oEl,"menuFindById() got menu element 'Joachim'");//12
+    oEl = myMenu1.test_menuFindById(0);
+    deepEqual(myMenu1.jsonMenu.menu[0],oEl,"menuFindById(0) got first menu element");//13
+    oEl = myMenu1.test_menuFindById(10);
+    ok(oEl === null,"menuFindById(10) returned null because Id=10 does not exist");//14
+    oMenu = {
+      "menu" : [
+          {
+              "title" : "MenuA/T1",//0
+              "uri":"http://www.microsoft.com"
+          },
+          {
+              "title" : "MenuB/T1",//4
+              "uri":"#"
+          }
+      ]
+    };
+    myMenu1 = FL.menu.createMenu({jsonMenu:oMenu,initialMenu:"_home",editable:false});
+    oEl = myMenu1.test_menuFindById(0);
+    deepEqual(myMenu1.jsonMenu.menu[0],oEl,"menuFindById(0) got first menu element in the case of 2 flat elements");//15
+    oEl = myMenu1.test_menuFindById("1");//same result for 1 or "1"
+    deepEqual(myMenu1.jsonMenu.menu[1],oEl,"menuFindById(1) got first menu element in the case of 2 flat elements");//16
+
 
     /*
     var myMenu1 = new FL.menu({jsonMenu:oMenu,initialMenu:"_home",editable:false});
@@ -473,7 +495,34 @@ $(function () {
   //     ok($("#repaymentAmount").length != 0, "total repayment amount output element exists");
   //     ok($("#totalToRepay").length != 0, "total amount to repay output button element exists");
   // });
+  test("util2 tests", function () { 
+    //typeOf
+    var xVar = "abc";
+    var success = utils.typeOf(xVar);
+    ok(success == "string" , "FL.util.typeOf('abc') -->'string'" );//1
+    xVar = 123;
+    success = utils.typeOf(xVar);
+    ok(success == "number" , "FL.util.typeOf(123) -->'number'" );//2
+    xVar = true;
+    success = utils.typeOf(xVar);
+    ok(success == "boolean" , "FL.util.typeOf(true) -->'boolean'" );//3
+    xVar = {key1:"abc"};
+    success = utils.typeOf(xVar);
+    ok(success == "object" , "FL.util.typeOf({key1:'abc'}) -->'object'" );//4
+    xVar = [1,2,3];
+    success = utils.typeOf(xVar);
+    ok(success == "array" , "FL.util.typeOf([1,2,3]) -->'array'");//5
+    xVar = "abc@link.com";
+    success = utils.typeOf(xVar);
+    ok(success == "email" , "FL.util.typeOf('abc@link.com') -->'email'");//6
+    xVar = new Date();
+    success = utils.typeOf(xVar);
+    ok(success == "date" , "FL.util.typeOf(new Date()) -->'date'");//6
+    var foo;
+    success = utils.typeOf(foo);
+    ok(success == "undefined" , "FL.util.typeOf(foo) foo is undefined -->'undefined'");//6
 
+  });
   test("client Dictionary tests", function () { //one test can have several assertions
     //client
     var success = FL.dd.createEntity("client","company we may invoice");
@@ -512,7 +561,7 @@ $(function () {
     entityCN = FL.dd.getCEntity("patolinas");
     ok(entityCN === null, "FL.dd.getCEntity ->Compressed code for patolinas is null - not existing");
     
-    FL.dd.addAttribute("order","shipped","expedition status","Shipped","boolean",null);
+    FL.dd.addAttribute("order","shipped","expedition status","Shipped","boolean","checkbox",null);
     actual = FL.dd.getEntityBySingular("order");
     ok(actual.attributes.length == 2, "Order has 2 attributes");
 
@@ -543,7 +592,7 @@ $(function () {
     actual = FL.dd.getFieldCompressedName("order","shipped");
     ok(actual === "01", "FL.dd.getFieldCompressedName -->compressed name for shipped='01'");//30
 
-    FL.dd.addAttribute("order","product","unique order item","product","string",null);
+    FL.dd.addAttribute("order","product","unique order item","product","string","textbox",null);
     actual = FL.dd.getFieldCompressedName("order","product");
     ok(actual === "02", "FL.dd.getFieldCompressedName -->compressed name is '02'");//31
     actual = FL.dd.isEntityInLocalDictionary("order");
@@ -705,8 +754,8 @@ $(function () {
     //--------------------- Test Setup ----------------------------------------
     //We need at least one entity in local dictionary
     var success = FL.dd.createEntity("order","client's product request");
-    FL.dd.addAttribute("order","shipped","expedition status","Shipped","boolean",null);
-    FL.dd.addAttribute("order","product","unique order item","product","string",null);
+    FL.dd.addAttribute("order","shipped","expedition status","Shipped","boolean","checkbox",null);
+    FL.dd.addAttribute("order","product","unique order item","product","string","textbox",null);
     //forcing compressed field names
     FL.dd.setFieldCompressedName("order","id","62");
     FL.dd.setFieldCompressedName("order","shipped","63");

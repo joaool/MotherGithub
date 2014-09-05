@@ -63,8 +63,7 @@ mixpanel.init("19ada1cb259cc3272c67085eb1bf03fc");</script><!-- end Mixpanel -->
     <script type="text/javascript" src="FL_ui/js/FLjquery.slidePanel.js"></script>
     <link rel="stylesheet" href="FL_ui/css/font-awesome.min.css">
     
-	<!-- <script src="FL_ui/js/underscore-min.js"></script> -->
-	<script src="FL_ui/js/underscore.js"></script>
+	<script src="FL_ui/js/underscore-min.js"></script>
 	<!-- <script src="js/jquery-1.11.1.min.js"></script> -->
 	<script src="FL_ui/js/backbone-min.js"></script>
 	<!-- <script src="js/bootstrap.min.js"></script> -->
@@ -91,66 +90,6 @@ mixpanel.init("19ada1cb259cc3272c67085eb1bf03fc");</script><!-- end Mixpanel -->
 	-->  	
 </head>
 <style>
-	.modal-header-success {
-	    color:#fff;
-	    padding:9px 15px;
-	    border-bottom:1px solid #eee;
-	    background-color: #5cb85c;
-	    -webkit-border-top-left-radius: 5px;
-	    -webkit-border-top-right-radius: 5px;
-	    -moz-border-radius-topleft: 5px;
-	    -moz-border-radius-topright: 5px;
-	     border-top-left-radius: 5px;
-	     border-top-right-radius: 5px;
-	}
-	.modal-header-warning {
-	    color:#fff;
-	    padding:9px 15px;
-	    border-bottom:1px solid #eee;
-	    background-color: #f0ad4e;
-	    -webkit-border-top-left-radius: 5px;
-	    -webkit-border-top-right-radius: 5px;
-	    -moz-border-radius-topleft: 5px;
-	    -moz-border-radius-topright: 5px;
-	     border-top-left-radius: 5px;
-	     border-top-right-radius: 5px;
-	}
-	.modal-header-danger {
-	    color:#fff;
-	    padding:9px 15px;
-	    border-bottom:1px solid #eee;
-	    background-color: #d9534f;
-	    -webkit-border-top-left-radius: 5px;
-	    -webkit-border-top-right-radius: 5px;
-	    -moz-border-radius-topleft: 5px;
-	    -moz-border-radius-topright: 5px;
-	     border-top-left-radius: 5px;
-	     border-top-right-radius: 5px;
-	}
-	.modal-header-info {
-	    color:#fff;
-	    padding:9px 15px;
-	    border-bottom:1px solid #eee;
-	    background-color: #5bc0de;
-	    -webkit-border-top-left-radius: 5px;
-	    -webkit-border-top-right-radius: 5px;
-	    -moz-border-radius-topleft: 5px;
-	    -moz-border-radius-topright: 5px;
-	     border-top-left-radius: 5px;
-	     border-top-right-radius: 5px;
-	}
-	.modal-header-primary {
-	    color:#fff;
-	    padding:9px 15px;
-	    border-bottom:1px solid #eee;
-	    background-color: #428bca;
-	    -webkit-border-top-left-radius: 5px;
-	    -webkit-border-top-right-radius: 5px;
-	    -moz-border-radius-topleft: 5px;
-	    -moz-border-radius-topright: 5px;
-	     border-top-left-radius: 5px;
-	     border-top-right-radius: 5px;
-	}
 	/* Social proof buttons from GitHub & Twitter for internal pages*/
 	.bs-docs-social {
 	  padding: 15px 0;
@@ -358,10 +297,6 @@ mixpanel.init("19ada1cb259cc3272c67085eb1bf03fc");</script><!-- end Mixpanel -->
 	  /*background-color: #D6F5F5;*/
 	  width:50px;
 	}
-	div ximg {/* FrameLink specific to adjust logo size line 638*/
-	  max-height: 218px;
-	  width:auto;
-	}	
 /*	.backgrid .backgridId {
 	  background-color: green;
 	  width:300px;
@@ -370,121 +305,52 @@ mixpanel.init("19ada1cb259cc3272c67085eb1bf03fc");</script><!-- end Mixpanel -->
     	margin-top:-100px;
     }*/
 </style>
-    <script id="_dictEditEntityTemplate" type="text/template"> 
-        <div class="dictTemplate" style="margin-top:0px;">
-            <form>
-                <div class="row">
-                    <div class="col-xs-12" >
-                        <div class="form-group">
-                            <label class="control-label" for="_dictEditEntityTemplate_entityName">Please give a name common to every single line...</label>
-                            <div class="input-group" style="line-height:0px;">
-                                <span class="input-group-addon">Each line is a single:</span>
-                                <input type="text" class="form-control" id="_dictEditEntityTemplate_entityName" name="entityName" placeholder="Ex. client, supplier, member, partner..." value="<%= masterDetailItems.master.entityName %>" onkeyup="FL.slidePanels.dictTemplateChangeWhatIsLabel(this.form)">
-                            </div>
-                            <label class="control-label" for="_dictEditEntityTemplate_entityDescription" id="_dictEditEntityTemplate_whatIsLabel" >What is a </label>
-                            <div class="input-group" style="line-height:0px;">
-                                <span class="input-group-addon">Description:</span>
-                                <textarea class="form-control" id="_dictEditEntityTemplate_entityDescription" name="entityDescription" onkeyup="FL.slidePanels.dictTemplateChangeDescription(this.form)" rows="3"><%= masterDetailItems.master.entityDescription %></textarea>
-                            </div>                      
-                            <div>
-                                <h4 id="_dictEditEntityTemplate_plural"></h4>
-                            </div>
-                            <div class="table-responsive"> 
-                                <table class="table table-bordered">
-                                    <thead>
-                                        <% _.each(masterDetailItems.detailHeader, function(item,index) { %>
-                                            <th><%= item %></th> 
-                                        <% }); %>                                     
-                                    </thead>
-                                    <tbody>
-                                        <% _.each(masterDetailItems.detail, function(item,index) { %> 
-                                             <% var xId = "_dictEditEntityTemplate__f"+(index+1) %><!-- create more variables -->
-                                            <tr>
-                                                <!-- use variables -->
-                                                <td><%= index+1 %></td>
-                        <td><input type="text" class="form-control" id="<%= xId %>_attribute" name="attr<%= index+1 %>" value="<%= item.attribute %>" onkeyup="FL.slidePanels.dictTemplateAttributeValidation(this.form,<%= index+1 %>)"></td>
-                        <td><textarea rows="2" id="<%= xId %>_description" onkeyup="FL.slidePanels.dictTemplateAttributeValidation(this.form,<%= index+1 %>)"><%= item.description %></textarea></td>
-                                                 <td id="<%= xId %>_statement" ><%= item.statement %></td>
-                                            </tr>
-                                        <% }); %>
-                                     </tbody>    
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </form>
-        </div>
-    </script>    
-
-	<script id="XdictTemplateEditTable" type="text/template"> 
-	    <div class="dictTemplate" style="margin-top:0px;">
-	        <form>
-	            <div class="row">
-	                <div class="col-xs-12" >
-	                    <div class="form-group">
-	                        <label class="control-label" for="_dictTemplate_singular">Please give a name common to every single line...</label>
-	                        <div class="input-group" style="line-height:0px;">
-	                            <span class="input-group-addon">Each line is a single:</span>
-	                            <input type="text" class="form-control" id="_dictTemplate_singular" name="singular" placeholder="Ex. client, supplier, member, partner..." onkeyup="FL.slidePanels.dictTemplateChangeWhatIsLabel(this.form)">
-	                        </div>
-	                        <label class="control-label" for="_dictTemplate_singularDescription" id="_dictTemplate_whatIsLabel" >What is a </label>
-	                        <div class="input-group" style="line-height:0px;">
-	                            <span class="input-group-addon">Description:</span>
-	                            <textarea class="form-control" id="_dictTemplate_singularDescription" name="description" onkeyup="FL.slidePanels.dictTemplateChangeDescription(this.form)" rows="3"></textarea>
-	                        </div>                      
-	                        <div>
-	                            <h4 id="_dictTemplate_plural"></h4>
-	                        </div>
-	                        <div class="table-responsive"> 
-	                            <table class="table table-bordered">
-	                                <thead>
-	                                    <tr>
-	                                        <th>#</th>
-	                                        <th>Attribute</th>
-	                                        <th>what is it ?</th>
-	                                        <th>Statement to validate</th>
-	                                    </tr>
-	                                </thead>
-	                                <tbody>
-	                                    <% _.each(items, function(item,index) { %> 
-	                                         <% var xId = "_dictTemplate_field"+(index+1) %><!-- create more variables -->
-	                                        <tr>
-	                                            <!-- use variables -->
-	                                            <td><%= index+1 %></td>
-	                    <td><input type="text" class="form-control" id="<%= xId %>_attr" name="attr<%= index+1 %>" value="<%= item.attribute %>" onkeyup="FL.slidePanels.dictTemplateAttributeValidation(this.form,<%= index+1 %>)"></td>
-	                    <td><textarea rows="2" id="<%= xId %>_descr" onkeyup="FL.slidePanels.dictTemplateAttributeValidation(this.form,<%= index+1 %>)"><%= item.description %></textarea></td>
-	                                            <td id="stat<%= index+1 %>" ><%= item.statement %></td>
-	                                        </tr>
-	                                    <% }); %>
-	                                 </tbody>    
-	                            </table>
-	                        </div>
-	                    </div>
-	                </div>
-	            </div>
-	        </form>
-	    </div>
-	</script>    
-	<script id="loginTemplate" type="text/template"> 
-		<div class="loginExample" style="margin-top:-100px;">
-			<form>
-				<div class="row">
-					<div class="col-xs-12" >
+<script id="dictTemplate" type="text/template"> 
+	<div class="dictTemplate" style="margin-top:-100px;">
+		<form>
+			<div class="row">
+				<div class="col-xs-12" >
+					<div class="form-group">
+						<label class="control-label" for="_dictTemplate_singular">Please give a name common to every single line...</label>
 						<div class="input-group" style="line-height:0px;">
-							<input type="email" class="form-control" id="inputEmail" placeholder="Email Address" >
-							<span class="input-group-addon"><span class="glyphicon glyphicon-envelope"></span></span>
-					    </div>
-						<div class="input-group" style="line-height:0px;">
-					        <input type="password" class="form-control" id="inputPassword" placeholder="Password">
-							<span class="input-group-addon"><span class="glyphicon glyphicon-lock"></span></span>
-					    </div>
-					    <button type="submit" class="btn btn-primary">Login</button>
+							<span class="input-group-addon">Each line is a:</span>
+							<input type="text" class="form-control" id="_dictTemplate_singular" name="singular" placeholder="Ex. client, supplier, member, partner..." onkeyup="FL.slidePanels.dictTemplateChangeWhatIsLabel(this.form)">
+				    	</div>
 				    </div>
-		    	</div>
-			</form>
-		</div>
-	</script>
+				    <div class="form-group">
+				    	<label class="control-label" for="_dictTemplate_singularDescription" id="_dictTemplate_whatIsLabel" >What is a ?</label>
+						<div class="input-group" style="line-height:0px;">
+							<span class="input-group-addon">Description:</span>
+					        <textarea class="form-control" id="_dictTemplate_singularDescription" rows="3"></textarea>
+					    </div>
+				    </div>
+				    <div>
+				    	<h4 id="_dictTemplate_plural"></h4>
+				    </div>
+			    </div>
+	    	</div>
+		</form>
+	</div>
+</script>
+<script id="loginTemplate" type="text/template"> 
+	<div class="loginExample" style="margin-top:-100px;">
+		<form>
+			<div class="row">
+				<div class="col-xs-12" >
+					<div class="input-group" style="line-height:0px;">
+						<input type="email" class="form-control" id="inputEmail" placeholder="Email Address" >
+						<span class="input-group-addon"><span class="glyphicon glyphicon-envelope"></span></span>
+				    </div>
+					<div class="input-group" style="line-height:0px;">
+				        <input type="password" class="form-control" id="inputPassword" placeholder="Password">
+						<span class="input-group-addon"><span class="glyphicon glyphicon-lock"></span></span>
+				    </div>
+				    <button type="submit" class="btn btn-primary">Login</button>
+			    </div>
+	    	</div>
+		</form>
+	</div>
+</script>
 <script id="dictTemplate23" type="text/template"> 
 	<div class="container">
 	    <div class="row">
@@ -543,9 +409,6 @@ mixpanel.init("19ada1cb259cc3272c67085eb1bf03fc");</script><!-- end Mixpanel -->
 	</div>      
 </script>
 <body style="padding-top:10px;">
-	<div id="_modalDialog"></div>
-    <div id="_modalDialogA"></div>
-    <div id="_modalDialogB"></div>
 	<script id="personTemplate" type="text/template"> 
 	    <span><strong><%= name %></strong> (<%= age %>) - <%= occupation %></span> 
 	    <button class="edit btn btn-primary">Edit</button>
@@ -632,10 +495,7 @@ mixpanel.init("19ada1cb259cc3272c67085eb1bf03fc");</script><!-- end Mixpanel -->
 							<span class="icon-bar"></span>
 							<span class="icon-bar"></span>
 						</button>
-<!-- 						<a  class="navbar-brand" href="javascript:home()"><img id="brand" style="width:12.0em;margin-top:-0.9em;margin-left:0.0em;" src="FL_ui/img/framelinklogo.png"></a>
- -->
- 						<a  class="navbar-brand logo" href="javascript:home()"><img id="brand" style="width:12.0em;margin-top:-0.9em;margin-left:0.0em;height:auto; width:auto; max-height:72px;" src="FL_ui/img/abc.png"></a>
-
+						<a  class="navbar-brand" href="javascript:home()"><img id="brand" style="width:12.0em;margin-top:-0.9em;margin-left:0.0em;" src="FL_ui/img/framelinklogo.png"></a>
 					</div>
 					<div id="toolbar" class="collapse navbar-collapse" style="margin-left:15.0em;margin-right:0.0em;">
 						<ul id="main-menu" class="nav navbar-nav">

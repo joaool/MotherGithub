@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>test bootstrap modal v1.0</title>
+    <script src="FL_ui/js/jquery-1.11.1.js" type="text/javascript"></script>
+    <script src="FL_ui/js/underscore-min.js"></script>
+    <script src="FL_ui/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="FL_ui/css/FLcerulean.css">
+    <link href="FL_ui/css/bootstrap-dialog.css" rel="stylesheet" type="text/css" />
+    <script src="FL_ui/js/bootstrap-dialog.js"></script>
+
+<!--[if lt IE 9]>
+<script src="//cdn.jsdelivr.net/html5shiv/3.7.2/html5shiv.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/respond.js/1.4.2/respond.min.js"></script>
+<![endif]-->
+</head>
+<style>
+.modal-header-success {
+    color:#fff;
+    padding:9px 15px;
+    border-bottom:1px solid #eee;
+    background-color: #5cb85c;
+    -webkit-border-top-left-radius: 5px;
+    -webkit-border-top-right-radius: 5px;
+    -moz-border-radius-topleft: 5px;
+    -moz-border-radius-topright: 5px;
+     border-top-left-radius: 5px;
+     border-top-right-radius: 5px;
+}
+.modal-header-warning {
+    color:#fff;
+    padding:9px 15px;
+    border-bottom:1px solid #eee;
+    background-color: #f0ad4e;
+    -webkit-border-top-left-radius: 5px;
+    -webkit-border-top-right-radius: 5px;
+    -moz-border-radius-topleft: 5px;
+    -moz-border-radius-topright: 5px;
+     border-top-left-radius: 5px;
+     border-top-right-radius: 5px;
+}
+.modal-header-danger {
+    color:#fff;
+    padding:9px 15px;
+    border-bottom:1px solid #eee;
+    background-color: #d9534f;
+    -webkit-border-top-left-radius: 5px;
+    -webkit-border-top-right-radius: 5px;
+    -moz-border-radius-topleft: 5px;
+    -moz-border-radius-topright: 5px;
+     border-top-left-radius: 5px;
+     border-top-right-radius: 5px;
+}
+.modal-header-info {
+    color:#fff;
+    padding:9px 15px;
+    border-bottom:1px solid #eee;
+    background-color: #5bc0de;
+    -webkit-border-top-left-radius: 5px;
+    -webkit-border-top-right-radius: 5px;
+    -moz-border-radius-topleft: 5px;
+    -moz-border-radius-topright: 5px;
+     border-top-left-radius: 5px;
+     border-top-right-radius: 5px;
+}
+.modal-header-primary {
+    color:#fff;
+    padding:9px 15px;
+    border-bottom:1px solid #eee;
+    background-color: #428bca;
+    -webkit-border-top-left-radius: 5px;
+    -webkit-border-top-right-radius: 5px;
+    -moz-border-radius-topleft: 5px;
+    -moz-border-radius-topright: 5px;
+     border-top-left-radius: 5px;
+     border-top-right-radius: 5px;
+}
+</style>
+<body>
+    <div id="_modalDialog"></div>
+    <div id="_modalDialogA"></div>
+    <div id="_modalDialogB"></div>
+    <a data-toggle="modal" href="#myModal" class="btn btn-primary">Launch modal</a>  
+    <a data-toggle="modal" href="#__FLmodalId_A" class="btn btn-primary">Launch modal A</a>  
+    <a data-toggle="modal" href="#__FLmodalId_B" class="btn btn-primary">Launch modal B</a>  
+    <footer class="footer">
+        <div class="container">
+            <p>©2014 FrameLink Co. <a href="http://www.framelink.co/contacts.html" target="">@support</a>.</p>
+        </div>
+    </footer> 
+    <script id="dictTemplate" type="text/template"> 
+        <div class="dictTemplate" style="margin-top:0px;">
+            <form>
+                <div class="row">
+                    <div class="col-xs-12" >
+                        <div class="form-group">
+                            <label class="control-label" for="_dictTemplate_singular">Please give a name common to every single line...</label>
+                            <div class="input-group" style="line-height:0px;">
+                                <span class="input-group-addon">Each line is a single:</span>
+                                <input type="text" class="form-control" id="_dictTemplate_singular" name="singular" placeholder="Ex. client, supplier, member, partner..." onkeyup="FL.slidePanels.dictTemplateChangeWhatIsLabel(this.form)">
+                            </div>
+                            <label class="control-label" for="_dictTemplate_singularDescription" id="_dictTemplate_whatIsLabel" >What is a </label>
+                            <div class="input-group" style="line-height:0px;">
+                                <span class="input-group-addon">Description:</span>
+                                <textarea class="form-control" id="_dictTemplate_singularDescription" name="description" onkeyup="FL.slidePanels.dictTemplateChangeDescription(this.form)" rows="3"></textarea>
+                            </div>                      
+                            <div>
+                                <h4 id="_dictTemplate_plural">*</h4>
+                            </div>
+                            <div class="input-group" style="line-height:0px;">
+                                <span class="input-group-addon">Field 1:</span>
+                                <input type="text" class="form-control" id="_dictTemplate_field1" name="field1">
+                            </div>
+                            <div class="table-responsive"> 
+                                <table class="table table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th>#</th>
+                                            <th>Attribute</th>
+                                            <th>what is it ?</th>
+                                            <th>Statement to validate</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>1</td>
+                                            <td>
+                                                <input type="text" class="form-control" id="_dictTemplate_field1" name="field1" value="address">
+                                            </td>
+                                            <td>
+                                                <input type="text" class="form-control" id="_dictTemplate_field1" name="field1" value="the address to send invoices">
+                                            </td>
+                                            <td>the address of Client is the address to send invoices</td>
+                                        </tr>
+                                        <tr>
+                                            <td>2</td>
+                                            <td>Peter</td>
+                                            <td>Parker</td>
+                                            <td>the Peter of Client is the Parker</td>                              
+                                        </tr>
+                                        <tr>
+                                            <td>3</td>
+                                            <td>John</td>
+                                            <td>Rambo</td>
+                                            <td>the John of Client is the Rambo</td>                                
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="input-group" style="line-height:0px;">
+                                <span class="input-group-addon">Field 2:</span>
+                                <input type="text" class="form-control" id="_dictTemplate_field2" name="field1">
+                            </div>
+                            <div class="input-group" style="line-height:0px;">
+                                <span class="input-group-addon">Field 3:</span>
+                                <input type="text" class="form-control" id="_dictTemplate_field3" name="field1">
+                            </div>
+                            <div class="input-group" style="line-height:0px;">
+                                <span class="input-group-addon">Field 4:</span>
+                                <input type="text" class="form-control" id="_dictTemplate_field4" name="field1">
+                            </div>
+                            <div class="input-group" style="line-height:0px;">
+                                <span class="input-group-addon">Field 5:</span>
+                                <input type="text" class="form-control" id="_dictTemplate_field5" name="field1">
+                            </div>
+                            <div class="input-group" style="line-height:0px;">
+                                <span class="input-group-addon">Field 6:</span>
+                                <input type="text" class="form-control" id="_dictTemplate_field6" name="field1">
+                            </div>
+                            <div class="input-group" style="line-height:0px;">
+                                <span class="input-group-addon">Field 7:</span>
+                                <input type="text" class="form-control" id="_dictTemplate_field7" name="field1">
+                            </div>
+                            <div class="input-group" style="line-height:0px;">
+                                <span class="input-group-addon">Field 8:</span>
+                                <input type="text" class="form-control" id="_dictTemplate_field8" name="field1">
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </script>
+     <script id="loginTemplate" type="text/template"> 
+        <div class="loginExample" style="margin-top:0px;">
+            <form>
+                <div class="row">
+                    <div class="col-xs-12" >
+                        <div class="input-group" style="line-height:0px;">
+                            <input type="email" class="form-control" id="inputEmail" placeholder="Email Address" >
+                            <span class="input-group-addon"><span class="glyphicon glyphicon-envelope"></span></span>
+                        </div>
+                        <div class="input-group" style="line-height:0px;">
+                            <input type="password" class="form-control" id="inputPassword" placeholder="Password">
+                            <span class="input-group-addon"><span class="glyphicon glyphicon-lock"></span></span>
+                        </div>
+                        <button type="submit" class="btn btn-primary" onclick="loginFunction()">Login</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </script>   
+    <script>
+        var loginFunction = function(){
+            alert("loginFunction !!!");
+        }
+        makeModal("A","Patolinas","dictTemplate",{},function(result){// "Cancel and "Ok" will be assumed with result = true for "Ok"
+            if(result){
+                alert("Yup in Patolinas");
+            }else{
+               alert("Nope in Patolinas");
+            }
+        });//OK
+        makeModal("B"," Mastruncex","loginTemplate",{icon:"user"},function(result){// "Cancel and "Ok" will be assumed with result = true for "Ok"
+            if(result){
+                alert("Yup in Mastrunço");
+            }else{
+               alert("Nope in Mastrunço");
+            }
+        });//OK
+        makeModal(" Juakim","dictTemplate",{type:"primary", icon:"search",button1:"Close",button2:"Save Changes"});//OK
+        makeModal(" Juakim","dictTemplate",{type:"primary", icon:"search",button1:"Close",button2:"Save Changes"},function(result){
+            if(result){
+                alert("Yup");
+            }else{
+               alert("Nope");
+            }
+        });//OK
+        // makeModalInfo("I want banana");//OK
+        makeModalConfirm("Do I want to continue","No","Yes Please",function(result){
+            if(result){
+                // alert("Yup");
+                makeModalInfo("Good to know that you want to continue !!!");
+            }else{
+                // alert("Nope");
+                makeModalInfo("Bad News !!! you wanna go...");
+            }
+        });//OK
+
+        // makeModal(" Juakim","dictTemplate");//OK
+
+        // makeModal("Saying Hello","<p>Hello world !!!</p>");//OK
+        function makeModalInfo(message) {
+            makeModal("","Information","<p>"+message+"</p>",{type:"primary",button1:"Ok",button2:null});//OK
+        };
+        function makeModalConfirm(message,btn1,btn2,makeModalConfirmCB) {
+            makeModal("","Confirmation","<p>"+message+"</p>",{type:"primary",button1:btn1,button2:btn2},makeModalConfirmCB);//OK
+        };
+
+        function makeModal(id,title,templateName,options,makeModalCB) {
+            // CONDITIONS NECESSARY FOR makeModal() to work:
+            //      1 - THE BODY MUST HAVE A DEDICATED SLOT: <div id="_modalDialog"+{id}></div>
+            // title - Model window title
+            // type - success, primary, info, warning and danger
+            // templateName - normally is a html template defined with  <script id="templateName" type="text/template"> 
+            //     it can be a direct html string if first char is "<".
+            // options  - JSON with icon and type
+            //      icon - termination of http://getbootstrap.com/components/ -
+            //          ex: glyphicon glyphicon-thumbs-up   =>"thumbs-up" 
+            //              glyphicon glyphicon-search      =>"search" 
+            //              glyphicon glyphicon-ok          =>"ok"   etc...
+            //      type - success, primary, info, warning and danger
+            //      button1 - name of first button
+            //      button2 - name of second button (null =>only one button is available)
+            //  callback - to return result example:
+            //          makeModal(" Juakim","dictTemplate",{type:"primary", icon:"search",button1:"Close",button2:"Save Changes"},function(result){
+            //              if(result){
+            //                  alert("Yup");
+            //              }else{
+            //                  alert("Nope");
+            //              }
+            //          });
+            //          NOTE: Callback argument result = true if button 2 is pressed, result = false if button 1 is pressed
+            // http://www.sitepoint.com/understanding-bootstrap-modals/
+            var options = _.extend( {icon:null,type:"success",button1:"Cancel",button2:"Ok"},options);
+            var modalId = "__FLmodalId_"+id;
+            var htmlIn = null;
+            // alert("Inside:"+templateName.substring(0,0));
+            if( templateName.substring(0,1) == "<"){
+                htmlIn = templateName;
+            }else{
+                var templateFunc = _.template($("#" + templateName ).html());
+                var htmlIn = templateFunc({name:"Joao",age:58,occupation:"tangas"});
+                
+            }
+            var iconHTML = "";
+            if(options.icon){
+                iconHTML = '<i class="glyphicon glyphicon-' + options.icon +'"></i>';
+            }
+            var button1HTML = "";
+            if(options.button1){
+                button1HTML = '<a href="#" id="__FLDialog_button1" data-dismiss="modal" class="btn">' + options.button1 + '</a>';
+            }
+            var button2HTML = "";
+            if(options.button2){
+                button2HTML = '<a href="#" id="__FLDialog_button2" class="btn btn-' + options.type + '">' + options.button2 + '</a>';
+            }
+            // var before = '<div class="modal fade" id="myModal">' +
+            var before = '<div class="modal fade" id="' +modalId+ '">' +
+                            '<div class="modal-dialog">' +
+                                '<div class="modal-content">' +
+                                    '<div class="modal-header modal-header-' + options.type + '">' +
+                                        '<button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>'+
+                                        // '<h3 style="color:white;" class="modal-title">' + title + '</h3>' +
+                                        // '<h3 style="color:white;" class="modal-title"><i class="glyphicon glyphicon-thumbs-up"></i>' + title + '</h3>' +
+                                        '<h3 style="color:white;" class="modal-title">' + iconHTML + title + '</h3>' +
+                                    '</div>' +
+                                    '<div class="modal-body">';
+            var after =             '</div>' +
+                                        '<div class="modal-footer">' +
+                                            // '<a href="#button1" id="__FLDialog_button1" data-dismiss="modal" class="btn">Close</a>' +
+                                            button1HTML +
+                                             // '<a href="#button2" id="__FLDialog_button2" class="btn btn-primary">Save changes</a>' +
+                                            button2HTML +
+                                        '</div>' +
+                                    '</div>' +
+                                '</div>' +
+                            '</div>' +
+                        '</div>';
+            var fullHTML = before + htmlIn + after;
+            // alert("makeModal="+fullHTML);
+            var $modalDialog = $("#_modalDialog"+id);
+             $modalDialog.empty();// "#_modalDialog" is the DOM reserved slot for dialog boxes
+            $modalDialog.html(fullHTML);
+            var $modal = $('#' + modalId );
+            if(makeModalCB){
+                $modal.on("click","#__FLDialog_button1", function() {
+                    // alert("makeModal - You clicked button1"); 
+                    $modal.off('hidden.bs.modal');
+                    $modal.modal('hide');
+                    return makeModalCB(false);
+                });
+                $modal.on("click","#__FLDialog_button2", function() {
+                    $modal.off('hidden.bs.modal');
+                    $modal.modal('hide');
+                    return makeModalCB(true);
+                });
+                $modal.on('hidden.bs.modal', function() {
+                    // alert("makeModal - You closed the window !!!"); 
+                    return makeModalCB(false);
+                });
+            }else{
+                // $modal.off('hidden.bs.modal');
+                $modal.modal('hide');
+                $('body').removeClass('modal-open');
+                $('.modal-backdrop').remove();
+            }
+            // $('#' + modalId ).modal('show');//to launch it immediatly when calling makeModal
+            $modal.modal('show');//to launch it immediatly when calling makeModal
+
+       }; 
+    </script>        
+</body>
+</html>

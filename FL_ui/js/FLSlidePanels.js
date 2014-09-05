@@ -61,47 +61,70 @@ jQuery(document).ready(function($){
 					var sourceFile = csvStore.currentGridCandidate.fileName;
 					// alert("confirm -->"+sourceFile);
 
-					if (sourceFile.length == 0) {
+					if (sourceFile.length === 0) {
 						BootstrapDialog.alert('Please choose a csv file to import, before confirmation !');
 					}else{
 						// alert(extractFileName(sourceFile));
-						var templateFunc = _.template($("#dictTemplate").html());
-						var formA = templateFunc({name:"Joao",age:58,occupation:"tangas"});
-						BootstrapDialog.confirm(formA, function(result) {
-							if(result){//logedIn
-								var singular = $('#_dictTemplate_singular').val();
-								var description = $('#_dictTemplate_singularDescription').val();
-								var entityName = csvStore.currentGridCandidate.entityName;
-								var plural = FL.dd.plural(singular,"En");
+						// we will transform attributesArr in items to display
+						// var attributesArr = csvStore.getAttributesArr();//the set was done in utils.csvToGrid()
 
-								// alert(singular + " --" +description+ " entity=" + entityName);
-								
+						//format in csvStore--> [{label:"xx",name:fieldName,description:xDescription,type:xtype,enumerable:xEnumerable},{col2}...{}]
+
+						var attributesArrNoId = csvStore.getAttributesArrNoId();//we retrieve all excepept name="id"
+						// alert("attributesArrNoId=\n"+JSON.stringify(attributesArrNoId));
+
+						// tansform [{label:"xx",name:fieldName,type:xtype,enumerable:xEnumerable},{col2}...{}] in items
+						var detailItems = utils.buildMasterDetailStructureFromattributesArr(attributesArrNoId);
+						var masterDetailItems = {
+							master:{entityName:"",entityDescription:""},
+							detailHeader:["#","Attribute","what is it","Statement to validate"],
+							detail:detailItems //format is array with {attribute:<attribute name>,description:<attr description>,statement;<phrase>}
+						};
+						// Ex: for masterDetailItems
+						// 	var masterDetailItems = {
+						//		master:{entityName:"",entityDescription:""},
+						//		detailHeader:["#","Attribute","what is it","Statement to validate"],
+						//		detail:[ //format is array with {attribute:<attribute name>,description:<attr description>,statement;<phrase>}
+				        //         {attribute:"name", description:"official designation",statement:"the name of the client is the official designation"},
+				        //         {attribute:"address", description:"place to send invoices",statement:"The address of the client is the place to send invoices"},
+				        //         {attribute:"city", description:"headquarters place", statement:"The city of the client is the headquarters place"},
+				        //         {attribute:"postal code", description:"postal reference for delivery",statement:"The postal code of the client is the postal reference for delivery"}
+				        //  	]
+						//	};
+
+						FL.common.editMasterDetail("B"," Define data","_dictEditEntityTemplate",masterDetailItems,{type:"primary", icon:"pencil",button1:"Cancel",button2:"Confirm Grid Import"},function(result){
+							if(result){
+								// alert("-->Yup \nmasterDetailItems="+JSON.stringify(masterDetailItems));//OK !!! it retrieves the new values !!!
+								//we create the entity in dictionary, save dictionary on server, save the grid on server and create menu option.
 								// update dictionary with singular and description
-								var cEntity = FL.dd.getCEntity(entityName);
-								csvStore.insertInArrayOfGrids(singular);
-								FL.dd.updateEntityByCName(cEntity,{singular:singular,plural:plural,description:description});
-								//now we sync the dictionary for the new entity and then we send the content to the server
+								// alert("FLSlidePanels entityName=" + masterDetailItems.master.entityName + " description=" + masterDetailItems.master.entityDescription );
+
+								//We update name and description in csvStore.attributesArr and then use it to create dictionary fields. 
+								var attributesArrNoId = csvStore.getAttributesArrNoId();//we retrieve all excepept name="id"
+								_.each(attributesArrNoId, function(element,index){
+									element["name"] = masterDetailItems.detail[index].attribute;
+									element["description"] = masterDetailItems.detail[index].description;
+								});
+								FL.dd.createEntityAndFields(masterDetailItems.master.entityName, masterDetailItems.master.entityDescription,csvStore.attributesArr);
+								var singular = masterDetailItems.master.entityName;
+								var oEntity =  FL.dd.getEntityBySingular(singular);
+								var plural = oEntity.plural;
+								// alert(" singular="+singular+" plural="+plural);
+								// var cEntity = FL.dd.getCEntity(masterDetailItems.master.entityName);
+								//now we sync the dictionary for the new entity put grid data ond server and create menu option
 								FL.server.insertCsvStoreDataTo(singular,function(err){
 									if(err){
 										console.log("Data from entity "+singular+" Error trying to store on server error="+err);
 										return;
 									}
+									FL.clearSpaceBelowMenus();
 									$.Topic( 'createGridOption' ).publish( plural,singular );//broadcast that will be received by FL.menu to add an option
-									console.log("save menu goes here");
-									// var z = FL.menu
-									console.log("Data from entity "+singular+" stored on server");
+									FL.dd.displayEntities();
 								});
-								
-								// $.Topic( 'createOption' ).publish( plural );//broadcast that will be received by FL.menu to add an option
-								console.log("FLSlidePanels.js '#confirm' click -->A new menu " + plural + " was created");
-								// FL.dd.displayEntities();
- 
-								// alert("cEntity = "+cEntity);
-
-							}else{//logedOut
-								alert("Non OK");
+							}else{
+								FL.common.makeModalInfo("Nothing was saved.");
 							}
-						},{title:"Identify your data",button1:"Cancel",button2:"Confirm data",type:'type-success',cssButton2:"btn-danger"});
+						});//OK						
 					}
 				});
 				$('input').change(function(e) { //this is the code to produce the grid
@@ -122,14 +145,49 @@ jQuery(document).ready(function($){
 			},
 			dictTemplateChangeWhatIsLabel: function(form){
 				// alert('saiu to dictTemplateExitingSingular with -->'+ form.singular.value);
-				var articleAndWord = FL.dd.preArticle(form.singular.value,"En");
-				var plural = FL.dd.plural(form.singular.value,"En");
+				var articleAndWord = FL.dd.preArticle(form.entityName.value,"En");
+				var plural = FL.dd.plural(form.entityName.value,"En");
 				// var article = "a";
 				// $("#_dictTemplate_whatIsLabel").html("What is " + articleAndWord + " " + form.singular.value + " ?");
-				$("#_dictTemplate_whatIsLabel").html("What is " + articleAndWord + " ?");
-				$("#_dictTemplate_plural").empty();
-				if(form.singular.value.length>0)
-					$("#_dictTemplate_plural").html("You loaded a table of " + plural );
+				// $("#_dictTemplate_whatIsLabel").html("What is " + articleAndWord + " ?");
+				$("#_dictEditEntityTemplate_whatIsLabel").html(articleAndWord +" is a:");
+				$("#_dictEditEntityTemplate_plural").empty();
+				// if(form.entityName.value.length>0)
+				// 	$("#_dictEditEntityTemplate_plural").html("FrameLink will import a table of " + plural + " with " + csvStore.getNumberOfLines() + " lines, each one with a single " + form.singular.value + ".");
+			},
+			dictTemplateChangeDescription: function(form){
+				// alert('saiu to dictTemplateExitingSingular with -->'+ form.singular.value);
+				var articleAndWord = FL.dd.preArticle(form.entityName.value,"En");
+				var plural = FL.dd.plural(form.entityName.value,"En");
+				var description = form.entityDescription.value;
+				var descriptionBeginning = FL.dd.preArticle(description,"En");
+				description = descriptionBeginning;
+				// var article = "a";
+				// $("#_dictEditEntityTemplate_whatIsLabel").html("What is " + articleAndWord + " " + form.singular.value + " ?");
+				// $("#_dictEditEntityTemplate_whatIsLabel").html("What is " + articleAndWord + " ?");
+				$("#_dictEditEntityTemplate_whatIsLabel").html(articleAndWord +" is " + description);
+			},
+			dictTemplateAttributeValidation: function(form,order){
+				// var statementId = "stat" + order;
+				var statementId = "_dictEditEntityTemplate__f" + order +"_statement";
+				var attrId = "_dictEditEntityTemplate__f" + order + "_attribute";
+				var descriptionId =  "_dictEditEntityTemplate__f" + order + "_description";
+				var attribute = $("#" + attrId).val();
+				var attributeDescription = $("#" + descriptionId).val();
+				// console.log("FLSlidePanel.js dictTemplateAttributeValidation statementId=" + statementId + " attrId="+attrId+" attribute="+attribute);
+				// console.log("FLSlidePanel.js dictTemplateAttributeValidation form.singular.value=" + form.singular.value);
+
+
+				var articleAndWord = FL.dd.preArticle(form.entityName.value,"En");
+				if(!articleAndWord)
+					articleAndWord = "entity";
+				var plural = FL.dd.plural(form.entityName.value,"En");
+				var description = form.entityDescription.value;
+				var descriptionBeginning = FL.dd.preArticle(description,"En");
+				description = descriptionBeginning;
+				var statement = "The " + attribute + " of " + articleAndWord + " is the " +  attributeDescription;
+				// console.log("FLSlidePanel.js dictTemplateAttributeValidation statement=" + statement);
+				$("#" + statementId ).html(statement);
 			},
 			editForm: function(formName){//Panel 2  when Home Link is clicked
 				alert("editForm in FL.slidePanels -->"+formName);

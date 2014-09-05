@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>test bootstrap modal v4.0</title>
+    <script src="FL_ui/js/jquery-1.11.1.js" type="text/javascript"></script>
+    <!-- <script src="FL_ui/js/underscore-min.js"></script> -->
+    <script src="FL_ui/js/underscore.js"></script>
+    <script src="FL_ui/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="FL_ui/css/FLcerulean.css">
+    <script src="FL_ui/js/FLCommon2.js"></script>
+    <script src="FL_ui/js/FLSlidePanels.js"></script>
+    <script src="FL_ui/js/FLdd2.js"></script>            
+      
+
+    <link href="FL_ui/css/bootstrap-dialog.css" rel="stylesheet" type="text/css" />
+    <script src="FL_ui/js/bootstrap-dialog.js"></script>
+
+<!--[if lt IE 9]>
+<script src="//cdn.jsdelivr.net/html5shiv/3.7.2/html5shiv.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/respond.js/1.4.2/respond.min.js"></script>
+<![endif]-->
+</head>
+<style>
+.modal-header-success {
+    color:#fff;
+    padding:9px 15px;
+    border-bottom:1px solid #eee;
+    background-color: #5cb85c;
+    -webkit-border-top-left-radius: 5px;
+    -webkit-border-top-right-radius: 5px;
+    -moz-border-radius-topleft: 5px;
+    -moz-border-radius-topright: 5px;
+     border-top-left-radius: 5px;
+     border-top-right-radius: 5px;
+}
+.modal-header-warning {
+    color:#fff;
+    padding:9px 15px;
+    border-bottom:1px solid #eee;
+    background-color: #f0ad4e;
+    -webkit-border-top-left-radius: 5px;
+    -webkit-border-top-right-radius: 5px;
+    -moz-border-radius-topleft: 5px;
+    -moz-border-radius-topright: 5px;
+     border-top-left-radius: 5px;
+     border-top-right-radius: 5px;
+}
+.modal-header-danger {
+    color:#fff;
+    padding:9px 15px;
+    border-bottom:1px solid #eee;
+    background-color: #d9534f;
+    -webkit-border-top-left-radius: 5px;
+    -webkit-border-top-right-radius: 5px;
+    -moz-border-radius-topleft: 5px;
+    -moz-border-radius-topright: 5px;
+     border-top-left-radius: 5px;
+     border-top-right-radius: 5px;
+}
+.modal-header-info {
+    color:#fff;
+    padding:9px 15px;
+    border-bottom:1px solid #eee;
+    background-color: #5bc0de;
+    -webkit-border-top-left-radius: 5px;
+    -webkit-border-top-right-radius: 5px;
+    -moz-border-radius-topleft: 5px;
+    -moz-border-radius-topright: 5px;
+     border-top-left-radius: 5px;
+     border-top-right-radius: 5px;
+}
+.modal-header-primary {
+    color:#fff;
+    padding:9px 15px;
+    border-bottom:1px solid #eee;
+    background-color: #428bca;
+    -webkit-border-top-left-radius: 5px;
+    -webkit-border-top-right-radius: 5px;
+    -moz-border-radius-topleft: 5px;
+    -moz-border-radius-topright: 5px;
+     border-top-left-radius: 5px;
+     border-top-right-radius: 5px;
+}
+</style>
+<body>
+    <div id="_modalDialog"></div>
+    <div id="_modalDialogA"></div>
+    <div id="_modalDialogB"></div>
+    <a data-toggle="modal" href="#myModal" class="btn btn-primary">Launch modal</a>  
+    <a data-toggle="modal" href="#__FLmodalId_A" class="btn btn-primary">Launch modal A</a>  
+    <a data-toggle="modal" href="#__FLmodalId_B" class="btn btn-primary">Launch modal B</a>  
+    <footer class="footer">
+        <div class="container">
+            <p>©2014 FrameLink Co. <a href="http://www.framelink.co/contacts.html" target="">@support</a>.</p>
+        </div>
+    </footer> 
+    <script id="_dictEditEntityTemplate" type="text/template"> 
+        <div class="dictTemplate" style="margin-top:0px;">
+            <form>
+                <div class="row">
+                    <div class="col-xs-12" >
+                        <div class="form-group">
+                            <label class="control-label" for="_dictEditEntityTemplate_entityName">Please give a name common to every single line...</label>
+                            <div class="input-group" style="line-height:0px;">
+                                <span class="input-group-addon">Each line is a single:</span>
+                                <input type="text" class="form-control" id="_dictEditEntityTemplate_entityName" name="entityName" placeholder="Ex. client, supplier, member, partner..." value="<%= masterDetailItems.master.entityName %>" onkeyup="FL.slidePanels.dictTemplateChangeWhatIsLabel(this.form)">
+                            </div>
+                            <label class="control-label" for="_dictEditEntityTemplate_entityDescription" id="_dictEditEntityTemplate_whatIsLabel" >What is a </label>
+                            <div class="input-group" style="line-height:0px;">
+                                <span class="input-group-addon">Description:</span>
+                                <textarea class="form-control" id="_dictEditEntityTemplate_entityDescription" name="entityDescription" onkeyup="FL.slidePanels.dictTemplateChangeDescription(this.form)" rows="3"><%= masterDetailItems.master.entityDescription %></textarea>
+                            </div>                      
+                            <div>
+                                <h4 id="_dictEditEntityTemplate_plural"></h4>
+                            </div>
+                            <div class="table-responsive"> 
+                                <table class="table table-bordered">
+                                    <thead>
+                                        <% _.each(masterDetailItems.detailHeader, function(item,index) { %>
+                                            <th><%= item %></th> 
+                                        <% }); %>                                     
+                                    </thead>
+                                    <tbody>
+                                        <% _.each(masterDetailItems.detail, function(item,index) { %> 
+                                             <% var xId = "_dictEditEntityTemplate__f"+(index+1) %><!-- create more variables -->
+                                            <tr>
+                                                <!-- use variables -->
+                                                <td><%= index+1 %></td>
+                        <td><input type="text" class="form-control" id="<%= xId %>_attribute" name="attr<%= index+1 %>" value="<%= item.attribute %>" onkeyup="FL.slidePanels.dictTemplateAttributeValidation(this.form,<%= index+1 %>)"></td>
+                        <td><textarea rows="2" id="<%= xId %>_description" onkeyup="FL.slidePanels.dictTemplateAttributeValidation(this.form,<%= index+1 %>)"><%= item.description %></textarea></td>
+                                                 <td id="<%= xId %>_statement" ><%= item.statement %></td>
+                                            </tr>
+                                        <% }); %>
+                                     </tbody>    
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </script>    
+    <script id="loginTemplate" type="text/template"> 
+        <div class="loginExample" style="margin-top:0px;">
+            <form>
+                <div class="row">
+                    <div class="col-xs-12" >
+                        <div class="input-group" style="line-height:0px;">
+                            <input type="email" class="form-control" id="inputEmail" placeholder="Email Address" >
+                            <span class="input-group-addon"><span class="glyphicon glyphicon-envelope"></span></span>
+                        </div>
+                        <div class="input-group" style="line-height:0px;">
+                            <input type="password" class="form-control" id="inputPassword" placeholder="Password">
+                            <span class="input-group-addon"><span class="glyphicon glyphicon-lock"></span></span>
+                        </div>
+                        <button type="submit" class="btn btn-primary" onclick="loginFunction()">Login</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </script>   
+    <script>
+        var loginFunction = function(){
+            alert("loginFunction !!!");
+        }
+        //this tests the use of makemodel to make master-details nodal dialog 
+        // receives master items and a detailled items array with current values to edit
+        // returns master items after edition and detailled items array after edition
+        //NOTES
+        //   the template to use in editMasterDetail must match the following rules:
+        //   0 - keys in masterDetailItems object must match <%= {keys} %> definitions in template. How ?:
+        //   1 - TEMPLATE MASTER SECTION (the html below <div class="form-group"> and above <div class="table-responsive"> )
+        //     1.1 all  <%= %> inside master section must have the format: masterDetailItems.master.<key existing in masterDetailItems.master element>
+        //        ex: if inside masterDetailItems key master is{entityName:"client",entityDescription:"someone we may invoice"}
+        //              we may use <%= masterDetailItems.master.entityName %> or <%= masterDetailItems.master.entityDescription %>
+        //                  This will display "client" and "someone we may invoice" in the masterof the modal dialog.
+        //   2 - TEMPLATE DETAIL SECTION  (the html inside <div class="table-responsive">)
+        //     2.1 the html inside <thead> is always:
+        //          <% _.each(masterDetailItems.detailHeader, function(item,index) { %>
+        //              <th><%= item %></th> 
+        //          <% }); %>                                     
+        //     2.2 the html inside <tbody> must always have:                                    
+        //              <% _.each(masterDetailItems.detail, function(item,index) { %> - as the first line after <tbody>
+        //     2.3 all  <%= %> inside <tbody> must have the format: item.<key existing in masterDetailItems.detail element>
+        //        ex: if line 0 of masterDetailItems.detail is {attribute:"name", description:"official name"},
+        //              we may use <%= item.attribute %> or <%= item.description %> in the template. This will display "name" and //                "official name" in the first detail line of the modal dialog. The same for line 1 and 2nd display line..etc
+   
+        //          
+        //   2- if the template calls functions they should be callable on windows domain name....
+        var masterDetailItems = {
+            master:{entityName:"client",entityDescription:"someone we may invoice"},
+            detailHeader:["#","ZAttribute","what is it","Statement to validate"],
+            detail:[
+                {attribute:"name", description:"official designation",statement:"the name of the client is the official designation"},
+                {attribute:"address", description:"place to send invoices",statement:"The address of the client is the place to send invoices"},
+                {attribute:"city", description:"headquarters place", statement:"The city of the client is the headquarters place"},
+                {attribute:"postal code", description:"postal reference for delivery",statement:"The postal code of the client is the postal reference for delivery"}
+            ]
+        };
+        // FL.dd.createEntity("client","someone we may invoice");
+        // FL.dd.addAttribute("client","name","official client designation","Name","string",null);
+        // FL.dd.addAttribute("client","address","place to send invoices","Address","string",null);
+        // FL.dd.addAttribute("client","city","postal city reference","City","string",null);
+        // FL.dd.addAttribute("client","postal code","postal reference","Postal Code","string",null);
+        // FL.dd.displayEntities();
+        // var items2 = FL.dd.getArrayOfFields("client");
+        // alert("items2=" + JSON.stringify(items2));
+        // items = items2;
+        // var template = $("#dictTemplateRepeat").html();
+        // // // alert(template);
+        // var templateFunc = _.template(template);
+        // var htmlIn = templateFunc({items:items});
+        // // alert(htmlIn);
+        // console.log("htmlIn=\n"+htmlIn);
+
+
+        // FL.common.makeModal("A","Patolinas","dictTemplate",{},function(result){// "Cancel and "Ok" will be assumed with result = true for "Ok"
+        //     if(result){
+        //         alert("Yup in Patolinas");
+        //     }else{
+        //        alert("Nope in Patolinas");
+        //     }
+        // });//OK
+
+        // FL.common.makeModal("B"," Mastruncex","loginTemplate",{icon:"user"},function(result){// "Cancel and "Ok" will be assumed with result = true for "Ok"
+        //     if(result){
+        //         alert("Yup in Mastrunço");
+        //     }else{
+        //        alert("Nope in Mastrunço");
+        //     }
+        // });//OK
+
+        // FL.common.makeModal("A"," Juakim","dictTemplate",{type:"primary", icon:"search",button1:"Close",button2:"Save Changes"});//OK
+        
+// FL.common.makeModal("B"," Juakim","dictEditEntityTemplate",{type:"primary", icon:"search",button1:"Close",button2:"Save Changes"},function(result){
+//     if(result){
+//         alert("Yup");
+//     }else{
+//        alert("Nope");
+//     }
+// });//OK
+        var $modalDialog = $("#_modalDialog"+"B");
+        alert("$modalDialog.length="+$modalDialog.length);
+
+        FL.common.editMasterDetail("B"," Define data","_dictEditEntityTemplate",masterDetailItems,{type:"primary", icon:"pencil",button1:"Close",button2:"Save Changes"},function(result){
+            if(result){
+                alert("-->Yup \nmasterDetailItems="+JSON.stringify(masterDetailItems));//OK !!! it retrieves the new values !!!
+            }else{
+               alert("-->Nope");
+            }
+        });//OK
+        // FL.common.makeModalInfo("I want banana");//OK
+
+        // FL.common.makeModalConfirm("Do You want to continue","No","Yes Please",function(result){
+        //     if(result){
+        //         // alert("Yup");
+        //          FL.common.makeModalInfo("Good to know that you want to continue !!!");
+        //     }else{
+        //         // alert("Nope");
+        //          FL.common.makeModalInfo("Bad News !!! you wanna go...");
+        //     }
+        // });//OK
+    </script>        
+</body>
+</html>

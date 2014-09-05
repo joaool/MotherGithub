@@ -46,11 +46,11 @@
 			//			description - description of attribute (answer to: "what the <name > of a <entity.singular> ?")
 			//			label - defaul value that will appear in UI labeling the attribute
 			//	OLD>>	type - one of: "string","string:email","string:url"... (others) ,"number","integer","boolean","date","weak" (a json object)
-			//			type - string, integer, number, Boolean, date, or json (this will be Nico's "M")
+			//			type - string, integer, number, boolean, date, or json (Nico's field "M")
 			//				NOTE: if type is "enumerable", the key enumerable must have an array of enumerables
 			//				NOTE: type "enumerable" is invalid for server. "enumerable" will be send as type="string" to server
 			//			enumerable - an array of enumerables or null (if key type != "enumerable")
-			//			typeUI -type of widget that is used with the field
+			//			typeUI -type of widget that is used with the field (Nico's field "9")
 			//				textbox, numberbox, textarea, checkbox, datetextbox, combobox, picture
 			//			key - boolean. True means the attribute is the  key field of the entity . (only one allowed)
 			//			
@@ -406,10 +406,11 @@
 									var xDescr=xArr[i].description;
 									var xLabel=xArr[i].label;
 									var xType=xArr[i].type;
+									var xTypeUI=xArr[i].typeUI;
 									var xKey=xArr[i].key;
 									var xEnumerable=xArr[i].enumerable;
 									// console.log("-----> attribute["+i+"]="+xName+"/"+xDescr+"/"+xCName+",key="+xKey+",type="+xType);
-									console.log("-----> attribute["+i+"]="+xName+"/"+xDescr+"/"+xCName+",label="+xLabel+",key="+xKey+",type="+xType);
+									console.log("-----> attribute["+i+"]="+xName+"/"+xDescr+"/"+xCName+",label="+xLabel+",key="+xKey+",type="+xType+",typeUI="+xTypeUI);
 									if(xEnumerable) {
 										for (var j=0;j<xEnumerable.length;j++){
 											console.log("------------> enumerable["+j+"]="+xEnumerable[j]);
@@ -467,18 +468,18 @@
 				}
 				return nextEntityName;
 			},
-			createEntity: function(xSingular,xDescription) {//add an entity entry 
+			createEntity: function(xSingular,xDescription) {//add an entity entry returning true if it succeds false otherwise
 				//   Whenever a new entity is created a key attribute is also created with:
 				//		dDictionary.addAttribute(xSingular,"id",xSingular+"'s id","textBox",true);
 				//      Note:The key attribute is glued to the entity - (it may be editable, but not deleted)
 				//			if the entity exists the key attribute also exist
 				//			it only can be removed if we remove the entity
+				//   
 				//ex. var oEntity=dDictionary.createEntity("Client","Individual or Company to whom we may send invoices");
 				// NOTE: entity is created only client side => sync = false 
 				// NOTE:plural is calculated by dDictionary.plural(xSingular,"En");
 				// returns true if succeded false if it fails
 				//alert("dDictionary.createEntity xSingular="+xSingular);
-
 				// console.log("BEGIN ############################ FL.dd.createEntity ##############################");
 				var oEntity=null;
 				var xPlural = null;
@@ -498,7 +499,7 @@
 					// alert("FL.dd.createEntity Error: you tried create entity "+xSingular+" but it already exists");
 				}
 				return xRet;
-			},	
+			},
 			updateEntityBySingular: function(xSingular,xOptions) {//updates an existing entity 
 				//Ex: updateEntityBySingular("client",{plural:"clients",description:"company that buys from us"});
 				var oEntity=null;
@@ -558,16 +559,29 @@
 					entityName = oEntity.singular;
 				return entityName;
 			},			
-			addAttribute: function(xSingular,xAttribute,xDescription,xLabel,xType,arrEnumerable) {//adds AttributeName,Description, label Type and enumerable to entity = xSingular
-				// if Type != "enumerable" => ArrEnumerable will be forced to null.
-				// if xAttribute already exists it is updated with xDescription, xType (xKey will not be changed)
+			addAttribute: function(xSingular,xAttribute,xDescription,xLabel,xType,xTypeUI,arrEnumerable) {//adds AttributeName,Description, label Type and enumerable to entity = xSingular			
+			// addAttribute: function(xSingular,xAttribute,xDescription,xLabel,xType,arrEnumerable) {//adds AttributeName,Description, label Type and enumerable to entity = xSingular			
+				// xSingular - Entity name (singular) to add attribute
+				// xAttribute - attribute name (Nico's "3")
+				// xDescription - attribute description (Nico's "4")
+				// xLabel - attribute label (Nico's "K")
+				// xType - attribute data type (Nico's "M") - possible datatypes:string, integer, number, boolean, date, or json 
+				// xTypeUI - widget to use for UI (Nico's "9") - possible datatypes:textbox, numberbox, textarea, checkbox, datetextbox, combobox, picture 
+				// arrEnumerable -  an array of enumerables or null  (Nico's "N")
+				// key - optional default = false - it is only true for standard attribute "id"
+				
+				// if Type != "enumerable" => ArrEnumerable will be forced to null.		
+				
+
+				// if xAttribute already exists it is updated with xDescription, xLabel, xType, xTypeUI, arrEnumerable (xKey will not be changed)
 				// if xAttribute does not exist it is created with xDescription, xType and xKey forced to false
+				// if xTypeUI is different from "combobox" arrEnumerable is forced to false
 				//		
 				// NOTE on xKey - the only attribute that has xKey=true is always created or removed when the entity is created or removed
 				//    To update the name and description of the key attribute of a just created attribute:
 				//		dDictionary.createEntity("Client","clients","Individual or Company to whom we may send invoices");//singular, plural, description
 				//		dDictionary.renameAttribute("Client","id","name");//renaming the key attribute
-				//		dDictionary.addAttribute("Client","name","client's id","Name",string",null);//xEntity,xAttribute,xDescription,xType,xKey
+				//		dDictionary.addAttribute("Client","name","client's id","Name","string","textbox",null);
 				//		
 				//		If we are updating a key attribute we force the type to "number" independently of the xType parameter
 				//	
@@ -582,19 +596,20 @@
 						var nId = oEntity.lastId++;
 						var sComp = getCompressed(nId++);
 						//({name:"address",description:"address to send invoices",label:"Address",type:"string",enumerable:null,key:false});
-						if(xType !="enumerable")
+						if( (xType != "string") && (xTypeUI != "combobox"))
 							arrEnumerable = null;
-						oEntity.attributes.push({name:xAttribute,description:xDescription,label:xLabel,type:xType,enumerable:arrEnumerable,key:false});
+						oEntity.attributes.push({name:xAttribute,description:xDescription,label:xLabel,type:xType,typeUI:xTypeUI,enumerable:arrEnumerable,key:false});
 						oEntity.L2C[xAttribute] = sComp;//Logical to Compressed
 						oEntity.C2L[sComp] = xAttribute;//Compressed to Logical
-						oEntity.lastId = nId;
+						// oEntity.lastId = nId;
 					}else{//updates the existing attribute - if xKey is true (it will continue to be true)
 						oEntity.attributes[xIndex].description = xDescription;
 						oEntity.attributes[xIndex].label = xLabel;
-						if(oEntity.attributes[xIndex].key)//if we are updating a key attribute we force the type to "string"
+						if(oEntity.attributes[xIndex].key)//if we are updating a key attribute we force the type to "number"
 							xType="number";
 						oEntity.attributes[xIndex].type = xType;
-						if(xType !="enumerable")
+						oEntity.attributes[xIndex].typeUI = xTypeUI;
+						if( (xType != "string") && (xTypeUI != "combobox"))
 							arrEnumerable = null;
 						oEntity.attributes[xIndex].enumerable = arrEnumerable;
 
@@ -701,7 +716,46 @@
 					fieldCN = oEntity.L2C[fieldName];
 				}
 				return fieldCN;
-			}						
+			},
+			getArrayOfFields: function(xSingular) {//for entity xSingular return an array of JSON 
+				// The array has an object for each field with {attribute:xName, description:xDescription,statement:xStatement}
+				// Ex: returning items (excepting id)
+		        //  items = [
+		        //         {attribute:"name", description:"official designation",statement:"the name of the client is the official designation"},
+		        //         {attribute:"address", description:"place to send invoices",statement:"The address of the client is the place to send invoices"},
+		        //         {attribute:"city", description:"headquarters place", statement:"The city of the client is the headquarters place"},
+		        //         {attribute:"postal code", description:"postal reference for delivery",statement:"The postal code of the client is the postal reference for delivery"}
+		        //  	];
+				var oEntity = this.entities[xSingular];
+				var xRetArr = [];
+				var fieldCN = null;
+				if(oEntity){
+					_.each(oEntity.attributes, function(element, index){
+						if(element.name != "id"){						
+							var el = {};
+							el["attribute"] = element.name;
+							el["description"] = element.description;
+							el["statement"] = attributeSemantics(element.name,element.description,oEntity,"En");
+							xRetArr.push(el);
+						}
+					});
+				}else{
+					alert("FL.dd.getArrayOfFields Error: entity "+xSingular+" does not exit in FrameLink dictionary.");
+				}
+				return xRetArr;
+			},
+			createEntityAndFields: function(entityName,entityDescription,fieldDefinitionArray) {//creates a dd entity with a set of fields 
+				//	fieldDefinitionArray - array of JSON (one element per field) with format definition
+				// format for fieldDefinitionArray -->[{label:"xx",name:fieldName, description:xdescription, type:xtype,enumerable:xEnumerable},{col2}...{}]
+				//     NOTE:fieldDefinitionArray may come from  csvStore.getAttributesArr() or csvStore.getAttributesArrNoId()
+				if(FL.dd.createEntity(entityName, entityDescription)){//singular,description
+					_.each(fieldDefinitionArray, function(element,index){
+						FL.dd.addAttribute(entityName,element.name, element.description,element.label,element.type,element.typeUI,element.enumerable);
+					});
+				}else{
+					alert("FL.dd.createEntityAndFields createEntity() Error entity " + masterDetailItems.master.entityName + " already exists !");
+				}						
+			}
 		};
 	})();
 // });

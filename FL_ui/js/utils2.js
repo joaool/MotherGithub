@@ -173,6 +173,8 @@ window.utils = {
         if(xRet == "object") {
             if (xVar instanceof Array)
                 xRet="array";
+            if (xVar instanceof Date)
+                xRet="date";
             if (!xVar)
                 xRet="null";
         }else if(xRet == "string"){
@@ -214,9 +216,9 @@ window.utils = {
         var arrOfTypes = [];
         _.each(arrOfKeys, function(element, index){
             var obj = {};
-            var fieldType = utils.typeOf(rows[0][element]);
-            // console.log(index+" firstRowAnalisys looking for enumerables -->"+element+ " fieldType="+fieldType);
-            if (fieldType == "string") {
+            var dataType = utils.typeOf((rows[0][element]).trim());//one of  "number","string","email","boolean","object","array","null","undefined","date"
+            // console.log(index+" firstRowAnalisys looking for enumerables -->"+element+ " dataType="+dataType);
+            if (dataType == "string") {//possible datatypes:string, integer, number, boolean, date, or json 
 
                 var arrOfRowValues = _.pluck(rows,element);
                 // var zz= _.chain(arrOfRowValues).countBy().pairs().max(_.last).value();
@@ -228,26 +230,36 @@ window.utils = {
                 if ( columnPercent < percent ) { //we have an enumerable
                     // console.log(index+" firstRowAnalisys looking for enumerables -->"+element+ " fieldType="+fieldType+" is enumerable ");
                     var enumerableArr = _.map(arrGroups, function(element){ return element[0]; });
-                    obj[element.toLowerCase()] = {"fieldType":"enumerable",enumerable:enumerableArr, label:element};
+                    obj[element.toLowerCase()] = {"fieldType":"string","fieldTypeUI":"combobox",enumerable:enumerableArr, label:element};
                 }else{
-                    obj[element.toLowerCase()] = {"fieldType":fieldType, label:element};
+                    obj[element.toLowerCase()] = {"fieldType":"string","fieldTypeUI":"textbox",enumerable:null,label:element};
                 }
 
             }else{
-                obj[element.toLowerCase()] = {"fieldType":fieldType, label:element};
+                if (dataType == "number") {//possible datatypes:string, integer, number, boolean, date, or json 
+                    obj[element.toLowerCase()] = {"fieldType":"number","fieldTypeUI":"numberbox",enumerable:null, label:element};
+                }else if(dataType == "email") {
+                    obj[element.toLowerCase()] = {"fieldType":"string","fieldTypeUI":"emailbox",enumerable:null, label:element};
+                }else if(dataType == "boolean") {
+                    obj[element.toLowerCase()] = {"fieldType":"boolean","fieldTypeUI":"checkbox",enumerable:null, label:element};
+                }else if(dataType == "date") {
+                    obj[element.toLowerCase()] = {"fieldType":"date","fieldTypeUI":"datetextbox",enumerable:null, label:element};
+                }else{
+                   obj[element.toLowerCase()] = {"fieldType":"string","fieldTypeUI":"textbox",enumerable:null,label:element};
+                }
             }
             arrOfTypes.push(obj);
             var z=32;
         });
         return arrOfTypes;
     },
-    createEntityFromCsv: function(rows){//creates a dd entry from a set of rows
+    createEntityFromCsvAnalisys: function(rows){//creates a dd entry from a set of rows
         var entityName = "_unNamed";
         //this new entity will be called "unNamed" + <num> - we need to evaluate how many unNamed<#> are already in dd.
         entityName = FL.dd.nextEntityBeginningBy(entityName);
         // FL.dd.createEntity("Client152","Individual or Company to whom we may send invoices");//singular, plural, description
         if(!FL.dd.createEntity(entityName,"temporary name for imported entity"))//singular,description
-            alert("createEntityFromCsv Error entity " + entityName + " already exists !");
+            alert("createEntityFromCsvAnalisys Error entity " + entityName + " already exists !");
         // this.checkTypesForArrayOfObjects(rows);
         var arrOfAttributes = this.firstRowAnalisys(rows, 0.5);
         _.each(arrOfAttributes, function(element,index){
@@ -258,11 +270,40 @@ window.utils = {
             if(fieldType=="enumerable"){
                 enumerable = element[attrName].enumerable;
             }
-            // console.log(index+" - createEntityFromCsv -->"+attrName +" type="+fieldType+" label="+label );
-            FL.dd.addAttribute(entityName, attrName,entityName+"' "+attrName,label,fieldType,enumerable);//xEntity,xAttribute,xDescription,xLabel,xType,xEnumerable
+            // console.log(index+" - createEntityFromCsvAnalisys -->"+attrName +" type="+fieldType+" label="+label );
+            FL.dd.addAttribute(entityName, attrName,entityName+"' "+attrName,label,fieldType,fieldTypeUI,enumerable);//xEntity,xAttribute,xDescription,xLabel,xType,xEnumerable
         });
         return entityName;
-     },
+    },
+    createAttributesArrFromCsvAnalisys: function(rows){//creates the equivalent to a dd entry from a set of rows
+        // returns an array with the same format as dd dictionary array of attributes. Each element has the following format:
+        //      ex: {name:"address",description:"address to send invoices",label:"Address",type:"string",enumerable:null,key:false});
+        var attributesArr = [];
+        var arrOfAttributes = this.firstRowAnalisys(rows, 0.5);
+        _.each(arrOfAttributes, function(element,index){
+            var attrName = _.keys(element)[0];
+            var fieldType =element[attrName].fieldType;
+            var fieldTypeUI =element[attrName].fieldTypeUI;
+            var label =element[attrName].label;
+            var enumerable = null;
+            // if(fieldType=="enumerable"){
+            //     enumerable = element[attrName].enumerable;
+            // }
+            if(fieldType=="string" && fieldTypeUI == "combobox"){
+                enumerable = element[attrName].enumerable;
+            }
+
+            console.log(index+" - createAttributesArrFromCsvAnalisys -->"+attrName +" type="+fieldType+" label="+label );
+            attributesArr.push({name: attrName,description: "description of " + attrName,label: label,type: fieldType, typeUI: fieldTypeUI, enumerable: enumerable, key: false});
+
+            // FL.dd.addAttribute(entityName, attrName,entityName+"' "+attrName,label,fieldType,enumerable);//xEntity,xAttribute,xDescription,xLabel,xType,xEnumerable
+        });
+        // attributesArr.push({label:"Order",name:"id",description: "order of lines",type:"string",enumerable:null,key:true}); //injects id exactly like dd
+        return attributesArr;
+    },
+    injectId: function(idTitle,arrOfColumns){//injects a first id column into the array
+        arrOfColumns.splice(0, 0, {label:idTitle,name:"id",description: "order of lines",type:"number",typeUI:"numberbox",enumerable:null,key:true});
+    },    
     backGridColumnsExtractedFromDictionary: function(entityName){//prepares a columns object for backgrid
         //first column has a delete button, second a non editable  id then the others       
         var oEntity = FL.dd.getEntityBySingular(entityName);
@@ -307,7 +348,7 @@ window.utils = {
                 column["label"] = element.label;
                 column["cell"] = Backgrid.IntegerCell.extend({ orderSeparator: '' });
                 // column["cell"] = Backgrid.IntegerCell.extend({ className:'bacgridId',orderSeparator: '' });
-            }else if(element.type=="enumerable"){
+            }else if(element.type=="string" && element.typeUI=="combobox"){
                 var enumValues = _.map(element.enumerable, function(element){ return [element,element]; });
                 // var MySelect2Cell = Backgrid.Extension.Select2Cell.extend({
                 var MySelectCell = Backgrid.SelectCell.extend({
@@ -449,13 +490,21 @@ window.utils = {
                 //     eventualy key names have upper case chars ->if columnsArr is provided by 
                 //       method utils.backGridColumnsExtractedFromDictionary() they will be converted to lower case only
                 //     eventually id will be missing among key names -  utils.csvToStore() will inject id into csvStore
+                
                 //now we pass this entity to the data dictionary. Then the data dictionary will feed the grid columns
-                var entityName = utils.createEntityFromCsv(data.results.rows);
-                csvStore.currentGridCandidate["entityName"] = entityName;
-                FL.dd.displayEntities();
-                // data.results.fields.push("id");
-                // var columns = utils.defaultEntityColumns(entityName);//extracts attributes from dictionary and prepares columns object for backgrid
-                var columnsArr = utils.backGridColumnsExtractedFromDictionary(entityName);//extracts attributes from dictionary and prepares columns object for backgrid
+                // csvStore.currentGridCandidate["entityName"] = entityName;
+                // var entityName = utils.createEntityFromCsvAnalisys(data.results.rows);
+                // FL.dd.displayEntities();
+                // var columnsArr2 = utils.backGridColumnsExtractedFromDictionary(entityName);//extracts attributes from dictionary and prepares columns object for backgrid
+                
+
+                // this is an alternative without creating any entry in data dictionary
+                // to use backGridColumnsFromArray() we need arrOfColumns with format: [{label:"xx",name:fieldName,type:xtype,enumerable:xEnumerable},{col2}...{}]
+                //  to get arrOfColumns we need a method similar to  createEntityFromCsvAnalisys(rows)
+                var arrOfColumns =  utils.createAttributesArrFromCsvAnalisys(data.results.rows);//returns all coluns from CSV
+                utils.injectId("id",arrOfColumns); //now the first column is an "id" column 
+                var columnsArr = utils.backGridColumnsFromArray(arrOfColumns);//extracts attributes from dictionary and prepares columns object for backgrid
+
                 console.log("columns defined...");
                 var columnsArr2 = [//columns definition to mountGrid - Manual equivalent  to utils.backGridColumnsExtractedFromDictionary()
                     {label:"Order",name:"id",type:"string",enumerable:null},
@@ -481,7 +530,7 @@ window.utils = {
                  ];
                 // columnsArr - columns definition to mountGrid has the format: [{label:"xx",name:fieldName,type:xtype,enumerable:xEnumerable},{col2}...{}]
                 // columnsArr2 = utils.backGridColumnsFromArray(columnsArr2);
-                
+                csvStore.setAttributesArr(arrOfColumns);
                 utils.csvToStore(data.results.rows); //feeds the csvStore data store object. It inserts id element and converts keys to lowercase
                 // utils.csvToStore(rowsArr2); //feeds the csvStore data store object. It inserts id element and converts keys to lowercase
                 
@@ -490,6 +539,15 @@ window.utils = {
                 // utils.mountGridInCsvStore(columnsArr2);//mount backbone views and operates grid - columnsArr must be prepared to backGrid
             }
         });
+    },
+    buildMasterDetailStructureFromattributesArr: function(attributesArr){
+        var items = [];
+        var detailLine = null;
+        _.each(attributesArr, function(element,index){
+            detailLine = {attribute:element.name, description:element.description, statement: "The " + element.name + " of entity is..."};
+            items.push(detailLine);
+        });
+        return items;
     },
     singleFormTemplate: function(formTitle,entitySingular,fieldArr){// returns a function with a template that has the tagged fields
         // returns a template function with tags for fields defined in fieldArr

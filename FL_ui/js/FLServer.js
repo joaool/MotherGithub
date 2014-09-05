@@ -75,9 +75,13 @@
 			var pageNoObj = {"home":1,"about":2};
 			return  pageNoObj[pagName];
 		};
-		var disconnectServer = function() {
+		var disconnectServer = function(disconnectServerCB) {
 			FL.server.fa.disconnect(function(e,d){
-				alert ('bye');
+				// alert ('bye');
+				if(disconnectServerCB){
+					alert("disconnectServer -->the callback exists");
+					return disconnectServerCB();
+				}
 			});
 		};
 		var connectServer = function(userName,password,connectServerCB) {
@@ -87,7 +91,7 @@
 			var fa = FL.server.fa;
 			// var fa = new FL.server.fl.app();
 			FL.server.fl.setTraceClient(2);
-			FL.server.fl.serverName('flServer');
+			// FL.server.fl.serverName('62.210.97.101');
 			FL.server.fl.login({"username": userName, "password": password}, function (err, data){
 				if (err){
 					localStorage.connection = null;
@@ -121,75 +125,11 @@
 					return connectServerCB({status:"offline"});
 				}
 			},
-			disconnect: function(){
+			disconnect: function(disconnectCB){
 				// alert("disconnectServer byPass="+byPass);
 				if(!this.offline)
-					disconnectServer();
+					disconnectServer(disconnectCB);
 			},
-			// xcreateServerEntity_Fields: function(entityName,createServerEntity_FieldsCB){
-			// 	// cb();
-			// 	var oEntity = FL.dd.getEntityBySingular(entityName);
-			// 	var eCN = null;
-			// 	async.waterfall([
-			// 		function(waterfallCB1){//waterfallCB1 to be managed by assync
-			// 			var fEntity = new FL.server.fl.entity();
-			// 			fEntity.add({"3": oEntity.singular, "4": oEntity.description, 'E': oEntity.plural}, function (err, data){
-			// 				if(err){
-			// 					alert("createEntity Error: "+JSON.stringify(err));
-			// 					return waterfallCB1(err);//async should exit the waterfall
-			// 				}
-			// 				eCN=data[0]['_id'];
-			// 				return waterfallCB1(null,eCN);//null=>it ok, eCN isd passed to  next function
-			// 			});	
-			// 		},
-			// 		function(eCN,waterfallCB2){
-			// 			var index = 0;
-			// 			var ffield = new FL.server.fl.field();//var ffield = new fl.field();
-			// 			var fCN = null;
-			// 			async.whilst(//whilst needs 3 functions. Func1=>exit criteria, Func2=>repeat function, Funct3=>when complete function 
-			// 				//NICO recommends:
-			// 				//	all callbacks to be used by async must be after a return
-			// 				function(){
-			// 					return index<oEntity.attributes.length;
-			// 				},
-			// 				function(loadAttributeCB){//loadAttributeCB is to be used by async	
-			// 					var enumerableArr = oEntity.attributes[index].enumerable;
-			// 					if(!enumerableArr)
-			// 						enumerableArr = [];
-			// 					ffield.add(	{"1": eCN, "3": oEntity.attributes[index].name, "4":oEntity.attributes[index].description, 'K': oEntity.attributes[index].label, 'M': oEntity.attributes[index].type, 'O':'simple','N':enumerableArr}, function (err, data){
-			// 						if(err){
-			// 							alert("FLdd2.js addAttribute Error:"+JSON.stringify(err));
-			// 							index=oEntity.attributes.length+1;//to exit the loop
-			// 							return loadAttributeCB(err);//inform async that it should exit the loop  
-			// 						}								
-			// 						fCN = data[0]['_id'];
-			// 						var oldCFieldName = oEntity.L2C[oEntity.attributes[index].name]; 
-			// 						delete oEntity.C2L[oldCFieldName];
-			// 						oEntity.L2C[oEntity.attributes[index].name] = fCN;//Logical to Compressed
-			// 						oEntity.C2L[fCN] = oEntity.attributes[index].name;//Compressed to Logical
-			// 						index++;
-			// 						return loadAttributeCB(null);//inform async that it can repeat the loop
-			// 					});
-			// 				},
-			// 				function(err){//The loop is over - this parameter comes from previous callback
-			// 					waterfallCB2(err);//exit waterfall function
-			// 					//when done
-			// 				}
-			// 			);// asyncwhilst
-			// 		}
-			// 	],function(err){ //This function gets called after the two tasks have called their  "task callbacks"
-			// 		console.log("If no error ->entity and fields are in server s over !!! ErroR:"+err);
-			// 		if(!err){
-			// 			console.log("synchronization is done in client dictionary");
-			// 			oEntity.csingular = eCN;
-			// 			oEntity.sync = true;
-			// 		}else{
-			// 			alert("ERROR createServerEntity_Fields unfinished!!!");
-			// 		}
-			// 		if(typeof createServerEntity_FieldsCB == "function")
-			// 			createServerEntity_FieldsCB(err);
-			// 	});
-			// },
 			createServerEntity_Fields: function(entityName,createServerEntity_FieldsCB){
 				// cb();
 				var oEntity = FL.dd.getEntityBySingular(entityName);
@@ -201,9 +141,9 @@
 
 					// var attrJSON = {"3":attribute.name, "4":attribute.description, 'K': attribute.label, 'M': attribute.type, 'O':false,'N':attribute.enumerableArr};
 					var attributeType =attribute.type;
-					if(attributeType == "enumerable")
-						attributeType = "string";					
-					var attrJSON = {"3":attribute.name, "4":attribute.description, 'K': attribute.label,'9': "textbox", 'M': attributeType, 'O':false,'N':attribute.enumerable};
+					// if(attributeType == "enumerable")
+					// 	attributeType = "string";				
+					var attrJSON = {"3":attribute.name, "4":attribute.description, 'K': attribute.label,'9':attribute.typeUI, 'M': attribute.type, 'O':false,'N':attribute.enumerable};
 					//"O" - attribute.repetable
 					entityJSON.fields.push(attrJSON);
 				}
@@ -224,7 +164,7 @@
 					return createServerEntity_FieldsCB(null);//null=>it ok
 				});	
 
-			},			
+			},
 			insertCsvStoreDataTo: function(entityName,insertCB){//creates entity=entityName in server and sends csvStore data to server
 				var oEntity =  FL.dd.getEntityBySingular(entityName);
 				this.createServerEntity_Fields(entityName,function(err){
@@ -245,68 +185,68 @@
 					});
 				});
 			},
-			NicoAddAttribute: function(xSingular,xAttribute,xDescription,xLabel,xType,arrEnumerable) {//adds AttributeName,Description, label Type amd enumerable to oEntity of Data Dictionary
-				// if Type != "enumerable" => ArrEnumerable will be forced to null.
-				// if xAttribute already exists it is updated with xDescription, xType (xKey will not be changed)
-				// if xAttribute does not exist it is created with xDescription, xType and xKey forced to false
-				//		
-				// NOTE on xKey - the only attribute that has xKey=true is always created or removed when the entity is created or removed
-				//    To update the name and description of the key attribute of a just created attribute:
-				//		dDictionary.createEntity("Client","clients","Individual or Company to whom we may send invoices");//singular, plural, description
-				//		dDictionary.renameAttribute("Client","id","name");//renaming the key attribute
-				//		dDictionary.addAttribute("Client","name","client's id","Name",string",null);//xEntity,xAttribute,xDescription,xType,xKey
-				//		
-				//		If we are updating a key attribute we force the type to "number" independently of the xType parameter
-				//	
-				//oEntity={singular:"Client",plural:"clients",description:"Company to send invoices",lastId:0,L2C:{},C2L:{},attributes:[]};
-				//checks if attribute already exists. If it exists updates, otherwise create it !!!
-				//console.clear();
-				var oEntity = this.entities[xSingular];
-				var ffield = null;
-				var sComp = null;
-				if(oEntity){
-					var xIndex = attributeIndex(xSingular,xAttribute);
-					if(xIndex<0){//if it does not exists creates it
+			// NicoAddAttribute: function(xSingular,xAttribute,xDescription,xLabel,xType,arrEnumerable) {//adds AttributeName,Description, label Type amd enumerable to oEntity of Data Dictionary
+			// 	// if Type != "enumerable" => ArrEnumerable will be forced to null.
+			// 	// if xAttribute already exists it is updated with xDescription, xType (xKey will not be changed)
+			// 	// if xAttribute does not exist it is created with xDescription, xType and xKey forced to false
+			// 	//		
+			// 	// NOTE on xKey - the only attribute that has xKey=true is always created or removed when the entity is created or removed
+			// 	//    To update the name and description of the key attribute of a just created attribute:
+			// 	//		dDictionary.createEntity("Client","clients","Individual or Company to whom we may send invoices");//singular, plural, description
+			// 	//		dDictionary.renameAttribute("Client","id","name");//renaming the key attribute
+			// 	//		dDictionary.addAttribute("Client","name","client's id","Name",string",null);//xEntity,xAttribute,xDescription,xType,xKey
+			// 	//		
+			// 	//		If we are updating a key attribute we force the type to "number" independently of the xType parameter
+			// 	//	
+			// 	//oEntity={singular:"Client",plural:"clients",description:"Company to send invoices",lastId:0,L2C:{},C2L:{},attributes:[]};
+			// 	//checks if attribute already exists. If it exists updates, otherwise create it !!!
+			// 	//console.clear();
+			// 	var oEntity = this.entities[xSingular];
+			// 	var ffield = null;
+			// 	var sComp = null;
+			// 	if(oEntity){
+			// 		var xIndex = attributeIndex(xSingular,xAttribute);
+			// 		if(xIndex<0){//if it does not exists creates it
 
-						// var nId = oEntity.lastId++;
-						// var sComp = getCompressed(nId++);
+			// 			// var nId = oEntity.lastId++;
+			// 			// var sComp = getCompressed(nId++);
 
-						ffield = new FL.server.fl.field();//var ffield = new fl.field();
+			// 			ffield = new FL.server.fl.field();//var ffield = new fl.field();
 	
-						ffield.add(	{"1": oEntity.csingular , "3": xAttribute, "4":xDescription, 'K': xLabel, 'M': xType, 'O':'simple','N':arrEnumerable}, function (err, data){
-							if(err){
-								alert("FLdd2.js addAttribute Error:"+JSON.stringify(err));
-								return;
-							}
-							sComp = data[0]['_id'];
-							if(xType !="enumerable")
-								arrEnumerable = null;
-							oEntity.attributes.push({name:xAttribute,description:xDescription,label:xLabel,type:xType,enumerable:arrEnumerable,key:false});
-							oEntity.L2C[xAttribute] = sComp;//Logical to Compressed
-							oEntity.C2L[sComp] = xAttribute;//Compressed to Logical
-							// oEntity.lastId = nId;
+			// 			ffield.add(	{"1": oEntity.csingular , "3": xAttribute, "4":xDescription, 'K': xLabel, 'M': xType, 'O':'simple','N':arrEnumerable}, function (err, data){
+			// 				if(err){
+			// 					alert("FLdd2.js addAttribute Error:"+JSON.stringify(err));
+			// 					return;
+			// 				}
+			// 				sComp = data[0]['_id'];
+			// 				if(xType !="enumerable")
+			// 					arrEnumerable = null;
+			// 				oEntity.attributes.push({name:xAttribute,description:xDescription,label:xLabel,type:xType,enumerable:arrEnumerable,key:false});
+			// 				oEntity.L2C[xAttribute] = sComp;//Logical to Compressed
+			// 				oEntity.C2L[sComp] = xAttribute;//Compressed to Logical
+			// 				// oEntity.lastId = nId;
 
-						});
-					}else{//updates the existing attribute - if xKey is true (it will continue to be true)
-						alert("XXXXXXXXX to be done");
-						oEntity.attributes[xIndex].description = xDescription;
-						oEntity.attributes[xIndex].label = xLabel;
-						if(oEntity.attributes[xIndex].key)//if we are updating a key attribute we force the type to "string"
-							xType="number";
-						oEntity.attributes[xIndex].type = xType;
-						if(xType !="enumerable")
-							arrEnumerable = null;
-						oEntity.attributes[xIndex].enumerable = arrEnumerable;
+			// 			});
+			// 		}else{//updates the existing attribute - if xKey is true (it will continue to be true)
+			// 			alert("XXXXXXXXX to be done");
+			// 			oEntity.attributes[xIndex].description = xDescription;
+			// 			oEntity.attributes[xIndex].label = xLabel;
+			// 			if(oEntity.attributes[xIndex].key)//if we are updating a key attribute we force the type to "string"
+			// 				xType="number";
+			// 			oEntity.attributes[xIndex].type = xType;
+			// 			if(xType !="enumerable")
+			// 				arrEnumerable = null;
+			// 			oEntity.attributes[xIndex].enumerable = arrEnumerable;
 
-						//oEntity.attributes[xIndex].key=xKey;
-					}
-					//dDictionary.save(xSingular,oEntity);
-				}else{
-					alert("FL.dd.addAttribute Error: you tried to add attribute "+xAttribute+" to a non existing entity "+xSingular);
-					//Err.alert("dDictionary.addAttribute",(new Error)," you tried to add attribute "+xAttribute+" to a non existing entity "+xSingular);
-				}
-				// console.log("dDictionary.addAttribute ->" + attributeSemantics(xAttribute,xDescription,oEntity,"En"));
-			},
+			// 			//oEntity.attributes[xIndex].key=xKey;
+			// 		}
+			// 		//dDictionary.save(xSingular,oEntity);
+			// 	}else{
+			// 		alert("FL.dd.addAttribute Error: you tried to add attribute "+xAttribute+" to a non existing entity "+xSingular);
+			// 		//Err.alert("dDictionary.addAttribute",(new Error)," you tried to add attribute "+xAttribute+" to a non existing entity "+xSingular);
+			// 	}
+			// 	// console.log("dDictionary.addAttribute ->" + attributeSemantics(xAttribute,xDescription,oEntity,"En"));
+			// },
 			preparePutRowFromCsvStoreById: function(entityName,id){
 				//with the dictionary for entityName translates field logical names in csvStore into compressed field names with csvStore content for id
 				//Ex: from csvStore.csvRows = {"1":{"id":1,"shipped":true,"product":"Prod 1"},"2":{"id":2,"shipped":false,"product":"Prod 2"}}
@@ -441,7 +381,7 @@
 							console.log("--- *** fields *** ---");
 							for( var fieldIndex = 0; fieldIndex < entities[i].fields.length; fieldIndex++){//boucle fields
 								// console.log("--->field fCN=" + entities[i].fields[fieldIndex]._id + " fieldName=" + entities[i].fields[fieldIndex].d["3"] );
-								FL.dd.addAttribute(entities[i].d["3"],entities[i].fields[fieldIndex].d["3"] ,entities[i].fields[fieldIndex].d["4"],entities[i].fields[fieldIndex].d["K"],entities[i].fields[fieldIndex].d["M"],entities[i].fields[fieldIndex].d["N"]);//("order","shipped","expedition status","Shipped","boolean",null)
+								FL.dd.addAttribute(entities[i].d["3"],entities[i].fields[fieldIndex].d["3"] ,entities[i].fields[fieldIndex].d["4"],entities[i].fields[fieldIndex].d["K"],entities[i].fields[fieldIndex].d["M"],entities[i].fields[fieldIndex].d["9"],entities[i].fields[fieldIndex].d["N"]);//("order","shipped","expedition status","Shipped","boolean",null)
 								//addAttribute uses a local compressed name. Now we have to force the field compressed name comming from server								
 								FL.dd.setFieldCompressedName(entities[i].d["3"],entities[i].fields[fieldIndex].d["3"], entities[i].fields[fieldIndex]._id );
 							}
@@ -514,14 +454,14 @@
 					return saveMainMenuCB(null);
 				});	
 			},
-			syncLocalStoreToServer: function(){//saves menu,style and font to server in LocalStore to server
+			syncLocalStoreToServer: function(){//saves menu,style and font to server, retrieving them from localStore
 				var lastMenuStr  = localStorage.storedMenu
 				var lastStyleStr = localStorage.style;// Retrieve last saved style ex.red or spacelab
 				var lastFontFamilyStr = localStorage.fontFamily;// Retrieve last saved fontFamily ex.impact or georgia
 				var oMenu = JSON.parse(lastMenuStr);
 				// FL.menu.currentMenuObj.jsonMenu = FL.menu.currentOptions.jsonMenu;//HACK - because FL.menu.currentMenuObj.jsonMenu does not reflect the last menu update
 				FL.server.saveMainMenu(oMenu,lastStyleStr,lastFontFamilyStr,function(err){
-					console.log("FL.server sincLocalStoreToServer() -> menu style and font saved on server -->"+err);
+					console.log("FL.server syncLocalStoreToServer() -> menu style and font saved on server -->"+err);
 					// alert("FLMenu2.js saveMenuToLocalAndServer called FL.server.saveMainMenu with style="+lastStyleStr+ " font="+lastFontFamilyStr);
 				});
 			},
@@ -627,7 +567,7 @@
 						return restorePageFromConnectionStringCB(null,htmlStr);
 					});
 				});
-			},
+			},				
 			testFunc: function(x) {
 				alert("FL.server.test() -->"+x);
 			}			

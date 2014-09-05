@@ -68,7 +68,8 @@ FL["menu"] = (function(){//name space FL.menu
 		if( idOrder === 0){
 			top = true;
 		}
-		for(var i=0;i<menuArray.length;i++){
+		var arrLen = menuArray.length;
+		for(var i=0;i<arrLen;i++){
 			//menuArray[i] = action(menuArray[i]);
 			menuArray[i] = action.call(null,menuArray[i],idOrder,top);
 			idOrder++;
@@ -243,7 +244,7 @@ FL["menu"] = (function(){//name space FL.menu
 		}
 	};
 	// --------- all methods above work for menuRefresh() with editable = false ---- code bellow is for editable = true
-	var setupContextMenu = function(jsonMenu,e){//changes DOM template according with e.target
+	var setupContextMenu = function(jsonMenu,e){//jsonMenu is the full menu object - changes DOM template according with e.target
 		var menuText = "Rename " + $(e.target).text();// + " menu";//default is menu
 		var menuTag = $(e.target).get(0).tagName;//A for normal menus <a>menu</a> and IMG for brand
 		var menuId = $(e.target).attr("id");//get id of current line
@@ -256,7 +257,7 @@ FL["menu"] = (function(){//name space FL.menu
 		}else if(menuTag == "A") {// a menu item was clicked
 			// var menuItem = menuFindById(parentThis.settings.jsonMenu.menu,menuId);
 			// var menuItem = menuFindById(this.jsonMenu.menu,menuId);
-			var menuItem = menuFindById(jsonMenu,menuId);//jsonMenu is menuArray
+			var menuItem = menuFindById(jsonMenu.menu,menuId);//jsonMenu is menuArray
 			var topMenu = menuItem.top;
 			$contextMenu.append("<li><a tabindex='-1' href='#'>" + menuText + "</a></li>");
 			if( topMenu ){
@@ -444,8 +445,14 @@ FL["menu"] = (function(){//name space FL.menu
 	var saveMenuToLocalAndServer = function() {//saves current menu and resave style and fontFamily
 		// localStorage.storedMenu  = JSON.stringify(parentThis.settings.jsonMenu);
 		// alert("enter FLMenu2 saveMenuToLocalAndServer !!!");
-		localStorage.storedMenu  = JSON.stringify(FL.menu.currentOptions.jsonMenu);
-		FL.menu.currentMenuObj.jsonMenu = FL.menu.currentOptions.jsonMenu;//HACK - because FL.menu.currentMenuObj.jsonMenu does not reflect the last menu update
+		
+		// localStorage.storedMenu  = JSON.stringify(FL.menu.currentOptions.jsonMenu);
+		// FL.menu.currentMenuObj.jsonMenu = FL.menu.currentOptions.jsonMenu;//HACK - because FL.menu.currentMenuObj.jsonMenu does not reflect the last menu update
+
+		localStorage.storedMenu  = JSON.stringify(FL.menu.currentMenuObj.jsonMenu);
+		FL.menu.currentOptions.jsonMenu = FL.menu.currentMenuObj.jsonMenu;//HACK - because FL.menu.currentMenuObj.jsonMenu does not reflect the last menu update
+
+
 		FL.server.syncLocalStoreToServer();
 	};
 	var insideContextMenu = function(event) {
@@ -474,7 +481,7 @@ FL["menu"] = (function(){//name space FL.menu
 			// parentThis.is_menuHide = true;
 			// parentThis.menuRefresh(this.jsonMenu.menu);	
 			is_menuHide = true;
-			FL.menu.currentMenuObj.menuRefresh(FL.menu.menuArray);	
+			FL.menu.currentMenuObj.menuRefresh(FL.menu.menuArray);
 
 			saveMenuToLocalAndServer();
 			console.log("******************************> insideContextMenu 'Add top menu' was the selection !");
@@ -659,8 +666,10 @@ FL["menu"] = (function(){//name space FL.menu
 		return menuFindById(this.jsonMenu.menu,id);//(menuArray,id)
 	};
 	menu.prototype.menuRefresh = function(menuArray) {//sets dom with menuArray definition
-		if(!menuArray)
+		if(!menuArray){
 			menuArray = this.jsonMenu.menu;
+			FL.menu.currentOptions.jsonMenu = this.jsonMenu;
+		}	
 		FL.menu.menuArray = menuArray;
 		menuEach(menuArray,add_Id_Top);//sets keys id and top for menuArray
 		var $menu = $("#main-menu");
@@ -740,6 +749,8 @@ FL["menu"] = (function(){//name space FL.menu
 		// var thiz = this;
 		$mainMenu.on("contextmenu", function (e) {//Set of DOM elements #menuContainer got a click handler
 			console.log("contextmenu was clicked inside contextmenu event with thiz.editable="+thiz.editable);
+			// menuArray = FL.menu.currentOptions.jsonMenu;
+			var jsonMenu = FL.menu.currentOptions.jsonMenu;
 			$.Topic( 'inMenuEdition' ).publish( true );
 			$.fn.editable.defaults.mode = 'popup';
 			// parentThis.is_contextOn = true;
@@ -749,7 +760,8 @@ FL["menu"] = (function(){//name space FL.menu
 			if(thiz.editable) {
 				is_menuHide = false;
 				console.log("is_menuHide was set to false");
-				var menuTag = setupContextMenu(menuArray,e);//prepares #contextMenu for right clicked element
+				// var menuTag = setupContextMenu(menuArray,e);//prepares #contextMenu for right clicked element
+				var menuTag = setupContextMenu(jsonMenu,e);//prepares #contextMenu for right clicked element
 				$( "#contextMenu" ).on( "click", insideContextMenu);//a click inside main-menu will call refHandler 
 				$("#contextMenu")
 					.data("invokedOn", $(e.target)) //attach data to settings.menuSelector, under the name "invokeOn" 

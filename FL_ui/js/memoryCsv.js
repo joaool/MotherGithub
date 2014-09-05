@@ -2,6 +2,21 @@
 window.csvStore = {
     csvRows:{}, //a JSON of JSONs  {1:{},2:{}...n:{}}; //NOTE:each row  should have a boolean sync field to work in offline mode
     lastId:0,
+    setAttributesArr: function(attributesArr){
+        //format [{label:"xx",name:fieldName,description:xDescription,type:xtype,enumerable:xEnumerable},{col2}...{}]
+        this.attributesArr = attributesArr;
+    },
+    getAttributesArr: function(){
+        return this.attributesArr;
+    },
+    getAttributesArrNoId: function(){
+        var retArr = [];
+        _.each(this.attributesArr, function(element,index){
+            if (element.name!="id")
+                retArr.push(element);
+        });
+        return retArr;
+    },
     store: function( arrToStore ) {//arrToStore is an array of objects [{},{},....{}] where id field is mandatory inside {}
         var arrOfIds = _.map(arrToStore,function(element){return element.id;});
         this.csvRows = _.object(arrOfIds,arrToStore); //becomes ->{1:arrToStore[1],2:arrToSAtore[2]....} 
@@ -13,6 +28,11 @@ window.csvStore = {
         // arrOfKeys[3] = "101";// to test
         var last = _.max(arrOfKeys,function(element){ return  parseInt(element,10); });
         return parseInt(last,10)+1;
+    },
+    getNumberOfLines: function(){//returns a number with the id of the last element + 1 
+        var arrOfKeys = _.keys(this.csvRows);
+        var numberOfLines = arrOfKeys.length;
+        return numberOfLines;
     },
     populate: function () {
         this.csvRows[1] = {
