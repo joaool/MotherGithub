@@ -3,10 +3,10 @@ var FL = FL || {};
 	var oMenu = {
 		"menu" : [
 			{
-				"title" : "Menu",//0
+				"title" : "User Administration",//0
 				// "uri":"http://www.microsoft.com"
 				// "uri":"./page_editor.html?d=joao"
-				"uri":"#"
+				"uri":"javascript:FL.links.userAdministration()"
 				// "uri":"microsoft"
 			},
 			// {
@@ -162,7 +162,7 @@ var FL = FL || {};
 			panelTopPos: '210px',
 			ajax: true,
 			// ajaxSource: 'FL_ui/sidepanel/fl_services.html'
-			ajaxSource: 'FL_ui/sidepanel/fl_builder.html'
+			ajaxSource: 'FL_ui/sidepanel/fl_builder2.html'
 		});
 		$('#panel3').slidePanel({
 			triggerName: '#trigger3',
@@ -218,12 +218,152 @@ var FL = FL || {};
 		// 	}			
 		// ]);
 		// myMenu.menuRefresh(oMenu.menu); //OK
+		
 		myMenu.menuRefresh();
 		home = function() {//necessary to force brand to call _home
 			// alert("Home !!!");
 			FL.clearSpaceBelowMenus();
 			myMenu.menuRefresh();
 		};
+		//testing login promises
+		// FL.API.connectAdHocUser();//OK
+		// FL.API.connectAdHocUser().then(FL.API.removeAdHocUser);//OK 
+		// FL.API.connectAdHocUser().then(function(){FL.API.registerAdHocUser("fofo26","fofo123","fofo26 app");});//OK
+		// FL.API.connectAdHocUser().then(function(){FL.API.registerAdHocUser("JSmith@nwtraders.com","js123","Northwind Company Site");});//OK
+		// FL.API.connectUserToDefaultApp("fofo26","fofo123");//OK
+		// FL.API.connectUserToDefaultApp("fofo25","fofo123").then(FL.API.syncLocalDictionary);//no connection - OK, null dict OK, 
+		// FL.API.connectUserToDefaultApp("joao@framelink.co","oLiVeIrA").then(FL.API.syncLocalDictionary);//no connection - OK, null dict OK, 
+
+		// FL.dd.createEntity("Client","Individual or Company to whom we may send invoices");		
+		// FL.dd.addAttribute("Client","name","client's name","Name","string","textbox",null);
+		// FL.dd.addAttribute("Client","address","client's address","Address","string","textbox",null);
+		// FL.dd.addAttribute("Client","city","client's city","City","string","combobox",["Amsterdam","Lisbon","Port Louis"]);
+		// FL.dd.displayEntities();
+
+		/*
+		FL.API.connectUserToDefaultApp("fofo25","fofo123") 
+		.then(separator)
+		.then(function(){FL.API.syncLocalDictionaryToServer("Client");});//OK
+		*/
+		// FL.API.connectAdHocUser().then(function(){FL.API.registerAdHocUser("customer1@xyz.com","123","test xyz");});//OK
+		// FL.API.connectUserToDefaultApp("customer1@xyz.com","123");
+		/*
+		FL.API.connectUserToDefaultApp("customer1@xyz.com","123") 
+		.then(separator)
+		.then(function(){FL.API.loadAppDataForSignInUser2();});//OK	 
+		*/
+
+		
+		// var promise = FL.API.connectUserToDefaultApp("customer1@xyz.com","123").then(FL.API.loadAppDataForSignInUser2);//OK	 		
+		// promise.done(function(menuData,homeHTML,appDescription){
+		// 	console.log("style=" + menuData.style + "\nfont=" + menuData.fontFamily + "\nmenu="+
+		// 		JSON.stringify(menuData.oMenu)+"\nhomePage="+homeHTML + "\nappDescription=" + appDescription );
+		// });
+		// promise.fail(function(err){console.log("Error loading application error="+err);});
+		
+		/*
+		var homePage = "<div class='jumbotron'>" +
+							"<h1>--- <%= appDescription %> ---</h1><p>Hello World !!!=>Welcome <%= userName %> </p>" +
+						"</div>";
+		// var homePage=null;
+		FL.API.setHomePage(homePage);
+		FL.API.connectUserToDefaultApp("customer1@xyz.com","123").then(FL.API.saveHomePage);//	
+		*/
+		
+		var oMyMenu = {
+			"menu" : [
+				{
+					"title" : "xyz admin",//0
+					"uri":"javascript:FL.links.userAdministration()"
+				},
+				{
+					"title" : "customers",//1
+					"uri" : "#",
+					"menu" : [
+						{
+							"title" : "Reports",//2
+							"uri":"#",
+				 			 "menu" : [
+					            {
+					                "title" : "Customer List by name",//3
+					                "uri":"#"  //http://framelink.co"
+					            },
+					            {
+					                "title" : "Ranked List",//3
+					                "uri":"#"  //http://framelink.co"
+					            }
+					        ]    
+					    }
+					]
+				},
+				{
+					"title" : "EMail Marketing",//12
+					"uri":"#3",
+				}
+			]	
+		};		    
+		// oMyMenu = null;		        
+		FL.API.setMenu(oMyMenu);
+		// FL.API.setStyle("spacelab");
+		// FL.API.setStyle(null);
+		// FL.API.setFontFamily("elite");
+		// FL.API.setFontFamily(null);
+		FL.API.connectUserToDefaultApp("customer1@xyz.com","123").then(FL.API.save_Menu_style_fontFamily);//	
 	});	
+	// FL.login.token = {};
+	// connectAdHocUser = function(connectAdHocUserCB) {//
+	// FL.login.token has all information about the user and the current applications the user is using
+	// connectAdHocUser = function(connectAdHocUserCB) {//
+	// GlobalUserName = null;
+	//-------- PROMISE WRAPPERS ------------------
+	var separator = function(){
+		var def = $.Deferred();
+		if(true){
+			console.log("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$");
+			def.resolve();
+		}
+		return def.promise();
+	};
+	var p0 =function(){
+		var deferred = $.Deferred();
+		console.log("process 0 begins...");
+		if(false)
+			deferred.reject();
+		setTimeout(function() {//after 10 sec executes the anonymous function
+			console.log("process 0 COMPLETE");
+			deferred.resolve();
+		}, 5000);
+		return deferred.promise();		
+	};
+	var p1 = function(){
+		var def = $.Deferred();
+		console.log("beginning p1...");
+		def.fail(function(){
+			alert("error!");
+		});
+		def.done(function(){
+			console.log(" p1 was well done!");
+		});
+		console.log("process 1 begins...");
+		if(false)
+			def.reject();
+		setTimeout(function() {//after 10 sec executes the anonymous function
+			console.log("process 1 COMPLETE");
+			def.resolve();
+		}, 2000);
+		return def.promise();		
+	};
+	var p2 = function process2(){
+		var deferred = $.Deferred();
+		console.log("process 2 begins...");
+
+		console.log("process 2 COMPLETE");
+		return deferred.promise();		
+	};
+	//only enters p1 after p0 is resolved
+	// p0().then(p1).then(p2);//OK !!!! DRY Dont Repeat Yourself and single Responsability Principle
+	// p0();
+	// p1();
+	// p2();
 	console.log(document.title+"......  END..");
 })();

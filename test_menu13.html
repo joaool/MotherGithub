@@ -80,10 +80,12 @@ mixpanel.init("19ada1cb259cc3272c67085eb1bf03fc");</script><!-- end Mixpanel -->
 	<script src="FL_ui/js/FLSlidePanels.js"></script>            
 	<script src="FL_ui/js/memoryCsv.js"></script>  
 	<script src="FL_ui/js/bootstrap-filestyle.js"> </script> 
-	<script src="FL_ui/js/async.js"> </script> 
+	<!-- <script src="FL_ui/js/async.js"> </script> -->
+	<script src="FL_ui/js/mandrill.js"> </script> 	
 	<script src="../flClient/flClient.js"></script>
 	<script src="../flClient/ajaxBrowser.js"></script>
 	<script src="FL_ui/js/FLServer.js"></script>
+	<script src="FL_ui/js/FLAPI.js"></script>
          
 	<!-- <script src="js/main3.js"></script> -->
 
@@ -415,57 +417,26 @@ mixpanel.init("19ada1cb259cc3272c67085eb1bf03fc");</script><!-- end Mixpanel -->
                 </div>
             </form>
         </div>
-    </script>    
-
-	<script id="XdictTemplateEditTable" type="text/template"> 
-	    <div class="dictTemplate" style="margin-top:0px;">
-	        <form>
-	            <div class="row">
-	                <div class="col-xs-12" >
-	                    <div class="form-group">
-	                        <label class="control-label" for="_dictTemplate_singular">Please give a name common to every single line...</label>
-	                        <div class="input-group" style="line-height:0px;">
-	                            <span class="input-group-addon">Each line is a single:</span>
-	                            <input type="text" class="form-control" id="_dictTemplate_singular" name="singular" placeholder="Ex. client, supplier, member, partner..." onkeyup="FL.slidePanels.dictTemplateChangeWhatIsLabel(this.form)">
-	                        </div>
-	                        <label class="control-label" for="_dictTemplate_singularDescription" id="_dictTemplate_whatIsLabel" >What is a </label>
-	                        <div class="input-group" style="line-height:0px;">
-	                            <span class="input-group-addon">Description:</span>
-	                            <textarea class="form-control" id="_dictTemplate_singularDescription" name="description" onkeyup="FL.slidePanels.dictTemplateChangeDescription(this.form)" rows="3"></textarea>
-	                        </div>                      
-	                        <div>
-	                            <h4 id="_dictTemplate_plural"></h4>
-	                        </div>
-	                        <div class="table-responsive"> 
-	                            <table class="table table-bordered">
-	                                <thead>
-	                                    <tr>
-	                                        <th>#</th>
-	                                        <th>Attribute</th>
-	                                        <th>what is it ?</th>
-	                                        <th>Statement to validate</th>
-	                                    </tr>
-	                                </thead>
-	                                <tbody>
-	                                    <% _.each(items, function(item,index) { %> 
-	                                         <% var xId = "_dictTemplate_field"+(index+1) %><!-- create more variables -->
-	                                        <tr>
-	                                            <!-- use variables -->
-	                                            <td><%= index+1 %></td>
-	                    <td><input type="text" class="form-control" id="<%= xId %>_attr" name="attr<%= index+1 %>" value="<%= item.attribute %>" onkeyup="FL.slidePanels.dictTemplateAttributeValidation(this.form,<%= index+1 %>)"></td>
-	                    <td><textarea rows="2" id="<%= xId %>_descr" onkeyup="FL.slidePanels.dictTemplateAttributeValidation(this.form,<%= index+1 %>)"><%= item.description %></textarea></td>
-	                                            <td id="stat<%= index+1 %>" ><%= item.statement %></td>
-	                                        </tr>
-	                                    <% }); %>
-	                                 </tbody>    
-	                            </table>
-	                        </div>
-	                    </div>
-	                </div>
-	            </div>
-	        </form>
-	    </div>
-	</script>    
+    </script>
+    <script id="adminTemplate" type="text/template"> 
+        <div class="loginExample" style="margin-top:0px;">
+            <form>
+                <div class="row">
+                    <div class="col-xs-12" >
+                        <div class="input-group" style="line-height:0px;">
+                            <input type="email" class="form-control" id="inputEmail" placeholder="Email Address" >
+                            <span class="input-group-addon"><span class="glyphicon glyphicon-envelope"></span></span>
+                        </div>
+                        <div class="input-group" style="line-height:0px;">
+                            <input type="password" class="form-control" id="inputPassword" placeholder="Password">
+                            <span class="input-group-addon"><span class="glyphicon glyphicon-lock"></span></span>
+                        </div>
+                        <button type="submit" class="btn btn-primary" onclick="loginFunction()">Login</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </script>           
 	<script id="loginTemplate" type="text/template"> 
 		<div class="loginExample" style="margin-top:-100px;">
 			<form>
@@ -634,7 +605,10 @@ mixpanel.init("19ada1cb259cc3272c67085eb1bf03fc");</script><!-- end Mixpanel -->
 						</button>
 <!-- 						<a  class="navbar-brand" href="javascript:home()"><img id="brand" style="width:12.0em;margin-top:-0.9em;margin-left:0.0em;" src="FL_ui/img/framelinklogo.png"></a>
  -->
- 						<a  class="navbar-brand logo" href="javascript:home()"><img id="brand" style="width:12.0em;margin-top:-0.9em;margin-left:0.0em;height:auto; width:auto; max-height:72px;" src="FL_ui/img/abc.png"></a>
+<!--  						<a  class="navbar-brand logo" href="javascript:home()"><img id="brand" style="width:12.0em;margin-top:-0.9em;margin-left:0.0em;height:auto; width:auto; max-height:72px;" src="FL_ui/img/abc.png"></a> -->
+<!--  						<a  class="navbar-brand logo" href="javascript:home()"><img id="brand" style="width:12.0em;margin-top:-0.9em;margin-left:0.0em;height:auto; width:auto; max-height:72px;" src="FL_ui/img/yourlogo.png"></a>
+ -->
+ 						<a  class="navbar-brand logo" href="javascript:home()"><img id="brand" style="width:12.0em;margin-top:-0.9em;margin-left:0.0em;height:auto; width:auto; max-height:72px;" src="FL_ui/img/NW.png"></a>
 
 					</div>
 					<div id="toolbar" class="collapse navbar-collapse" style="margin-left:15.0em;margin-right:0.0em;">
@@ -703,5 +677,22 @@ mixpanel.init("19ada1cb259cc3272c67085eb1bf03fc");</script><!-- end Mixpanel -->
 	<a href="#" id="trigger3" class="trigger left"><img style="height:30px;" src="FL_ui/sidepanel/slide_services2.png"></a>
 	<div id="panel3" class="slide_panel left">
 	</div>
+	<!--
+	// <script type="text/javascript">//customer.io initial code snipet
+	//   var _cio = _cio || [];
+	//   (function() {
+	//     var a,b,c;a=function(f){return function(){_cio.push([f].
+	//     concat(Array.prototype.slice.call(arguments,0)))}};b=["load","identify",
+	//     "sidentify","track","page","cookie"];for(c=0;c<b.length;c++){_cio[b[c]]=a(b[c])};
+	//     var t = document.createElement('script'),
+	//         s = document.getElementsByTagName('script')[0];
+	//     t.async = true;
+	//     t.id    = 'cio-tracker';
+	//     t.setAttribute('data-site-id', '8b036b44b1bf5d9a083a');
+	//     t.src = 'https://assets.customer.io/assets/track.js';
+	//     s.parentNode.insertBefore(t, s);
+	//   })();
+	// </script>
+	-->	
 </body>
 </html>

@@ -84,7 +84,7 @@
 				}
 			});
 		};
-		var connectServer = function(userName,password,connectServerCB) {
+		var connectServer = function(userName,password,domain,connectServerCB) {
 			// var fl = new flMain();
 			if(!FL.server.fa)
 				FL.server.fa = new FL.server.fl.app();
@@ -92,15 +92,36 @@
 			// var fa = new FL.server.fl.app();
 			FL.server.fl.setTraceClient(2);
 			// FL.server.fl.serverName('62.210.97.101');
-			FL.server.fl.login({"username": userName, "password": password}, function (err, data){
+			var jsonParam = {"username": userName, "password": password};
+			if(domain){
+				jsonParam.domain = domain;
+			}
+			FL.server.fl.login(jsonParam, function (err, data){
 				if (err){
+					if(err=="Access denied"){ //unknown pair user/password
+						alert("unknown user/password");	
+						//createFullaccess				
+					}
 					localStorage.connection = null;
 					alert('flLoging: err=' + JSON.stringify(err));
-					return connectServerCB(false);
+					return connectServerCB(err);
 					// return console.log ('flLoging: err=' + JSON.stringify(err));
 				}
-				var myApp =data.applications[0];
-				alert ('connecting to '+myApp.name + JSON.stringify(myApp));
+				var myApp = null;  
+				if(data.applications.length == 0){
+					alert("You have no accessible application - Please contact you application Administrator");
+					return connectServerCB("You have no accessible application - Please contact you application Administrator");
+				}else if(data.applications.length == 1){//direct access to the sole app 
+					myApp =data.applications[0];
+				}else{
+					//this user has several applications
+					alert("to code a selection mechanism so that the user can choose one out of the application set: first app="+data.applications[0].description + "second app"+data.applications[1].description);
+					//data.applications[ii].domainName
+					//data.applications[ii].description
+					var ii=0;
+					myApp =data.applications[ii];//if a single application  
+				}
+				// alert ('connecting to '+myApp.name + JSON.stringify(myApp));
 				fa.connect(myApp, function(err2, data2){
 					if (err2){
 						alert('fa.connect: err=' + JSON.stringify(err2));
@@ -108,6 +129,9 @@
 						return connectServerCB(false);
 						// return console.log ('fla.connect: err=' + JSON.stringify(err2));
 					}
+					FL.menuLevel = data2.menuLevel;
+					FL.restrictions = data2.restrictions;
+					alert("FL.server.connectServer menuLevel="+FL.menuLevel+"\n Restrictions="+JSON.stringify(FL.restrictions));
 					localStorage.connection = JSON.stringify(myApp);
 					return connectServerCB(null);
 				});
@@ -117,10 +141,10 @@
 			fl: new flMain(),//FL.server.fl
 			fa: null,
 			offline:true,
-			connect: function(userName,password,connectServerCB){
+			connect: function(userName,password,domain,connectServerCB){
 				// alert("connectServer byPass="+byPass);
 				if(!this.offline){
-					connectServer(userName,password,connectServerCB);
+					connectServer(userName,password,domain,connectServerCB);
 				}else{
 					return connectServerCB({status:"offline"});
 				}

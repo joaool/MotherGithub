@@ -139,7 +139,133 @@
 				// 		FL.common.makeModalInfo("FrameLink dictionary was successfully deleted (client and server).");
 				// 	}
 				// });
-			}	
+			},
+			userGrid: function() {//call with menu key "uri": "javascript:FL.links.setDefaultGrid('JOJO')"
+				FL.common.makeModalInfo("To be implemented.");
+			},			
+			userAdministration: function() {//call with menu key "uri": "javascript:FL.links.setDefaultGrid('JOJO')"
+				// FL.common.makeModalInfo("You are the sole user, for the time being.");
+				var message = "<p>You are the sole user, for the time being.</p><br>" +
+							  "<button type='submit' class='btn btn-primary' onclick='xFL.links.userGrid()'>Add users</button>'";
+				FL.common.makeModal("A","User Administration",message,{type:"primary", icon:"pencil",button1:"",button2:"Ok"},function(){
+					if(result){
+						alert("Yup");
+					}else{
+						alert("Nope");
+					}
+				});
+			},
+			resetMenus: function() {//saves factory default menu in current user"
+				// var lastMenuStr  = localStorage.storedMenu
+				var oMenu = {
+					"menu" : [
+						{
+							"title" : "User Administration",//0
+							"uri":"javascript:FL.links.userAdministration()"
+						}
+					]
+				};
+				localStorage.storedMenu = JSON.stringify(oMenu);
+				FL.server.syncLocalStoreToServer();
+				FL.menu.topicUpdateJsonMenu(oMenu);
+			},
+			testEmail: function() {//sends a sample email with mandrill javascript API
+				var xhr = new XMLHttpRequest();
+				xhr.open("GET", "http://www.codecademy.com/", false);//4 verbs - GET, POST, PUT, DELETE
+				xhr.send();
+				console.log(xhr.status);
+				console.log(xhr.statusText);
+
+				var m = new mandrill.Mandrill('vVC6R5SZJEHq2hjEZfUwRg');
+				m.users.ping(function(res){console.log(res);},function(err){console.log(err);});
+				// create a variable for the API call parameters
+				var params = {
+					"message": {
+						"from_email":"support@framelink.co",
+						"to":[{"email":"joaoccoliveira@live.com"}],
+						"subject": "Text from FrameLink support team",
+						"text": "I'm Joao from FrameLink support team."
+					}
+				};
+				var params2 = {
+					"message": {
+						"from_email":"support@framelink.co",
+						"to":[{"email":"joaoccoliveira@live.com"}],
+						"subject": "Text from FrameLink support team",
+						"html": "<p>I'm <strong>learning</strong> the Mandrill API at Codecademy.</p>",
+						"autotext":true,
+						"track_opens":true,
+						"track_clicks":true
+					}
+				};
+				var params3 = {//placing merge tags in the content
+					"message": {
+						"from_email":"support@framelink.co",
+						"from_name" : "Joao Oliveira",
+						"to":[{"email":"joaool@framelink.co","name":"Jojo"},{"email":"joaoccoliveira@live.com","name":"Joao"}],
+						"subject": "Your *|ORDER|* has been received",
+						"html":  "<p>Hey *|COOLFRIEND|*, we've been friends for *|YEARS|*.</p>",
+						"autotext":true,
+						"track_opens":true,
+						"track_clicks":true,
+						"merge_vars": [//suports IF ELSE conditions
+							{
+								"rcpt": "joaool@framelink.co",
+								"vars": [
+									{
+										"name": "ORDER",
+										"content": "1"
+									},
+									{
+										"name": "COOLFRIEND",
+										"content": "Patolinas"
+									},
+									{
+										"name": "YEARS",
+										"content": "5 awesome years"
+									}
+								]
+							},
+							{
+								"rcpt": "joaoccoliveira@live.com",
+								"vars": [
+									{
+										"name": "ORDER",
+										"content": "2"
+									},
+									{
+										"name": "COOLFRIEND",
+										"content": "Malhanca"
+									},
+									{
+										"name": "YEARS",
+										"content": "4.5 awesome years"
+									}
+								]
+							},
+						]
+					}
+				};
+				//The global_merge_vars parameter lets you specify some default values in the event that a recipient
+				//   doesn't have recipient-specific information.
+				m.messages.send(params3,function(res){console.log(res);},function(err){console.log(err);});
+				alert("Send a test email");
+				// var xId = 'id_1';
+				// var xEmail = 'joaoccoliveira@live.com';
+				// _cio.identify({
+				// 	// Required attributes
+				// 	id: xId,          	// Unique id for the currently signed in user in your application.
+				// 	email: xEmail,	// Email of the currently signed in user.
+				// 	created_at: 1410680673, 	// Timestamp in your system that represents when
+				// 								// the user first signed up. You'll want to send it
+				// 								// as seconds since the epoch.
+
+				// 	// Optional (these are examples. You can name attributes what you wish)
+
+				// 	first_name: 'John',       // Add any attributes you'd like to use in the email subject or body.
+				// 	plan_name: 'free'      // To use the example segments, set this to 'free' or 'premium'.
+				// });
+			}
 		};
 	})();
 // });

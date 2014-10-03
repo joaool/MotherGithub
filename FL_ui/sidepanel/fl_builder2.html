@@ -1,22 +1,48 @@
-<div style="margin-left:-70px;">
- 	<h3 style="color: white;">FrameLink Forms/Grids.</h3>
-	<p style="color: white;">You can import CSV files (ex. from Excel or other spreadsheets) incorporating them in your FrameLink Database. </p>
+<div id="fl_builder" style="margin-left:-70px;">
+	<h3 style="color: white; display: inline-block">Edit home page :</h3>
+	<span><a href="javascript:FL.links.pageEditor('home')"  style="text-decoration: underline;"> Home Page</a></span>
+
+ 	<h3 style="color: white;">Import Grids</h3>
+	<p style="color: white;">Import CSV files (ex. from Excel or other spreadsheets) incorporating them into FrameLink. </p>
 	<div class="container">
 		<div class="row">
 		    <!-- <div id="importButton" class="span12 btn btn-primary"></div> -->
-		    <div id="importButton" class="col-sm-12"></div>
-		</div>	
+		    <div id="importButton" class="col-sm-12">
+				<div class='col-xs-6' style='width: 350px;' >
+					<div class='form-group'>
+						<input type='file' id='input1'>
+						<label>
+							<div style="display: block">
+								<h4 id='confirmStatment' style='color:white;'>If <u>xx</u> is the file you want to import, press the OK button</h4>
+									<!-- <div id='confirmStatment'>If xx is the file you want to import, press the OK button</div>  -->
+								<button id='confirm' class='btn btn-primary btn-xs' type='button'>OK</button>
+							</div>					
+						</label>
+					</div>
+				</div>				    	    	
+		    </div>
+		</div>
+<!-- 		<div class="row">
+		    <div id="csvcontent" class="span12>"></div>
+		</div>
+		<div class="col-md-12">
+		    <button id="addGrid" class="edit btn btn-primary">Add Row</button>
+		    <div id="grid"></div>
+		    <div id="paginator"></div>
+		</div> -->
 	</div>
 	<br>
+ 	<h3 style="color: white;">Define Forms</h3>
 	<p style="color: white;">You can define 'standard' forms for your application and 'forms' that depend on the configuration of your FrameLInk Database. </p>
-
+         
 	<div style="clear:both;color: white;"></div>
 	<div class="columns">
 		<div class="colleft">
 		<h5>Standard Templates</h5>
 		<ul>
-			<li><a href="javascript:utils.editForm('Home')" title="home">Home</a></li>
-			<li><a href="http://spyrestudios.com/about/" title="about">About</a></li>
+			<!-- <li><a href="javascript:FL.slidePanels.editForm('Home')" title="home">Home</a></li> -->
+			<li><a href="javascript:FL.links.pageEditor('home')" title="home">Home</a></li>
+			<li><a href="javascript:FL.slidePanels.editForm('Home')" title="Backbone">Backbone</a></li>
 			<li><a href="http://spyrestudios.com/portfolio/" title="portfolio">Portfolio</a></li>
 			<li><a href="http://spyrestudios.com/contact/" title="contact">Contact</a></li>
 			<li><a href="http://spyrestudios.com" title="blog">Blog</a></li>
@@ -25,14 +51,12 @@
 	<div class="colright">
 		<h5>Free Forms</h5>
 		<ul>
-			<li><a href="javascript:utils.listForm('Home')" title="Twitter">List</a></li>
+			<li><a href="javascript:FL.slidePanels.listForm('Home')" title="Twitter">List</a></li>
 			<li><a href="http://designbump.com/user/147" title="DesignBump">DesignBump</a></li>
-			<li><a href="http://digg.com/users/jophillips" title="Digg">Digg</a></li>
-			<li><a href="http://delicious.com/jon.phillips" title="Del.Icio.Us">Del.Icio.Us</a></li>
-			<li><a href="http://designmoo.com/users/jonphillips" title="DesignMoo">DesignMoo</a></li>
+			<li><a href="javascript:FL.links.testEmail()" title="testEmail">email test</a></li>
+			<li><a href="javascript:FL.links.resetMenus()" title="resetMenus">Reset menu</a></li>
+			<li><a href="javascript:FL.links.clearDictionary()" title="Clear dictionary">Clear dictionary</a></li>
 		</ul>
 	</div>
-
-
 
 </div>
