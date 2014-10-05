@@ -131,7 +131,6 @@ var FL = FL || {};
 		 //    }
 		]    
 	};
-
 	FL.oMenu = oMenu;
 	$(document).ready(function() {
 		console.log("FLMain.js begin inside document.ready");

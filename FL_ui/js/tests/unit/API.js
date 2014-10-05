@@ -13,27 +13,114 @@ $(function () {
     console.log(JSON.stringify(FL.login.token));
     equal(JSON.stringify(FL.login.token),"{}","FL.login.token == {} at the beginning");//non strict assertion//4
     
+    // test connectAdHocUser --------------------------------------------------------------------
+    // PRE-CONDITIONS
+    // "jojo100@fl.co" - is an existing user
+    // "jojo101@fl.co" - is a non-existing user
+    //
+    // 1) Generates an adHocUser [TEST #5], 2)Tries to register the adHoc user as existing user "jojo100@fl.co"
+    //
+    //     if "jojo100@fl.co" does not exist:=> TEST #6 Register done! Old clientName=" + clientName + " changed to " + FL.login.token.clientName
+    //     if "jojo100@fl.co" exists: =>connects that user to the default application, then remove it, then   
     var promise= FL.API.connectAdHocUser();
     promise.done(function(){
         console.log("==========================================================================================");
         console.log(JSON.stringify(FL.login.token));
+        var clientName = FL.login.token.clientName;
         actual = false;
         if(FL.login.token.clientName)
           actual = true;
         console.log("==========================================================================================");
-        equal(actual,true,"6-FL.login.token has a value defined by FrameLInk server");//5
+          equal(actual,true,"TEST #5 SUCCESS FL.login.token has a clientName=" + FL.login.token.clientName + ". This value was defined by FrameLink server.");//5
+        QUnit.start();
+        var existingUser = "jojo100@fl.co";
+        //test attempt to register an user that is already registered
+        asyncTest("registerAdHocUser existing user " + existingUser + " (after connectAdHocUser)", function () { //one test can have several assertions
+          expect(1);
+          var promiseRegister = FL.API.registerAdHocUser(existingUser,"123","my first app");
+          promiseRegister.done(function(){
+              equal(false,true,"TEST #5A Register done! Old clientName=" + clientName + " changed to " + FL.login.token.clientName);//6
+              QUnit.start();
+          });
+          promiseRegister.fail(function(err){
+              if(err.substring(0,13)=="existing user"){//error because user already exist !!!
+                equal(true,true,"TEST #5A Register cannot be done because " + existingUser + " is an existing user ");//6
+                QUnit.start();
+              }else{
+                equal(false,true,"TEST #5A Attempt to Register failled by error="+err);//6
+                QUnit.start();
+              }
+          });
+        });//asyncTest          
+        asyncTest("connectUserToDefaultApp for existing user " + existingUser, function () { //one test can have several assertions
+          expect(1);
+          var existingUser = "jojo100@fl.co";
+          var promise2= FL.API.connectUserToDefaultApp(existingUser,"123");
+          promise2.done(function(){
+              equal(true,true,"TEST #6 Connected to application '" + FL.login.token.appDescription + "', domain="+ FL.login.token.domainName);//6
+              QUnit.start();
+          });
+          promise2.fail(function(err){
+              equal(false,true,"TEST #5 FAILURE in connectAdHocUser err="+err);//5
+              QUnit.start();
+          });
+        });//asyncTest
+        var newUser = "jojo101@fl.co";
+        asyncTest("connectAdHocUser and registered it as new user " + newUser, function () { //one test can have several assertions
+          expect(1);
+          var existingUser = "jojo100@fl.co";
+          var promise = FL.API.connectAdHocUser().then(function(){FL.API.registerAdHocUser(newUser,"123","new user's app");});//OK
+          promise.done(function(){
+              equal(true,true,"adHoc user become registered as '" + FL.login.token.userName  + "' with app='" + FL.login.token.appDescription + "', and domain="+ FL.login.token.domainName);
+              QUnit.start();
+              asyncTest("removeCurrentUser " + FL.login.token.userName, function () { //one test can have several assertions
+                expect(1);
+                var promise = FL.API.removeCurrentUser();
+                promise.done(function(){
+                  equal(true,true,"current user ex-adhoc user '" + FL.login.token.userName  + "' successfully removed");
+                  QUnit.start();
+                });
+                promise.fail(function(){
+                  equal(true,true,"Failure trying to remove ex-adhoc user '" + FL.login.token.userName  + "' !!!");
+                   QUnit.start();
+                });
+              });
+          });
+          promise.fail(function(err){
+              equal(false,true,"FAILURE trying to register adHoc user err="+err);//
+              QUnit.start();
+          });
+        });//asyncTest        
+    });
+    promise.fail(function(err){
+        equal(false,true,"TEST #5 FAILURE in connectAdHocUser err="+err);//5
         QUnit.start();
     });
-    promise.fail(function(){
-        console.log("==========================================================================================");
-        console.log(JSON.stringify(FL.login.token));
-        actual = false;
-        if(FL.login.token.clientName)
-          actual = true;
-        console.log("==========================================================================================");
-        equal(actual,true,"6-FL.login.token has a value defined by FrameLInk server");//5
-        QUnit.start();
-    });
+    // END OF test connectAdHocUser --------------------------------------------------------------------
+
+
+
+
+    // // test isUserExist ---- CHECK WITH NICO ------------------------------------------------------------
+    // var promise2= FL.API.isUserExist("jojo100@fl.co");
+    // promise2.done(function(exists){
+    //     if(exists){
+    //         console.log("jojo100@fl.co exists !");
+    //         equal(true,true,"TEST #6 user 'jojo100@fl.co' exists in FrameLink server we do not need to create it");//5
+    //     }else{
+    //         console.log("jojo100 does not exist !");
+    //         equal(true,true,"TEST #6 user 'jojo100@fl.co' does not exists in FrameLink server");//5
+    //     }
+    //     QUnit.start();
+    // });
+    // promise2.fail(function(err){
+    //     console.log("fail testing if jojo100@fl.co exist.");
+    //     equal(false,true,"TEST #6 FAILURE in isUserExist err="+err);//5
+    //     QUnit.start();
+    // });
+    // // END OF test isUserExist --------------------------------------------------------------------
+
+
     // ok( actual == "myDomain1","FL.common.stringAfterLast('http://www.framelink.co/app?d=myDomain1','=') -> 'myDomain'");//4 
  
       // asyncTest("Test connectAdHocUser()", function () { //one test can have several assertions

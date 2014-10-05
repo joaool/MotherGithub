@@ -8,6 +8,7 @@
 	// b="B";
 	// var a = (typeof a === 'undefined') ? b : a;//if a is defined returns "A" otherwise returns the content of b
 	// alert("zzz="+a);//sets "B"
+
 	FL = (typeof FL === 'undefined') ? {} : FL;
 	FL["API"] = (function(){//name space FL.API
 		var internalTest = function(x) {//
@@ -25,8 +26,6 @@
 			// fl.applicationFullCreate({"adminName": "joao@framelink.co", "adminPassWord": "oLiVeIrA"}, function (err, myApp){
 				// err = "abc";
 				if(err){
-					// alert("ERROR ON _applicationFullCreate");
-					console.log("=================================>ERROR ON fl.applicationFullCreate");
 					FL.login.token = {
 						"clientName":null,
 						"userName":null,
@@ -40,10 +39,11 @@
 						"appRestrictions":null,
 						"error":"fl.applicationFullCreate"
 					};
-					def.reject(err);
+					console.log("=================================>ERROR ON _applicationFullCreate err="+err);
+					def.reject("ERROR ON _applicationFullCreate err="+ err);
 				}else{
 					// myAppFC=myApp;
-					console.log("....................................>fl.applicationFullCreate RESPONSE OK ON _applicationFullCreate....");
+					console.log("....................................>_applicationFullCreate RESPONSE OK ON _applicationFullCreate....");
 					FL.login.token = {
 						"clientName":myApp.clientName,
 						"userName":myApp.userName,
@@ -80,7 +80,7 @@
 						console.log("....................................>fl.login RESPONSE OK ON _login....");
 						FL.login.token.appDef = appDef;
 						FL.login.token.appDescription = appDef.description;
-						def.resolve();		
+						def.resolve();
 					}else{
 						FL.login.token.appDef = null;
 						FL.login.token.appDescription = null;
@@ -135,6 +135,31 @@
 			});
 			return def.promise();
 		};
+		var _isUserExist = function(userName){
+			console.log("....................................>beginning _isUserExist...."+JSON.stringify(FL.login.token));
+			var def = $.Deferred();
+			var fl = FL.login.token.fl;//new flMain();
+			if(!fl){
+				fl = new flMain();
+				FL.login.token.fl = fl;
+			}			
+			fl.isUserExist({"adminName": "nico@framelink.co", "adminPassWord":"coLas","userName":userName}, function(err, result){
+				console.log(".............................fa.disconnect ON _isUserExist....");
+				// err = "abc";
+				if(err){
+					// alert("ERROR ON _isUserExist err="+err);
+					console.log("======================>ERROR ON _isUserExist err="+err);
+					def.reject("ERROR ON _isUserExist err="+ err);
+				}else{
+					console.log("=====================================>_isUserExist: OK ");
+					var exists = false;
+					if(result)
+						exists = true; 
+					def.resolve(exists);
+				}
+			});
+			return def.promise();
+		};
 		var _applicationRemove = function(){
 			var def = $.Deferred();
 			var fl = FL.login.token.fl; //new flMain();
@@ -155,13 +180,13 @@
 			});
 			return def.promise();
 		};
-		var _applicationCreate = function(){
+		var _applicationCreate = function(appDescription){
 			var def = $.Deferred();
 			var fl = FL.login.token.fl; //new flMain();
 			// var fl = new flMain();
 			// var fa = FL.login.token.fa;//new fl.app();
 			fl.applicationCreate({"adminName": FL.login.token.userName, "adminPassWord": FL.login.token.userPassWord, "domainPrefix": "test",
-				"description": "sample Application"}, function (err, data){
+				"description": appDescription}, function (err, data){
 				console.log("............................._applicationCreate....");
 				// err = "abc";
 				if(err){
@@ -171,6 +196,7 @@
 				}else{
 					FL.login.token.appDef = data.d;
 					FL.login.token.domainName = data.d['domainName'];
+					FL.login.token.appDescription = appDescription;
 					console.log("=====================================>_applicationCreate: OK APPLICATION CREATED  ->token="+JSON.stringify(FL.login.token));
 					def.resolve();
 				}
@@ -212,9 +238,13 @@
 				console.log("............................._applicationFinalize....with:"+userName+"/"+appDescription);
 				// err = "abc";
 				if(err){
-					alert("ERROR ON _applicationFinalize err="+err);
+					// alert("ERROR ON _applicationFinalize err="+err);
 					console.log("======================>ERROR ON _applicationFinalize err="+err);
-					def.reject(err);
+					var errMsg = "ERROR ON _applicationFinalize err="+ err;
+					var posIndex = err.indexOf("already exist");//HACK this means that the error is because the user already exists
+					if (posIndex>=0)
+						errMsg = "existing user ERROR " + err;
+					def.reject(errMsg);
 				}else{
 					// FL.login.token = {
 					//	"clientName":null,
@@ -407,7 +437,7 @@
 								console.log("=====================================>_restorePage: OK ");
 							}
 						}
-					}	
+					}
 					def.resolve(retData);
 				}
 			});
@@ -553,7 +583,7 @@
 		var getPageNo = function(pagName){ //to be used by savePage and restorePage
 			var pageNoObj = {"home":1,"about":2};
 			return  pageNoObj[pagName];
-		};		
+		};
 		var _test =	function(){
 			console.log("--- test ----");
 		};
@@ -571,26 +601,26 @@
 				var fl = new flMain();//FL.server.fl
 				// var fa = new fl.app();
 				fl.setTraceClient(2);
-				def.fail(function(){
-					alert("error on connectAdHocUser ! ");
-				});
+				// def.fail(function(){
+				// 	alert("error on connectAdHocUser ! ");
+				// });
 				console.log("....................................>beginning connectAdHocUser....");
 				var connectAdHocUserPromise=_applicationFullCreate({"adminName": "nico@framelink.co", "adminPassWord": "coLas"})
 				.then(_login).then(_connect);
 				connectAdHocUserPromise.done(function(){console.log(">>>>> connectAdHocUserPromise SUCCESS <<<<<");def.resolve();});
-				connectAdHocUserPromise.fail(function(){console.log(">>>>> connectAdHocUserPromise FAILURE <<<<<");def.reject();});
+				connectAdHocUserPromise.fail(function(err){console.log(">>>>> connectAdHocUserPromise FAILURE <<<<<");def.reject(err);});
 				return def.promise();
 
 				// to generate unique userName
 				// var seconds = new Date().getTime() / 1000;
 				// var userName = "toto"+ seconds;
 			},
-			removeAdHocUser: function() {//
-				console.log("....................................>beginning removeAdHocUser....with token="+JSON.stringify(FL.login.token));
+			removeCurrentUser: function() {//
+				console.log("....................................>beginning removeCurrentUser....with token="+JSON.stringify(FL.login.token));
 				var def = $.Deferred();
-				var removeAdHocUserPromise=_disconnect().then(_applicationRemove).then(_clientRemove);
-				removeAdHocUserPromise.done(function(){console.log(">>>>> removeAdHocUserPromise SUCCESS <<<<<");def.resolve();});
-				removeAdHocUserPromise.fail(function(){console.log(">>>>> removeAdHocUserPromise FAILURE <<<<<");def.reject();});
+				var removeCurrentUserPromise=_disconnect().then(_applicationRemove).then(_clientRemove);
+				removeCurrentUserPromise.done(function(){console.log(">>>>> removeCurrentUser SUCCESS <<<<<");def.resolve();});
+				removeCurrentUserPromise.fail(function(){console.log(">>>>> removeCurrentUser FAILURE <<<<<");def.reject();});
 				return def.promise();
 			},
 			registerAdHocUser: function(userName,password,appDescription) {//
@@ -598,7 +628,7 @@
 				var def = $.Deferred();
 				var registerAdHocUser=_applicationFinalize(userName,appDescription).then(function(){_userChangePassWord(password);});
 				registerAdHocUser.done(function(){console.log(">>>>> registerAdHocUser SUCCESS <<<<<");def.resolve();});
-				registerAdHocUser.fail(function(){console.log(">>>>> registerAdHocUser FAILURE <<<<<");def.reject();});
+				registerAdHocUser.fail(function(err){console.log(">>>>> registerAdHocUser FAILURE <<<<< "+err);def.reject(err);});
 				return def.promise();
 			},
 			connectUserToDefaultApp: function(userName,password) {//
@@ -631,7 +661,7 @@
 					if( err == "no application available"){//we will try to recover the error creating one application
 						// alert("Recovering from no application");
 						console.log("....................................>connectUserToDefaultApp....Recovering from no application...");
-						var applicationCreatePromise = _applicationCreate();
+						var applicationCreatePromise = _applicationCreate("automatic sample");
 						applicationCreatePromise.done(function(){console.log("....................................>connectUserToDefaultApp applicationCreate DONE");def.resolve();});
 						applicationCreatePromise.fail(function(err){console.log("....................................>connectUserToDefaultApp applicationCreate FAIL");def.reject("ERROR:connectUserToDefaultApp ->applicationCreate FAIL err=" + err);});
 					}else{
@@ -642,6 +672,18 @@
 				});
 				return def.promise();	
 			},
+			isUserExist: function(userName){
+				console.log("....................................>beginning isUserExist....with token="+JSON.stringify(FL.login.token));
+				var def = $.Deferred();
+				var isUserExistPromise=_isUserExist();
+				isUserExistPromise.done(function(exists){
+					console.log(">>>>> isUserExist SUCCESS <<<<< exist="+exists);
+					def.resolve(exists);
+				});
+				isUserExistPromise.fail(function(err){console.log(">>>>> isUserExist FAILURE <<<<<");def.reject(err);});
+				return def.promise();
+			},		
+
 			temporaryRebuildsLocalDictionaryFromServer: function(entities){
 				// console.log("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx entities=" + entities + " xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
 				console.log("xxxxxxxxx #$%#%#%5 xxxxxxx");
