@@ -209,68 +209,6 @@
 					});
 				});
 			},
-			// NicoAddAttribute: function(xSingular,xAttribute,xDescription,xLabel,xType,arrEnumerable) {//adds AttributeName,Description, label Type amd enumerable to oEntity of Data Dictionary
-			// 	// if Type != "enumerable" => ArrEnumerable will be forced to null.
-			// 	// if xAttribute already exists it is updated with xDescription, xType (xKey will not be changed)
-			// 	// if xAttribute does not exist it is created with xDescription, xType and xKey forced to false
-			// 	//		
-			// 	// NOTE on xKey - the only attribute that has xKey=true is always created or removed when the entity is created or removed
-			// 	//    To update the name and description of the key attribute of a just created attribute:
-			// 	//		dDictionary.createEntity("Client","clients","Individual or Company to whom we may send invoices");//singular, plural, description
-			// 	//		dDictionary.renameAttribute("Client","id","name");//renaming the key attribute
-			// 	//		dDictionary.addAttribute("Client","name","client's id","Name",string",null);//xEntity,xAttribute,xDescription,xType,xKey
-			// 	//		
-			// 	//		If we are updating a key attribute we force the type to "number" independently of the xType parameter
-			// 	//	
-			// 	//oEntity={singular:"Client",plural:"clients",description:"Company to send invoices",lastId:0,L2C:{},C2L:{},attributes:[]};
-			// 	//checks if attribute already exists. If it exists updates, otherwise create it !!!
-			// 	//console.clear();
-			// 	var oEntity = this.entities[xSingular];
-			// 	var ffield = null;
-			// 	var sComp = null;
-			// 	if(oEntity){
-			// 		var xIndex = attributeIndex(xSingular,xAttribute);
-			// 		if(xIndex<0){//if it does not exists creates it
-
-			// 			// var nId = oEntity.lastId++;
-			// 			// var sComp = getCompressed(nId++);
-
-			// 			ffield = new FL.server.fl.field();//var ffield = new fl.field();
-	
-			// 			ffield.add(	{"1": oEntity.csingular , "3": xAttribute, "4":xDescription, 'K': xLabel, 'M': xType, 'O':'simple','N':arrEnumerable}, function (err, data){
-			// 				if(err){
-			// 					alert("FLdd2.js addAttribute Error:"+JSON.stringify(err));
-			// 					return;
-			// 				}
-			// 				sComp = data[0]['_id'];
-			// 				if(xType !="enumerable")
-			// 					arrEnumerable = null;
-			// 				oEntity.attributes.push({name:xAttribute,description:xDescription,label:xLabel,type:xType,enumerable:arrEnumerable,key:false});
-			// 				oEntity.L2C[xAttribute] = sComp;//Logical to Compressed
-			// 				oEntity.C2L[sComp] = xAttribute;//Compressed to Logical
-			// 				// oEntity.lastId = nId;
-
-			// 			});
-			// 		}else{//updates the existing attribute - if xKey is true (it will continue to be true)
-			// 			alert("XXXXXXXXX to be done");
-			// 			oEntity.attributes[xIndex].description = xDescription;
-			// 			oEntity.attributes[xIndex].label = xLabel;
-			// 			if(oEntity.attributes[xIndex].key)//if we are updating a key attribute we force the type to "string"
-			// 				xType="number";
-			// 			oEntity.attributes[xIndex].type = xType;
-			// 			if(xType !="enumerable")
-			// 				arrEnumerable = null;
-			// 			oEntity.attributes[xIndex].enumerable = arrEnumerable;
-
-			// 			//oEntity.attributes[xIndex].key=xKey;
-			// 		}
-			// 		//dDictionary.save(xSingular,oEntity);
-			// 	}else{
-			// 		alert("FL.dd.addAttribute Error: you tried to add attribute "+xAttribute+" to a non existing entity "+xSingular);
-			// 		//Err.alert("dDictionary.addAttribute",(new Error)," you tried to add attribute "+xAttribute+" to a non existing entity "+xSingular);
-			// 	}
-			// 	// console.log("dDictionary.addAttribute ->" + attributeSemantics(xAttribute,xDescription,oEntity,"En"));
-			// },
 			preparePutRowFromCsvStoreById: function(entityName,id){
 				//with the dictionary for entityName translates field logical names in csvStore into compressed field names with csvStore content for id
 				//Ex: from csvStore.csvRows = {"1":{"id":1,"shipped":true,"product":"Prod 1"},"2":{"id":2,"shipped":false,"product":"Prod 2"}}
@@ -299,7 +237,7 @@
 			convertArrC2LForEntity: function(entityName,serverArr){//serverArr =>[{"_id":123,d:{},r:[]},{"_id":124,d:{},r:[]},....{"_id":125,d:{},r:[]}]
 				//Use the dictionary for entityName to convert compressed field names in keys in serverArr to logical field names
 				//Ex: from server [{"d":{"01":true,"02":"Super 1","00":1},"r":[]},{"d":{"01":false,"02":"Super 2","00":2},"r":[]}]
-				//     ==============> [{"shipped":true,"product":"Super 1","id":1},{"shipped":false,"product":"Super 2","id":2}]	
+				//     ==============> [{"_id":123,id:1,"shipped":true,"product":"Super 1","id":1},{"_id":124,id:2,"shipped":false,"product":"Super 2","id":2}]	
 				// If serverArr elements inside d object have no compressed name corresponding to "id" in local dictionary, id will be added
 				// if serverArr elements have a "_id" property/value "_id" will be included in the return array 
 				var oEntity =  FL.dd.getEntityBySingular(entityName);
@@ -327,7 +265,7 @@
 					return el;
 				});
 				return retArr;
-			},
+			},			
 			loadCsvStoreFromEntity: function(entityName,loadCsvStoreFromEntityCB){
 				//For this to run entityName must exist in local Dictionary and must be in sync with server
 				// var arrToStoreLocally = [];
@@ -352,7 +290,7 @@
 							console.log("arrToStoreLocally="+JSON.stringify(arrToStoreLocally));
 
 							csvStore.store(arrToStoreLocally);
-							// alert("import is done");
+							alert("import is done");
 							console.log("import is done");
 							return loadCsvStoreFromEntityCB(true);
 						});

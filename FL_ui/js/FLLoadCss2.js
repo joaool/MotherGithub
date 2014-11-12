@@ -270,7 +270,8 @@ jQuery(document).ready(function($){
 			// FL.server.connect("joao@framelink.co","oLiVeIrA",function(err){
 			var loginPromise = null;
 			if( loginObject.email == "guest@framelink.co"){//create temporary account
-				loginPromise = FL.API.connectAdHocUser();
+				// loginPromise = FL.API.connectAdHocUser();
+				loginPromise = FL.API.prepareTrialApp();
 			}else{//use an existing account
 				loginPromise = FL.API.connectUserToDefaultApp(loginObject.email,loginObject.password);//for the time being Defaut is the first one
 			}
@@ -289,136 +290,29 @@ jQuery(document).ready(function($){
 					localStorage.fontFamily = menuData.fontFamily;
 					resetStyle(true);
 					localStorage.login = JSON.stringify(loginObject);
-					$.Topic( 'signInDone' ).publish( true );	
+					$.Topic( 'signInDone' ).publish( true );
 					recoverLastMenu();//recover locally saved menu and informs FL.menu about the new menu if any
-					FL.login.checkSignIn();
+					var histoPromise=FL.API.createHistoMails_ifNotExisting();
+					histoPromise.done(function(){
+						FL.login.checkSignIn();
+						return loginAccessCB(null,loginObject);
+					});
+					histoPromise.fail(function(err){
+						alert("FLLoadCss2.js loginAccess --> loginAccess ACCESS FAILURE err="+err);
+						return loginAccessCB(err,loginObject);
+					});
 					// def.resolve(menuData,homeHTML);
 				});
-				loadAppPromise.fail(function(err){alert("FLLoadCss2.js  --> loginAccess FAILURE <<<<< error="+err);});
+				loadAppPromise.fail(function(err){
+					alert("FLLoadCss2.js  --> loginAccess FAILURE <<<<< error="+err);
+					return loginAccessCB(err,loginObject);
+				});
 			});
 			loginPromise.fail(function(){
 				alert("FLLoadCss2.js  --> loginAccess ACCESS FAILURE");
+				return loginAccessCB(err,loginObject);
 			});
 		};
-		var XloginAccess = function(loginObject,loginAccessCB){//when login email is valid and other data acceptable - {email:email,userName:userName,password:password};
-			// loginObject = {email:email,userName:userName,password:password};
-			// FL.server.connect("Nico","coLas",function(err){console.log("connectServer connection is="+err);});//3rd parameter is byPass
-			// FL.server.connect("joao@framelink.co","oLiVeIrA",function(err){
-				if( loginObject.email == "guest@framelink.co"){
-					//we create a new application - button new account
-					loginObject.email = "joao@framelink.co";
-					loginObject.password = "oLiVeIrA";
-					//call superfunction to create trial database	
-					FL.server.fl.applicationFullCreate({//alloAnonymous = true by default
-						"adminName":"joao@framelink.co",
-						"adminPassWord":"oLiVeIrA"
-					},function(err,data){
-						if(err){
-							alert();
-							return loginAccessCB(err);
-						}	
-						//We need this to update user and client to real names....
-						//8.2.20.	applicationChangeDescription, 8.2.8.	userChangeName
-						var xClient = data.clientName;//ex client_12345 this will be eventuallyt used to remove the 8.2.18.	applicationRemoveTry
-						var xUser = data.userName;//ex guest_12345
-						var xPassword = data.userPassWord;
-						var xDomainName = data.domainName;//this is no changeable
-						// FL.server.connect(xUser,xPassword,xDomainName,function(err){
-						// };	
-						// alert("loginAccess:"+xUser+"/"+xPassword+"/"+xDomainName);
-						return loginAccessCB("Retry",{email:xUser,password:xPassword,domain:xDomainName});
-						//to change 
-					});
-					return;
-				}
-				FL.server.connect(loginObject.email,loginObject.password,loginObject.domain,function(err){
-				console.log("connectServer connection is="+err);
-				if(err){
-					if(err.status != "offline"){
-						alert("FLLoadCss2.js loginAccess ERROR err="+err);
-					}else{//offline
-						alert("FLLoadCss2.js loginAccess IT IS OFFLINE process will go on");
-						localStorage.login = JSON.stringify(loginObject);
-						$.Topic( 'signInDone' ).publish( true );
-						recoverLastMenu();//recover locally saved menu and informs FL.menu about the new menu if any
-						FL.login.checkSignIn();
-						console.log("----------OFFLINE-------------------->On signIn() (log OK) FL.loggedIn="+FL.loggedIn);
-						vUser(loginObject);//comment this line to remove vUser and aKey access				
-					}
-				}else{//no error on connect we move on to retrieve dictionary menu, style and fonts
-					// alert("FLLoadCss2.js loginAccess SUCCESSFULL CONNECT process will go on loading dictionary,menu,style &fonts");
-					loadAppDataForSignInUser(function(err,data,restData){
-						if (err){
-							alert('FLLoadCss.js loadAppDataForSignInUser Error Err='+err);
-						}else{//no error =>err==null . data object has menu,style and font
-							if (data){
-								var oMenu = data.oMenu;//style stored on server
-								var	currentStyle = data.style;//style stored on server
-								var	currentFontFamily = data.fontFamily;//default stored on server
-							}else{
-								var oMenu = {
-									"menu" : [
-										{
-											"title" : "User Administration",//0
-											// "uri":"http://www.microsoft.com"
-											// "uri":"./page_editor.html?d=joao"
-											"uri":"javascript:FL.links.userAdministration()"
-											// "uri":"microsoft"
-										}
-									]
-								};
-								var	currentStyle = "readable";//default style
-								var	currentFontFamily = "helvetica";//default font
-							}
-							// alert("FLLoadCss2.js loginAccess style=" + currentStyle + "fontFamily=" + currentFontFamily);
-							if(restData && restData.d){
-								var htmlStr = restData.d.html;
-							}else{
-								var	htmlStr="<div class='jumbotron'>" +
-												"<h1>FrameLink Platform</h1>" +
-												"<p>This site has no functionality as it is. <strong>Sign In</strong> as a designer (upper right corner) to transform this site into the backend of your business. No need for email/password initially. Introduce them later on, to continue the design or give access to someone else.</p><p><strong>'Tour'</strong> will give you an idea how to redesign this site into your business information system.</p>" +
-												"<p>" +
-													"<a href='#' class='btn btn-primary btn-large' onclick='FL.showTourStep0 = true; FL.tourIn();'>Tour</a>" +
-												"</p>" +
-											"</div>";
-							}
-							alert('FLLoadCss.js loginAccess: PAGE RESTORED SUCCESSFULLY data=' + JSON.stringify(htmlStr));
-
-							FL.menu.homeMemory = htmlStr; //this means that this will be displayed
-							FL.menu.currentMenuObj.updateJsonMenu(oMenu);
-							// FL.menu.currentMenuObj.updateInitialMenu(htmlStr);
-							FL.menu.currentMenuObj.menuRefresh();
-
-							localStorage.storedMenu  = JSON.stringify(oMenu);
-							localStorage.style = currentStyle;
-							localStorage.fontFamily = currentFontFamily;
-							resetStyle(true);
-
-							localStorage.login = JSON.stringify(loginObject);
-							$.Topic( 'signInDone' ).publish( true );
-							
-							recoverLastMenu();//recover locally saved menu and informs FL.menu about the new menu if any
-							FL.login.checkSignIn();
-
-							// alert("FLLoadCss2.js loginAccess menu, style and fonts SUCCESSFULL retrieved oMenu="+JSON.stringify(oMenu));
-
-							console.log("-------------ONLINE----------------->On signIn() (log OK) FL.loggedIn="+FL.loggedIn);
-							vUser(loginObject);//comment this line to remove vUser and aKey access
-						}
-					});
-
-				}
-			});//3rd parameter is byPass
-			// localStorage.login = JSON.stringify(loginObject);
-			// $.Topic( 'signInDone' ).publish( true );
-			// // FL.recoverLastMenu();//recover locally saved menu and informs FL.menu about the new menu if any
-			// recoverLastMenu();//recover locally saved menu and informs FL.menu about the new menu if any
-			// FL.login.checkSignIn();
-			// console.log("------------------------------>On signIn() (log OK) FL.loggedIn="+FL.loggedIn);
-			// vUser(loginObject);//comment this line to remove vUser and aKey access
-			// alert("email="+email+" pos(0)="+email.substring(0,0)+" pos(3)="+email.substring(3,3)+" pos(4)="+email.substring(4,4));
-			// $.Topic( 'inLogOnProcess' ).publish( false );
-		};		
 		var recoverLastTourActiveStatus = function() {//recover locally saved menu and informs FL.menu about the new menu if any
 			var lastTourStatusStr = localStorage.getItem("storedTourStatus");
 			var lastTourStatusObject = null;

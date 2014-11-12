@@ -73,7 +73,7 @@ FL["common"] = (function(){//name space FL.common
         makeModalInfo: function(message) {
             this.makeModal("","Information","<p>"+message+"</p>",{type:"primary",button1:"Ok",button2:null});//OK
         },
-        makeModalConfirm: function(message,btn1,btn2,makeModalConfirmCB) {
+        makeModalConfirm: function(message,btn1,btn2,makeModalConfirmCB) {//button 2 is the default
             this.makeModal("","Confirmation","<p>"+message+"</p>",{type:"primary",button1:btn1,button2:btn2},makeModalConfirmCB);//OK
         },
 		makeModal: function(id,title,templateName,options,makeModalCB,dataStructureForSubstitution) {

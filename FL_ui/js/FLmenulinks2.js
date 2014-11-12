@@ -14,19 +14,46 @@
 			console.log( "FLmenulinks2.js internalTest -->"+x );
 		};
 		var displayDefaultGrid = function(entityName) {
+			var promise=FL.API.loadTable(entityName);
+			promise.done(function(data){
+				console.log("New %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
+				csvStore.store(data);
+				var z=csvStore.csvRows;//only for debugging
+				// alert("New displayDefaultGrid -->import is done");
+				console.log("New displayDefaultGrid -->import is done");
+				console.log("show csvStore="+JSON.stringify(csvStore.csvRows));
+				FL.clearSpaceBelowMenus();
+				$("#addGrid").show();
+				$("#addGrid").html("Add Row");
+				var columnsArr = utils.backGridColumnsExtractedFromDictionary(entityName);//extracts attributes from dictionary and prepares columns object for backgrid
+				console.log("New &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&& entity="+entityName);
+				console.log("show columnsArr="+JSON.stringify(columnsArr));
+
+				utils.mountGridInCsvStore(columnsArr);//mount backbone views and operates grid -
+			});
+			promise.fail(function(err){
+				alert("displayDefaultGrid Error="+err);
+			});
+
+
+		};
+		var XdisplayDefaultGrid = function(entityName) {
 			FL.server.loadCsvStoreFromEntity(entityName,function(err){//all csvStore will be stored in server as "order" content
 				console.log("loadCsvStoreFromEntity is done !!! Error:"+err);
 				// FL.server.disconnect();
-				console.log("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
+				console.log("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% entity="+entityName);
 				console.log("show csvStore="+JSON.stringify(csvStore.csvRows));
 
 				FL.clearSpaceBelowMenus();
 				$("#addGrid").show();
 				$("#addGrid").html("Add Row");
 				var columnsArr = utils.backGridColumnsExtractedFromDictionary(entityName);//extracts attributes from dictionary and prepares columns object for backgrid
+				console.log("&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&& entity="+entityName);
+				console.log("show columnsArr="+JSON.stringify(columnsArr));
+
 				utils.mountGridInCsvStore(columnsArr);//mount backbone views and operates grid - 
 			});
-		};
+		};		
 		return{
 			abc: "abc",
 			test: function(x) {//call with menu key "uri": "javascript:FL.links.test('JOJO')"
@@ -170,6 +197,9 @@
 				FL.menu.topicUpdateJsonMenu(oMenu);
 			},
 			testEmail: function() {//sends a sample email with mandrill javascript API
+				var eCN = FL.dd.getCEntity("_histoMail");
+				var fCN = FL.dd.getFieldCompressedName("_histoMail","msg");
+				var dbName = FL.login.token.dbName;
 				var xhr = new XMLHttpRequest();
 				xhr.open("GET", "http://www.codecademy.com/", false);//4 verbs - GET, POST, PUT, DELETE
 				xhr.send();
@@ -190,12 +220,32 @@
 				var params2 = {
 					"message": {
 						"from_email":"support@framelink.co",
-						"to":[{"email":"joaoccoliveira@live.com"}],
-						"subject": "Text from FrameLink support team",
-						"html": "<p>I'm <strong>learning</strong> the Mandrill API at Codecademy.</p>",
+						"from_name": "jojo",
+						"to":[{"email":"joaoccoliveira@live.com"},{"email":"joaocarloscoliveira@gmail.com"},{"email":"nicolas@cuvillier.net"}],
+						// "to":[{"email":"joaoccoliveira@live.com"}],
+						// "to":[{"email":"joaocarloscoliveira@gmail.com"}],
+						"subject": "test #15 -  from FrameLink support team",
+						"html": '<p>Thank you for selecting <a href="http://www.framelink.co"><strong>FrameLink</strong></a> to build your backend site !</p>',
+// "html":'<body style="margin:0; padding:0;" bgcolor="#F0F0F0" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0"><!-- 100% background wrapper (grey background) --><table border="0" width="100%" height="100%" cellpadding="0" cellspacing="0" bgcolor="#F0F0F0"><tr>   <td align="center" valign="top" bgcolor="#F0F0F0" style="background-color: #F0F0F0;"><br><!-- 600px container (white background) --><table border="0" width="600" cellpadding="0" cellspacing="0" class="container" style="width:600px;max-width:600px"><tr><td class="container-padding header" align="left" style="font-family:Helvetica, Arial, sans-serif;font-size:24px;font-weight:bold;padding-bottom:12px;color:#DF4726;padding-left:24px;padding-right:24px">Antwort v1.0</td></tr><tr><td class="container-padding content" align="left" style="padding-left:24px;padding-right:24px;padding-top:12px;padding-bottom:12px;background-color:#ffffff"><br><div class="title" style="font-family:Helvetica, Arial, sans-serif;font-size:18px;font-weight:600;color:#374550">Single Column Fluid Layout</div><br><div class="body-text" style="font-family:Helvetica, Arial, sans-serif;font-size:14px;line-height:20px;text-align:left;color:#333333">This is an example of a single column fluid layout. There are no columns. Because the container table width is set to 100%, it automatically resizes itself to all devices. The magic of good old fashioned HTML.<br><br>The media query change we make is to decrease the content margin from 24px to 12px for devices up to max width of 400px.<br><br></div></td></tr><tr><td class="container-padding footer-text" align="left" style="font-family:Helvetica, Arial, sans-serif;font-size:12px;line-height:16px;color:#aaaaaa;padding-left:24px;padding-right:24px"><br><br>Sample Footer text: © 2014 Acme, Inc.<br><br>You are receiving this email because you opted in on our website. Update your <a href="#" style="color:#aaaaaa">email preferences</a> or <a href="#" style="color:#aaaaaa">unsubscribe</a>.<br><br><strong>Acme, Inc.</strong><br><span class="ios-footer">123 Main St.<br>Springfield, MA 12345<br></span><a href="http://www.acme-inc.com" style="color:#aaaaaa">www.acme-inc.com</a><br><br><br></td></tr></table><!--/600px container --></td></tr></table><!--/100% background wrapper--></body>',
+// "html":'<body style="margin:0; padding:0;" bgcolor="#F0F0F0" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0"><!-- 100% background wrapper (grey background) --><table border="0" width="100%" height="100%" cellpadding="0" cellspacing="0" bgcolor="#F0F0F0"><tr><td align="center" valign="top" bgcolor="#F0F0F0" style="background-color: #F0F0F0;"><br><!-- 600px container (white background) --><table border="0" width="600" cellpadding="0" cellspacing="0" class="container" style="width:600px;max-width:600px"><tr><td class="container-padding header" align="left" style="font-family:Helvetica, Arial, sans-serif;font-size:24px;font-weight:bold;padding-bottom:12px;color:#DF4726;padding-left:24px;padding-right:24px">Test 3 columns & Pictures</td></tr><tr><td class="content" align="left" style="padding-top:12px;padding-bottom:12px;background-color:#ffffff"><table width="600" border="0" cellpadding="0" cellspacing="0" class="force-row" style="width: 600px;"><tr><td class="content-wrapper" style="padding-left:24px;padding-right:24px"><br><div class="title" style="font-family:Helvetica, Arial, sans-serif;font-size:18px;font-weight:600;color:#374550">Three Columns</div></td></tr><tr><td class="cols-wrapper" style="padding-left:12px;padding-right:12px"><!--[if mso]><table border="0" width="576" cellpadding="0" cellspacing="0" style="width: 576px;"><tr><td width="192" style="width: 192px;" valign="top"><![endif]--><table width="192" border="0" cellpadding="0" cellspacing="0" align="left" class="force-row" style="width: 192px;"><tr><td class="col" valign="top" style="padding-left:12px;padding-right:12px;padding-top:18px;padding-bottom:12px"><img src="http://amerikaihirujsag.com/wp-content/uploads/2012/11/555-192x125.jpg" border="0" alt="The White Whale" width="168" height="110" hspace="0" vspace="0" style="max-width:100%; " class="image"><div class="subtitle" style="font-family:Helvetica, Arial, sans-serif;font-size:16px;font-weight:600;color:#2469A0;margin-top:18px">The White Whale</div><div class="col-copy" style="font-family:Helvetica, Arial, sans-serif;font-size:13px;line-height:20px;text-align:left;color:#333333;margin-top:12px">I take the good old <a href="http://www.framelink.co"><strong>FrameLink</strong></a> ground that the whale is a fish, and call upon holy Jonah to back me. This fundamental thing settled, the next point is, in what internal respect does the whale differ from other fish.</div><br></td></tr></table>'+
+// '<!--[if mso]></td><td width="192" style="width: 192px;" valign="top"><![endif]--><table width="192" border="0" cellpadding="0" cellspacing="0" align="left" class="force-row" style="width: 192px;"><tr><td class="col" valign="top" style="padding-left:12px;padding-right:12px;padding-top:18px;padding-bottom:12px"><img src="http://eltcasino.com/wp-content/uploads/2013/12/EN-192x125-Blade-CRM.jpg" border="0" alt="I am Ishmael" width="168" height="110" hspace="0" vspace="0" style="max-width:100%; " class="image"><div class="subtitle" style="font-family:Helvetica, Arial, sans-serif;font-size:16px;font-weight:600;color:#2469A0;margin-top:18px">I am Ishmael</div><div class="col-copy" style="font-family:Helvetica, Arial, sans-serif;font-size:13px;line-height:20px;text-align:left;color:#333333;margin-top:12px">Here upon the very point of starting for the voyage, Captain Peleg and Captain Bildad were going it with a high hand on the quarter-deck, just as if they were to be joint-commanders at sea, as well as to all appearances in port.</div><br></td></tr></table><!--[if mso]></td><td width="192" style="width: 192px;" valign="top"><![endif]--><table width="192" border="0" cellpadding="0" cellspacing="0" align="left" class="force-row" style="width: 192px;"><tr><td class="col" valign="top" style="padding-left:12px;padding-right:12px;padding-top:18px;padding-bottom:12px"><img src="http://www.momentumlife.tv/wp-content/uploads/2013/01/012413_1442_MotherhoodI1-192x125.png" border="0" alt="The Albatross" width="168" height="110" hspace="0" vspace="0" style="max-width:100%; " class="image"><div class="subtitle" style="font-family:Helvetica, Arial, sans-serif;font-size:16px;font-weight:600;color:#2469A0;margin-top:18px">The Albatross</div><div class="col-copy" style="font-family:Helvetica, Arial, sans-serif;font-size:13px;line-height:20px;text-align:left;color:#333333;margin-top:12px">And somehow, at the time, I felt a sympathy and a sorrow for him, but for I dont know what, unless it was the cruel loss of his leg. And yet I also felt a strange awe of him; but that sort of awe, which I cannot at all describe.</div><br></td></tr></table>'+
+// '<!--[if mso]></td></tr></table><![endif]--></td></tr></table></td></tr><tr><td class="container-padding footer-text" align="left" style="font-family:Helvetica, Arial, sans-serif;font-size:12px;line-height:16px;color:#aaaaaa;padding-left:24px;padding-right:24px"><br><br>Sample Footer text: © 2014 Acme, Inc.<br><br>You are receiving this email because you opted in on our website. Update your <a href="#" style="color:#aaaaaa">email preferences</a> or <a href="#" style="color:#aaaaaa">unsubscribe</a>.<br><br><strong>Acme, Inc.</strong><br><span class="ios-footer">123 Main St.<br>Springfield, MA 12345<br></span><a href="http://www.acme-inc.com" style="color:#aaaaaa">www.acme-inc.com</a><br><br><br></td></tr></table><!--/600px container --></td></tr></table><!--/100% background wrapper--></body>',
 						"autotext":true,
 						"track_opens":true,
-						"track_clicks":true
+						"track_clicks":true,
+						"metadata": {
+							"dbName": dbName,//"45829",//it is in token
+							"eCN": eCN,	//"111",
+							"fCN": fCN   //456",
+						}
+						// "recipient_metadata": [
+						// 	{
+						// 		"rcpt": "joaoccoliveira@live.com",
+						// 		"values": {
+						// 			"user_id": 123456
+						// 		}
+						// 	}
+						// ]						
 					}
 				};
 				var params3 = {//placing merge tags in the content
@@ -248,7 +298,7 @@
 				};
 				//The global_merge_vars parameter lets you specify some default values in the event that a recipient
 				//   doesn't have recipient-specific information.
-				m.messages.send(params3,function(res){console.log(res);},function(err){console.log(err);});
+				m.messages.send(params2,function(res){console.log(res);},function(err){console.log(err);});
 				alert("Send a test email");
 				// var xId = 'id_1';
 				// var xEmail = 'joaoccoliveira@live.com';

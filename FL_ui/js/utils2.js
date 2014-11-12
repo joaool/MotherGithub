@@ -303,10 +303,11 @@ window.utils = {
     },
     injectId: function(idTitle,arrOfColumns){//injects a first id column into the array
         arrOfColumns.splice(0, 0, {label:idTitle,name:"id",description: "order of lines",type:"number",typeUI:"numberbox",enumerable:null,key:true});
-    },    
+    },
     backGridColumnsExtractedFromDictionary: function(entityName){//prepares a columns object for backgrid
         //first column has a delete button, second a non editable  id then the others       
         var oEntity = FL.dd.getEntityBySingular(entityName);
+        // alert("backGridColumnsExtractedFromDictionary ->"+JSON.stringify(oEntity.attributes));
         return this.backGridColumnsFromArray(oEntity.attributes);
     },
     backGridColumnsFromArray: function(arrOfColumns){//prepares a columns object for backgrid
@@ -408,7 +409,7 @@ window.utils = {
                 this.on('change',this.modelUpdate,this);
             },
             modelUpdate: function(){
-                // alert("CsvElement modelUpdate !!!! --->"+ this.get("id") +  " nome="+this.get("nome"));
+                // alert("CsvElement modelUpdate !!!! --->"+ this.get("id") + " _id="+ this.get("_id") + " nome="+this.get("nome"));
                 // alert("CsvElement modelUpdate !!!! --->"+ JSON.stringify(this.toJSON()));
                 csvSetCollection.sync("update",this);
             },

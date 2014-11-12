@@ -595,6 +595,58 @@ $(function () {
     FL.dd.addAttribute("order","product","unique order item","product","string","textbox",null);
     actual = FL.dd.getFieldCompressedName("order","product");
     ok(actual === "02", "FL.dd.getFieldCompressedName -->compressed name is '02'");//31
+
+    console.log("%%%%%%%%%%%%%% begin %%%%%%%%%%%%%%%%%%%%%%%%");
+    FL.dd.displayEntities();
+    //addRelation: function(xSingular,rCN,withEntityName,verb,cardinality,side,storedHere) {//adds a new relation to the array of relations of entity xSingular
+    FL.dd.createEntity("sales_rep","employee responsable for sales");
+    // FL.dd.addAttribute(xSingular,xAttribute,xDescription,xLabel,xType,xTypeUI,arrEnumerable);
+    FL.dd.addAttribute("sales_rep","name","sales_rep's name","Rep Name","string","textbox",null);
+    FL.dd.addAttribute("sales_rep","phone","sales_rep's phone","Rep Phone","string","textbox",null);
+
+    FL.dd.addRelation("client","order","has","N",0,true,"En");//
+    FL.dd.addRelation("client","sales_rep","is managed by ","1",0,true,"En");
+    FL.dd.addRelation("sales_rep","client","is responsable by complaints of ","N",0,true,"En");
+
+
+    console.log("------- after ---------------");
+    FL.dd.displayEntities();
+    actual = FL.dd.relationsOf("sales_rep");
+    ok(actual[0].rCN === "02", "first relation from FL.dd.relationsOf('sales_rep') has rCN=='02'");//32
+    ok(actual[0].semantic === "sales_rep manages many clients", "first relation from FL.dd.relationsOf('sales_rep') has semantic 'sales_rep manages many clients'");//33
+    ok(actual[1].rCN === "03", "first relation from FL.dd.relationsOf('sales_rep') has rCN=='03'");//34
+    ok(actual[1].semantic === "sales_rep is responsable by complaints of  many clients", "first relation from FL.dd.relationsOf('sales_rep') has semantic 'sales_rep is responsable by complaints of  many clients'");//35
+    console.log("relations ="+JSON.stringify(actual));
+
+    actual = FL.dd.relationsOf("client");
+    ok(actual[0].rCN === "01", "first relation from FL.dd.relationsOf('client') has rCN=='01'");//36
+    ok(actual[0].semantic === "client has many orders", "first relation from FL.dd.relationsOf('client') has semantic 'client has many orders'");//37
+    console.log("relations="+JSON.stringify(actual));
+
+    actual = FL.dd.relationsOf("order");
+    console.log("relations="+JSON.stringify(actual));
+
+    ok(actual[0].rCN === "01", "first relation from FL.dd.relationsOf('order') has rCN=='01'");//36
+    ok(actual[0].semantic === "order is referred by one and only one client", "first relation from FL.dd.relationsOf('order') has semantic 'order is referred by one and only one client'");//37
+
+
+    console.log("%%%%%%%%%%%%%%% end %%%%%%%%%%%%%%%%%%%%%%%%");
+    FL.API.customTable({singular:"shipment"});
+    console.log("********************************************name**************>"+FL.API.data.shipment.name);
+    console.log("********************************************descrption**************>"+FL.API.data.shipment.description);
+    console.log("********************************************eCN**************>"+FL.API.data.shipment.eCN);
+    console.log("**********************************************************>"+FL.API.data.shipment.get("singular"));
+    console.log("**********************************************************>"+FL.API.data.shipment.get("csingular"));
+    console.log("**********************************************************>"+FL.API.data.shipment.get("plural"));
+    console.log("**********************************************************>"+FL.API.data.shipment.get("description"));
+    console.log("**********************************************************>"+FL.API.data.shipment.get("sync"));
+    // // FL.API.data.shipment.tfunc();
+    FL.API.data.shipment.set("description","place to send merchandise");
+    console.log("***************after set*******************************************>"+FL.API.data.shipment.get("description"));
+    var records=[{"name":"Joao","phone":"123"},{"name":"Anton","phone":"456"}];
+    FL.API.saveTable("sales_rep",records);
+    console.log("*********************************after saveTable*******************************************");
+
     actual = FL.dd.isEntityInLocalDictionary("order");
     ok(actual === true, "FL.dd.isEntityInLocalDictionary -->'order' exists in local dictionary.");//32
     actual = FL.dd.isEntityInLocalDictionary("orderz");
@@ -611,9 +663,10 @@ $(function () {
     //now testing relations functions
     actual = FL.dd.isRelation("client","01");
     ok(actual === false, "FL.dd.isRelation --> relation compressed name '01' does not exist");//37
-    FL.dd.addRelation("client","01","order","orders","N");//(xSingular,rCN,withEntityName,verb,cardinality,side,storedHere)
-    obj = FL.dd.entities["client"].relations[0];
-    deepEqual( obj, {"rCN":"01","withEntity":"order","verb":"orders","cardinality":"N","semantic":"client orders many orders","side":null,"storedHere":null,"withEntityCN":null},"FL.dd.addRelation --> added relation client to order ");//38
+
+    // FL.dd.addRelation("client","01","order","orders","N");//(xSingular,rCN,withEntityName,verb,cardinality,side,storedHere)
+    // obj = FL.dd.entities["client"].relations[0];
+    // deepEqual( obj, {"rCN":"01","withEntity":"order","verb":"orders","cardinality":"N","semantic":"client orders many orders","side":null,"storedHere":null,"withEntityCN":null},"FL.dd.addRelation --> added relation client to order ");//38
 
     //FL.dd.displayEntities();
 

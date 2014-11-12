@@ -218,6 +218,39 @@ var FL = FL || {};
 		// ]);
 		// myMenu.menuRefresh(oMenu.menu); //OK
 		
+		Stripe.setPublishableKey('pk_test_6CAFi1bRUlnFyOnfrRVsbiHS');
+		Stripe.card.createToken({
+		  number: '4188190022954197',
+		  cvc: '067',
+		  exp_month: 10,
+		  exp_year: 2015
+		}, stripeResponseHandler);
+		function stripeResponseHandler(status, response) {
+		  var $form = $('#payment-form');
+
+		  if (response.error) {
+		    // Show the errors on the form
+		    // $form.find('.payment-errors').text(response.error.message);
+		    // $form.find('button').prop('disabled', false);
+		    alert("Stripe returned an error !!!");
+		  } else { //ok !!!!
+		    // response contains id and card, which contains additional card details
+		    // var token = response.id;
+		    // Insert the token into the form so it gets submitted to the server
+		    // $form.append($('<input type="hidden" name="stripeToken" />').val(token));
+		    // and submit
+		    // $form.get(0).submit();
+		    var resp = "status=" + status; //200=>ok others=> problem https://stripe.com/docs/api#errors
+		    resp = resp +"\ntokenId="+response.id;
+		    resp = resp +"\nbrand="+response.card.brand;
+		    resp = resp +"\nfunding="+response.card.funding;
+		    resp = resp +"\ncountry="+response.card.country;
+		    resp = resp +"\nlivemode="+response.livemode;
+		    alert(resp);
+		  }
+		}
+
+
 		myMenu.menuRefresh();
 		home = function() {//necessary to force brand to call _home
 			// alert("Home !!!");
@@ -226,7 +259,7 @@ var FL = FL || {};
 		};
 		//testing login promises
 		// FL.API.connectAdHocUser();//OK
-		// FL.API.connectAdHocUser().then(FL.API.removeAdHocUser);//OK 
+		// FL.API.connectAdHocUser().then(FL.API.removeCurrentUser);//OK 
 		// FL.API.connectAdHocUser().then(function(){FL.API.registerAdHocUser("fofo26","fofo123","fofo26 app");});//OK
 		// FL.API.connectAdHocUser().then(function(){FL.API.registerAdHocUser("JSmith@nwtraders.com","js123","Northwind Company Site");});//OK
 		// FL.API.connectUserToDefaultApp("fofo26","fofo123");//OK

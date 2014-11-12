@@ -30,6 +30,7 @@ jQuery(document).ready(function($){
 					"</div>";					
 				// var compiled = _.template(importButtonHtml);
 			// $('#importButton').html(compiled( {fileName:fileName} ));
+				// alert("-------------------->"+fileName);
 				if (fileName.length == 0){
 					$('#confirmStatment').empty();
 					$('#confirm').hide();
@@ -45,7 +46,8 @@ jQuery(document).ready(function($){
 				}
 				// $('#importButton').html(compiled( {fileName:fileName} ));
 
-				$('#input1').filestyle({//http://markusslima.github.io/bootstrap-filestyle/
+				$('#input1').filestyle({//http://markusslima.github.io/bootstrap-filestyle/ 
+					//In fl_builder2.html we define  <input type='file' id='input1'> The event is caugth here...
 					input : true,
 					buttonText : 'Import new csv file',
 					buttonName : 'btn-primary',
@@ -57,6 +59,8 @@ jQuery(document).ready(function($){
 					return  nameStr.substring(xPos + 1);
 				};
 				$('#confirm').click(function() {
+					//In fl_builder2.html we define <button id='confirm' class='btn btn-primary btn-xs' type='button'>OK</button> The event is caugth here...
+					// the button "OK" (with id="confirm") only appears after the file selection. See importButtonHtml
 					// var sourceFile = $("input[type=file]").val();//ex:c:\fakepath\weadvice.csv
 					var sourceFile = csvStore.currentGridCandidate.fileName;
 					// alert("confirm -->"+sourceFile);
@@ -64,15 +68,7 @@ jQuery(document).ready(function($){
 					if (sourceFile.length === 0) {
 						BootstrapDialog.alert('Please choose a csv file to import, before confirmation !');
 					}else{
-						// alert(extractFileName(sourceFile));
-						// we will transform attributesArr in items to display
-						// var attributesArr = csvStore.getAttributesArr();//the set was done in utils.csvToGrid()
-
-						//format in csvStore--> [{label:"xx",name:fieldName,description:xDescription,type:xtype,enumerable:xEnumerable},{col2}...{}]
-
-						var attributesArrNoId = csvStore.getAttributesArrNoId();//we retrieve all excepept name="id"
-						// alert("attributesArrNoId=\n"+JSON.stringify(attributesArrNoId));
-
+						var attributesArrNoId = csvStore.getAttributesArrNoId();//we retrieve all except name="id"
 						// tansform [{label:"xx",name:fieldName,type:xtype,enumerable:xEnumerable},{col2}...{}] in items
 						var detailItems = utils.buildMasterDetailStructureFromattributesArr(attributesArrNoId);
 						var masterDetailItems = {
@@ -80,57 +76,54 @@ jQuery(document).ready(function($){
 							detailHeader:["#","Attribute","what is it","Statement to validate"],
 							detail:detailItems //format is array with {attribute:<attribute name>,description:<attr description>,statement;<phrase>}
 						};
-						// Ex: for masterDetailItems
-						// 	var masterDetailItems = {
-						//		master:{entityName:"",entityDescription:""},
-						//		detailHeader:["#","Attribute","what is it","Statement to validate"],
-						//		detail:[ //format is array with {attribute:<attribute name>,description:<attr description>,statement;<phrase>}
-				        //         {attribute:"name", description:"official designation",statement:"the name of the client is the official designation"},
-				        //         {attribute:"address", description:"place to send invoices",statement:"The address of the client is the place to send invoices"},
-				        //         {attribute:"city", description:"headquarters place", statement:"The city of the client is the headquarters place"},
-				        //         {attribute:"postal code", description:"postal reference for delivery",statement:"The postal code of the client is the postal reference for delivery"}
-				        //  	]
-						//	};
-
 						FL.common.editMasterDetail("B"," Define data","_dictEditEntityTemplate",masterDetailItems,{type:"primary", icon:"pencil",button1:"Cancel",button2:"Confirm Grid Import"},function(result){
 							if(result){
-								// alert("-->Yup \nmasterDetailItems="+JSON.stringify(masterDetailItems));//OK !!! it retrieves the new values !!!
-								//we create the entity in dictionary, save dictionary on server, save the grid on server and create menu option.
-								// update dictionary with singular and description
-								// alert("FLSlidePanels entityName=" + masterDetailItems.master.entityName + " description=" + masterDetailItems.master.entityDescription );
-
 								//We update name and description in csvStore.attributesArr and then use it to create dictionary fields. 
-								var attributesArrNoId = csvStore.getAttributesArrNoId();//we retrieve all excepept name="id"
+								var attributesArrNoId = csvStore.getAttributesArrNoId();//we retrieve all except name="id"
 								_.each(attributesArrNoId, function(element,index){
 									element["name"] = masterDetailItems.detail[index].attribute;
 									element["description"] = masterDetailItems.detail[index].description;
 								});
-								FL.dd.createEntityAndFields(masterDetailItems.master.entityName, masterDetailItems.master.entityDescription,csvStore.attributesArr);
 								var singular = masterDetailItems.master.entityName;
-								var oEntity =  FL.dd.getEntityBySingular(singular);
-								var plural = oEntity.plural;
-								// alert(" singular="+singular+" plural="+plural);
-								// var cEntity = FL.dd.getCEntity(masterDetailItems.master.entityName);
-								//now we sync the dictionary for the new entity put grid data ond server and create menu option
-								FL.server.insertCsvStoreDataTo(singular,function(err){
-									if(err){
-										console.log("Data from entity "+singular+" Error trying to store on server error="+err);
-										return;
-									}
-									FL.clearSpaceBelowMenus();
-									$.Topic( 'createGridOption' ).publish( plural,singular );//broadcast that will be received by FL.menu to add an option
-									FL.dd.displayEntities();
-								});
+								var description = masterDetailItems.master.entityDescription;
+								if(FL.dd.createEntityAndFields(singular, description,csvStore.attributesArr)){
+									var oEntity =  FL.dd.getEntityBySingular(singular);
+									var plural = oEntity.plural;
+									// alert(" singular="+singular+" plural="+plural);
+									// var cEntity = FL.dd.getCEntity(masterDetailItems.master.entityName);
+									//now we sync the dictionary for the new entity put grid data ond server and create menu option
+										// FL.server.insertCsvStoreDataTo(singular,function(err){
+										// 	if(err){
+										// 		console.log("Data from entity "+singular+" Error trying to store on server error="+err);
+										// 		return;
+										// 	}
+										// 	FL.clearSpaceBelowMenus();
+										// 	$.Topic( 'createGridOption' ).publish( plural,singular );//broadcast that will be received by FL.menu to add an option
+										// 	FL.dd.displayEntities();
+										// });
+									FL.grid.insertDefaultGridMenu(singular,plural);
+								}else{
+									// alert("FLSlidePanels Error trying to create existing entity "+singular);
+									FL.common.makeModalConfirm("Entity " + singular + " exists. Do you want to overwrite it ?","Yes - overwrite " + singular + "!","No",function(result){
+										if(result){
+											FL.common.makeModalInfo("Nothing was done"); 
+										}else{
+											alert("is going to overwrite");
+											// FL.grid.insertDefaultGridMenu(singular,plural);
+										}
+									});
+								}	
 							}else{
 								FL.common.makeModalInfo("Nothing was saved.");
 							}
 						});//OK						
 					}
 				});
-				$('input').change(function(e) { //this is the code to produce the grid
+				$('input').change(function(e) { //this change occurs after file selection - thi is the code to produce the grid
 					// alert("FLLoadCss2 managePanel3 input changed");
 					// console.log("input changed");
 					var fileName = extractFileName( $("input[type=file]").val() );//ex:c:\fakepath\weadvice.csv
+					// alert("1---->"+fileName);
 					csvStore.currentGridCandidate["fileName"] = fileName;
 					$('#confirmStatment').html("<h4 id='confirmStatment' style='color:white;'>If <u>" + fileName + "</u> is the file you want to import, press the OK button</h4>");
 					$('#confirm').show();
@@ -139,7 +132,9 @@ jQuery(document).ready(function($){
 					$("#addGrid").html("Add Row");
 
 					var csvFile = $('input[type=file]');
-					utils.csvToGrid(csvFile);
+					// alert("2---->"+JSON.stringify(csvFile));
+
+					utils.csvToGrid(csvFile);//csvFile is a JQuery object
 					console.log("------------------------------------>"+fileName);
 				});
 			},

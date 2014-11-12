@@ -111,7 +111,7 @@
 			sOut=  strReverse( sOut);
 			return sOut;
 		};
-		strReverse=function ( str ) {//reverse a string: ex: "abcd" becomes "dcba"
+		var strReverse=function ( str ) {//reverse a string: ex: "abcd" becomes "dcba"
 			var sOut="";
 			var iLen=str.length;
 			for (var ii=iLen-1; ii>=0; ii--) {
@@ -119,7 +119,7 @@
 			}
 			return sOut;
 		};
-		preArticle = function(sWord,xLanguage) {//for language xLanguage extract the article to be used before sWord
+		var preArticle = function(sWord,xLanguage) {//for language xLanguage extract the article to be used before sWord
 			//Ex z="What is "+dDictionary.preArticle(xEntity,"En")+"?";
 			if(!sWord)
 				return null;
@@ -152,7 +152,7 @@
 			}
 			return xArticle+" "+sWord;
 		};	//preArticle			
-		plural = function(sWord,xLanguage) {//returns the plural of sWord in language=xLanguage
+		var plural = function(sWord,xLanguage) {//returns the plural of sWord in language=xLanguage
 			//ex: dDictionary.plural("car","En") ->cars, dDictionary.plural("box","En")->boxes 
 			var xWord=sWord;
 			var xFirst=sWord.substr(0,1);
@@ -236,7 +236,7 @@
 			}
 			return xWord;
 		};//plural
-		makeSemStr= function(x1,x2,xType,xLanguage) {//concatenate basic entity semantics
+		var makeSemStr= function(x1,x2,xType,xLanguage) {//concatenate basic entity semantics
 		// x1 - first word (pre) to be connected to second by phrase of type=xType
 		// x2 - second word (pos) to be connected to first by phrase of type=xType
 		// xType:
@@ -257,7 +257,7 @@
 			var sRet=oTrad.pre+x1+oTrad.mid+x2+oTrad.pos;
 			return sRet;
 		}; //makeSemStr
-		entitySemantics= function(oEntity,xType,xLanguage) {//shows entity/description semantics
+		var entitySemantics= function(oEntity,xType,xLanguage) {//shows entity/description semantics
 		// return (case "A") --> <Client> is a <Individual or Company to whom we may send invoices>
 		// ex: if(this.oDbg.isDbg("main")) this.oDbg.display("Semantics 1)->"+dDictionary.entitySemantics(oEntity,"A","En"));
 		// ex: if(this.oDbg.isDbg("main")) this.oDbg.display("Semantics 2)->"+dDictionary.entitySemantics(oEntity,"B","En"));
@@ -273,7 +273,7 @@
 			}
 			return xRet;
 		}; //entitySemantics
-		attributeSemantics= function(xAttribute,xAttrDescription,oEntity,xLanguage) {//shows singular-description for attribute=xAttribute
+		var attributeSemantics= function(xAttribute,xAttrDescription,oEntity,xLanguage) {//shows singular-description for attribute=xAttribute
 		// ex: The <address> of <Client> is <the address to send invoices>
 		//  dDictionary.attributeSemantics(oEntity.attributes[i].name,oEntity.attributes[i].description,oEntity,"En");
 			var trad={ //entity+A+description, B.pre+singular+B.mid+plural+B.pos
@@ -284,21 +284,119 @@
 			};
 			var oLanguage=trad[xLanguage];//extracts language code
 			return oLanguage.pre+xAttribute+oLanguage.mid1+oEntity.singular+oLanguage.mid2+xAttrDescription+oLanguage.pos;
-		}; //attributeSemantics
-		cardinalityDecoder=function(sCardinality,xLanguage){//returns semantics to Cardinality - object {cardText:<string or null>,cardPlural:<boolean>}
+		};//attributeSemantics
+		var reversePhrase_is_something = function(sVerb){
+		//		book "is published by" an editor--> editor "publishes" many books
+			var xArr=sVerb.split(" ");
+			var xLen=xArr[1].length;//length of second word (supposedly a verb)
+			var xLast=xArr[1].substr(xLen-2,2);//last 2 chars (ed)
+			// if(xLast=="ed")
+				var xRet=xArr[1].substr(0,xLen-2)+"es";//publishes							
+			return xRet;
+		};
+		var invertedToOneVerb = function(sVerb,xLanguage){//returns verb of inverted relation of sVerb
+		// this method computes the passive voice for the verb in "To One" sentences (3rd person)
+		//		Invoice Line  "has" one product --> product "is referred by" many Incoice Lines
+		//		Invoice "invoices" one client	--> client "is invoiced by" many invoices
+		//		reserve "is done by" one member	--> member "does " many reserves
+		//		book "has" genre                --> genre "is referred by" many books (or classifies) 
+		//		book "is published by" an editor--> editor "publishes" many books
+		//		editor "publishes" one title   --> title  "is published by" many editors
+		//		trip "visits" one destination   --> destination "is visited by" many trips
+		//
+		//		salesRep "is responsable by complaints of " many clients --> client "complaints to" one salesRep
+		//
+		//   sVerb - verb in the direct "To One" relation (left side examples)
+		//   RETURN: inverted relation verb (rigth side examples)
+		//     Example: "visits" becomes "is visited by"
+		//           the inverse relation becomes-> destination is visited by zero or many trips
+		// Tests
+		// xPre="reserve";xIn="is done by";xPos="member";
+		// var xOut=dDictionary.invertedToOneVerb(xIn,"En");
+		// console.log(xPre+" "+xIn+" one "+xPos+" ->"+xPos+" "+xOut+" many "+dDictionary.plural(xPre,"En"));
+			var DirDefault = {"En":{"default":"is referred by","has":"is referred by","is done by":"does"},
+								"Fr":{"default":"appartient a","a":"appartient a"},
+								"Pt":{"default":"pertence a","tem":"pertence a"},
+								"Nl":{"default":"wordt verwezen","heeft":"wordt verwezen"}
+							};
+			//var InvDefault ={ "En":{"referres":"is referred by"},"Fr":{"a":"appartiennent"},"Pt":{"tem":"pertence a"},"Nl":{"heeft":"wordt verwezen"};
+			var oObj = DirDefault[xLanguage];
+			var xRet = null;
+			if(oObj){
+				for (var key in oObj) {
+					if (oObj.hasOwnProperty(key)) {
+						if(key==sVerb)
+							xRet=oObj[key];
+					}
+				}
+			}
+			if(xRet)
+				return xRet;
+			var xLen=sVerb.length;
+			var xArr=sVerb.split(" ");
+			var xLast = null;
+			var xLast2 = null;
+			switch(xLanguage){
+				case "En":
+					if(xArr.length>1){//more than one word
+						if(xArr.length>3){
+							if(xArr[1] == "responsable" && xArr[2] == "by" ){//"it begins by is responsable by" Ex:"is responsable by complaints"
+								xRet=xArr[3]+" to";//returns "complaints to"
+							}else{
+								xRet=reversePhrase_is_something(sVerb);
+							}		
+						}else if(xArr[0]=="is"){ //"is published by" ->publishes <> "is managed by" ->manages
+							xRet=reversePhrase_is_something(sVerb);
+						}
+					}else if(xArr.length==1){ //one single word -> "publishes" ->"is published by", "visits"->"is visited by" 
+						xLen=xArr[0].length;
+						xLast=xArr[0].substr(xLen-1,1);//last 1 chars (s)
+						xLast2=xArr[0].substr(xLen-2,2);//last 2 chars (s)
+						if(xLast2=="es"){//"publishes" ->"is published by"
+							xRet="is "+xArr[0].substr(0,xLen-2)+"ed by";
+						}else if(xLast=="s"){//"visits"->"is visited by" 
+							xRet="is "+xArr[0].substr(0,xLen-1)+"ed by";
+						}
+					}
+					break;
+				case "Pt":
+					if(xArr.length>1){//more than one word
+						if(xArr[0]=="é"){ //"é publicado por " ->publica
+							xLen=xArr[1].length;
+							var xLast3=xArr[1].substr(xLen-3,3);//last 2 chars (ed)
+							if(xLast3=="ado")
+								xRet=xArr[1].substr(0,xLen-3)+"a";
+						}
+					}else if(xArr.length==1){ //one single word -> "publica" ->"é publicado por", "visita"->"é visitado por" 
+						xLen=xArr[0].length;
+						xLast=xArr[0].substr(xLen-1,1);//last 1 chars (s)
+						xLast2=xArr[0].substr(xLen-2,2);//last 2 chars (s)
+						if(xLast2=="xx"){//"to be done"
+							xRet="is "+xArr[0].substr(0,xLen-2)+"ed by";
+						}else if(xLast=="a"){//"visita"->"is visited by"
+							xRet="é "+xArr[0]+"do por";
+						}
+					}
+					break;
+				}//end switch
+			if(!xRet)
+				xRet=oObj["default"];
+			return xRet;
+		}; //invertedToOneVerb			
+		var cardinalityDecoder=function(sCardinality,xLanguage){//returns semantics to Cardinality - object {cardText:<string or null>,cardPlural:<boolean>}
 			//returns and object with {cardText:<string or null>,cardPlural:<boolean>}
 			//   cardText contains the expression corresponding to the code=sCardinality in the language=xLanguage
-			//  	 if cardinality does not exist - cardText will be null - working as a validator
+			//		 if cardinality does not exist - cardText will be null - working as a validator
 			//   cardPlural - contains a boolean such as:
 			//		 if cardinality implies a second member singular in relation semantics - cardPlural will be false
 			//		 if cardinality implies a second member plural in relation semantics - cardPlural will be true
 			//		  ex:in expression - "Invoice Item" "belongs to" "one and only one" "Invoice" ->second member is singular
 			//		    :in expression - "Client" "has" "many" "Invoices"						  ->second member is plural
 			var trad={ //entity+A+description, B.pre+singular+B.mid+plural+B.pos
-				"En":{"0_1":{text:"zero or 1",cardPlural:false},"N":{text:"many",cardPlural:true},"1":{text:"one and only one",cardPlural:false}},
-				"Fr":{"0_1":{text:"zero ou 1",cardPlural:false},"N":{text:"plusieurs",cardPlural:true},"1":{text:"un et seulement un",cardPlural:false}},
-				"Nl":{"0_1":{text:"nul of 1",cardPlural:false},"N":{text:"velen",cardPlural:true},"1":{text:"slechts één",cardPlural:false}},
-				"Pt":{"0_1":{text:"zero or 1",cardPlural:false},"N":{text:"vários",cardPlural:true},"1":{text:"um e só um",cardPlural:false}},
+				"En":{"1":{text:"zero or 1",cardPlural:false},"N":{text:"many",cardPlural:true},"1":{text:"one and only one",cardPlural:false}},
+				"Fr":{"1":{text:"zero ou 1",cardPlural:false},"N":{text:"plusieurs",cardPlural:true},"1":{text:"un et seulement un",cardPlural:false}},
+				"Nl":{"1":{text:"nul of 1",cardPlural:false},"N":{text:"velen",cardPlural:true},"1":{text:"slechts één",cardPlural:false}},
+				"Pt":{"1":{text:"zero ou 1",cardPlural:false},"N":{text:"varios",cardPlural:true},"1":{text:"um e apenas um",cardPlural:false}},
 			};
 			var oLanguage=trad[xLanguage];//extracts language code
 			xCardText=null;
@@ -308,11 +406,11 @@
 				if(xDecoder){
 					xCardText=xDecoder.text;
 					xCardPlural=xDecoder.cardPlural;
-				};
-			};
+				}
+			}
 			return {cardText:xCardText,cardPlural:xCardPlural};//if cardiality does not exist cardText will return null
 		};//cardinalityDecoder		
-		relationSemantics= function(sSingular,sRightEntity,sVerb,sCardinality,xLanguage) {//shows relationsemantics
+		var relationSemantics= function(sSingular,sRightEntity,sVerb,sCardinality,xLanguage) {//shows relationsemantics
 		// ex for : sSingular="Client",sRightEntity="Invoice",sVerb="has",sCardinality="0_N",xLanguage="En"
 		// 	  returns : "Client has many invoices"
 		//  dDictionary.attributeSemantics(oEntity.attributes[i].name,oEntity.attributes[i].description,oEntity,"En");
@@ -321,7 +419,7 @@
 			if(!oCard.cardText){
 				alert("relationSemantics - Impossible to find semantics for cardinality="+sCardinality+" Language="+xLanguage);
 				//Err.alert("dDictionary.relationSemantics",(new Error),"Impossible to find semantics for cardinality="+sCardinality+" Language="+xLanguage);
-			};
+			}
 			xRet+=oCard.cardText+" ";
 			var xRight=sRightEntity;//this will be the singular for thew right entity
 			if(oCard.cardPlural){
@@ -329,11 +427,11 @@
 				if(!xRight){
 					alert("relationSemantics - RightEntity="+sRightEntity+" does not exist in Data Dictionay");
 					//Err.alert("dDictionary.relationSemantics",(new Error),"RightEntity="+sRightEntity+" does not exist in Data Dictionay");
-				};
-			};
+				}
+			}
 			return xRet+xRight;
 		}; //relationSemantics			
-		attributeIndex= function(xSingular,xAttribute) {//for entity=xSingular, returns the index of attribute=xAttribute
+		var attributeIndex= function(xSingular,xAttribute) {//for entity=xSingular, returns the index of attribute=xAttribute
 			// if attribute exists within xSingular returns it. Returns -1 otherwise
 			// console.log("dd.attributeIndex ->check index for "+xAttribute);
 			var xRet = -1;
@@ -355,7 +453,29 @@
 				// console.log("dd.attributeIndex ->for attribute="+xAttribute+" returns position="+xRet);
 			}
 			return xRet;
-		};//attributeIndex			
+		};//attributeIndex
+		var prepareRelation = function(xSingular,rCN,withEntityName,verb,cardinality,side,storedHere,xLanguage){//prepare JSON to relation arr - used by FL.dd.addRelation()
+			var relation = {};
+			relation["rCN"] = rCN;
+			relation["withEntity"] = withEntityName;
+			relation["verb"] = verb;
+			relation["cardinality"] = cardinality;
+			if(!side)
+				side = null;
+			if(!storedHere)
+				storedHere = null;
+			relation["side"] = side;
+			relation["storedHere"] = storedHere;
+			// var rightEntityName = 
+			var xSemantics=FL.dd.relationSemantics(xSingular,withEntityName,verb,cardinality,xLanguage);
+
+			relation["semantic"] = xSemantics;
+
+			relation["side"] = side;
+			relation["storedHere"] = storedHere;
+			relation["withEntityCN"] = null;//this is an auxiliary field to support FL.server.syncLocalDictionary()
+			return relation;		
+		};
 		return{
 			entities: {__Last:0,__LastRelation:0},
 			test:"FL.dd.test return !!!",
@@ -434,7 +554,7 @@
 									var side = xArr[i].side;
 									var storeHere = xArr[i].storeHere;
 
-									console.log("-----> relation["+i+"] with compressedId="+rCN+" -> "+xSemantic+" - #="+cardinality);
+									console.log("-----> relation["+i+"] with rCN="+rCN+" -> "+xSemantic+" - #="+cardinality);
 								}
 							}else{
 								console.log("----->no relations defined !");
@@ -468,7 +588,7 @@
 				}
 				return nextEntityName;
 			},
-			createEntity: function(xSingular,xDescription) {//add an entity entry returning true if it succeds false otherwise
+			createEntity: function(xSingular,xDescription) {//add an entity entry returning true if it succeeds false otherwise
 				//   Whenever a new entity is created a key attribute is also created with:
 				//		dDictionary.addAttribute(xSingular,"id",xSingular+"'s id","textBox",true);
 				//      Note:The key attribute is glued to the entity - (it may be editable, but not deleted)
@@ -535,7 +655,7 @@
 				}
 				return xRet;
 			},
-			getCEntity: function(xEntity) {//returns the compressed name of a logical name xEntity
+			getCEntity: function(xEntity) {//returns the compressed name of a logical name xEntity - if does not exist =>returns null
 				//returns the compressed name of the logical name xEntity. The method is a NOP if xEntity is null;
 				var xCEntity=null;
 				if(xEntity){
@@ -558,9 +678,9 @@
 				if (oEntity) 
 					entityName = oEntity.singular;
 				return entityName;
-			},			
+			},
 			addAttribute: function(xSingular,xAttribute,xDescription,xLabel,xType,xTypeUI,arrEnumerable) {//adds AttributeName,Description, label Type and enumerable to entity = xSingular			
-			// addAttribute: function(xSingular,xAttribute,xDescription,xLabel,xType,arrEnumerable) {//adds AttributeName,Description, label Type and enumerable to entity = xSingular			
+			// addAttribute: function(xSingular,xAttribute,xDescription,xLabel,xType,arrEnumerable) {//adds AttributeName,Description, label Type and enumerable to entity = xSingular
 				// xSingular - Entity name (singular) to add attribute
 				// xAttribute - attribute name (Nico's "3")
 				// xDescription - attribute description (Nico's "4")
@@ -621,38 +741,57 @@
 					//Err.alert("dDictionary.addAttribute",(new Error)," you tried to add attribute "+xAttribute+" to a non existing entity "+xSingular);
 				}
 			},
-			addRelation: function(xSingular,rCN,withEntityName,verb,cardinality,side,storedHere) {//adds a new relation to the array of relations of entity xSingular
+			addRelation: function(xSingular,withEntityName,verb,cardinality,side,storedHere,xLanguage) {//adds a new relation to the array of relations of entity xSingular
+				//xLanguage --> En, Fr, Nl, Pt
+				//NOTE: the rCN relation compressed name is retirned by the server when we try to create the relation.
+				//      In order to follow the approach -->"first we create in local dictionary the we synchronize to the server" we begin by generating
+				//		an unique compressed name in the client that will be updated when we save the relation in the server. The unique relation compressed
+				//		name is generated from entities.__LastRelation 
 				//ex:FL.dd.addRelation(entities[i].d["3"],rCN,withEntityName,verb,cardinality,side,storedHere);
+				//	{idRelation:3,cIdRelation:"03",rightEntity:"Invoice",description:"has",cardinality:"0_1",semantic:"Client has many Invoices",delChildren:false}
+				//dDictionary.addRelation= function(xSingular,sRightEntity,sDescription,sCardinality,bDelChildren,xLanguage) {//adds/updates a relation to the Data Dictionary
+
+
+				//     In real live we could have: 
+				//					"invoice" "has" "one and only one" "client" - a first relation between invoice and client
+				//					"invoice" "products must be delivered to" "one and only one" "client" - a second relation between invoice and client
+				// alert("step1");
 				var oEntity = this.entities[xSingular];
+				var oToEntity = this.entities[withEntityName];
 				if(oEntity){
-					// checks if rCN already exists - if it exists it does not add
-					if (FL.dd.isRelation(xSingular,rCN)){
-						alert("FL.dd.addRelation Error: you tried to add a relation with a compressed name "+rCN+" that already exists !");
+					if(oToEntity){
+						// checks if rCN already exists - if it exists it does not add
+						if (FL.dd.isRelation(xSingular,rCN)){
+							alert("FL.dd.addRelation Error: you tried to add a relation with a compressed name "+rCN+" that already exists !");
+						}else{
+							// var xNextRelation=dDictionary.entities["__LastRelation"]+1; ???????????
+							// dDictionary.entities["__LastRelation"]=xNextRelation; ???????????????
+							var xNext = this.entities["__LastRelation"]+1;
+							this.entities["__LastRelation"] = xNext;
+							var rCN = getCompressed(xNext);
+
+							var side2 = 1;//we assume (0 - 1) if not we set  (1 - 0)
+							if(side == 1)//Side, either 0 or 1. Mandatory
+								side2 = 0;
+							var storedHere2 = false;//we assume (true - false) if not we set (false - true)
+							if(!storedHere)//storedHere. Where to store the relation. Should be true to at least one side. 
+								storeHere2 = true;
+
+							var relation = prepareRelation(xSingular,rCN,withEntityName,verb,cardinality,side,storedHere,xLanguage);
+							oEntity.relations.push(relation);
+
+							var verb2 = invertedToOneVerb(verb,xLanguage);
+							var cardinality2 = "1";//Cardinality. Not used by the datalayer. Could be ‘1’ or ‘N’. Mandatory
+							if(cardinality == "1")
+								cardinality2 = "N";
+
+							var relation2 = prepareRelation(withEntityName,rCN,xSingular,verb2,cardinality2,side2,storedHere2,xLanguage);
+							oToEntity.relations.push(relation2);
+
+						}
 					}else{
-						// var xNextRelation=dDictionary.entities["__LastRelation"]+1; ???????????
-						// dDictionary.entities["__LastRelation"]=xNextRelation; ???????????????
-						var relation = {};
-						relation["rCN"] = rCN;
-						relation["withEntity"] = withEntityName;
-						relation["verb"] = verb;
-						relation["cardinality"] = cardinality;
-						if(!side)
-							side = null;
-						if(!storedHere)
-							storedHere = null;
-						relation["side"] = side;
-						relation["storedHere"] = storedHere;
-						// var rightEntityName = 
-						var xSemantics=FL.dd.relationSemantics(xSingular,withEntityName,verb,cardinality,"En");
-
-						relation["semantic"] = xSemantics;
-
-						relation["side"] = side;
-						relation["storedHere"] = storedHere;
-						relation["withEntityCN"] = null;//this is an auxiliary field to support FL.server.syncLocalDictionary() 
-
-						oEntity.relations.push(relation);
-					}
+						alert("FL.dd.addRelation Error: you tried to add a relation between "+xSingular+" and a non existing entity "+withEntityName);
+					}				
 				}else{
 					alert("FL.dd.addRelation Error: you tried to add a relation "+relationName+" to a non existing entity "+xSingular);
 				}
@@ -671,7 +810,7 @@
 						FL.dd.setSync(xSingular,true);
 					}
 				});
-			},			
+			},
 			isRelation: function(xSingular,rCN) {//returns true if relation exists, false otherwise 
 				var exists = false;
 				var oEntity = this.entities[xSingular];
@@ -748,13 +887,93 @@
 				//	fieldDefinitionArray - array of JSON (one element per field) with format definition
 				// format for fieldDefinitionArray -->[{label:"xx",name:fieldName, description:xdescription, type:xtype,enumerable:xEnumerable},{col2}...{}]
 				//     NOTE:fieldDefinitionArray may come from  csvStore.getAttributesArr() or csvStore.getAttributesArrNoId()
+				// Returns: true if createEntityAndFields succeeds - false if entityName already exists.
+				var xRet = false;
 				if(FL.dd.createEntity(entityName, entityDescription)){//singular,description
 					_.each(fieldDefinitionArray, function(element,index){
 						FL.dd.addAttribute(entityName,element.name, element.description,element.label,element.type,element.typeUI,element.enumerable);
 					});
+					xRet = true;
 				}else{
-					alert("FL.dd.createEntityAndFields createEntity() Error entity " + masterDetailItems.master.entityName + " already exists !");
-				}						
+					// alert("FL.dd.createEntityAndFields createEntity() Error entity " + masterDetailItems.master.entityName + " already exists !");
+					console.log("FL.dd.createEntityAndFields Error:trying to create existing entity " + entityName + " !!!");
+				}
+				return xRet;
+			},
+			relationsOf: function(xSingular) {//returns an array with all relations of xSingular
+				//	format of each array element:
+				//	{idRelation:3,cIdRelation:"03",rightEntity:"Invoice",description:"has",cardinality:"0_1",semantic:"Client has many Invoices"});
+				//   one entity may have several relations with another entity !
+				var xComboArr=[];
+				// var oEntity=dDictionary.entities[xSingular];
+				var oEntity = this.entities[xSingular];
+				if(oEntity){
+					var xArr=oEntity.relations;
+					if(xArr.length>0){//entity has relations
+						for (var i=0;i<xArr.length;i++){
+							xComboArr.push(xArr[i]);
+						}
+					}
+				}
+				return xComboArr;
+			},
+			removeRelations: function(xSingular,sRightEntity) {//removes direct and reverse relations between the 2 entities
+				//   removes relations sRightEntity from xSingular set of relations also removing
+				// 		relations xSingular from sRightEntity set  of relations
+				//   Notes:
+				///  if xSingular or sRightEntity does not exists nothing is done
+				//   this method assumes several relatiions between two entities
+				//   if only one (direct or reverse) relation exist that relation will be removed
+				
+				var oDirectEntity = this.entities[xSingular];
+				var oReverseEntity = this.entities[sRightEntity];
+
+				if(oDirectEntity && oReverseEntity){
+					// var xIndex=dDictionary.relationIndex(xSingular,sRightEntity);
+					var directRelationsArr = oDirectEntity.relations;//all direct relations - we need to isolate those with sRightEntity
+					var indexArr=[];
+					_.each(directRelationsArr, function(element,index){
+						if(element.rightEntity == sRightEntity)
+							indexArr.push(index);
+					});
+					_.each(indexArr, function(element){
+						oDirectEntity.relations.splice(element,1); //in position xIndex remove 1 item
+					});						
+					// xIndex=dDictionary.relationIndex(sRightEntity,xSingular);
+
+					var reverseRelationsArr = oReverseEntity.relations;
+					indexArr=[];
+					_.each(reverseRelationsArr, function(element,index){
+						if(element.rightEntity == xSingular)
+							indexArr.push(index);
+					});
+					_.each(indexArr, function(element){
+						oReverseEntity.relations.splice(element,1); //in position xIndex remove 1 item
+					});
+				}
+			},
+			removeEntity: function(xSingular) {//removes  entity xSingular
+				//In order to remove an entity we begin by removing the relations of every direct relation of xSingular	and also the inverse relations
+				//		that other entities ,may have with xSingular
+				//	format of each array element:
+				// 	{idRelation:3,cIdRelation:"03",rightEntity:"Invoice",description:"has",cardinality:"0_1",semantic:"Client has many Invoices"});
+				// var oEntity=dDictionary.entities[xSingular];
+
+				var oEntity = this.entities[xSingular];
+
+				if(oEntity){//entity exists
+					var xRelArr=FL.dd.relationsOf(xSingular);//xRelArr has all relations that xSingular has woth other entities
+					for (var i=0;i<xRelArr.length;i++){
+						//now deletes each relation (inverse and direct)
+						xRightEntity=xRelArr[i].rightEntity;
+						if(xRightEntity)
+							FL.dd.removeRelations(xSingular,xRightEntity);//this removes direct and inverse relations
+					};
+					// delete dDictionary.entities[xSingular];//now that all relations are gone we can delete the entity
+					delete this.entities[xSingular];//now that all relations are gone we can delete the entity
+				}else{
+					alert("dDictionary.removeEntity Error:Trying to remove a non existing entity:"+xSingular);
+				}
 			}
 		};
 	})();

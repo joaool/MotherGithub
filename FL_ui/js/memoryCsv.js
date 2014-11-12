@@ -76,7 +76,10 @@ window.csvStore = {
     },
 
     update: function (model) {
+        alert("memoryCsv.js Update was called !!!");
         this.csvRows[model.id] = model;//it is used !!!
+        alert("memoryCsv.js update modelUpdate !!!! --->"+ model.get("id") + " _id="+ model.get("_id") + " nome="+model.get("nome"));
+
         return model;
     },
 
