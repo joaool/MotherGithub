@@ -477,7 +477,7 @@
 			return relation;		
 		};
 		return{
-			entities: {__Last:0,__LastRelation:0},
+			entities: {__Last:9999,__LastRelation:0},
 			test:"FL.dd.test return !!!",
 			preArticle: function(sWord,xLanguage) {//for language xLanguage extract the article to be used before sWord
 				//Ex z="What is "+dDictionary.preArticle(xEntity,"En")+"?";

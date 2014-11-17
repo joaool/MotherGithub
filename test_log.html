@@ -1,0 +1,64 @@
+<!--
+* http://download.dojotoolkit.org/release-1.2.3/dojo-release-1.2.3/dojox/form/tests/test_BusyButton.html
+* http://www.sitepen.com/blog/2008/10/17/dojo-building-blocks-of-the-web/
+*
+* <!DOCTYPE html>
+-->
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>Test log v1.0</title>
+  	<script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
+	<script>
+	//goal: show console messages controled by a debug=true/false var showing line numbers
+	repeat= function(str,n){
+	    n= n || 1;
+	    return Array(n+1).join(str);
+	};
+
+	debug = false;
+	(function() {//hijack any JavaScript funct <----------- OK !!!
+		//http://stackoverflow.com/questions/9216441/intercept-calls-to-console-log-in-chrome
+	    var Oldlog = console.log;
+	    console.log = function() {
+	    	var nRepeat =  120 - arguments[0].length;
+	        var args = [].slice.apply(arguments).concat([repeat("-",nRepeat),(new Error()).stack.split(/\n/)[2].trim()]);
+	        if(debug)
+	        	Oldlog.apply(this, args);
+
+	    }
+	})();	
+	// var log = console.log.bind(console);
+
+
+	var Person = function(name) {//http://stackoverflow.com/questions/572897/how-does-javascript-prototype-work
+  		this.name = name;
+	};
+	Person.prototype.getName = function(){//extend the base object: add a new getter to object Person
+		return this.name;
+	};
+	//if we want a class Customer inheriting from Person, we do:
+	var Customer = function(name) {
+  		this.name = name;
+	};
+	Customer.prototype = new Person();//we link the prototype of Customer to new instance of Person. Now we can call the methods of Person in Customer
+
+	debug = true;
+	var p1 = new Person("joao");//a function instance
+	console.log(p1.name);
+	console.log("getName =>"+p1.getName());
+	var c1 = new Customer("Nico");//a function instance
+	console.log("inherited getName =>"+c1.getName());//customers inherits all props and methods of person
+
+	console.log({ alex: "some dude" });
+	console.log("my name is jojo");
+	console.log("step --------------------------------------------->1");
+	debug = false;
+	console.log("step ------------------------------------------->2");
+	debug = true;
+	console.log(document.title+"......  END..");
+</script>
+</head>
+	<body class="claro Mother"> 
+
+	</body>
+</html>

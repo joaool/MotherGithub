@@ -254,6 +254,12 @@ FL["common"] = (function(){//name space FL.common
 			}
 			return retStr;
 		},
+		repeat: function(str,n){//repeat str n times
+			n = n || 1;
+			if( n < 0 )
+				n = 0;
+			return Array(n+1).join(str);
+		},
 		testFunc: function(x) {
 			alert("FL.common.test() -->"+x);
 		}

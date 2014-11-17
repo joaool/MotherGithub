@@ -528,7 +528,7 @@ $(function () {
     var success = FL.dd.createEntity("client","company we may invoice");
     ok(success === true , "createEntity operation successfull for first entity !" );
     actual = FL.dd.entities["client"];
-    ok(actual.csingular == "01", "Compressed code for first entity = '01'");
+    ok(actual.csingular == "2ls", "Compressed code for first entity = '2ls'");//first entity is 9999 + 1
     ok(actual.description == "company we may invoice", "description is correct");
     ok(actual.plural == "clients", "plural is clients");
     success = FL.dd.createEntity("client","another company we may invoice");
@@ -538,26 +538,26 @@ $(function () {
     success = FL.dd.createEntity("order","client's product request");
     ok(success === true , "createEntity operation successfull for 2nd entity !" );
     actual = FL.dd.entities["order"];
-    ok(actual.csingular == "02", "Compressed code for 2nd entity = '02'");
+    ok(actual.csingular == "2lS", "Compressed code for 2nd entity = '2lS'");
     ok(actual.description == "client's product request", "description is correct for 2nd entity");
     ok(actual.plural == "orders", "plural is orders");
 
     success = FL.dd.updateEntityBySingular("client",{plural:"customers",description:"frequent buyer"});
     ok(success === true , "updateEntityBySingular operation successfull for client" );//10
     actual = FL.dd.entities["client"];
-    ok(actual.csingular == "01", "Compressed code for first entity = '01'");
+    ok(actual.csingular == "2ls", "Compressed code for first entity = '2ls'");
     ok(actual.description == "frequent buyer", "description was updated correctely");
     ok(actual.plural == "customers", "plural has changed to customers");
 
-    success = FL.dd.updateEntityByCName("01",{plural:"clients",description:"very frequent buyer"});
+    success = FL.dd.updateEntityByCName("2ls",{plural:"clients",description:"very frequent buyer"});
     ok(success === true , "updateEntityByCName operation successfull for client" );
     actual = FL.dd.entities["client"];
-    ok(actual.csingular == "01", "Compressed code for first entity = '01'");
+    ok(actual.csingular == "2ls", "Compressed code for first entity = '2ls'");
     ok(actual.description == "very frequent buyer", "description was updated correctely");
     ok(actual.plural == "clients", "plural has changed back to clients");
 
     var entityCN = FL.dd.getCEntity("order");
-    ok(entityCN == "02", "FL.dd.getCEntity ->Compressed code for 'order' is = '02'");
+    ok(entityCN == "2lS", "FL.dd.getCEntity ->Compressed code for 'order' is = '2lS'");
     entityCN = FL.dd.getCEntity("patolinas");
     ok(entityCN === null, "FL.dd.getCEntity ->Compressed code for patolinas is null - not existing");
     
@@ -643,22 +643,22 @@ $(function () {
     // // FL.API.data.shipment.tfunc();
     FL.API.data.shipment.set("description","place to send merchandise");
     console.log("***************after set*******************************************>"+FL.API.data.shipment.get("description"));
-    var records=[{"name":"Joao","phone":"123"},{"name":"Anton","phone":"456"}];
-    FL.API.saveTable("sales_rep",records);
-    console.log("*********************************after saveTable*******************************************");
+    // var records=[{"name":"Joao","phone":"123"},{"name":"Anton","phone":"456"}];
+    // FL.API.saveTable("sales_rep",records);
+    // console.log("*********************************after saveTable*******************************************");
 
     actual = FL.dd.isEntityInLocalDictionary("order");
     ok(actual === true, "FL.dd.isEntityInLocalDictionary -->'order' exists in local dictionary.");//32
     actual = FL.dd.isEntityInLocalDictionary("orderz");
     ok(actual === false, "FL.dd.isEntityInLocalDictionary -->'orderz' does not exists in local dictionary.");//33
     
-    actual = FL.dd.getEntityByCName("02");
-    ok(actual == "order", "FL.dd.getEntityByCName --> returns 'order' for entity compressed name = '02'");//34
+    actual = FL.dd.getEntityByCName("2lS");
+    ok(actual == "order", "FL.dd.getEntityByCName --> returns 'order' for entity compressed name = '2lS'");//34
     actual = FL.dd.getEntityByCName("0A");
     ok(actual === null, "FL.dd.getEntityByCName --> returns null for entity compressed name = '0A'");//35
     // FL.dd.displayEntities();
-    actual = FL.dd.getEntityByCName("01");
-    ok(actual === "client", "FL.dd.getEntityByCName --> returns 'client' for entity compressed name = '01'");//36
+    actual = FL.dd.getEntityByCName("2ls");
+    ok(actual === "client", "FL.dd.getEntityByCName --> returns 'client' for entity compressed name = '2ls'");//36
 
     //now testing relations functions
     actual = FL.dd.isRelation("client","01");
