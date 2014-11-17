@@ -108,10 +108,12 @@ $(function () {
 
 // _log.off();
 Test_createUserAndDefaultApp_connect()
+  .then(Test_createHistoMails_ifNotExisting)
   .then(Test_removeTable_existing)
   .then(Test_removeTable_unexisting)
   .then(Test_saveTable)
   .then(Test_addRecord)
+  .then(Test_loadTable)
   .then(emptyTest)
   .fail(function(err){console.log("BIG ERROR:"+err);})
   .always(function(){
@@ -126,7 +128,7 @@ function Test_createUserAndDefaultApp_connect(){
   var seconds = new Date().getTime() / 1000;
   var newInexistingUser = "testCreate"+ seconds + "@framelink.co";
   console.log(" ================================================= 4 createUserAndDefaultApp ===================================================");
-  asyncTest("createUserAndDefaultApp for " + newInexistingUser, function () { //one test can have several assertions
+  asyncTest("createUserAndDefaultApp for " + newInexistingUser + "--------->connect", function () { //one test can have several assertions
     FL.API.debug = false;
     console.log(" ================================================= 4.1 createUserAndDefaultApp  ===================================================");
     expect(1);
@@ -148,11 +150,36 @@ function Test_createUserAndDefaultApp_connect(){
 
   return def.promise();
 }
+function Test_createHistoMails_ifNotExisting(){
+    var def = $.Deferred();
+    asyncTest("--------->FL.API.createHistoMails_ifNotExisting()", function () { //one test can have several assertions
+      FL.API.debug = false;
+      // console.log(" =================================================  createHistoMails_ifNotExisting =================================================");
+      expect(1);
+      var promise=FL.API.createHistoMails_ifNotExisting();
+      promise.done(function(){//both cases of recently created or existing como here...
+          console.log("%%%----------------------------------------------------->createHistoMails_ifNotExisting OK");
+          var eCN = FL.dd.getCEntity("_histoMail");
+          equal(true,true,"_histoMail exist !!! ecn=" + eCN );//6
+          FL.API.debug = false;
+          QUnit.start();
+          return def.resolve();
+      });
+      promise.fail(function(err){
+          console.log("%%%----------------------------------------------------->createHistoMails_ifNotExisting err="+err);
+          equal(err,null," error in FL.API.createHistoMails_ifNotExisting()");// it shows the actual result (err)...
+          FL.API.debug = false;
+          QUnit.start();
+          return def.reject(err);
+      });
+    });//asyncTest     
+    return def.promise();
+}
 function Test_removeTable_existing(){
     var def = $.Deferred();
     // _log.on(); 
     // FL.API.debug = true;
-    asyncTest("removeTable for existing table -->_histoMail" , function () { //one test can have several assertions
+    asyncTest("--------->removeTable for existing table -->_histoMail" , function () { //one test can have several assertions
           // console.log(" ================================================= 5.1 removeTable for existing table ===================================================");
           expect(1);
           var histoPromise=FL.API.createHistoMails_ifNotExisting();
@@ -183,7 +210,7 @@ function Test_removeTable_existing(){
 }
 function Test_removeTable_unexisting(){
   var def = $.Deferred();
-  asyncTest("removeTable for unexisting table" , function () { //one test can have several assertions
+  asyncTest("--------->removeTable for unexisting table" , function () { //one test can have several assertions
     FL.API.debug = false;
     console.log(" ================================================= 6.1 removeTable for unexisting table ===================================================");
     expect(1);
@@ -212,7 +239,7 @@ function Test_saveTable(){
   FL.dd.addAttribute("sales_rep","name","sales_rep's name","Rep Name","string","textbox",null);
   FL.dd.addAttribute("sales_rep","phone","sales_rep's phone","Rep Phone","string","textbox",null);
   var records=[{"name":"Jojox","phone":"123"},{"name":"Anton","phone":"456"}];
-  asyncTest("saveTable sales_rep with content [{'name':'Jojo','phone':'123'},{'name':'Anton','phone':'456'}]" , function () {
+  asyncTest("--------->saveTable sales_rep with content [{'name':'Jojo','phone':'123'},{'name':'Anton','phone':'456'}]" , function () {
     FL.API.debug = false;
     console.log(" ================================================= 8.1 saveTable sales_rep with content  =================================================");
     expect(1);
@@ -245,13 +272,13 @@ function Test_addRecord(){
   FL.dd.addAttribute("sales_rep","name","sales_rep's name","Rep Name","string","textbox",null);
   FL.dd.addAttribute("sales_rep","phone","sales_rep's phone","Rep Phone","string","textbox",null);
   var records=[{"name":"Jojo","phone":"123"},{"name":"Anton","phone":"456"}];
-  asyncTest("addRecordsToTable to sales_rep with content [{'name':'George','phone':'789'},{'name':'Ringo','phone':'012'}]" , function () {
+  asyncTest("--------->addRecordsToTable to sales_rep with content [{'name':'George','phone':'789'},{'name':'Ringo','phone':'012'}]" , function () {
     console.log(" ================================================= 9 addRecord to sales_rep  =================================================");
     expect(1);
     var saveTablePromise = FL.API.saveTable("sales_rep",records);
     // var promise=FL.API.isUserExist("customer1@xyz");
     saveTablePromise.done(function(data){
-        FL.API.debug = true;
+        FL.API.debug = false;
         var recordsToInsert = [{'name':'George','phone':'789'},{'name':'Ringo','phone':'012'}];
         var promise = FL.API.addRecordsToTable("sales_rep",recordsToInsert);
         promise.done(function(data){
@@ -278,6 +305,29 @@ function Test_addRecord(){
 
   return def.promise();
 }
+function Test_loadTable(){
+  var def = $.Deferred();
+  asyncTest("--------->loadTable sales_rep" , function () { //one test can have several assertions
+    FL.API.debug = false;
+    console.log(" ================================================= loadTable sales_rep ===================================================");
+    expect(1);
+    var promise= FL.API.loadTable("sales_rep");
+    promise.done(function(data){
+        console.log("Succeded loading table sales_rep. returned:"+JSON.stringify(data));
+        equal(true,true,"Succeded loading sales_rep !!!!");//6
+        FL.API.debug = false;
+        QUnit.start();
+        return def.resolve();
+    });
+    promise.fail(function(err){
+        equal(err,null," failed");
+        FL.API.debug = false;
+        QUnit.start();
+        return def.reject(err);
+    });
+  });//asyncTest       
+  return def.promise();
+}
 
 function emptyTest(){
   var def = $.Deferred();
@@ -287,21 +337,7 @@ function emptyTest(){
 
 
 
-  // console.log(" ================================================= 6 removeTable for unexisting table ===================================================");
-  // asyncTest("removeTable for unexisting table" , function () { //one test can have several assertions
-  //   console.log(" ================================================= 6.1 removeTable for unexisting table ===================================================");
-  //   expect(1);
-  //   var promise= FL.API.removeTable("blabla");
-  //   promise.done(function(){
-  //       // console.log("Succeded removing table");
-  //       equal(true,true,"Succeded removing unexisting table !!!! (nico!) ");//6
-  //       QUnit.start();
-  //   });
-  //   promise.fail(function(err){
-  //       equal(err,null," failed");
-  //       QUnit.start();
-  //   });
-  // });//asyncTest    
+   
   // // console.log(" ================================================= 5 FL.API.isUserExist =================================================");
   // // asyncTest("FL.API.customTable('shipment')", function () { //one test can have several assertions
   // //   console.log(" ================================================= 5.1 FL.API.customTable({singular:'shipment'}); =================================================");
@@ -344,49 +380,10 @@ function emptyTest(){
   // //   });
   // // });//asyncTest 
 
-  // console.log(" ================================================= 7 createHistoMails_ifNotExisting =================================================");
-  // asyncTest("FL.API.createHistoMails_ifNotExisting()", function () { //one test can have several assertions
-  //   console.log(" ================================================= 7.1 createHistoMails_ifNotExisting =================================================");
-  //   expect(1);
-  //   var promise=FL.API.createHistoMails_ifNotExisting();
-  //   // var promise=FL.API.isUserExist(existingUser);
-  //    promise.done(function(){//both cases of recently created or existing como here...
-  //       // console.log("----------------------------------------------------->createHistoMails_ifNotExisting OK");
-  //       var eCN = FL.dd.getCEntity("_histoMail");
-  //       equal(true,true,"_histoMail exist !!! ecn=" + eCN );//6
-  //       QUnit.start();
-  //   });
-  //   promise.fail(function(err){
-  //       // equal(false,true,"TEST #1 isUserExist(" + existingUser + ") err=" + err);//6
-  //       // console.log("----------------------------------------------------->createHistoMails_ifNotExisting err="+err);
-  //       equal(err,null," error in FL.API.createHistoMails_ifNotExisting()");// it shows the actual result (err)...
-  //       QUnit.start();
-  //   });
-  // });//asyncTest 
 
-  // console.log(" ================================================= 8 saveTable sales_rep with content  =================================================");
-  // FL.dd.createEntity("sales_rep","employee responsable for sales");
-  // FL.dd.addAttribute("sales_rep","name","sales_rep's name","Rep Name","string","textbox",null);
-  // FL.dd.addAttribute("sales_rep","phone","sales_rep's phone","Rep Phone","string","textbox",null);
-  // var records=[{"name":"Jojo","phone":"123"},{"name":"Anton","phone":"456"}];
-  // // asyncTest("saveTable sales_rep with content [{'name':'Jojo','phone':'123'},{'name':'Anton','phone':'456'}]" , function () {
-  // //   console.log(" ================================================= 8.1 saveTable sales_rep with content  =================================================");
-  // //   expect(1);
-  // //   // FL.API.setConsoleTrace(true);
-  // //   // var promise = FL.API.saveTable("sales_rep",records);
-  // //   var promise=FL.API.isUserExist("customer1@xyz");
-  // //   promise.done(function(){
-  // //       console.log("Succeded saving table");
-  // //       equal(true,true,"Succeded saving table sales_rep with 2 records !!!! ");//6
-  // //       FL.API.setConsoleTrace(false);
-  // //       QUnit.start();
-  // //   });
-  // //   promise.fail(function(err){
-  // //       equal(err,null," failed");
-  // //       FL.API.consoleTrace(false);
-  // //       QUnit.start();
-  // //   });
-  // // });//asyncTest
+
+
+
   // existingUser = "jojo100@fl.co";
   // // console.log(" ================================================= 2 isUserExist ===================================================");
   // asyncTest("saveTable sales_rep with content [{'name':'Jojo','phone':'123'},{'name':'Anton','phone':'456'}]", function () { //one test can have several assertions

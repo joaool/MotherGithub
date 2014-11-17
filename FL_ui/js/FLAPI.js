@@ -1215,7 +1215,9 @@
 						return def.reject("updateRecordsToTable table="+entityName+ " not in sync");//
 					}else{//table exists and is in sync
 						console.log("........FL.API.updateRecordsToTable() table="+entityName+ " is ok. We will insert!");
-						var arrToSend = convertRecordsTo_arrToSend(entityName,recordsId);		
+						var arrToSend = convertRecordsTo_arrToSend(entityName,recordsId);
+						//fd.update("4Z", {query:{"57":10}, update:{"57":25}}, function(ee, dd){
+		
 						insertPromise = _insert(ecn,arrToSend);
 						insertPromise.then(function(data){return def.resolve(data);},function(err){return def.reject(err);});
 					}
@@ -1251,7 +1253,7 @@
 					console.log("....................................>beginning createHistoMails_ifNotExisting....with token="+JSON.stringify(FL.login.token));
 					FL.dd.createEntity("_histoMail","mails histo entity");//update local dict
 					FL.dd.addAttribute("_histoMail",'msg','events log','mail event','string','textbox',null);
-					FL.dd.displayEntities();
+					// FL.dd.displayEntities();
 					var synch=FL.API.syncLocalDictionaryToServer('_histoMail');
 					synch.done(function(){
 						console.log(">>>>>createHistoMails_ifNotExisting syncLocalDictionaryToServer SUCCESS <<<<<");

@@ -511,7 +511,8 @@
 				for (var key in oEntities) {
 					if (oEntities.hasOwnProperty(key)) {//this restrain the iteration only to the object's own attributes
 						if(key=="__Last"){
-							console.log("(__Last) -> Number of entities in dictionary="+oEntities[key]);
+
+							console.log("(__Last) -> Number of entities in dictionary="+ (oEntities[key]-9999) );
 						}else if(key=="__LastRelation"){
 							console.log("(__LastRelation) -> Number of relations in dictionary="+oEntities[key]);
 						}else{
