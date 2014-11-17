@@ -1158,7 +1158,9 @@
 						console.log("saveTable --->"+JSON.stringify(arrToSend));
 						console.log("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
 						insertPromise = _insert(ecn,arrToSend);
-						insertPromise.then(function(data){return def.resolve(data);},function(err){return def.reject(err);});
+						insertPromise.then(function(data){console.log(">>>>>saveTable Ok");return def.resolve(data);},function(err){return def.reject(err);});
+						//data has the format:
+						// [{"d":{"55":"Jojox","56":"123"},"v":0,"_id":"546963669b04c9107942d32d"},{"d":{"55":"Anton","56":"456"},"v":0,"_id":"546963669b04c9107942d32e"}]
 						// return def.resolve();
 					}
 				).fail(
@@ -1175,34 +1177,51 @@
 			// Methods getRecordsFromTable,updateRecordsToTable and removeRecordsFromTable - has parameters  (entityName,recordsId,withTS)
 			//		where recordsId has the format [{"_id":1,timeStamp:"A"},{"_id":4},....]
 			addRecordsToTable: function(entityName,recordsArray) {//add one or several records to existing table
-				//assumes a login to an application exists
+				//assumes a login to an application exists and entitName exists in local and is in sync
 				//recordsArray [{"number":12,"code":"abc"},....]
-				console.log("....................................>beginning saveTable....with appToken="+JSON.stringify(FL.login.appToken));
+				console.log("....................................>beginning addRecordsToTable....with appToken="+JSON.stringify(FL.login.appToken));
 				var def = $.Deferred();
 				var ecn = FL.dd.getCEntity(entityName);
-				//begins by removeTable, then sync local dict  to server, then inserting lines
-				// var remove_synch = FL.API.removeTable(entityName).then(FL.API.syncLocalDictionaryToServer(entityName));
-				// var remove_synch = FL.API.removeTable(entityName).then(FL.API.syncLocalDictionaryToServer(entityName));
-				FL.API.removeTable(entityName).then(function(){return FL.API.syncLocalDictionaryToServer(entityName);})
-				.then(function(){
-						ecn = FL.dd.getCEntity(entityName);
-						console.log(">>>>>saveTable --> remove and synch SUCCESS <<<<<");
-						console.log("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
-						var arrToSend = convertRecordsTo_arrToSend(entityName,recordsArray);
-						console.log("saveTable --->"+JSON.stringify(arrToSend));
-						console.log("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
+				if(ecn === null){
+					console.log("........FL.API.addRecordsToTable() table="+entityName+ " not in local dict !");
+					return def.reject("addRecordsToTable <table="+entityName+ "> does not exist in local dict !");//
+				}else{//the table exists in local dict but may be unsynchronized
+					var oEntity = FL.dd.entities[entityName];	
+					if(!oEntity.sync){//table exists in local dict but is not in sync with server	
+						console.log("........FL.API.addRecordsToTable() <table="+entityName+ "> exists in local dict but is not in sync");
+						return def.reject("addRecordsToTable <table="+entityName+ "> not in sync !");//
+					}else{//table exists and is in sync
+						console.log("........FL.API.addRecordsToTable() table="+entityName+ " is ok. We will insert!");
+						var arrToSend = convertRecordsTo_arrToSend(entityName,recordsArray);		
 						insertPromise = _insert(ecn,arrToSend);
-						insertPromise.then(function(){return def.resolve();},function(err){return def.reject(err);});
-						// return def.resolve();
+						insertPromise.then(function(data){return def.resolve(data);},function(err){return def.reject(err);});
 					}
-				).fail(
-					function(err){
-						console.log(">>>>>saveTable --> remove and synch FAILURE <<<<< "+err);
-						return def.reject(err);
-					}
-				);
+				}	
 				return def.promise();
-			},			
+			},
+			updateRecordsToTable: function(entityName,recordsId) {//add one or several records to existing table
+				//assumes a login to an application exists and entitName exists in local and is in sync
+				//recordsArray [{"number":12,"code":"abc"},....]
+				console.log("....................................>beginning updateRecordsToTable....with appToken="+JSON.stringify(FL.login.appToken));
+				var def = $.Deferred();
+				var ecn = FL.dd.getCEntity(entityName);
+				if(ecn === null){
+					console.log("........FL.API.updateRecordsToTable() table="+entityName+ " not in local dict !");
+					return def.reject("updateRecordsToTable table="+entityName+ " does not exist");//
+				}else{//the table exists in local dict but may be unsynchronized
+					var oEntity = FL.dd.entities[entityName];
+					if(!oEntity.sync){//table exists in local dict but is not in sync with server	
+						console.log("........FL.API.updateRecordsToTable() table="+entityName+ " exists in local dict but is not in sync");
+						return def.reject("updateRecordsToTable table="+entityName+ " not in sync");//
+					}else{//table exists and is in sync
+						console.log("........FL.API.updateRecordsToTable() table="+entityName+ " is ok. We will insert!");
+						var arrToSend = convertRecordsTo_arrToSend(entityName,recordsId);		
+						insertPromise = _insert(ecn,arrToSend);
+						insertPromise.then(function(data){return def.resolve(data);},function(err){return def.reject(err);});
+					}
+				}	
+				return def.promise();
+			},					
 			loadTable: function(entityName) {//returns the full content of a table from server
 				//assumes a login to an application exists
 				console.log("....................................>beginning loadTable....with appToken="+JSON.stringify(FL.login.appToken));

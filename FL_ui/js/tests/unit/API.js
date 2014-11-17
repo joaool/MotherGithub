@@ -7,6 +7,21 @@ $(function () {
     var expected = 1;
     ok( actual == expected,"Validated !!!" ); //bolean expression
   });
+  (function() {//hijack any JavaScript funct <----------- OK !!!
+    //http://stackoverflow.com/questions/9216441/intercept-calls-to-console-log-in-chrome
+      var Oldlog = console.log;
+      // console.log = function(){};//activate this instead of next - to "remove" all console.logs
+      console.log = function() {
+        var nRepeat =  90 - arguments[0].length;
+          var args = [].slice.apply(arguments).concat([FL.common.repeat("-",nRepeat),(new Error()).stack.split(/\n/)[2].trim()]);
+          if(FL.API.debug){
+            FL.API.fl.setTraceClient(2);
+            Oldlog.apply(this, args);
+          }else{
+            FL.API.fl.setTraceClient(0);
+          }
+      };
+  })();
   // FL.API.trace = false;
   // FL.API.setConsoleTrace(false);
   FL.API.debug = true; //a simple variable that  disables  the  display in the hijack function
@@ -90,44 +105,13 @@ $(function () {
   
 
 // Tests in mode connect
-  (function() {//hijack any JavaScript funct <----------- OK !!!
-    //http://stackoverflow.com/questions/9216441/intercept-calls-to-console-log-in-chrome
-      var Oldlog = console.log;
-      // console.log = function(){};//activate this instead of next - to "remove" all console.logs
-      console.log = function() {
-        var nRepeat =  90 - arguments[0].length;
-          var args = [].slice.apply(arguments).concat([FL.common.repeat("-",nRepeat),(new Error()).stack.split(/\n/)[2].trim()]);
-          if(FL.API.debug){
-            FL.API.fl.setTraceClient(2);
-            Oldlog.apply(this, args);
-          }else{
-            FL.API.fl.setTraceClient(0);
-          }
-      };
-  })();
-
-// _log = function(){//xxxxxxxxxxxxxxxxxxxxxxxxxx  to be removed
-//     var oldConsoleLog = null;
-//     var pub = {};
-//     pub.on =  function enableLogger() 
-//         {
-//             if(oldConsoleLog == null)
-//                 return;
-//             window['console']['log'] = oldConsoleLog;
-//         };
-//     pub.off = function disableLogger()
-//         {
-//             oldConsoleLog = console.log;
-//             window['console']['log'] = function() {};
-//         };
-//     return pub;
-// }();
 
 // _log.off();
 Test_createUserAndDefaultApp_connect()
   .then(Test_removeTable_existing)
   .then(Test_removeTable_unexisting)
   .then(Test_saveTable)
+  .then(Test_addRecord)
   .then(emptyTest)
   .fail(function(err){console.log("BIG ERROR:"+err);})
   .always(function(){
@@ -173,7 +157,7 @@ function Test_removeTable_existing(){
           expect(1);
           var histoPromise=FL.API.createHistoMails_ifNotExisting();
           histoPromise.done(function(){
-            FL.API.debug = true;
+            FL.API.debug = false;
             console.log(" ================================================= 5.1 removeTable for existing table ===================================================");
             var removePromise= FL.API.removeTable("_histoMail");
             removePromise.done(function(){
@@ -229,15 +213,17 @@ function Test_saveTable(){
   FL.dd.addAttribute("sales_rep","phone","sales_rep's phone","Rep Phone","string","textbox",null);
   var records=[{"name":"Jojox","phone":"123"},{"name":"Anton","phone":"456"}];
   asyncTest("saveTable sales_rep with content [{'name':'Jojo','phone':'123'},{'name':'Anton','phone':'456'}]" , function () {
-    FL.API.debug = true;
+    FL.API.debug = false;
     console.log(" ================================================= 8.1 saveTable sales_rep with content  =================================================");
     expect(1);
     var promise = FL.API.saveTable("sales_rep",records);
     // var promise=FL.API.isUserExist("customer1@xyz");
     promise.done(function(data){
         console.log("Succeded saving table. returned:"+JSON.stringify(data));
+        //data has the format:
+        // [{"d":{"55":"Jojox","56":"123"},"v":0,"_id":"546963669b04c9107942d32d"},{"d":{"55":"Anton","56":"456"},"v":0,"_id":"546963669b04c9107942d32e"}]
         equal(true,true,"Succeded saving table sales_rep with 2 records !!!! ");//6
-        FL.dd.displayEntities();
+        // FL.dd.displayEntities();
         FL.API.debug = false;
         QUnit.start();
         return def.resolve();
@@ -264,12 +250,13 @@ function Test_addRecord(){
     expect(1);
     var saveTablePromise = FL.API.saveTable("sales_rep",records);
     // var promise=FL.API.isUserExist("customer1@xyz");
-    saveTablePromise.done(function(){
+    saveTablePromise.done(function(data){
         FL.API.debug = true;
-        var promise = FL.API.addRecordsToTable("sales_rep",records);
-        promise.done(function(){
+        var recordsToInsert = [{'name':'George','phone':'789'},{'name':'Ringo','phone':'012'}];
+        var promise = FL.API.addRecordsToTable("sales_rep",recordsToInsert);
+        promise.done(function(data){
+            console.log("Succeded adding 2 records. returned:"+JSON.stringify(data));
             equal(true,true,"Succeded adding 2 records to table sales_rep !!!! ");
-            FL.dd.displayEntities();
             FL.API.debug = false;
             QUnit.start();
             return def.resolve();
