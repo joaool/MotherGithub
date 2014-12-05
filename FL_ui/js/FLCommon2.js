@@ -59,28 +59,113 @@ FL["common"] = (function(){//name space FL.common
 			this.makeModal(id,title,templateName,options,function(result){
 				if(result){
 					fillMasterForTemplate(templateName,masterDetailJson.master);
-					// var phrase = $("#_dictEditEntityTemplate_plural").text();
 					fillDetailForTemplate(templateName,masterDetailJson.detail);
-					// alert("editMasterDetail Yup master.entityName="+singular);
-					// alert("editMasterDetail Yup masterDetailItems="+JSON.stringify(masterDetailItems));
 					return editMasterDetailCB(true);
 				}else{
-					// alert("editMasterDetail Nope");
 					return editMasterDetailCB(false);
 				}
 			},masterDetailJson);
         },
-        makeModalInfo: function(message) {
-            this.makeModal("","Information","<p>"+message+"</p>",{type:"primary",button1:"Ok",button2:null});//OK
+        makeModalInfo: function(message,makeModalInfoCB) {
+            this.makeModal2("Information","<p>"+message+"</p>",{type:"primary",button1:"Ok",button2:null},makeModalInfoCB);//OK
         },
         makeModalConfirm: function(message,btn1,btn2,makeModalConfirmCB) {//button 2 is the default
-            this.makeModal("","Confirmation","<p>"+message+"</p>",{type:"primary",button1:btn1,button2:btn2},makeModalConfirmCB);//OK
+            this.makeModal2("Confirmation","<p>"+message+"</p>",{type:"primary",button1:btn1,button2:btn2},makeModalConfirmCB);//OK
         },
+		makeModal2: function(title,message,options,makeModalCB) {
+			// version specific for makeModalInfo and makeModal confirm - does not use parsley
+			// CONDITIONS NECESSARY FOR makeModal() to work:
+            //      1 - THE BODY MUST HAVE A DEDICATED SLOT: <div id="_modalDialog"+{id}></div>
+            //	title - Model window title
+            //	message - Dialog content
+            //	options  - JSON with icon and type
+            //      icon - termination of http://getbootstrap.com/components/ -
+            //          ex: glyphicon glyphicon-thumbs-up   =>"thumbs-up" 
+            //              glyphicon glyphicon-search      =>"search" 
+            //              glyphicon glyphicon-ok          =>"ok"   etc...
+            //      type - success, primary, info, warning and danger
+            //      button1 - name of first button
+            //      button2 - name of second button (null =>only one button is available)
+            //  callback - to return result example:
+            //          makeModal(" Juakim","dictTemplate",{type:"primary", icon:"search",button1:"Close",button2:"Save Changes"},function(result){
+            //              if(result){
+            //                  alert("Yup");
+            //              }else{
+            //                  alert("Nope");
+            //              }
+            //          });
+            //          NOTE: Callback argument result = true if button 2 is pressed, result = false if button 1 is pressed
+            // http://www.sitepoint.com/understanding-bootstrap-modals/
+			var $modalDialog = $("#_modalDialog");
+			options = _.extend( {icon:null,type:"success",button1:"Cancel",button2:"Ok"},options);
+            var modalId = "__FLmodalId";
+            var iconHTML = "";
+            if(options.icon){
+                iconHTML = '<i class="glyphicon glyphicon-' + options.icon +'"></i>';
+            }
+            var button1HTML = "";
+            if(options.button1){
+                button1HTML = '<a href="#" id="__FLDialog_button1" data-dismiss="modal" class="btn">' + options.button1 + '</a>';
+            }
+            var button2HTML = "";
+            if(options.button2){//this button has the parsley validate (like APPLE ->OK at right)
+                button2HTML = '<a href="#" id="__FLDialog_button2" class="btn btn-' + options.type + ' validate">' + options.button2 + '</a>';
+            }
+            // var before = '<div class="modal fade" id="myModal">' +
+            var before = '<div class="modal fade" id="' +modalId+ '">' +
+                            '<div class="modal-dialog">' +
+                                '<div class="modal-content">' +
+                                    '<div class="modal-header modal-header-' + options.type + '">' +
+                                        '<button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>'+
+                                        // '<h3 style="color:white;" class="modal-title">' + title + '</h3>' +
+                                        // '<h3 style="color:white;" class="modal-title"><i class="glyphicon glyphicon-thumbs-up"></i>' + title + '</h3>' +
+                                        '<h3 style="color:white;" class="modal-title">' + iconHTML + title + '</h3>' +
+                                    '</div>' +
+                                    '<div class="modal-body">';
+            var after =             '</div>' +
+                                        '<div class="modal-footer">' +
+                                            // '<a href="#button1" id="__FLDialog_button1" data-dismiss="modal" class="btn">Close</a>' +
+                                            button1HTML +
+                                             // '<a href="#button2" id="__FLDialog_button2" class="btn btn-primary">Save changes</a>' +
+                                            button2HTML +
+                                        '</div>' +
+                                    '</div>' +
+                                '</div>' +
+                            '</div>' +
+                        '</div>';
+            var fullHTML = before + message + after;
+            $modalDialog.empty().append(fullHTML);
+            var $modal = $('#' + modalId );
+            if(makeModalCB){
+                $modal.on("click","#__FLDialog_button1", function() {
+                    // alert("makeModal - You clicked button1"); 
+                    $modal.off('hidden.bs.modal');
+                    $modal.modal('hide');
+                    return makeModalCB(false);
+                });
+				$modal.on("click","#__FLDialog_button2", function() {
+					$modal.off('hidden.bs.modal');
+                    $modal.modal('hide');
+					return makeModalCB(true);
+                });
+                $modal.on('hidden.bs.modal', function() {
+                    // alert("makeModal - You closed the window !!!");
+                    return makeModalCB(false);
+                });
+            }else{
+                // $modal.off('hidden.bs.modal');              
+				console.log("makeModal ----->No callback");
+				$modal.modal('hide');
+				$('body').removeClass('modal-open');
+				$('.modal-backdrop').remove();
+             }
+            // $('#' + modalId ).modal('show');//to launch it immediatly when calling makeModal
+            $modal.modal('show');//to launch it immediatly when calling makeModal	
+		},
 		makeModal: function(id,title,templateName,options,makeModalCB,dataStructureForSubstitution) {
-           // CONDITIONS NECESSARY FOR makeModal() to work:
+			// CONDITIONS NECESSARY FOR makeModal() to work:
             //      1 - THE BODY MUST HAVE A DEDICATED SLOT: <div id="_modalDialog"+{id}></div>
             // title - Model window title
-            // type - success, primary, info, warning and danger
             // templateName - normally is a html template defined with  <script id="templateName" type="text/template"> 
             //     it can be a direct html string if first char is "<".
             // options  - JSON with icon and type
@@ -118,6 +203,8 @@ FL["common"] = (function(){//name space FL.common
             var modalId = "__FLmodalId_"+id;
             var htmlIn = null;
             // alert("Inside:"+templateName.substring(0,0));
+            var form = null;
+
             if( templateName.substring(0,1) == "<"){
                 htmlIn = templateName;
             }else{
@@ -126,7 +213,11 @@ FL["common"] = (function(){//name space FL.common
 				var htmlT1 = f1();
                 var templateFunc = _.template($("#" + templateName ).html());
                 htmlIn = templateFunc({name:"Joao",age:58,occupation:"tangas"});
+				form = $("#form_" + templateName );
+				// form.parsley();
+				// form.parsley().validate();
             }
+
             var iconHTML = "";
             if(options.icon){
                 iconHTML = '<i class="glyphicon glyphicon-' + options.icon +'"></i>';
@@ -136,8 +227,8 @@ FL["common"] = (function(){//name space FL.common
                 button1HTML = '<a href="#" id="__FLDialog_button1" data-dismiss="modal" class="btn">' + options.button1 + '</a>';
             }
             var button2HTML = "";
-            if(options.button2){
-                button2HTML = '<a href="#" id="__FLDialog_button2" class="btn btn-' + options.type + '">' + options.button2 + '</a>';
+            if(options.button2){//this button has the parsley validate (like APPLE ->OK at right)
+                button2HTML = '<a href="#" id="__FLDialog_button2" class="btn btn-' + options.type + ' validate">' + options.button2 + '</a>';
             }
             // var before = '<div class="modal fade" id="myModal">' +
             var before = '<div class="modal fade" id="' +modalId+ '">' +
@@ -162,25 +253,50 @@ FL["common"] = (function(){//name space FL.common
                             '</div>' +
                         '</div>';
             var fullHTML = before + htmlIn + after;
-           	// console.log("makeModal="+fullHTML);
+			// console.log("makeModal="+fullHTML);
             // var $modalDialog = $("#_modalDialog"+id);
             // $modalDialog.empty();// "#_modalDialog" is the DOM reserved slot for dialog boxes
             // $modalDialog.html(fullHTML);           
             $modalDialog.empty().append(fullHTML);
             var $modal = $('#' + modalId );
+
+			form = $("#form_" + templateName );
+			form.parsley();
+			form.parsley().validate();
+
             if(makeModalCB){
                 $modal.on("click","#__FLDialog_button1", function() {
                     // alert("makeModal - You clicked button1"); 
+                    console.log("Button 1 was clicked");
                     $modal.off('hidden.bs.modal');
                     $modal.modal('hide');
                     window.masterDetailItems = null;
                     return makeModalCB(false);
                 });
                 $modal.on("click","#__FLDialog_button2", function() {
-                    $modal.off('hidden.bs.modal');
+/*				
+					$modal.off('hidden.bs.modal');
                     $modal.modal('hide');
                     window.masterDetailItems = null;
                     return makeModalCB(true);
+*/
+					console.log("Button 2 was clicked");
+					// var form = $("#form_" + templateName );
+					// form.parsley();
+					// form.parsley().validate();
+					if(form.parsley().isValid()){//http://stackoverflow.com/questions/19821934/parsley-js-validation-not-triggering
+						console.log('no client side errors!');
+						$modal.off('hidden.bs.modal');
+						$modal.modal('hide');
+						window.masterDetailItems = null;
+						return makeModalCB(true);						
+					}else{
+						console.log('Client side errors!!!!');
+						$('.invalid-form-error-message')
+							.html("You must correctly fill the fields...")
+							.addClass("filled");
+						event.preventDefault();
+					}
                 });
                 $modal.on('hidden.bs.modal', function() {
                     // alert("makeModal - You closed the window !!!");
@@ -188,14 +304,15 @@ FL["common"] = (function(){//name space FL.common
                     return makeModalCB(false);
                 });
             }else{
-                // $modal.off('hidden.bs.modal');
-                $modal.modal('hide');
-                $('body').removeClass('modal-open');
-                $('.modal-backdrop').remove();
-            }
+                // $modal.off('hidden.bs.modal');              
+				console.log("makeModal ----->No callback");
+				$modal.modal('hide');
+				$('body').removeClass('modal-open');
+				$('.modal-backdrop').remove();
+             }
             // $('#' + modalId ).modal('show');//to launch it immediatly when calling makeModal
             $modal.modal('show');//to launch it immediatly when calling makeModal	
-		},
+		},		
 		setStyleAndFont: function(styleName,fontName){//the css files FL<styleName>.css and FLfont_<fontName>.css must exist in FL_ui/css
 			loadCSS("FL" + styleName + ".css");
 			loadCSS("FLfont_" + fontName + ".css");
@@ -234,7 +351,7 @@ FL["common"] = (function(){//name space FL.common
 		getLastTagInString: function(str,separator,tagTerminator) {//returns the content after the last separator until end or terminal char
 			// str - string that will be processed
 			// separator - last ocurrence to be identified in string
-			// tagTermionator - character (or set of caracters) that define the end-of-tag
+			// tagTerminator - character (or set of caracters) that define the end-of-tag
 			//		if tagTerminator is a string any of the string chars will be considered a tag terminator ex "/#"
 			//		if no tagTerminator is found the full string after the separator is returned
 			//		ex. getTagInString("http://www.framelink.co/app?d=myDomain1#","=","#") -->returns  "myDomain1" (the "#" is excluded)
@@ -289,35 +406,37 @@ jQuery.Topic = function( id ) {//https://gist.github.com/addyosmani/1321768 publ
 // BootstrapDialog.alert("FrameLink"); //http://nakupanda.github.io/bootstrap3-dialog/
 // BootstrapDialog.confirm("FrameLink menus ?"); //http://nakupanda.github.io/bootstrap3-dialog/
 //  BootstrapDialog.confirm = function(message, callback,options) {//http://nakupanda.github.io/bootstrap3-dialog/
-BootstrapDialog.confirm = function(message,callback,options) {//http://nakupanda.github.io/bootstrap3-dialog/
-	new BootstrapDialog({
-		//element = _.extend(element,updatedElement);//passed by reference
-		title: _.extend({title:"CONFIRMATION"},options).title,
-		message: message,
-		// form: '<label>Email </label><input type="text" id="titleDrop"><br><label>User Name</label><input type="text" id="descriptionDrop">',//form,
-		// type: BootstrapDialog.TYPE_PRIMARY, // <-- Default value is BootstrapDialog.TYPE_PRIMARY
-		type: _.extend({type:'type-primary' },options).type, //'type-primary', 'type-info' .'type-success','type-warning','type-danger' 
-		draggable:true,
-		data: {
-			'callback': callback
-		},
-		buttons: [{
-				label: _.extend({button1:"Cancel"},options).button1,
-				action: function(dialog) {
-					typeof dialog.getData('callback') === 'function' && dialog.getData('callback')(false);
-					dialog.close();
-				}
-			}, {
-				label:  _.extend({button2:"Ok"},options).button2,
-				cssClass: _.extend({cssButton2:"btn-primary"},options).cssButton2,
-				action: function(dialog) {
-					typeof dialog.getData('callback') === 'function' && dialog.getData('callback')(true);
-					dialog.close();
-				}
-			}
-		]
-	}).open();
-};
+
+// BootstrapDialog.confirm = function(message,callback,options) {//http://nakupanda.github.io/bootstrap3-dialog/	
+// 	new BootstrapDialog({
+// 		//element = _.extend(element,updatedElement);//passed by reference
+// 		title: _.extend({title:"CONFIRMATION"},options).title,
+// 		message: message,
+// 		// form: '<label>Email </label><input type="text" id="titleDrop"><br><label>User Name</label><input type="text" id="descriptionDrop">',//form,
+// 		// type: BootstrapDialog.TYPE_PRIMARY, // <-- Default value is BootstrapDialog.TYPE_PRIMARY
+// 		type: _.extend({type:'type-primary' },options).type, //'type-primary', 'type-info' .'type-success','type-warning','type-danger' 
+// 		draggable:true,
+// 		data: {
+// 			'callback': callback
+// 		},
+// 		buttons: [{
+// 				label: _.extend({button1:"Cancel"},options).button1,
+// 				action: function(dialog) {
+// 					typeof dialog.getData('callback') === 'function' && dialog.getData('callback')(false);
+// 					dialog.close();
+// 				}
+// 			}, {
+// 				label:  _.extend({button2:"Ok"},options).button2,
+// 				cssClass: _.extend({cssButton2:"btn-primary"},options).cssButton2,
+// 				action: function(dialog) {
+// 					typeof dialog.getData('callback') === 'function' && dialog.getData('callback')(true);
+// 					dialog.close();
+// 				}
+// 			}
+// 		]
+// 	}).open();
+// };
+
 FL["clone"] = function(obj) {//http://stackoverflow.com/questions/122102/what-is-the-most-efficient-way-to-clone-an-object/5344074#5344074
 	var ss = JSON.stringify(obj);
 	return JSON.parse(ss);

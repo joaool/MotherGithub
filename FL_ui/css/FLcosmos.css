@@ -1925,6 +1925,13 @@ select[multiple].input-lg {
   margin-bottom: 10px;
   color: #959595;
 }
+.parsley-help-block {
+  display: block;
+  color: red;
+  font-size: 12px;
+  line-height: 0.9em;
+  margin: 5px 0 15px 20px;
+}
 @media (min-width: 768px) {
   .form-inline .form-group {
     display: inline-block;

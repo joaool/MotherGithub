@@ -31,12 +31,13 @@ $(function () {
   asyncTest("FL.API.isUserExist(" + existingUser + ")", function () { //one test can have several assertions
     console.log(" ================================================= 2.1 isUserExist ===================================================");
     expect(1);
-    FL.API.debug = false;
+    FL.API.debug = true;
     var promise=FL.API.isUserExist(existingUser);
     // promise.then(function(){return def.resolve();},function(err){return def.reject(err);});
    
     promise.done(function(exist){
         equal(true,true,"TEST #1 isUserExist(" + existingUser + ") ->" +exist);//6
+        console.log("test was done with success !");
         if(!exist){
           // FL.API.userCreate(existingUser,"123","clientAdmin")
         }

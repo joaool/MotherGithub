@@ -17,6 +17,12 @@ window.csvStore = {
         });
         return retArr;
     },
+    setEntityName: function(entityName){
+        this.entityName = entityName;
+    },
+    getEntityName: function(){
+        return this.entityName;
+    },
     store: function( arrToStore ) {//arrToStore is an array of objects [{},{},....{}] where id field is mandatory inside {}
         var arrOfIds = _.map(arrToStore,function(element){return element.id;});
         this.csvRows = _.object(arrOfIds,arrToStore); //becomes ->{1:arrToStore[1],2:arrToSAtore[2]....} 
@@ -78,8 +84,14 @@ window.csvStore = {
     update: function (model) {
         alert("memoryCsv.js Update was called !!!");
         this.csvRows[model.id] = model;//it is used !!!
-        alert("memoryCsv.js update modelUpdate !!!! --->"+ model.get("id") + " _id="+ model.get("_id") + " nome="+model.get("nome"));
-
+        //alert("memoryCsv.js update modelUpdate !!!! --->"+ model.get("id") + " _id="+ model.get("_id") + " nome="+model.get("nome"));
+        alert("memoryCsv.js update modelUpdate !!!! --->"+JSON.stringify(model));
+        var promise=FL.API.updateRecordToTable(this.entityName,model.attributes);
+        promise.done(function(){
+            console.log(">>>>>memoryCsv update updateRecordToTable FAILURE SUCCESS <<<<<");
+            return model;
+        });
+        promise.fail(function(err){console.log(">>>>>memoryCsv update updateRecordToTable FAILURE <<<<<"+err);return model;});
         return model;
     },
 

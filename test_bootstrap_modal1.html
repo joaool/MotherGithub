@@ -7,8 +7,7 @@
     <script src="FL_ui/js/underscore-min.js"></script>
     <script src="FL_ui/js/bootstrap.min.js"></script>
     <link rel="stylesheet" href="FL_ui/css/FLcerulean.css">
-    <link href="FL_ui/css/bootstrap-dialog.css" rel="stylesheet" type="text/css" />
-    <script src="FL_ui/js/bootstrap-dialog.js"></script>
+
 
 <!--[if lt IE 9]>
 <script src="//cdn.jsdelivr.net/html5shiv/3.7.2/html5shiv.min.js"></script>
@@ -203,42 +202,44 @@
         </div>
     </script>   
     <script>
+       console.log("Begin !");
         var loginFunction = function(){
-            alert("loginFunction !!!");
+           console.log("loginFunction !!!");
         }
-        makeModal("A","Patolinas","dictTemplate",{},function(result){// "Cancel and "Ok" will be assumed with result = true for "Ok"
-            if(result){
-                alert("Yup in Patolinas");
-            }else{
-               alert("Nope in Patolinas");
-            }
-        });//OK
-        
+        // makeModal("A","Patolinas","dictTemplate",{},function(result){// "Cancel and "Ok" will be assumed with result = true for "Ok"
+        //     if(result){
+        //         alert("Yup in Patolinas");
+        //     }else{
+        //        alert("Nope in Patolinas");
+        //     }
+        // });//OK
+
         makeModal("B"," Mastruncex","loginTemplate",{icon:"user"},function(result){// "Cancel and "Ok" will be assumed with result = true for "Ok"
+            console.log("inside Callback....");
             if(result){
-                alert("Yup in Mastrunço");
+                console.log("Yup in Mastrunço");
             }else{
-               alert("Nope in Mastrunço");
+               console.log("Nope in Mastrunço");
             }
         });//OK
-        makeModal(" Juakim","dictTemplate",{type:"primary", icon:"search",button1:"Close",button2:"Save Changes"});//OK
-        makeModal(" Juakim","dictTemplate",{type:"primary", icon:"search",button1:"Close",button2:"Save Changes"},function(result){
-            if(result){
-                alert("Yup");
-            }else{
-               alert("Nope");
-            }
-        });//OK
-        // makeModalInfo("I want banana");//OK
-        makeModalConfirm("Do I want to continue","No","Yes Please",function(result){
-            if(result){
-                // alert("Yup");
-                makeModalInfo("Good to know that you want to continue !!!");
-            }else{
-                // alert("Nope");
-                makeModalInfo("Bad News !!! you wanna go...");
-            }
-        });//OK
+        // makeModal(" Juakim","dictTemplate",{type:"primary", icon:"search",button1:"Close",button2:"Save Changes"});//OK
+        // makeModal(" Juakim","dictTemplate",{type:"primary", icon:"search",button1:"Close",button2:"Save Changes"},function(result){
+        //     if(result){
+        //         alert("Yup");
+        //     }else{
+        //        alert("Nope");
+        //     }
+        // });//OK
+        // // makeModalInfo("I want banana");//OK
+        // makeModalConfirm("Do I want to continue","No","Yes Please",function(result){
+        //     if(result){
+        //         // alert("Yup");
+        //         makeModalInfo("Good to know that you want to continue !!!");
+        //     }else{
+        //         // alert("Nope");
+        //         makeModalInfo("Bad News !!! you wanna go...");
+        //     }
+        // });//OK
 
         // makeModal(" Juakim","dictTemplate");//OK
 
@@ -278,7 +279,7 @@
             var options = _.extend( {icon:null,type:"success",button1:"Cancel",button2:"Ok"},options);
             var modalId = "__FLmodalId_"+id;
             var htmlIn = null;
-            // alert("Inside:"+templateName.substring(0,0));
+            console.log("Inside:"+templateName.substring(0,0));
             if( templateName.substring(0,1) == "<"){
                 htmlIn = templateName;
             }else{
@@ -321,19 +322,21 @@
                             '</div>' +
                         '</div>';
             var fullHTML = before + htmlIn + after;
-            // alert("makeModal="+fullHTML);
+            console.log("makeModal="+fullHTML);
             var $modalDialog = $("#_modalDialog"+id);
-             $modalDialog.empty();// "#_modalDialog" is the DOM reserved slot for dialog boxes
+            $modalDialog.empty();// "#_modalDialog" is the DOM reserved slot for dialog boxes
             $modalDialog.html(fullHTML);
             var $modal = $('#' + modalId );
+            console.log("after jquery...");
             if(makeModalCB){
                 $modal.on("click","#__FLDialog_button1", function() {
-                    // alert("makeModal - You clicked button1"); 
+                    console.log("makeModal - You clicked button1"); 
                     $modal.off('hidden.bs.modal');
                     $modal.modal('hide');
                     return makeModalCB(false);
                 });
                 $modal.on("click","#__FLDialog_button2", function() {
+                    console.log("makeModal - You clicked button2"); 
                     $modal.off('hidden.bs.modal');
                     $modal.modal('hide');
                     return makeModalCB(true);

@@ -669,7 +669,7 @@ FL["menu"] = (function(){//name space FL.menu
 		if(!menuArray){
 			menuArray = this.jsonMenu.menu;
 			FL.menu.currentOptions.jsonMenu = this.jsonMenu;
-		}	
+		}
 		FL.menu.menuArray = menuArray;
 		menuEach(menuArray,add_Id_Top);//sets keys id and top for menuArray
 		var $menu = $("#main-menu");
@@ -832,6 +832,7 @@ FL["menu"] = (function(){//name space FL.menu
 			// alert("FL.menu.topicSetEditable status="+status);
 		},
 		topicUpdateJsonMenu: function(jsonMenu) {//this method is used to subscribe topics on createMenu
+			console.log("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% FLMenu2.js topicUpdateJsonMenu was called");
 			FL.menu.currentMenuObj.updateJsonMenu(jsonMenu);
 		},
 		topicCreateDatabaseAcess: function(optionTitle) {//this method is used to subscribe topics on createMenu

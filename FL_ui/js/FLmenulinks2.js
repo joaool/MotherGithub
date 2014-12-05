@@ -17,6 +17,7 @@
 			var promise=FL.API.loadTable(entityName);
 			promise.done(function(data){
 				console.log("New %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
+				csvStore.setEntityName(entityName);
 				csvStore.store(data);
 				var z=csvStore.csvRows;//only for debugging
 				// alert("New displayDefaultGrid -->import is done");

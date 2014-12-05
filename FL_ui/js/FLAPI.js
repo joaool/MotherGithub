@@ -14,6 +14,23 @@
 		var internalTest = function(x) {//
 			alert("internalTest() -->"+x);
 		};
+		var tokenClear = function(){
+			token = {
+				"clientName":null,
+				"userName":null,
+				"userPassWord":null,
+				"domainName":null,
+				"dbName":null,
+				// "fl":fl, //to maintain from start to end
+				// "fa":fa,
+				"appDef":null,
+				"appDescription":null,
+				"appMenuLevel":null,
+				"appRestrictions":null,
+				"error":null
+			};
+			return token;
+		};
 		//-------- PROMISE WRAPPERS ------------------
 		var	_applicationFullCreate = function(jsonParam) {
 			//ex _applicationFullCreate({"adminName": "nico@framelink.co", "adminPassWord": "coLas"}, function (err, myApp){
@@ -26,20 +43,21 @@
 			// fl.applicationFullCreate({"adminName": "joao@framelink.co", "adminPassWord": "oLiVeIrA"}, function (err, myApp){
 				// err = "abc";
 				if(err){
-					FL.login.token = {
-						"clientName":null,
-						"userName":null,
-						"userPassWord":null,
-						"domainName":null,
-						"dbName":null,
-						"fl":fl,
-						"fa":fa,
-						"appDef":null,
-						"appDescription":null,
-						"appMenuLevel":null,
-						"appRestrictions":null,
-						"error":"fl.applicationFullCreate"
-					};
+					FL.login.token = tokenClear();
+					// FL.login.token = {
+					// 	"clientName":null,
+					// 	"userName":null,
+					// 	"userPassWord":null,
+					// 	"domainName":null,
+					// 	"dbName":null,
+					// 	// "fl":fl, //to maintain from start to end
+					// 	// "fa":fa,
+					// 	"appDef":null,
+					// 	"appDescription":null,
+					// 	"appMenuLevel":null,
+					// 	"appRestrictions":null,
+					// 	"error":null						
+					// };
 					console.log("=================================>ERROR ON _applicationFullCreate err="+err);
 					def.reject("ERROR ON _applicationFullCreate err="+ err);
 				}else{
@@ -252,7 +270,7 @@
 					def.reject(err);
 				}else{
 					var oldUserName = FL.login.token.userName;
-					FL.login.token = null;
+					FL.login.token = tokenClear();
 					// alert("_clientRemove DONE user=" + oldUserName + "was removed!  ->token="+JSON.stringify(FL.login.token));
 					console.log("=====================================>_clientRemove DONE user=" + oldUserName + "was removed! ->token="+JSON.stringify(FL.login.token));
 					def.resolve();
@@ -398,7 +416,7 @@
 				}
 			});
 			return def.promise();
-		};		
+		};
 		var _addWithFields = function(entityJSON){//creates an entity with the fields in server, with one single call
 			var def = $.Deferred();
 			var fl = FL.login.token.fl; //new flMain();
@@ -652,7 +670,7 @@
 			return def.promise();
 		};			
 		var	rebuildsLocalDictionaryFromServer = function(entities){//interprets entity JSON received from server to local dd
-			console.log("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx entities=" + entities + " xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
+			console.log("rebuildsLocalDictionaryFromServer xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx entities=" + entities + " xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
 			var sucess = null;
 			var oEntity = null;
 			// console.log("&&&&&&&&&&&&&&&&&&& begin syncLocalDictionary &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&");
@@ -761,27 +779,22 @@
 			});
 			return def.promise();
 		};
-		var _update = function(ecn){ //entity compressed name
+		var _update = function(ecn,_id,jsonToSend){ //entity compressed name, _id and jsonToSend (a single record)
+			//	format of jsonToSend ->{"51":"cli1","52":"Lx","53":"Pt"}
 			var def = $.Deferred();
 			var fl = FL.login.token.fl; //new flMain();
-			// var fl = new flMain();
-			// var fa = FL.login.token.fa;//new fl.app();
-			// fd.update("50", {"query":{"_id":fCN1},"update":{"52":"Faro"}}, function(err, result){..})
+			var fd = new fl.data();
 
-			// fl.userChangePassWord({"adminName":"nico@framelink.co", "adminPassWord":"coLas",
-			// 		"userName":FL.login.token.userName, "userPassWord":password}, function(err, result){
-			// 	console.log("............................._userChangePassWord....TO "+password);
-			// 	// err = "abc";
-			// 	if(err){
-			// 		alert("ERROR ON _userChangePassWord err="+err);
-			// 		console.log("======================>ERROR ON _userChangePassWord err="+err);
-			// 		def.reject(err);
-			// 	}else{
-			// 		FL.login.token.userPassWord = password;
-			// 		console.log("=====================================>_userChangePassWord: OK Password changed to " + password + "  ->token="+JSON.stringify(FL.login.token));
-			// 		def.resolve();
-			// 	}
-			// });
+			fd.update(ecn, {"query":{"_id":_id},"update":jsonToSend}, function(err, result){
+				console.log("............................._update....i_id="+_id+" To ->"+JSON.stringify(jsonToSend));
+				if(err){
+					console.log("======================>ERROR ON _update err="+err);
+					def.reject(err);
+				}else{
+					console.log("=====================================>_update: OK " + result.count + " records were updated.");
+					def.resolve(result.count);
+				}
+			});
 			return def.promise();
 		};
 		var convertRecordsTo_arrToSend = function(entityName,recordsArray){//used by saveTable()
@@ -797,6 +810,7 @@
 			var retObj = {};
 			var fCN = null;
 			var oEntity =  FL.dd.getEntityBySingular(entityName);
+			recordEl = _.omit(recordEl, "_id"); 
 			_.each(recordEl, function(value,key){
 				fCN = oEntity.L2C[key];//with key ( a logical name) we get the compressed name
 				retObj[fCN] = value;
@@ -814,25 +828,13 @@
 			offline:true,
 			trace:true,//to be removed
 			debug:true,
-			xconsoleTrace: function(text) {
-				if(FL.API.trace){
-					// console.log(text + " line:"+extractLineNumberFromStack(this.stack));
-					console.log(text);
-				}
-			},
-			xsetConsoleTrace: function(bStatus) {//setConsoleTrace(true) ->shows all traces -- setConsoleTrace(false) ->no traces 
-				if(bStatus){
-					FL.API.fl.setTraceClient(2);
-					FL.API.trace = true;
-				}else{
-					FL.API.fl.setTraceClient(0);
-					FL.API.trace = false;
-				}
-			},
 			// getPageNo: function(pagName){ //to be used by savePage and restorePage
 			//	var pageNoObj = {"home":1,"about":2};
 			//	return  pageNoObj[pagName];
-			// },		
+			// },
+			clearServerToken: function(){
+				FL.login.token = tokenClear();
+			},		
 			prepareTrialApp: function() {///create adHoc client, create adHoc user, create adHoc app 
 				var def = $.Deferred();
 				var fl = new flMain();//FL.server.fl
@@ -919,12 +921,12 @@
 				console.log("....................................>beginning disconnect....current token="+JSON.stringify(FL.login.token));
 				var def = $.Deferred();
 				var disconnect=_disconnect();
-				disconnect.done(function(){console.log(">>>>> disconnect SUCCESS <<<<<");FL.login.token = null; return def.resolve();});
+				disconnect.done(function(){console.log(">>>>> disconnect SUCCESS <<<<<");FL.login.token = tokenClear(); return def.resolve();});
 				disconnect.fail(function(err){console.log(">>>>> disconnect FAILURE <<<<< "+err); return def.reject(err);});
 				return def.promise();
 			},
 			connectUserToDefaultApp: function(userName,password) {//
-				//if userName/password has no application one application is created
+				//if userName/password exists but has no application, one application is created
 				console.log("....................................>beginning connectUserToDefaultApp....with token="+JSON.stringify(FL.login.token));
 				var def = $.Deferred();
 				var tokenBackup = FL.login.token;//if it fails we will recover the initial token this backup
@@ -959,16 +961,16 @@
 					}else{
 						console.log(">>>>> connectUserToDefaultApp FAILURE <<<<< Error:" + err);
 						FL.login.token = tokenBackup;
-						def.reject();					
+						def.reject(err);					
 					}
 				});
 				return def.promise();	
 			},
 			isUserExist: function(userName){
 				var def = $.Deferred();
+				console.log("....................................>beginning isUserExist....with token="+JSON.stringify(FL.login.token));
 				var isUserExistPromise=_isUserExist(userName);
 				// FL.API.trace = false;
-				console.log("....................................>beginning isUserExist....with token="+JSON.stringify(FL.login.token));
 				isUserExistPromise.done(function(exists){
 					console.log(">>>>> isUserExist SUCCESS <<<<< exist="+exists);
 					return def.resolve(exists);
@@ -1030,7 +1032,7 @@
 				addWithFields.fail(function(err){console.log(">>>>> syncLocalDictionaryToServer FAILURE <<<<< "+err);return def.reject();});
 				return def.promise();
 			},
-			loadAppDataForSignInUser2: function() {//
+			loadAppDataForSignInUser2: function() {//loads (local dict + menu + style + fontFamily) from server
 				console.log("....................................>beginning loadAppDataForSignInUser2....with token="+JSON.stringify(FL.login.token));
 				var def = $.Deferred();
 				//syncLocalDictionary ->restoreMainMenu  if it succeds -> restorePage
@@ -1199,27 +1201,37 @@
 				}	
 				return def.promise();
 			},
-			updateRecordsToTable: function(entityName,recordsId) {//add one or several records to existing table
+			updateRecordToTable: function(entityName,record) {//add one (later several...) records to existing table
 				//assumes a login to an application exists and entitName exists in local and is in sync
-				//recordsArray [{"number":12,"code":"abc"},....]
-				console.log("....................................>beginning updateRecordsToTable....with appToken="+JSON.stringify(FL.login.appToken));
+				//record is a JSON containing a _id key {"_id":12345,"id":1,"code":"abc"}
+				console.log("....................................>beginning updateRecordToTable....with appToken="+JSON.stringify(FL.login.appToken));
 				var def = $.Deferred();
 				var ecn = FL.dd.getCEntity(entityName);
 				if(ecn === null){
-					console.log("........FL.API.updateRecordsToTable() table="+entityName+ " not in local dict !");
-					return def.reject("updateRecordsToTable table="+entityName+ " does not exist");//
+					console.log("........FL.API.updateRecordToTable() table="+entityName+ " not in local dict !");
+					return def.reject("updateRecordToTable table="+entityName+ " does not exist");//
 				}else{//the table exists in local dict but may be unsynchronized
 					var oEntity = FL.dd.entities[entityName];
 					if(!oEntity.sync){//table exists in local dict but is not in sync with server	
-						console.log("........FL.API.updateRecordsToTable() table="+entityName+ " exists in local dict but is not in sync");
-						return def.reject("updateRecordsToTable table="+entityName+ " not in sync");//
+						console.log("........FL.API.updateRecordToTable() table="+entityName+ " exists in local dict but is not in sync");
+						return def.reject("updateRecordToTable table="+entityName+ " not in sync");//
 					}else{//table exists and is in sync
-						console.log("........FL.API.updateRecordsToTable() table="+entityName+ " is ok. We will insert!");
-						var arrToSend = convertRecordsTo_arrToSend(entityName,recordsId);
-						//fd.update("4Z", {query:{"57":10}, update:{"57":25}}, function(ee, dd){
-		
-						insertPromise = _insert(ecn,arrToSend);
-						insertPromise.then(function(data){return def.resolve(data);},function(err){return def.reject(err);});
+						console.log("........FL.API.updateRecordToTable() table="+entityName+ " is ok. We will insert!");
+						var arrToSend = convertOneRecordTo_arrToSend(entityName,record);//returns {"d":{"51":"cli1","52":"Lx","53":"Pt"}} 
+						if(record._id){
+							console.log("update ->"+record._id+" record="+JSON.stringify(record));
+							var updatePromise = _update(ecn,record._id,arrToSend.d);
+							updatePromise.done(function(count){
+								console.log(">>>>> updatePromise SUCCESS <<<<< " + count + " records updated!");
+								def.resolve(count);
+							});
+							updatePromise.fail(function(err){console.log(">>>>> updatePromise FAILURE <<<<<"+err);def.reject(err);});
+							// return def.resolve(data);
+						}else{
+							console.log("........FL.API.updateRecordToTable() table="+entityName+ " is ok but _id is missing");
+							return def.reject("updateRecordToTable table="+entityName+ " -->error: missing _id");//
+						}	
+						// insertPromise.then(function(data){return def.resolve(data);},function(err){return def.reject(err);});
 					}
 				}	
 				return def.promise();

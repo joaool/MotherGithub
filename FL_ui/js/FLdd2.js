@@ -474,7 +474,7 @@
 			relation["side"] = side;
 			relation["storedHere"] = storedHere;
 			relation["withEntityCN"] = null;//this is an auxiliary field to support FL.server.syncLocalDictionary()
-			return relation;		
+			return relation;
 		};
 		return{
 			entities: {__Last:9999,__LastRelation:0},
@@ -487,7 +487,7 @@
 				return plural(sWord,xLanguage);
 			},
 			clear: function(){
-				this.entities = {__Last:0,__LastRelation:0};
+				this.entities = {__Last:9999,__LastRelation:0};
 			},
 			relationSemantics: function(sSingular,sRightEntity,sVerb,sCardinality,xLanguage) {
 				return relationSemantics(sSingular,sRightEntity,sVerb,sCardinality,xLanguage);
