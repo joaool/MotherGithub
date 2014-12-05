@@ -779,7 +779,7 @@
 			});
 			return def.promise();
 		};
-		var _update = function(ecn,_id,jsonToSend){ //entity compressed name, _id and jsonToSend (a single record)
+		var _update = function(ecn,_id,jsonToSend){ //update a single row within table ecn entity compressed name, _id and jsonToSend (a single record)
 			//	format of jsonToSend ->{"51":"cli1","52":"Lx","53":"Pt"}
 			var def = $.Deferred();
 			var fl = FL.login.token.fl; //new flMain();
@@ -797,6 +797,23 @@
 			});
 			return def.promise();
 		};
+		var _remove = function(ecn,_id){ //remove  a single row within table ecn (entity compressed name)
+			var def = $.Deferred();
+			var fl = FL.login.token.fl; //new flMain();
+			var fd = new fl.data();
+
+			fd.remove(ecn, {"query":{"_id":_id}}, function(err, result){
+				console.log("............................._remove....i_id="+_id);
+				if(err){
+					console.log("======================>ERROR ON _remove err="+err);
+					def.reject(err);
+				}else{
+					console.log("=====================================>_remove: OK ");
+					def.resolve();
+				}
+			});
+			return def.promise();
+		};		
 		var convertRecordsTo_arrToSend = function(entityName,recordsArray){//used by saveTable()
 			//Converts format: [{"name":cli1,"city":"Lx","country":"Pt"},{..},....] to 
 			//	format of arrToSend ->[{"d":{"51":"cli1","52":"Lx","53":"Pt"}},{"d":{"51":"cli2","52":"Sintra","53":"Pt"}}]	
@@ -1222,7 +1239,7 @@
 							console.log("update ->"+record._id+" record="+JSON.stringify(record));
 							var updatePromise = _update(ecn,record._id,arrToSend.d);
 							updatePromise.done(function(count){
-								console.log(">>>>> updatePromise SUCCESS <<<<< " + count + " records updated!");
+								console.log(">>>>> updatePromise SUCCESS <<<<< " + count + " record updated!");
 								def.resolve(count);
 							});
 							updatePromise.fail(function(err){console.log(">>>>> updatePromise FAILURE <<<<<"+err);def.reject(err);});
@@ -1235,7 +1252,41 @@
 					}
 				}	
 				return def.promise();
-			},					
+			},
+			removeRecordFromTable: function(entityName,record) {//add one (later several...) records to existing table
+				//assumes a login to an application exists and entitName exists in local and is in sync
+				//record is a JSON containing a _id key {"_id":12345,"id":1,"code":"abc"}
+				console.log("....................................>beginning removeRecordFromTable....with appToken="+JSON.stringify(FL.login.appToken));
+				var def = $.Deferred();
+				var ecn = FL.dd.getCEntity(entityName);
+				if(ecn === null){
+					console.log("........FL.API.removeRecordFromTable() table="+entityName+ " not in local dict !");
+					return def.reject("removeRecordFromTable table="+entityName+ " does not exist");//
+				}else{//the table exists in local dict but may be unsynchronized
+					var oEntity = FL.dd.entities[entityName];
+					if(!oEntity.sync){//table exists in local dict but is not in sync with server	
+						console.log("........FL.API.removeRecordFromTable() table="+entityName+ " exists in local dict but is not in sync");
+						return def.reject("removeRecordFromTable table="+entityName+ " not in sync");//
+					}else{//table exists and is in sync
+						console.log("........FL.API.removeRecordFromTable() table="+entityName+ " is ok. We will remove!");
+						if(record._id){
+							console.log("remove ->"+record._id+" record="+JSON.stringify(record));
+							var removePromise = _remove(ecn,record._id);
+							removePromise.done(function(){
+								console.log(">>>>> removePromise SUCCESS <<<<< record removed!");
+								def.resolve();
+							});
+							removePromise.fail(function(err){console.log(">>>>> removePromise FAILURE <<<<<"+err);def.reject(err);});
+							// return def.resolve(data);
+						}else{
+							console.log("........FL.API.removeRecordFromTable() table="+entityName+ " is ok but _id is missing");
+							return def.reject("removeRecordFromTable table="+entityName+ " -->error: missing _id");//
+						}	
+						// insertPromise.then(function(data){return def.resolve(data);},function(err){return def.reject(err);});
+					}
+				}	
+				return def.promise();
+			},							
 			loadTable: function(entityName) {//returns the full content of a table from server
 				//assumes a login to an application exists
 				console.log("....................................>beginning loadTable....with appToken="+JSON.stringify(FL.login.appToken));

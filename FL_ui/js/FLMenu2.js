@@ -219,7 +219,7 @@ FL["menu"] = (function(){//name space FL.menu
 			var menuTag = getMenuTag(href);
 			console.log("   dispatchHref called by refHandler href="+href+" ---------> menuTag="+menuTag);
 			// alert("dispatchHref href="+href+" ---------> menuTag="+menuTag);
-			if(menuTag.substr(0,1) == "_"){ //ex:"http://www.microsoft.com" or "./mission.html"
+			if(menuTag !== null && menuTag.substr(0,1) == "_"){ //ex:"http://www.microsoft.com" or "./mission.html"
 				// alert("Special menu command ->"+menuTag);
 				loadInternalPage(menuTag);
 			}else{

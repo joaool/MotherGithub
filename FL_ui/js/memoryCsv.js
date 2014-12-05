@@ -82,13 +82,13 @@ window.csvStore = {
     },
 
     update: function (model) {
-        alert("memoryCsv.js Update was called !!!");
+        // alert("memoryCsv.js Update was called !!!");
         this.csvRows[model.id] = model;//it is used !!!
         //alert("memoryCsv.js update modelUpdate !!!! --->"+ model.get("id") + " _id="+ model.get("_id") + " nome="+model.get("nome"));
-        alert("memoryCsv.js update modelUpdate !!!! --->"+JSON.stringify(model));
+        console.log("memoryCsv.js update modelUpdate !!!! --->"+JSON.stringify(model));
         var promise=FL.API.updateRecordToTable(this.entityName,model.attributes);
         promise.done(function(){
-            console.log(">>>>>memoryCsv update updateRecordToTable FAILURE SUCCESS <<<<<");
+            console.log(">>>>>memoryCsv update updateRecordToTable  SUCCESS <<<<<");
             return model;
         });
         promise.fail(function(err){console.log(">>>>>memoryCsv update updateRecordToTable FAILURE <<<<<"+err);return model;});
@@ -96,6 +96,13 @@ window.csvStore = {
     },
 
     destroy: function (model) {
+        console.log("memoryCsv.js - delete row "+JSON.stringify(model.attributes));
+        var promise=FL.API.removeRecordFromTable(this.entityName,model.attributes);
+        promise.done(function(){
+            console.log(">>>>>memoryCsv destroy removeRecordFromTable SUCCESS <<<<<");
+            return model;
+        });
+        promise.fail(function(err){console.log(">>>>>memoryCsv destroy removeRecordFromTable FAILURE <<<<<"+err);return model;});
         delete this.csvRows[model.id];//it is used !!!
         return model;
     },
