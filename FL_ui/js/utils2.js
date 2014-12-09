@@ -327,7 +327,7 @@ window.utils = {
             },
             deleteRow: function (e) {
                 e.preventDefault();
-                alert("we will remove "+this.model.get("id"));
+                // alert("we will remove "+this.model.get("id"));
                 // csvSetCollection.sync("delete",this.model);
                 this.model.collection.sync("delete",this.model);
                 this.model.collection.remove(this.model);
@@ -341,7 +341,7 @@ window.utils = {
         var columns = [{name: "del", label: "Delete", cell: DeleteCell }];
         // var oEntity = FL.dd.getEntity(entityName);
         _.each(arrOfColumns, function(element,index){
-            console.log("defaultEntityColumns *********************--->"+element.name);
+            console.log("utils2 backGridColumnsFromArray defaultEntityColumns *********************--->"+element.name);
             var column = {};
             column["name"] = element.name;
             if( element.name=="id" ) {
@@ -407,12 +407,19 @@ window.utils = {
             initialize: function () {
                 console.log("initializing CsvElement model");
                 this.on('change',this.modelUpdate,this);
+                this.on('add',this.modelAdd,this);
             },
             modelUpdate: function(){
                 // alert("CsvElement modelUpdate !!!! --->"+ this.get("id") + " _id="+ this.get("_id") + " nome="+this.get("nome"));
                 // alert("CsvElement modelUpdate !!!! --->"+ JSON.stringify(this.toJSON()));
                 csvSetCollection.sync("update",this);
             },
+            modelAdd: function(){
+                // alert("CsvElement modelUpdate !!!! --->"+ this.get("id") + " _id="+ this.get("_id") + " nome="+this.get("nome"));
+                // alert("CsvElement modelAdd !!!! --->"+ JSON.stringify(this.toJSON()));
+                console.log("mountGridInCsvStore CsvElement Add model id="+this.id+" marca="+this.attributes.marca+" _id="+this.attributes._id);
+
+            },      
             // sync:csvStore.sync
             sync:function(method, model, options){
                 return csvStore.sync(method, model, options);
@@ -422,8 +429,10 @@ window.utils = {
             model: CsvElement,
         });
         var csvSetCollection = new CsvSet(csvStore.csvRows);//We can instantiate our new collection by passing in an array of models.       
-        csvSetCollection.fetch({success: function(){
+        csvSetCollection.fetch({remove:false,success: function(){
             console.log(" csvSetCollection.fetch ==========================================> success !!!");
+        },error:function(){
+            console.log(" csvSetCollection.fetch ==========================================> ERROR !!!");
         }});
 
         var CsvPageableCollection = Backbone.PageableCollection.extend({
@@ -454,15 +463,15 @@ window.utils = {
 
         $("#csvcontent").empty();
         $("#addGrid").click(function () {
-            // var last = csvSetCollection.length +1;
-            var last = csvStore.getNextId();
-            var newRow = utils.defaultNewGridRow(columnsArr, last);
-
+             csvStore.addOneEmptyRow();
+            var lastKeyInStore = csvStore.getNextId() - 1; //get the highest key in csvStore.csvRows
             var CsvElementModel = Backbone.Model.extend({});
+
+            newRow = csvStore.csvRows[lastKeyInStore];
             var csvLine = new CsvElementModel(newRow);
 
-            // csvSetCollection.add(newRow);//grid without paginator - collection does not have a save method
-            csvPageableCollection.getLastPage();//we force lastPage display !!! - remove this line if no paginator
+            csvSetCollection.add(newRow);//grid without paginator - collection does not have a save method
+            csvPageableCollection.getLastPage();//we force lastKeyInStorePage display !!! - remove this line if no paginator
             csvPageableCollection.add(newRow);//the new model was inserted in the collection <--- necessary for paginator - - remove this line if no paginator
 
             csvLine.sync("create",newRow);

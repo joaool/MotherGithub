@@ -17,8 +17,8 @@
 			var promise=FL.API.loadTable(entityName);
 			promise.done(function(data){
 				console.log("New %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
-				csvStore.setEntityName(entityName);
-				csvStore.store(data);
+				csvStore.setEntityName(entityName);//stores <entityName> in csvStore object 
+				csvStore.store(data);//data is an array of objects [{},{},....{}] where id field is mandatory inside {}
 				var z=csvStore.csvRows;//only for debugging
 				// alert("New displayDefaultGrid -->import is done");
 				console.log("New displayDefaultGrid -->import is done");

@@ -1,7 +1,7 @@
 // The in-memory Store. Encapsulates logic to access wine data.
 window.csvStore = {
     csvRows:{}, //a JSON of JSONs  {1:{},2:{}...n:{}}; //NOTE:each row  should have a boolean sync field to work in offline mode
-    lastId:0,
+    numberOfRows:0,
     setAttributesArr: function(attributesArr){
         //format [{label:"xx",name:fieldName,description:xDescription,type:xtype,enumerable:xEnumerable},{col2}...{}]
         this.attributesArr = attributesArr;
@@ -17,8 +17,11 @@ window.csvStore = {
         });
         return retArr;
     },
-    setEntityName: function(entityName){
+    setEntityName: function(entityName){//sets entity name and csvStore.attributesArr
         this.entityName = entityName;
+        // defines attributesArr to set in setAttributesArr(attributesArr)  -->format [{label:"xx",name:fieldName,description:xDescription,type:xtype,enumerable:xEnumerable},{col2}...{}]
+        var oEntity = FL.dd.getEntityBySingular(entityName);
+        this.setAttributesArr(oEntity.attributes);
     },
     getEntityName: function(){
         return this.entityName;
@@ -27,7 +30,19 @@ window.csvStore = {
         var arrOfIds = _.map(arrToStore,function(element){return element.id;});
         this.csvRows = _.object(arrOfIds,arrToStore); //becomes ->{1:arrToStore[1],2:arrToSAtore[2]....} 
         // this.csvRows = arrToStore;
-        this.lastId = arrOfIds.length;
+        this.numberOfRows = arrOfIds.length;
+    },
+    addOneEmptyRow:function(){//adds one line to csvRrows with empty fields of this.entityName and _id="-1"
+        var nextId = this.getNextId();
+        //we will extract form dictionary the fields with empty values
+        // var oEntity = FL.dd.getEntityBySingular(this.entityName);
+        // columnsArr --> Format: [{label:"xx",name:fieldName,type:xtype,enumerable:xEnumerable},{col2}...{}]
+        var columnsArr = this.getAttributesArr();//returns an array of fields with empty content
+        var newRow = utils.defaultNewGridRow(columnsArr, nextId);
+
+        this.csvRows[nextId] = newRow;//becomes ->{93:arrToStore[1],2:arrToSAtore[2]....} 
+        this.csvRows[nextId]["_id"] = "-1";//this means a new line that must be inserted in the server
+        var z = 32;
     },
     getNextId: function(){//returns a number with the id of the last element + 1 
         var arrOfKeys = _.keys(this.csvRows);
@@ -62,7 +77,7 @@ window.csvStore = {
             picture: "waterbrook.jpg"
         };
 
-        this.lastId = 2;
+        this.numberOfRows = 2;
     },
 
     find: function (model) {
@@ -75,9 +90,11 @@ window.csvStore = {
     },
 
     create: function (model) {
-        this.lastId++;
-        // model.set('id', this.lastId);
-        this.csvRows[this.lastId] = model;//it is used !!!
+        this.numberOfRows++;
+        // model.set('id', this.numberOfRows);
+        console.log("memoryCsv.js create new line --->"+JSON.stringify(model));
+        model["_id"] = "-1";
+        this.csvRows[this.numberOfRows] = model;//it is used !!!
         return model;
     },
 
@@ -86,12 +103,32 @@ window.csvStore = {
         this.csvRows[model.id] = model;//it is used !!!
         //alert("memoryCsv.js update modelUpdate !!!! --->"+ model.get("id") + " _id="+ model.get("_id") + " nome="+model.get("nome"));
         console.log("memoryCsv.js update modelUpdate !!!! --->"+JSON.stringify(model));
-        var promise=FL.API.updateRecordToTable(this.entityName,model.attributes);
-        promise.done(function(){
-            console.log(">>>>>memoryCsv update updateRecordToTable  SUCCESS <<<<<");
-            return model;
-        });
-        promise.fail(function(err){console.log(">>>>>memoryCsv update updateRecordToTable FAILURE <<<<<"+err);return model;});
+        var promise = null;
+        if(model.attributes._id == "-1"){
+            promise=FL.API.addRecordsToTable(this.entityName,[model.attributes]);
+            promise.done(function(data){
+                console.log(">>>>>memoryCsv update addRecordsToTable  SUCCESS <<<<<");
+                console.log("memoryCsv.js update addRecordsToTable !!!! --->"+JSON.stringify(data));
+                //data format:
+                // [  {"d": {"51":"Nome do cliente","52":"Cascais","53":"Portugal",
+                //        "54":["cliente@sapo.pt","clienteportugese@gmail.com"]},
+                //     "r":[{"r":"59","s":0,"e":"50","l":[{"_id":"789fgd89","u":"n"}]}],
+                //     "v":0,
+                //     "_id":"53e1bf93f9b224b302c2a572"}
+                // ]
+                return model;
+            });
+            promise.fail(function(err){console.log(">>>>>memoryCsv update addRecordsToTable FAILURE <<<<<"+err);return model;});
+        }else if(model.attributes._id){
+            promise = FL.API.updateRecordToTable(this.entityName,model.attributes);
+            promise.done(function(data){
+                console.log(">>>>>memoryCsv update updateRecordToTable  SUCCESS <<<<< -->"+JSON.stringify(data));
+                return model;
+            });
+            promise.fail(function(err){console.log(">>>>>memoryCsv update updateRecordToTable FAILURE <<<<<"+err);return model;});
+        }else{
+            console.log(">>>>>memoryCsv update updateRecordToTable  NOP Nothing was done !!!! <<<<< -->model.attributes._id="+model.attributes._id);
+        }
         return model;
     },
 

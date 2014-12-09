@@ -785,7 +785,7 @@
 			var fl = FL.login.token.fl; //new flMain();
 			var fd = new fl.data();
 
-			fd.update(ecn, {"query":{"_id":_id},"update":jsonToSend}, function(err, result){
+			fd.update(ecn, {"query":{"_id":_id},"update":jsonToSend, upsert:true}, function(err, result){
 				console.log("............................._update....i_id="+_id+" To ->"+JSON.stringify(jsonToSend));
 				if(err){
 					console.log("======================>ERROR ON _update err="+err);
