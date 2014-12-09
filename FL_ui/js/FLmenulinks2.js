@@ -25,7 +25,7 @@
 				console.log("show csvStore="+JSON.stringify(csvStore.csvRows));
 				FL.clearSpaceBelowMenus();
 				$("#addGrid").show();
-				$("#addGrid").html("Add Row");
+				$("#addGrid").html(" Add Row");
 				var columnsArr = utils.backGridColumnsExtractedFromDictionary(entityName);//extracts attributes from dictionary and prepares columns object for backgrid
 				console.log("New &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&& entity="+entityName);
 				console.log("show columnsArr="+JSON.stringify(columnsArr));
