@@ -944,12 +944,15 @@
 			},
 			connectUserToDefaultApp: function(userName,password) {//
 				//if userName/password exists but has no application, one application is created
-				console.log("....................................>beginning connectUserToDefaultApp....with token="+JSON.stringify(FL.login.token));
+				// console.log("....................................>beginning connectUserToDefaultApp....with token="+JSON.stringify(FL.login.token));
+				console.log("....................................>beginning connectUserToDefaultApp....");
 				var def = $.Deferred();
 				var tokenBackup = FL.login.token;//if it fails we will recover the initial token this backup
 				var fl = null;
 				var fa = null;
-				if (FL === null || FL.login === null || FL.login.token === null){//FL.login.token is null
+				// if (FL === null || FL.login === null || FL.login.token === null){//FL.login.token is null
+				// if (FL.login === null || FL.login.token === null){//FL.login.token is null
+				if (FL.login.token.fl === null){//FL.login.token is null
 					fl = new flMain();
 					fa = new fl.app();
 					FL.login.token["fl"] = fl;

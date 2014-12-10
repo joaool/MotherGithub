@@ -187,7 +187,7 @@ jQuery(document).ready(function($){
 			$('#trigger1').show();$('#trigger2').show();$('#trigger3').show();
 			FL.clearSpaceBelowMenus();
 			FL.domInject("_placeHolder",homeHTML );
-			FL.domain = FL.login.token.appDescription; 
+			FL.domain = FL.login.token.appDescription;
 			displaySignInUser(loginObject.email);
 		};
 		var appSetup = function(loginObject){//(local dict + menu + style + fontFamily) from server, and displays UI accordingly ->menu, style, font and homepage 
@@ -339,7 +339,7 @@ jQuery(document).ready(function($){
 				}
 			});//OK	
 			return def.promise();
-		};	
+		};
 		var loginAccess = function(loginObject){//when login email is valid and other data acceptable - {email:email,userName:userName,password:password};
 			// loginObject = {email:email,userName:userName,password:password};
 			var def = $.Deferred();
@@ -399,7 +399,7 @@ jQuery(document).ready(function($){
 					FL.common.makeModalInfo("Cannot sign up because " + loginObject.email + " is already registered.<br> - If " + loginObject.email + " is your Email, please choose <strong>'Sign In'</strong> to enter as an existing user.",function(){
 						console.log("FLLoadCss2 ->newUserAccess->makeModalInfo --->pressed 'Ok' after existing email message for email="+loginObject.email);
 						return def.resolve(false);//false ==>user not created because it already exists						
-					});				
+					});
 				}
 			});
 			existingUserPromise.fail(function(err){
@@ -449,7 +449,7 @@ jQuery(document).ready(function($){
 		};
 		return{
 			test:"juakim",
-			token: {},
+			token: {fl:null},
 			appToken: {},
 			defaultStyle: "readable",
 			defaultFontFamily: "helvetica",
@@ -497,38 +497,38 @@ jQuery(document).ready(function($){
 				displaySignInUser();//displays no user, just icon and "Sign In" link
 				FL.mix("Entering",{});
 			},
-			XcheckSignIn:function(is_recoverLastMenu) {//updates DOM login line with local saved status. If logged in shows slidePanels -  returns true/false acording with logIn/logOut
-				//if is_recoverLastMenu = true =>LastMenu will be recovered and will be passed to FL.menu
-				messageEnabler.getInstance();//a singleton to listen for "slidePanel" broadcasts 
-				var loggedIn = false;
-				var lastLogin = null;
-				var htmlToInject = null;
-				if (typeof(Storage) != undefined) {//browser supports storage
-					var lastLoginStr = localStorage.login;// Retrieve format {email:x1,userName:x2,password:x3};
-					if (lastLoginStr == "undefined" || lastLoginStr == "")
-						lastLoginStr = null;
-					if(lastLoginStr != null) {
-						var lastLoginObj = JSON.parse(lastLoginStr);
-						displaySignInUser(lastLoginObj.email);
-						$('#trigger1').show();$('#trigger2').show();$('#trigger3').show();
-						$.Topic( 'signInDone' ).publish( true ); //informs FL.menu that edition is allowed
-						if(is_recoverLastMenu){
-							recoverLastMenu();//recover locally saved tour status and menu and informs FL.menu about the new menu if any
-						}
-					}else{//the status is signed out
-						displaySignInUser();//displays no user, just icon and "Sign In" link
-						$('#trigger1').hide();$('#trigger2').hide();$('#trigger3').hide();
-						$.Topic( 'signInDone' ).publish( false ); //informs FL.menu that edition is not allowed
-						$.Topic( 'sidePanelOpened' ).publish( false ); //informs FL.menu that sidePanel is closed 
-						FL.mix("Entering",{});
-					}
-					recoverLastTourActiveStatus();
-					resetStyle(true);//the status is login 
-				}else{
-					FL.common.makeModalInfo('No menu persistence because your browser does not support Web Storage...');
-				}
-				return loggedIn;
-			},
+			// XcheckSignIn:function(is_recoverLastMenu) {//updates DOM login line with local saved status. If logged in shows slidePanels -  returns true/false acording with logIn/logOut
+			// 	//if is_recoverLastMenu = true =>LastMenu will be recovered and will be passed to FL.menu
+			// 	messageEnabler.getInstance();//a singleton to listen for "slidePanel" broadcasts 
+			// 	var loggedIn = false;
+			// 	var lastLogin = null;
+			// 	var htmlToInject = null;
+			// 	if (typeof(Storage) != undefined) {//browser supports storage
+			// 		var lastLoginStr = localStorage.login;// Retrieve format {email:x1,userName:x2,password:x3};
+			// 		if (lastLoginStr == "undefined" || lastLoginStr == "")
+			// 			lastLoginStr = null;
+			// 		if(lastLoginStr != null) {
+			// 			var lastLoginObj = JSON.parse(lastLoginStr);
+			// 			displaySignInUser(lastLoginObj.email);
+			// 			$('#trigger1').show();$('#trigger2').show();$('#trigger3').show();
+			// 			$.Topic( 'signInDone' ).publish( true ); //informs FL.menu that edition is allowed
+			// 			if(is_recoverLastMenu){
+			// 				recoverLastMenu();//recover locally saved tour status and menu and informs FL.menu about the new menu if any
+			// 			}
+			// 		}else{//the status is signed out
+			// 			displaySignInUser();//displays no user, just icon and "Sign In" link
+			// 			$('#trigger1').hide();$('#trigger2').hide();$('#trigger3').hide();
+			// 			$.Topic( 'signInDone' ).publish( false ); //informs FL.menu that edition is not allowed
+			// 			$.Topic( 'sidePanelOpened' ).publish( false ); //informs FL.menu that sidePanel is closed 
+			// 			FL.mix("Entering",{});
+			// 		}
+			// 		recoverLastTourActiveStatus();
+			// 		resetStyle(true);//the status is login 
+			// 	}else{
+			// 		FL.common.makeModalInfo('No menu persistence because your browser does not support Web Storage...');
+			// 	}
+			// 	return loggedIn;
+			// },
 			checkSignIn2:function() {
 				//checkSignIn2 ->recover last saved loginObject and:
 				//	if user/password exists ->logs in -> shows slide panels ->updates upper right corner
@@ -631,7 +631,21 @@ jQuery(document).ready(function($){
 				getStartedPromise.fail(function(err){
 					alert("Login access error err="+JSON.stringify(err));
 				});
-			},	
+			},
+			home:function(){
+				// alert("the brand !!!");
+				var loadAppPromise=FL.API.loadAppDataForSignInUser2();//gets data dictionary + main menu + style + fontFamily + home page
+				loadAppPromise.done(function(menuData,homeHTML){
+					console.log("FL.login.home ---> homeHTML=" + homeHTML);
+					console.log("FL.login.home --------------------------------------------->first menu=" + menuData.oMenu.menu[0].title);				
+					FL.clearSpaceBelowMenus();
+					FL.domInject("_placeHolder",homeHTML );
+				});	
+				loadAppPromise.fail(function(err){
+					alert("FLpage_editor ->  --> after successfull connectUserToDefaultApp FAILURE in loadAppDataForSignInUser2 <<<<< error="+err);
+					// return def.reject("FLLoadCss2.js  --> loginAccess appSetup FAILURE in loadAppDataForSignInUser2 <<<<< error="+err);
+				});				
+			},
 			clearAllSettings: function(){//restore original menu in local storage and updates DOM status - called directly from DOM link
 	            FL.common.makeModalConfirm("Your current edit menu will be lost and you will be logged out. Do you really want this ?","Cancel","OK",function(result){
 	                if(result){

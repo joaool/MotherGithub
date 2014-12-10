@@ -62,12 +62,12 @@
 				alert("Fl.link.test(x) x="+x);
 			},
 			pageEditor: function(xPage) {//call with menu key "uri": "javascript:FL.links.test('JOJO')"
-				var connectionString = localStorage.connection;
+				// var connectionString = localStorage.connection;
+				var connectionString = localStorage.login;// Retrieve format {email:x1,password:x3,domain:x4};
 				if(connectionString.length === 0){
 					alert("Fl.link.pageEditor PLEASE CONNECT TO THE DATABASE ");
 					return;
 				}
-			alert("Fl.link.pageEditor call with:\npage=" + xPage + "\nconnectionString="+connectionString);
 				// "uri":"./page_editor.html?d=joao"
 				// location.href = "./page_editor.html?d=joao";
 				//localStorage.connection = connectionString; //this was already done in FL.server.connectServer()
@@ -100,35 +100,60 @@
 				// 	}
 				// }
 
-				FL.server.disconnect(function(){
-					alert("inside disconnect callback ");
-					var style = localStorage.style;
-					var font = localStorage.fontFamily;
-					// location.href = "./page_editor.html?connectionString="+connectionString+"#page=" + xPage + "#style=" + style + "#font="+font;
-					// location.href = "./page_editor.html?connectionString="+connectionString+"#page=" + xPage + "#style=" + style + "#font="+font;
-					var child = window.open("./page_editor.html?connectionString="+connectionString+"#page=" + xPage + "#style=" + style + "#font="+font, 'theWindow');
-					if (window.focus) {
-						child.focus();
-					}
+				// FL.server.disconnect(function(){
+				// 	alert("inside disconnect callback ");
+				// 	var style = localStorage.style;
+				// 	var font = localStorage.fontFamily;
+				// 	// location.href = "./page_editor.html?connectionString="+connectionString+"#page=" + xPage + "#style=" + style + "#font="+font;
+				// 	// location.href = "./page_editor.html?connectionString="+connectionString+"#page=" + xPage + "#style=" + style + "#font="+font;
+				// 	var child = window.open("./page_editor.html?connectionString="+connectionString+"#page=" + xPage + "#style=" + style + "#font="+font, 'theWindow');
+				// 	if (window.focus) {
+				// 		child.focus();
+				// 	}
 
-					var timer = setInterval(checkChild, 500);
-					function checkChild() {
-						if (child.closed) {
-							alert("FrameLink Page Editor was closed \nconnectionString="+connectionString);
-							clearInterval(timer);
-							//restore home page
-							FL.server.restorePageFromConnectionString("home",connectionString,function(err,htmlStr){
-								if (err){
-									alert('FLmenulinks2.js after closing page_editor window ERROR restoring home page err=' + JSON.stringify(err));
-								}
-								FL.menu.homeMemory = htmlStr; //this means that this will be displayed
-								FL.menu.currentMenuObj.menuRefresh();
-							});
-						}else{
-							// child.focus();
-						}
+				// 	var timer = setInterval(checkChild, 500);
+				// 	function checkChild() {
+				// 		if (child.closed) {
+				// 			alert("FrameLink Page Editor was closed \nconnectionString="+connectionString);
+				// 			clearInterval(timer);
+				// 			//restore home page
+				// 			FL.server.restorePageFromConnectionString("home",connectionString,function(err,htmlStr){
+				// 				if (err){
+				// 					alert('FLmenulinks2.js after closing page_editor window ERROR restoring home page err=' + JSON.stringify(err));
+				// 				}
+				// 				FL.menu.homeMemory = htmlStr; //this means that this will be displayed
+				// 				FL.menu.currentMenuObj.menuRefresh();
+				// 			});
+				// 		}else{
+				// 			// child.focus();
+				// 		}
+				// 	}
+				// });
+				// alert("Fl.link.pageEditor call with:\npage=" + xPage + "\nconnectionString="+connectionString);
+				var style = localStorage.style;
+				var font = localStorage.fontFamily;
+				var child = window.open("./page_editor.html?connectionString="+connectionString+"#page=" + xPage + "#style=" + style + "#font="+font, 'theWindow');
+				if (window.focus) {
+					child.focus();
+				}				
+				var timer = setInterval(checkChild, 500);
+				function checkChild() {
+					if (child.closed) {
+						// alert("FrameLink Page Editor was closed \nconnectionString="+connectionString);
+						clearInterval(timer);
+						FL.login.home();
+						//restore home page
+					// FL.server.restorePageFromConnectionString("home",connectionString,function(err,htmlStr){
+					// 	if (err){
+					// 		alert('FLmenulinks2.js after closing page_editor window ERROR restoring home page err=' + JSON.stringify(err));
+					// 	}
+					// 	FL.menu.homeMemory = htmlStr; //this means that this will be displayed
+					// 	FL.menu.currentMenuObj.menuRefresh();
+					// });
+					}else{
+						// child.focus();
 					}
-				});
+				};
 				// document.getElementById('TheForm').submit();
 
 				// alert("this an alert after calling PageEditor");
