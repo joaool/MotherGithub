@@ -1,4 +1,19 @@
 var FL = FL || {};
+(function() {//hijack any JavaScript funct <----------- OK !!!
+//http://stackoverflow.com/questions/9216441/intercept-calls-to-console-log-in-chrome
+  var Oldlog = console.log;
+  // console.log = function(){};//activate this instead of next - to "remove" all console.logs
+  console.log = function() {
+    var nRepeat =  90 - arguments[0].length;
+      var args = [].slice.apply(arguments).concat([FL.common.repeat("-",nRepeat),(new Error()).stack.split(/\n/)[2].trim()]);
+      if(FL.API.debug){
+        FL.API.fl.setTraceClient(2);
+        Oldlog.apply(this, args);
+      }else{
+        FL.API.fl.setTraceClient(0);
+      }
+  };
+})();
 (function() { //App is a name space.
 	var oMenu = {
 		"menu" : [
@@ -8,6 +23,7 @@ var FL = FL || {};
 			},
 		]
 	};
+	FL.API.debug = false;
 	FL.oMenu = oMenu; //why is this necessary ? it is !
 	// FL.oMenu = null;
 	$(document).ready(function() {
@@ -24,14 +40,14 @@ var FL = FL || {};
 			FL["domain"] = FL.common.getLastTagInString(fullUrl,"=","#");//FL.domain is globally defined - the last # is disregarded
 			// alert("FL.domain="+FL.domain);
 		}
-		$('#panel1').slidePanel({
-			triggerName: '#trigger1',
-			position: 'fixed',
-			triggerTopPos: '110px',
-			panelTopPos: '110px',
-			ajax: true,
-			ajaxSource: 'FL_ui/sidepanel/fl_settings.html'
-		});
+		// $('#panel1').slidePanel({
+		// 	triggerName: '#trigger1',
+		// 	position: 'fixed',
+		// 	triggerTopPos: '110px',
+		// 	panelTopPos: '110px',
+		// 	ajax: true,
+		// 	ajaxSource: 'FL_ui/sidepanel/fl_settings.html'
+		// });
 		$('#panel2').slidePanel({
 			triggerName: '#trigger2',
 			position: 'fixed',
@@ -41,14 +57,14 @@ var FL = FL || {};
 			// ajaxSource: 'FL_ui/sidepanel/fl_services.html'
 			ajaxSource: 'FL_ui/sidepanel/fl_builder2.html'
 		});
-		$('#panel3').slidePanel({
-			triggerName: '#trigger3',
-			position: 'fixed',
-			triggerTopPos: '310px',
-			panelTopPos: '310px',
-			ajax: true,
-			ajaxSource: 'FL_ui/sidepanel/fl_services.html'
-		});
+		// $('#panel3').slidePanel({
+		// 	triggerName: '#trigger3',
+		// 	position: 'fixed',
+		// 	triggerTopPos: '310px',
+		// 	panelTopPos: '310px',
+		// 	ajax: true,
+		// 	ajaxSource: 'FL_ui/sidepanel/fl_services.html'
+		// });
 		// $('#trigger2').on('mousedown','#fl_builder',function(){alert("Inside Panel2 at pos-load !!!!")});
 		// $('#trigger2').on('mousedown',function(){alert("Inside Panel2 at pos-load !!!!")});
 		$('#trigger1').hide();

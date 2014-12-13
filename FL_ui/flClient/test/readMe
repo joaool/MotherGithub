@@ -1,0 +1,27 @@
+		TEST PROGRAM
+		============
+
+0) Remark
+	the environment variables are only handled with the testxxxxx.js. If you run an application in a browser
+	you have to use the javascipt way of doing things
+
+1) how to run them
+   Linux: export FLAPISRV='serverName'
+   Windows: set FLAPISRV='serverName'
+   javascript: fl.serverName('serverName')
+
+   serverName can be : 'localhost', '62.210.97.101', 'framelink.co/apps'
+
+2) Trace
+	Linux: export FLCLITRACE=2
+	Windows: set FLCLITRACE=2
+	javascript: fl.setTraceClient(2)
+
+	NB: trace flag = 4 allow to dump a call to the server, in order to replay commands. See the doc
+
+Exemple how to run the test with a remote server from a windows machine:
+
+start cmd.exe
+	set FLAPISRV='62.210.97.101'
+	set FLCLITRACE=2
+	node testData.js

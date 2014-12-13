@@ -1221,7 +1221,7 @@
 				}	
 				return def.promise();
 			},
-			updateRecordToTable: function(entityName,record) {//add one (later several...) records to existing table
+			updateRecordToTable: function(entityName,record) {//update a single record to existing table
 				//assumes a login to an application exists and entitName exists in local and is in sync
 				//record is a JSON containing a _id key {"_id":12345,"id":1,"code":"abc"}
 				console.log("....................................>beginning updateRecordToTable....with appToken="+JSON.stringify(FL.login.appToken));
@@ -1256,7 +1256,7 @@
 				}	
 				return def.promise();
 			},
-			removeRecordFromTable: function(entityName,record) {//add one (later several...) records to existing table
+			removeRecordFromTable: function(entityName,record) {//removes a single record from a table
 				//assumes a login to an application exists and entitName exists in local and is in sync
 				//record is a JSON containing a _id key {"_id":12345,"id":1,"code":"abc"}
 				console.log("....................................>beginning removeRecordFromTable....with appToken="+JSON.stringify(FL.login.appToken));

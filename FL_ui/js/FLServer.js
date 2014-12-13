@@ -189,7 +189,7 @@
 				});	
 
 			},
-			insertCsvStoreDataTo: function(entityName,insertCB){//creates entity=entityName in server and sends csvStore data to server
+			XinsertCsvStoreDataTo: function(entityName,insertCB){//creates entity=entityName in server and sends csvStore data to server
 				var oEntity =  FL.dd.getEntityBySingular(entityName);
 				this.createServerEntity_Fields(entityName,function(err){
 					if(err)
@@ -209,6 +209,26 @@
 					});
 				});
 			},
+			XXXinsertCsvStoreDataTo: function(entityName,insertCB){//creates entity=entityName in server and sends csvStore data to server
+				var oEntity =  FL.dd.getEntityBySingular(entityName);
+				this.createServerEntity_Fields(entityName,function(err){
+					if(err)
+						return insertCB(err);
+					var eCN = oEntity.csingular;
+					//for sure it is sinchronized
+					var fd = new FL.server.fl.data();
+					var arrToSend = FL.server.preparePutAllCsvStore(entityName);
+					fd.insert(eCN,arrToSend,function(err, data){
+						if (err){
+							alert('insertCsvStoreDataTo: err=' + JSON.stringify(err));
+							return insertCB(false);
+						}
+						console.log("exit from insertCsvStoreDataTo -->"+JSON.stringify(data));
+						return insertCB(null);
+						// var myApp =data.applications[0];
+					});
+				});
+			},			
 			preparePutRowFromCsvStoreById: function(entityName,id){
 				//with the dictionary for entityName translates field logical names in csvStore into compressed field names with csvStore content for id
 				//Ex: from csvStore.csvRows = {"1":{"id":1,"shipped":true,"product":"Prod 1"},"2":{"id":2,"shipped":false,"product":"Prod 2"}}

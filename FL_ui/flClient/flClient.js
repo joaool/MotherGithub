@@ -1,4 +1,4 @@
-/*
+/* 
     FrameLink client library
 
 Documentation
@@ -22,27 +22,62 @@ version 0.9 : Nicolas Cuvillier
 TODO
 
 */
+//sysParam 0:Entity, 1: Field, 2: Relation
+//  [0]: Mandatory fields for insert 
+//  [1]: Updatable fields
+//  [2]: Special validation function ['fCN']: function(value){ if (value == good) return true; else return false;}
+//
+
 
 (function() {
     // privates
+
+    var sysParam=[
+        //entity
+        [
+            // mandatory fields for insert, with minimum count
+            {'3':1, '4':1, 'E':1},
+            // updatable -1 means forgot everything in the array
+            {'3':0, '4':0, 'E':0},
+            // default projection
+            {'_id':1, '3':1, '4':1, 'E':1}  // also used in entity.js
+        ],
+        [
+            // mandatory fields for insert, with minimum count
+            {'1':1, '3':1, '4':1, 'K':1, 'M':1, '9':1},
+            // updatable -1 means forgot everything in the array
+            {'3':0, '4':0, 'K':0, 'M':0, 'N':-1, 'O':1, '9':0, 'P':0},  // optionsname has to be added here
+            // default projection
+            {'_id':1, '1':1, '3':1, '4':1, 'K':1, 'M':1, 'N':1, 'O':1, '9':1, 'P':1}  // also used in entity.js
+        ],
+        [
+            // mandatory fields for insert, with minimum count
+            {'00':1, 'U':2, 'V':2, 'W':2, 'Y':2, 'Z':2},
+            // updatable -1 means forgot everything in the array
+            {'00':1, 'U':0, 'V':2, 'W':2, 'X':2, 'Y':2, 'Z':2, '01':1, 'option':1},
+            // default projection
+            {'_id':1, '00.U':1, '00,Z':1, '00.V':1, '00.W':1, '00.Y':1, '01':1}  // also used in entity.js
+        ]
+    ];
     var axCall =function(protocol, srv, port, path, jsonData, callBack, trace){
         throw new Error("callAjax is not set");
     }
     var tabCodec=[{1: 'OK'}];
     var urlMainProt='http:';
     var urlMainSrv='62.210.97.101';
-    var urlMainPort =8124;
+    //urlMainSrv='localhost';
+    var urlMainPort =8123;
 
     var urlAbeProt;
     var urlAbeSrv;
     var urlAbePort;
 
     var flTraceClient=0;  // same values as flTools.trace
-    var flTraceServer=0;  // same values as flTools.trace
+    var flTraceSession=-1;
+    var flTraceServer=-1;  // same values as flTools.trace
 
     var strTraceTxt="";
     var bResetTraceTxt=true;
-    var userName;
     //////////
     // flMain
     //////////
@@ -63,28 +98,38 @@ TODO
                     throw new Error("flMain: bad argument-callAjax is not defined");
             }
         }
-
+        // utility API
         flMain.prototype.pingMe = function (){
             return true;
         }
+        flMain.prototype.getsId = function (){
+            return axCall(null, null, null, 'getsId', { }, false, null, 0, null);
+        }
+
         flMain.prototype.serverName = function (srvName){
             urlMainSrv=srvName;
         }
+        function resetTraceValue(traceVal)
+        {   if (traceVal <0)
+                return -1;
+            if (traceVal > 65535)
+                return 65535;
+            return traceVal;
+        }
         flMain.prototype.setTraceClient = function (newTrace){
-            flTraceClient = newTrace;
+            flTraceClient = resetTraceValue(newTrace);
         }
         flMain.prototype.flushTraceClient = function (){
             bResetTraceTxt=true;
             return strTraceTxt;
         }
-
         flMain.prototype.setTraceServer = function (newTrace){
-            flTraceServer = newTrace;
+            flTraceServer = resetTraceValue(newTrace);
         }
-        flMain.prototype.logMessage = function (message){
-            axCall(urlMainProt, urlMainSrv, urlMainPort, "/fl/login", superJ, false, myCallBack, flTraceServer);
+        flMain.prototype.setTraceSession = function (newTrace){
+            flTraceSession = resetTraceValue(newTrace);
         }
-
+        // Login
         flMain.prototype.login = function(j, callBack){
             if (j.username == undefined || j.password == undefined){
                 callBack('Bad parameter', null);
@@ -92,50 +137,302 @@ TODO
             }
             var superJ=j;
             function myCallBack(err, data){
-                ////console.log ('in fl.login.callback !');
+                //console.log ('in fl.login.callback !');
                 if (err)
                     return callBack(err, null);
          
-                userName = data.user;
-                //console.log("fl.login: saving userName: " + userName);
                 data.user=undefined;
                 return callBack(null, data)
             }
-            axCall(urlMainProt, urlMainSrv, urlMainPort, "/fl/login", superJ, false, myCallBack, flTraceServer);
-        }        
+            //console.log('going to '+urlMainSrv);
+            sendCommand(1, 'fl/login', "-1", superJ, {}, myCallBack);
+        }
+        // User API
+        flMain.prototype.getSessionInfo = function(callBack){
+            if (!checkParam(callBack)){
+                callBack('Bad parameter', null);
+                return;
+            }
+            function myCallBack(err, data){
+                data.u1 = urlAbeProt;
+                data.u2 = urlAbeSrv;
+                data.u3 = urlAbePort;
+                data.u4= flTraceClient;
+                return callBack(err, data);
+            }
+            sendCommand(1, 'session/get', null, { }, {}, myCallBack);
+        }
+        // User API
+        flMain.prototype.setSessionInfo = function(jsonData, callBack){
+            if (!checkParam(jsonData.data1, jsonData.data2, callBack)){
+                callBack('Bad parameter', null);
+                return;
+            }
+            urlAbeProt = data.u1;
+            urlAbeSrv = data.u2;
+            urlAbePort = data.u3;
+            flTraceClient = data.u4;
 
-    //////////
+            sendCommand(1, 'session/set', null, jsonData, {}, callBack);
+        }
+ 
+        // User API
+        flMain.prototype.userCreate = function(jsonData, callBack){
+            if (!checkParam(jsonData.userName, jsonData.userPassWord, jsonData.adminName, jsonData.adminPassWord, jsonData.userType, callBack)){
+                callBack('Bad parameter', null);
+                return;
+            }
+            if (isFlagged(4))
+                generateFunction('fl', 'userCreate', undefined, JSON.stringify(jsonData));
+            sendCommand(1, 'fl/userCreate', "06", jsonData, {}, callBack);
+        }
+        flMain.prototype.userChangePassWord = function(jsonData, callBack){
+            if (!checkParam(jsonData.userName, jsonData.userPassWord, jsonData.adminName, jsonData.adminPassWord, callBack)){
+                callBack('Bad parameter', null);
+                return;
+            }
+            if (isFlagged(4))
+                generateFunction('fl', 'userChagePassWord', undefined, JSON.stringify(jsonData));
+            sendCommand(1, 'fl/userChangePassWord', "06", jsonData, {}, callBack);
+        }
+        flMain.prototype.userChangeName = function(jsonData, callBack){
+            if (!checkParam(jsonData.userName, jsonData.userPassWord, jsonData.newName, jsonData.newPassWord, callBack)){
+                callBack('Bad parameter', null);
+                return;
+            }
+            if (isFlagged(4))
+                generateFunction('fl', 'userChangeName', undefined, JSON.stringify(jsonData));
+            sendCommand(1, 'fl/userChangeName', "06", jsonData, {}, callBack);
+        }
+        flMain.prototype.userChangeType = function(jsonData, callBack){
+            if (!checkParam(jsonData.userName, jsonData.userPassWord, jsonData.adminName, jsonData.adminPassWord, jsonData.userType, callBack)){
+                callBack('Bad parameter', null);
+                return;
+            }
+            if (isFlagged(4))
+                generateFunction('fl', 'userChangeType', undefined, JSON.stringify(jsonData));
+            sendCommand(1, 'fl/userChangeType', "06", jsonData, {}, callBack);
+        }
+        flMain.prototype.promoteAsClientAdmin = function(jsonData, callBack){
+            if (!checkParam(jsonData.userName, jsonData.userPassWord, jsonData.adminName, jsonData.adminPassWord, jsonData.newClientName, callBack)){
+                callBack('Bad parameter', null);
+                return;
+            }
+            if (isFlagged(4))
+                generateFunction('fl', 'promoteAsClientAdmin', undefined, JSON.stringify(jsonData));
+            sendCommand(1, 'fl/promoteAsClientAdmin', "06", jsonData, {}, callBack);
+        }
+        flMain.prototype.userRemove = function(jsonData, callBack){
+            if (!checkParam(jsonData.userName, jsonData.adminName, jsonData.adminPassWord, callBack)){
+                callBack('Bad parameter', null);
+                return;
+            }
+            if (isFlagged(4))
+                generateFunction('fl', 'userRemove', undefined, JSON.stringify(jsonData));
+            sendCommand(1, 'fl/userRemove', "06", jsonData, {}, callBack);
+        }
+        flMain.prototype.isUserExist = function(jsonData, callBack){
+            if (!checkParam(jsonData.userName, jsonData.adminName, jsonData.adminPassWord, callBack)){
+                callBack('Bad parameter', null);
+                return;
+            }
+            if (isFlagged(4))
+                generateFunction('fl', 'isUserExist', undefined, JSON.stringify(jsonData));
+            sendCommand(1, 'fl/isUserExist', "06", jsonData, {}, callBack);
+        }
+        flMain.prototype.userGetList = function(jsonData, callBack){
+            if (!checkParam(jsonData.adminName, jsonData.adminPassWord, callBack)){
+                callBack('Bad parameter', null);
+                return;
+            }
+            if (isFlagged(4))
+                generateFunction('fl', 'userGetList', undefined, JSON.stringify(jsonData));
+            sendCommand(1, 'fl/userGetList', "06", jsonData, {}, callBack);
+        }
+        //  CLIENT APIs
+        flMain.prototype.clientCreate = function(jsonData, callBack){
+            if (!checkParam(jsonData.clientName, jsonData.adminName, jsonData.adminPassWord, callBack)){
+                callBack('Bad parameter', null);
+                return;
+            }
+            if (isFlagged(4))
+                generateFunction('fl', 'clientCreate', undefined, JSON.stringify(jsonData));
+            sendCommand(1, 'fl/clientCreate', "06", jsonData, {}, callBack);
+        }
+        flMain.prototype.clientChangeName = function(jsonData, callBack){
+            if (!checkParam(jsonData.clientName, json.newClientName, jsonData.adminName, jsonData.adminPassWord, callBack)){
+                callBack('Bad parameter', null);
+                return;
+            }
+            if (isFlagged(4))
+                generateFunction('fl', 'clientChangeName', undefined, JSON.stringify(jsonData));
+            sendCommand(1, 'fl/clientChangeName', "06", jsonData, {}, callBack);
+        }
+        flMain.prototype.clientRemove = function(jsonData, callBack){
+            if (!checkParam(jsonData.clientName, jsonData.adminName, jsonData.adminPassWord, callBack)){
+                callBack('Bad parameter', null);
+                return;
+            }
+            if (isFlagged(4))
+                generateFunction('fl', 'clientRemove', undefined, JSON.stringify(jsonData));
+            sendCommand(1, 'fl/clientRemove', "06", jsonData, {}, callBack);
+        }
+        flMain.prototype.clientGetList = function(jsonData, callBack){
+            if (!checkParam(jsonData.adminName, jsonData.adminPassWord, callBack)){
+                callBack('Bad parameter', null);
+                return;
+            }
+            if (isFlagged(4))
+                generateFunction('fl', 'clientGetList', undefined, JSON.stringify(jsonData));
+            sendCommand(1, 'fl/clientGetList', "06", jsonData, {}, callBack);
+        }
+        flMain.prototype.applicationFullCreate = function(jsonData, callBack){
+            if (!checkParam(jsonData.adminName, jsonData.adminPassWord, callBack)){
+                callBack('Bad parameter', null);
+            }
+            if (isFlagged(4))
+                generateFunction('fa', 'applicationFullCreate', undefined, JSON.stringify(jsonData));
+            sendCommand(1, 'fl/applicationFullCreate', "-1", jsonData, {}, callBack);
+        }
+        flMain.prototype.applicationFinalize = function(jsonData, callBack){
+            if (!checkParam(jsonData.adminName, jsonData.adminPassWord, jsonData.userName, jsonData.clientName, jsonData.domainName, 
+                  jsonData.newUserName, jsonData.newClientName, jsonData.newDescription, callBack)){
+                callBack('Bad parameter', null);
+            }
+            if (isFlagged(4))
+                generateFunction('fa', 'applicationfinalizeApp', undefined, JSON.stringify(jsonData));
+            sendCommand(1, 'fl/applicationfinalizeApp', "-1", jsonData, {}, callBack);
+        }
+        flMain.prototype.applicationCreate = function(jsonData, callBack){
+            if (!checkParam(jsonData.adminName, jsonData.adminPassWord, jsonData.domainPrefix, jsonData.description, 
+                            callBack)){
+                callBack('Bad parameter', null);
+                return;
+            }
+            if (isFlagged(4))
+                generateFunction('fa', 'applicationCreate', undefined, JSON.stringify(jsonData));
+            sendCommand(1, 'fl/applicationCreate', "-1", jsonData, {}, callBack);
+        }
+        flMain.prototype.applicationRemove = function(jsonData, callBack){
+            if (!checkParam(jsonData.adminName, jsonData.adminPassWord, jsonData.domain, callBack)){
+                callBack('Bad parameter', null);
+                return;
+            }
+            if (isFlagged(4))
+                generateFunction('fa', 'applicationRemove', undefined, JSON.stringify(jsonData));
+            sendCommand(1, 'fl/applicationRemove', "-1", jsonData, {}, callBack);
+        } 
+        flMain.prototype.applicationGetNextDomainName = function(jsonData, callBack){
+            if (!checkParam(jsonData.domainPrefix, callBack)){
+                callBack('Bad parameter', null);
+                return;
+            }
+            if (isFlagged(4))
+                generateFunction('fl', 'applicationGetNextDomainName', undefined, JSON.stringify(jsonData));
+            sendCommand(1, 'fl/applicationGetNextDomainName', "-1", jsonData, {}, callBack);
+        }
+        flMain.prototype.applicationGrantAccess = function(jsonData, callBack){
+            //console.dir(jsonData);
+            if (!checkParam(jsonData.domainName, jsonData.adminName, jsonData.adminPassWord, 
+                            jsonData.userName, jsonData.accessLevel, callBack)){
+                callBack('Bad parameter', null);
+                return;
+            }
+            if (isFlagged(4))
+                generateFunction('fa', 'applicationGrantAccess', undefined, JSON.stringify(jsonData));
+            sendCommand(1, 'fl/applicationGrantAccess', "-1", jsonData, {}, callBack);
+        }
+        flMain.prototype.applicationChangeDomainName = function(jsonData, callBack){
+            //console.dir(jsonData);
+            if (!checkParam(jsonData.domainName, jsonData.adminName, jsonData.adminPassWord, 
+                            jsonData.newDomainName, callBack)){
+                callBack('Bad parameter', null);
+                return;
+            }
+            if (isFlagged(4))
+                generateFunction('fa', 'applicationChangeDomainName', undefined, JSON.stringify(jsonData));
+            sendCommand(1, 'fl/applicationChangeDomainName', "-1", jsonData, {}, callBack);
+        }
+        flMain.prototype.applicationChangeDescription = function(jsonData, callBack){
+            //console.dir(jsonData);
+            if (!checkParam(jsonData.domainName, jsonData.adminName, jsonData.adminPassWord, 
+                            jsonData.newDescription, callBack)){
+                callBack('Bad parameter', null);
+                return;
+            }
+            if (isFlagged(4))
+                generateFunction('fa', 'applicationChangeDescription', undefined, JSON.stringify(jsonData));
+            sendCommand(1, 'fl/applicationChangeDescription', "-1", jsonData, {}, callBack);
+        }
+
+    ///////////
     // appS
     //////////
         flMain.prototype.app = (function() {
             var app = function(){
             }
+            app.prototype.logMessage = function (message, callback){
+                var j={message: message};
+                sendApiSrv("application/message", j, callback);
+            }
             app.prototype.connect = function(j, callBack){
                 //console.log("=> app.connect trace: " + flTraceClient);
                 var self = this;
-                if (checkParam(j.abe, j.abePort, j.store, j.storePort, j.db, j.secret, j.abeProtocol, callBack) == false)
+                if (checkParam(j.apiPort, j.apiServer, j.storeServer, j.storePort, j.dbName, j.secret, j.apiProtocol, callBack) == false)
                     return callBack('bad parameters', null);
 
-                urlAbeProt=j.abeProtocol;
-                urlAbeSrv= j.abe;
-                urlAbePort=j.abePort;
-                console.log("..." +"app.connect: url saved: " + urlAbeProt+'//' + urlAbeSrv+':' + urlAbePort);
+                urlAbeProt=j.apiProtocol;
+                urlAbeSrv= j.apiServer;
+                urlAbePort=j.apiPort;
+                //console.log("..." +"app.connect: url saved: " + urlAbeProt+'//' + urlAbeSrv+':' + urlAbePort);
 
                 function appConnectCB (err, dataConnect){
                     tabCodec=[{'_id':'_id'}];
                     if (err){
-                        console.dir(err);
+                        //console.dir(err);
                         return callBack(err, null);
                     }
                     callBack(null, dataConnect);
                 };
-                sendApi("application/connect", j, appConnectCB.bind(this));
+                sendApiSrv("application/connect", j, appConnectCB.bind(this));
             }
-            app.prototype.init = function(callBack){
+            app.prototype.init = function(initData, callBack){
                 if (checkParam(callBack) == false)
                     return callBack('bad parameters', null);
 
-                sendApi("application/init", { }, callBack);
+                if (checkParam(initData, initData.application, initData.adminId, callBack) == false)
+                    return callBack('bad parameters', null);
+                sendApiSrv("flApp/zinit", initData, callBack);
+            }
+            app.prototype.grantAccess = function(grantData, callBack){
+                if (checkParam(grantData.userId, grantData.accessLevel, callBack) == false)
+                    return callBack('bad parameters', null);
+
+                sendApiSrv("flApp/zrantAccess", grantData, callBack);
+            }
+            app.prototype.remove = function(removeData, callBack){
+                if (checkParam(callBack) == false)
+                    return callBack('bad parameters', null);
+
+                if (checkParam(removeData, removeData.domain, removeData.hash, removeData.date, callBack) == false)
+                    return callBack('bad parameters', null);
+                sendApiSrv("flApp/zremove", removeData, callBack);
+            }
+            app.prototype.setMenuLevel = function(menuLevelData, callBack){
+                if (checkParam(callBack) == false)
+                    return callBack('bad parameters', null);
+
+                if (checkParam(menuLevelData, menuLevelData['0D'], menuLevelData['0E'], callBack) == false)
+                    return callBack('bad parameters', null);
+                sendApiSrv("application/setmenulevel", menuLevelData, callBack);
+            }
+            app.prototype.setLoginRestriction = function(loginRestricData, callBack){
+                if (checkParam(callBack) == false)
+                    return callBack('bad parameters', null);
+
+                if (checkParam(loginRestricData, loginRestricData['1'], loginRestricData['0D'], loginRestricData['0E'], callBack) == false)
+                    return callBack('bad parameters', null);
+                sendApiSrv("application/setloginrestriction", loginRestricData, callBack);
             }
             app.prototype.disconnect = function(callBack){
                 if(strTraceTxt.length >0)
@@ -145,9 +442,8 @@ TODO
                 if (checkParam(callBack) == false)
                     return callBack('bad parameters', null);
 
-                sendApi("application/disconnect", { }, callBack);
+                sendApiSrv("application/disconnect", { }, callBack);
             }
-
             return app;
         })();
         //////////
@@ -195,42 +491,42 @@ TODO
                 }
                 if (isFlagged(4))
                     generateFunction('fd', 'insert', eCN, JSON.stringify(d));
-                sendCommand('data/insert', eCN, d, {}, callBack);
+                sendCommand(2, 'data/insert', eCN, d, {}, callBack);
             }
             data.prototype.findOne = function(eCN, options, callBack){
                 if (checkParamOnly(options.query, "StopHere") == false)
                     throw new Error ("Invalid parameters");
                 if (isFlagged(4))
                     generateFunction('fd', 'findOne', eCN, JSON.stringify(options));
-                sendCommand('data/findOne', eCN, options, callBack);
+                sendCommand(2, 'data/findOne', eCN, options, callBack);
             }
             data.prototype.findAll = function(eCN, options, callBack){
                 if (checkParamOnly(options.query, "StopHere") == false)
                     throw new Error ("Invalid parameters");
                 if (isFlagged(4))
                     generateFunction('fd', 'findAll', eCN, JSON.stringify(options));
-                sendCommand('data/findAll', eCN, options, callBack);
+                sendCommand(2, 'data/findAll', eCN, options, callBack);
             }
             data.prototype.update = function(eCN, options, callBack){
                 if (checkParamOnly(options.update, options.query, "StopHere") == false)
                     throw new Error ("Invalid parameters");
                 if (isFlagged(4))
                     generateFunction('fd', 'update', eCN, JSON.stringify(options));
-                sendCommand('data/update', eCN, options, callBack);
+                sendCommand(2, 'data/update', eCN, options, callBack);
             }
             data.prototype.findAndModify = function(eCN, options, callBack){
                 if (checkParamOnly(options, "StopHere") == false)
                     throw new Error ("Invalid parameters");
                 if (isFlagged(4))
                     generateFunction('fd', 'findAndModify', eCN, JSON.stringify(options));
-                sendCommand('data/findandmodify', eCN, options, callBack);
+                sendCommand(2, 'data/findandmodify', eCN, options, callBack);
             }
             data.prototype.remove = function(eCN, options, callBack){
                 if (checkParamOnly(options.query, "StopHere") == false)
                     throw new Error ("Invalid parameters");
                 if (isFlagged(4))
                     generateFunction('fd', 'remove', eCN, JSON.stringify(options));
-                sendCommand('data/remove', eCN, options, callBack);
+                sendCommand(2, 'data/remove', eCN, options, callBack);
             }
             data.prototype.count = function(eCN, options, callBack){
                 if (typeof options == 'function'){
@@ -239,7 +535,7 @@ TODO
                 }
                 if (isFlagged(4))
                     generateFunction('fd', 'count', eCN, JSON.stringify(options));
-                sendCommand('data/count', eCN, options, callBack);
+                sendCommand(2, 'data/count', eCN, options, callBack);
             }
             return data;
         })();
@@ -248,82 +544,96 @@ TODO
         //////////
         // Entity
         //  Internal:
-        //  { _id: eCN, "1": eCN, "2": ["E","S/U"], "3": singulier, "4": description,
-        //              "A":[], "E": pluriel, "F":[], "G": "50", "H": 0, I: 0 };
+        //  { _id: eCN, "1":-1, "2":"E", "3": singulier, "4": description,
+        //              "A":[{'B':'idxName', 'C':{fCN1:1, fCN2:-1}, 'D':[{'unique':true},..]}], 
+        //              "E": pluriel, "F":[fCN1, fCN2,...], "H": 1.01, I: 0, 'J':0, 'T':1, "G": "50", I: 0 };
         //      "G","I" are only for Master_0
         //////////
         flMain.prototype.entity=(function(){
             var entity = function() {
             }
             // API going to the server
-            entity.prototype.add = function(data, options, callBack){
-                if(checkParamOnly(data['3'], data['4'], data['E'], 'StopHere' ) == false)
-                    throw new Error("Invalid arguments");
+            // data=
+            entity.prototype.add = function(data, callBack){
+                if (miniFieldIncluded(0, data) == false)
+                    return callBack("Invalid arguments", null);
                 data['2']='E';
-                if(typeof(options == 'function'))
-                {
-                    callBack=options;
-                    options=null;
-                }
                 if (isFlagged(4))
-                {
-                    if (options == undefined)
-                        generateFunction('fEnt', 'add', null, JSON.stringify(data));
-                    else
                         generateFunction('fEnt', 'add', null, JSON.stringify(data));                        
-                }
-                sendCommand('data/insert', "0", {d: data}, options, callBack);
+                sendCommand(2, 'data/insert', "0", {d: data}, { }, callBack);
+            }
+            entity.prototype.addWithFields = function(data, callBack){
+                if (!checkEntityWithFields(data))
+                    return callBack("Invalid arguments", null);
+                if (isFlagged(4))
+                    generateFunction('fEnt', 'addWithField', null, JSON.stringify(data));
+                sendCommand(2, 'entity/addWithField', "0", { }, data, callBack);
             }
             // iNet should be like: {"query":{"_id":eCN}, projection:{}}
             entity.prototype.getOne = function(options, callBack){
                 if(checkParamOnly(options, options['query'], 'StopHere' ) == false)
-                    throw new Error("Invalid arguments");
+                    return callBack("Invalid arguments", null);
                 jsonConcat(options.query, {'2': 'E'}, "");
                 if (isFlagged(4))
                     generateFunction('fEnt', 'getOne', null, JSON.stringify(options));
                 adjustSystemDico(options);
-                sendCommand('data/findOne', "0", { }, options, callBack);
+                if (options.projection == undefined)
+                    options.projection = getDefaultProjection(0);
+                sendCommand(2, 'data/findOne', "0", { }, options, callBack);
             }
             entity.prototype.getAll = function(options, callBack){
                 if(checkParamOnly(options, options['query'], 'StopHere' ) == false)
-                    throw new Error("Invalid arguments");
+                    return callBack("Invalid arguments", null);
                 jsonConcat(options.query, {'2': 'E'}, "");
                 if (isFlagged(4))
                     generateFunction('fEnt', 'getAll', null, JSON.stringify(options));
                 adjustSystemDico(options);
-                sendCommand('data/findAll', "0", { }, options, callBack);
+                if (options.projection == undefined)
+                    options.projection = getDefaultProjection(0);
+                sendCommand(2, 'data/findAll', "0", { }, options, callBack);
             }
             entity.prototype.count = function(options, callBack){
                 if(checkParamOnly(options, options['query'], 'StopHere' ) == false)
-                    throw new Error("Invalid arguments");
+                    return callBack("Invalid arguments", null);
                 jsonConcat(options.query, {'2': 'E'}, "");
                 if (isFlagged(4))
                     generateFunction('fEnt', 'count', null, JSON.stringify(options));
                 adjustSystemDico(options);
-                sendCommand('data/count', "0", { }, options, callBack);
+                sendCommand(2, 'data/count', "0", { }, options, callBack);
             }
             entity.prototype.findandmodify = function(options, callBack){
                 if(checkParamOnly(options, options['query'], 'StopHere' ) == false)
-                    throw new Error("Invalid arguments");
-                if(flTools.areKeysAllowed(['0','1','2','G','H'], options.update) == false)
-                    throw new error("can't update those fields");
+                    return callBack("Invalid arguments", null);
+                if (! updatableFieldOnly(0, options.update))
+                    return callBack("Invalid arguments", null);
                 jsonConcat(options.query, {'2': 'E'}, "");
                 if (isFlagged(4))
                     generateFunction('fEnt', 'findandmodify', null, JSON.stringify(options));
                 adjustSystemDico(options);
-                sendCommand('data/findandmodify', "0", { }, options, callBack);
+                sendCommand(2, 'data/findandmodify', "0", { }, options, callBack);
             }
             entity.prototype.update = function(options, callBack){
                 if(checkParamOnly(options, options['query'], 'StopHere' ) == false)
-                    throw new Error("Invalid arguments");
-                if(flTools.areKeysAllowed(['0','1','2','G','H'], options.update) == false)
-                    throw new error("can't update those fields");
+                    return callBack("Invalid arguments", null);
+                if (! updatableFieldOnly(0, options.update))
+                    return callBack("Invalid arguments", null);
                 jsonConcat(options.query, {'2': 'E'}, "");
                 if (isFlagged(4))
                     generateFunction('fEnt', 'update', null, JSON.stringify(options));
                 adjustSystemDico(options);
-                sendCommand('data/update', "0", { }, options, callBack);
+                sendCommand(2, 'data/update', "0", { }, options, callBack);
             }
+            entity.prototype.getAllWithField = function(options, callBack){
+                if(checkParamOnly(options, options['query'], 'StopHere' ) == false)
+                    throw new Error("Invalid arguments");
+                jsonConcat(options.query, {'2': 'E'}, "");
+                if (isFlagged(4))
+                    generateFunction('fEnt', 'getAllWithField', null, JSON.stringify(options));
+                adjustSystemDico(options);
+                if (options.projection == undefined)
+                    options.projection = getDefaultProjection(0);
+                sendCommand(2, 'entity/getAllWithField', "0", { }, options, callBack);
+            }            
             /*
             entity.prototype.remove = function(options, callBack){
                 if(checkParamOnly(options, options['query'], 'StopHere' ) == false)
@@ -331,7 +641,7 @@ TODO
                 if (isFlagged(4))
                     generateFunction('fEnt', 'remove', null, JSON.stringify(options));
                 adjustSystemDico(options);
-                sendCommand('data/remove', "0", { }, options, callBack);
+                sendCommand(2, 'data/remove', "0", { }, options, callBack);
             }
             */
             return entity;
@@ -348,77 +658,78 @@ TODO
             var field = function() {
             }
 
-            field.prototype.add = function(data, options, callBack){
-                if(checkParamOnly(data['1'], data['3'], data['4'], 'StopHere' ) == false)
-                    throw new Error("Invalid arguments");
+            field.prototype.add = function(data, callBack){
+                if (!miniFieldIncluded(1, data))
+                    return callBack("Invalid arguments", null);
                 data['2']='F';
-                if(typeof(options == 'function'))
-                {
-                    callBack=options;
-                    options=null;
-                }
                 if (isFlagged(4))
                     generateFunction('fField', 'add', null, JSON.stringify(data));
-                sendCommand('data/insert', "0", {d: data}, options, callBack);
+                sendCommand(2, 'data/insert', "0", {d: data}, { }, callBack);
             }
             // iNet should be like: {"query":{"_id":eCN}, projection:{}}
             field.prototype.getOne = function(options, callBack){
                 if(checkParamOnly(options, options['query'], 'StopHere' ) == false)
-                    throw new Error("Invalid arguments");
+                    return callBack("Invalid arguments", null);
                 jsonConcat(options.query, {'2': 'F'}, "");
                 if (isFlagged(4))
                     generateFunction('fField', 'getOne', null, JSON.stringify(options));
                 adjustSystemDico(options);
-                sendCommand('data/findOne', "0", { }, options, callBack);
+                if (options.projection == undefined)
+                    options.projection = getDefaultProjection(1);
+                sendCommand(2, 'data/findOne', "0", { }, options, callBack);
             }
             field.prototype.getAll = function(options, callBack){
                 if(checkParamOnly(options, options['query'], 'StopHere' ) == false)
-                    throw new Error("Invalid arguments");
+                    return callBack("Invalid arguments", null);
                 jsonConcat(options.query, {'2': 'F'}, "");
                 if (isFlagged(4))
                     generateFunction('fField', 'getAll', null, JSON.stringify(options));
                 adjustSystemDico(options);
-                sendCommand('data/findAll', "0", { }, options, callBack);
+                if (options.projection == undefined)
+                    options.projection = getDefaultProjection(1);
+                sendCommand(2, 'data/findAll', "0", { }, options, callBack);
             }
             field.prototype.update = function(options, callBack){
                 if(checkParamOnly(options, options['query'], 'StopHere' ) == false)
-                    throw new Error("Invalid arguments");
+                    return callBack("Invalid arguments", null);
+                if (! updatableFieldOnly(1, options.update))
+                    return callBack("Invalid arguments", null);
                 jsonConcat(options.query, {'2': 'F'}, "");
                 if (isFlagged(4))
                     generateFunction('fField', 'update', null, JSON.stringify(options));
                 adjustSystemDico(options);
-                sendCommand('data/update', "0", { }, options, callBack);
+                sendCommand(2, 'data/update', "0", { }, options, callBack);
             }
             field.prototype.count = function(options, callBack){
                 if(checkParamOnly(options, options['query'], 'StopHere' ) == false)
-                    throw new Error("Invalid arguments");
+                    return callBack("Invalid arguments", null);
                 jsonConcat(options.query, {'2': 'F'}, "");
                 if (isFlagged(4))
                     generateFunction('fField', 'count', null, JSON.stringify(options));
                 adjustSystemDico(options);
-                sendCommand('data/count', "0", { }, options, callBack);
+                sendCommand(2, 'data/count', "0", { }, options, callBack);
             }
             field.prototype.findandmodify = function(options, callBack){
                 if(checkParamOnly(options, options['query'], 'StopHere' ) == false)
-                    throw new Error("Invalid arguments");
-                if(flTools.areKeysAllowed(['0','1','2','L'], options.update) == false)
-                    throw new error("can't update those fields");
+                    return callBack("Invalid arguments", null);
+                if (! updatableFieldOnly(1, options.update))
+                    return callBack("Invalid arguments", null);
                 jsonConcat(options.query, {'2': 'F'}, "");
                 if (isFlagged(4))
                     generateFunction('fField', 'findandmodify', null, JSON.stringify(options));
                 adjustSystemDico(options);
-                sendCommand('data/findandmodify', "0", { }, options, callBack);
+                sendCommand(2, 'data/findandmodify', "0", { }, options, callBack);
             }
             field.prototype.update = function(options, callBack){
                 if(checkParamOnly(options, options['query'], 'StopHere' ) == false)
-                    throw new Error("Invalid arguments");
-                if(flTools.areKeysAllowed(['0','1','2','L'], options.update) == false)
-                    throw new error("can't update those fields");
+                    return callBack("Invalid arguments", null);
+                if (! updatableFieldOnly(1, options.update))
+                    return callBack("Invalid arguments", null);
                 jsonConcat(options.query, {'2': 'F'}, "");
                 if (isFlagged(4))
                     generateFunction('fField', 'update', null, JSON.stringify(options));
                 adjustSystemDico(options);
-                sendCommand('data/update', "0", { }, options, callBack);
+                sendCommand(2, 'data/update', "0", { }, options, callBack);
             }
 
             /*
@@ -429,7 +740,7 @@ TODO
                  if (isFlagged(4))
                     generateFunction('fField', 'remove', null, JSON.stringify(options));
                 adjustSystemDico(options);
-               sendCommand('data/remove', "0", { }, options, callBack);
+               sendCommand(2, 'data/remove', "0", { }, options, callBack);
             }
             */
             return field;
@@ -448,52 +759,52 @@ TODO
             var relation = function() {
             }
             // API going to the server
-            relation.prototype.add = function(data, options, callBack){
-                console.dir(data);
-                if(checkParamOnly(data['3'], data['4'], data['00'], 
-                    data['00'][0]['U'], data['00'][0]['V'],data['00'][0]['W'],data['00'][0]['X'],data['00'][0]['Y'],data['00'][0]['Z'],     
-                    data['00'][1]['U'], data['00'][1]['V'],data['00'][1]['W'],data['00'][1]['X'],data['00'][1]['Y'],data['00'][1]['Z'],
-                    'StopHere' ) == false)
-                    throw new Error("Invalid arguments");
+            relation.prototype.add = function(data, callBack){
+                //console.dir(data);
+                if (!miniFieldIncluded(2, data))
+                    return callBack("Invalid arguments", null);
                 data['1']='-1';
                 data['2']='R';
-                if(typeof(options == 'function'))
-                {
-                    callBack=options;
-                    options=null;
-                }
                 if (isFlagged(4))
                     generateFunction('fRel', 'add', null, JSON.stringify(data));
-                sendCommand('data/insert', "0", {d: data}, options, callBack);
+                sendCommand(2, 'data/insert', "0", {d: data}, { }, callBack);
             }
             // iNet should be like: {"query":{"_id":eCN}, projection:{}}
             relation.prototype.getOne = function(options, callBack){
                 if(checkParamOnly(options, options['query'], 'StopHere' ) == false)
-                    throw new Error("Invalid arguments");
+                    return callBack("Invalid arguments", null);
                 jsonConcat(options.query, {'2': 'R'}, "");
                 if (isFlagged(4))
                     generateFunction('fRel', 'getOne', null, JSON.stringify(options));
                 adjustSystemDico(options);
-                sendCommand('data/findOne', "0", { }, options, callBack);
+                if (options.projection == undefined)
+                    options.projection = getDefaultProjection(2);
+                sendCommand(2, 'data/findOne', "0", { }, options, callBack);
             }
             relation.prototype.getAll = function(options, callBack){
                 if(checkParamOnly(options, options['query'], 'StopHere' ) == false)
-                    throw new Error("Invalid arguments");
+                    return callBack("Invalid arguments", null);
                 jsonConcat(options.query, {'2': 'R'}, "");
                 if (isFlagged(4))
                     generateFunction('fRel', 'getAll', null, JSON.stringify(options));
                 adjustSystemDico(options);
-                sendCommand('data/findAll', "0", { }, options, callBack);
+                if (options.projection == undefined)
+                    options.projection = getDefaultProjection(2);
+                sendCommand(2, 'data/findAll', "0", { }, options, callBack);
             }
+            /*
             relation.prototype.update = function(options, callBack){
                 if(checkParamOnly(options, options['query'], 'StopHere' ) == false)
-                    throw new Error("Invalid arguments");
+                    return callBack("Invalid arguments", null);
+                if (! updatableFieldOnly(2, options.update))
+                    return callBack("Invalid arguments", null);
                 jsonConcat(options.query, {'2': 'R'}, "");
                 if (isFlagged(4))
                     generateFunction('fRel', 'update', null, JSON.stringify(options));
                 adjustSystemDico(options);
-                sendCommand('data/update', "0", { }, options, callBack);
+                sendCommand(2, 'data/update', "0", { }, options, callBack);
             }
+            */
             relation.prototype.count = function(options, callBack){
                 if(checkParamOnly(options, options['query'], 'StopHere' ) == false)
                     throw new Error("Invalid arguments");
@@ -501,30 +812,21 @@ TODO
                 if (isFlagged(4))
                     generateFunction('fRel', 'count', null, JSON.stringify(options));
                 adjustSystemDico(options);
-                sendCommand('data/count', "0", { }, options, callBack);
+                sendCommand(2, 'data/count', "0", { }, options, callBack);
             }
+            /*
             relation.prototype.findandmodify = function(options, callBack){
                 if(checkParamOnly(options, options['query'], 'StopHere' ) == false)
-                    throw new Error("Invalid arguments");
-                if(flTools.areKeysAllowed(['0','1','2','L'], options.update) == false)
-                    throw new error("can't update those relations");
+                    return callBack("Invalid arguments", null);
+                if (! updatableFieldOnly(2, options.update))
+                    return callBack("Invalid arguments", null);
                 jsonConcat(options.query, {'2': 'R'}, "");
                 if (isFlagged(4))
                     generateFunction('fRel', 'findandmodify', null, JSON.stringify(options));
                 adjustSystemDico(options);
-                sendCommand('data/findandmodify', "0", { }, options, callBack);
+                sendCommand(2, 'data/findandmodify', "0", { }, options, callBack);
             }
-            relation.prototype.update = function(options, callBack){
-                if(checkParamOnly(options, options['query'], 'StopHere' ) == false)
-                    throw new Error("Invalid arguments");
-                if(flTools.areKeysAllowed(['0','1','2','L'], options.update) == false)
-                    throw new error("can't update those relations");
-                jsonConcat(options.query, {'2': 'R'}, "");
-                if (isFlagged(4))
-                    generateFunction('fRel', 'update', null, JSON.stringify(options));
-                adjustSystemDico(options);
-                sendCommand('data/update', "0", { }, options, callBack);
-            }
+            */
 
             /*
             relation.prototype.remove = function(options, callBack){
@@ -534,7 +836,7 @@ TODO
                  if (isFlagged(4))
                     generateFunction('fRel', 'remove', null, JSON.stringify(options));
                 adjustSystemDico(options);
-               sendCommand('data/remove', "0", { }, options, callBack);
+               sendCommand(2, 'data/remove', "0", { }, options, callBack);
             }
             */
 
@@ -572,51 +874,59 @@ TODO
         strTraceTxt+='   },\n';
     }
 
-     function sendCommand(){        // (api, eCN, [data], [options], cb)
+     function sendCommand( ){        // (noSrv, api, eCN, [data], [options], cb)
         //console.log("in sendCommand");
         //dumpArg(arguments, 'sendCommand');
         var cb;
         var j={};
-        j.eCN=arguments[1];
+        j.eCN=arguments[2];
         j.options={}
         j.data={};
 
         switch (arguments.length)
         {
-            case 3:
-                cb=arguments[2];
-                break;
             case 4:
-                j.options=arguments[2];
                 cb=arguments[3];
                 break;
             case 5:
-                j.data=arguments[2];
                 j.options=arguments[3];
                 cb=arguments[4];
                 break;
+            case 6:
+                j.data=arguments[3];
+                j.options=arguments[4];
+                cb=arguments[5];
+                break;
             default:
-                throw new Exception('missing arguments');
+                throw new Exception('sendCommand: wrong number of arguments');
                 break;
         }
 
         if(typeof cb != 'function'){
             dumpArg(arguments, 'sendCommand');
-            throw new Error ("no callBack given "+arguments.length);
+            throw new Error ("sendCommand: no callBack given " + arguments.length);
         }
-        
         if(j.options != undefined){
-            if(j.options.noPrefix != true)
-                prefixFields(j.options);
+            //if(j.options.nofix != true)
+            prefixFields(j.options);
             delete j.options.noPrefix;
         }
         if(isFlagged(4)){
             dumpArg(arguments, 'sendCommand');
-            console.log(arguments[0] + ', ' + JSON.stringify(j) ) 
+            //console.log(arguments[1] + ', ' + JSON.stringify(j) ) 
         }
-        sendApi(arguments[0], j, cb);
+        switch(arguments[0]) {
+            case 1:
+                sendMainSrv(arguments[1], j, cb);
+                break;
+            case 2:
+                sendApiSrv(arguments[1], j, cb);
+                break;
+            default:
+                throw new Error("sendCommand: invalid server No: " + argumants[0]);
+                break;
+        }
     }
-
     function adjustSystemDico(options){
         if(options == undefined)
             options={};
@@ -632,7 +942,6 @@ TODO
         }
         delete options.system;
     }
-
     function areKeysAllowed(forbidenKeys, js)
     {
         var forbidWithPrefix=[];
@@ -656,7 +965,24 @@ TODO
      }
      return o1;
     }
-    function sendApi (apiName, superJ, callBack){
+    function sendMainSrv (apiName, superJ, callBack){
+        if(isFlagged(2) )
+            console.log("   => " + apiName + ' : ' + JSON.stringify(superJ));
+
+        function api2CallBack(err, data){
+            //console.log ('<= ' + apiName + '-callBack data= ' + JSON.stringify(data) + ', err: ' + err);
+            if (err){
+                if(isFlagged(2) )
+                        console.log("   <= " +apiName + '-callBack : ** ERROR ** : ' + err);
+                return callBack(err, null);
+            }
+            if(isFlagged(2) )
+                console.log("   <= " + apiName + " data: " + JSON.stringify(data));
+            return callBack(null, data);
+        }
+        axCall(urlMainProt, urlMainSrv, urlMainPort, '/api/' + apiName, superJ, false, api2CallBack, flTraceSession, flTraceServer);
+    }
+    function sendApiSrv (apiName, superJ, callBack){
         if(isFlagged(2) )
             console.log("   => " + apiName + ' : ' + JSON.stringify(superJ));
 
@@ -671,7 +997,7 @@ TODO
                 console.log("   <= " + apiName + " data: " + JSON.stringify(data));
             return callBack(null, data);
         }
-        axCall(urlAbeProt, urlAbeSrv, urlAbePort, '/api/' + apiName, superJ, true, apiCallBack, flTraceServer);
+        axCall(urlAbeProt, urlAbeSrv, urlAbePort, '/api/' + apiName, superJ, true, apiCallBack, flTraceSession, flTraceServer);
     }
     function isFlagged(flg){
         if ((flg & flTraceClient) == flg)
@@ -720,8 +1046,10 @@ TODO
                     js[idx]=js[jsK];
                     delete js[jsK];
                 }
-                if (typeof js[idx] == 'object'){
-                    prefixMe(str + '  ', js[idx], !(js[idx] instanceof Array));
+                else{
+                    if (typeof js[idx] == 'object'){
+                        prefixMe(str + '  ', js[idx], !(js[idx] instanceof Array));
+                    }
                 }
             }
         }
@@ -752,7 +1080,84 @@ TODO
             }
             //console.log(tmpStr);
         }
+    //
+    function checkEntityWithFields(data){
+        var entity=JSON.parse(JSON.stringify(data));
+        delete entity.fields;
+        if(!miniFieldIncluded(0, entity)){
+            //console.log('miniField ent failed');
+            return false;
+        }
+        console.log('miniField ent ok');
+        if(data.fields == undefined){
+            //console.log('data.fields is null');
+            return false;
+        }
+        for(fi =0; fi< data.fields.length; fi++){
+            data.fields[fi]['1']='xx';
+            if(!miniFieldIncluded(1, data.fields[fi])){
+                //console.log('miniField fi ' + JSON.stringify(data.fields[fi]) + ' failed');
+                return false;
+            }
+        }
+        //console.log('check OK');
+        return true;
+    }
+    ////////////////////////// integrity check for dictionary access ////////////////////////
+    function miniFieldIncluded(ind, js)
+    {
+        var rslt={};
+        JSON.stringify(js, function(k, v){
+            if(rslt[k] == undefined)
+                rslt[k]=1;
+            else
+                rslt[k]++;
+            return v;
+        });
+        //console.dir(rslt);
+        for(var k in sysParam[ind][0]){
+            //console.log('  '+k +':'+ sysParam[ind][0][k] + ' <=> '+ rslt[k]);
+            if (rslt[k] == undefined || sysParam[ind][0][k] > rslt[k]){
+                //console.log("one arg missing");
+                return false;
+            }
+        }
+        //console.log("miniField: ok");
+        return true;
+    }
 
+    function updatableFieldOnly(ind, js2)
+    {
+        var js=JSON.parse(JSON.stringify(js2));     // deep copy
+        var rslt={};
+        JSON.stringify(js, function(k, v){
+            //console.log(JSON.stringify(k) +':'+ JSON.stringify(v)+' type ' + typeof v + ' Array? ' + (v instanceof Array) + ', sp: '+sysParam[ind][1][k]);
+            if(k == "" | k[0] == '$' || (typeof v == 'object' && !(v instanceof Array)))
+                return v;
+            if(rslt[k] == undefined)
+                rslt[k]=1.0;
+            else
+                rslt[k]=rslt[k]+1;
+
+            if(sysParam[ind][1][k] == -1){
+                //console.log (JSON.stringify(v)+ ' becomes ' +JSON.stringify([]));
+                return [];
+            }
+            return v;
+        })
+        //console.dir(rslt);
+        for(var k in rslt){
+            //console.log(k +':'+ rslt[k] + ' == ' + sysParam[ind][1][k]);
+            if(sysParam[ind][1][k]== undefined)
+                return false;
+        }
+        return true;
+    }
+    function getDefaultProjection(ind)
+    {
+        return JSON.parse(JSON.stringify(sysParam[ind][2]));
+    }
+    ///////////////////////////////////////////////////////////////////////////////////////////////    
     // Declaration for node and browser compatibility
     if (typeof module !== 'undefined' && typeof module.exports !== 'undefined')
         module.exports = flMain;

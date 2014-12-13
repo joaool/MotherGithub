@@ -89,7 +89,7 @@ window.csvStore = {
         return _.values(this.csvRows);//it is used !!!
     },
 
-    create: function (model) {
+    create: function (model) {       
         this.numberOfRows++;
         // model.set('id', this.numberOfRows);
         console.log("memoryCsv.js create new line --->"+JSON.stringify(model));
@@ -99,12 +99,13 @@ window.csvStore = {
     },
 
     update: function (model) {
+        var def = $.Deferred();
         // alert("memoryCsv.js Update was called !!!");
         this.csvRows[model.id] = model;//it is used !!!
         //alert("memoryCsv.js update modelUpdate !!!! --->"+ model.get("id") + " _id="+ model.get("_id") + " nome="+model.get("nome"));
         console.log("memoryCsv.js update modelUpdate !!!! --->"+JSON.stringify(model));
         var promise = null;
-        if(model.attributes._id == "-1"){
+        if(model.attributes._id == "-1"){//this is an update over a new line =>insert in db
             promise=FL.API.addRecordsToTable(this.entityName,[model.attributes]);
             promise.done(function(data){
                 console.log(">>>>>memoryCsv update addRecordsToTable  SUCCESS <<<<<");
@@ -116,20 +117,24 @@ window.csvStore = {
                 //     "v":0,
                 //     "_id":"53e1bf93f9b224b302c2a572"}
                 // ]
-                return model;
+            // return model;
+                return def.resolve(model);
             });
-            promise.fail(function(err){console.log(">>>>>memoryCsv update addRecordsToTable FAILURE <<<<<"+err);return model;});
-        }else if(model.attributes._id){
+            promise.fail(function(err){console.log(">>>>>memoryCsv update addRecordsToTable FAILURE <<<<<"+err);return def.reject(err);});
+        }else if(model.attributes._id){//this is an update over an existing line =>update in db
             promise = FL.API.updateRecordToTable(this.entityName,model.attributes);
             promise.done(function(data){
                 console.log(">>>>>memoryCsv update updateRecordToTable  SUCCESS <<<<< -->"+JSON.stringify(data));
-                return model;
+            //return model;
+                return def.resolve(model);
             });
-            promise.fail(function(err){console.log(">>>>>memoryCsv update updateRecordToTable FAILURE <<<<<"+err);return model;});
+            promise.fail(function(err){console.log(">>>>>memoryCsv update updateRecordToTable FAILURE <<<<<"+err);return def.reject(err);});
         }else{
             console.log(">>>>>memoryCsv update updateRecordToTable  NOP Nothing was done !!!! <<<<< -->model.attributes._id="+model.attributes._id);
+            return def.reject("memoryCsv update error - missing attribute _id in model");
         }
-        return model;
+        // return model;
+        return def.promise();
     },
 
     destroy: function (model) {
@@ -143,7 +148,7 @@ window.csvStore = {
         delete this.csvRows[model.id];//it is used !!!
         return model;
     },
-    sync: function (method, model, options) {
+    sync: function (method, model, options) {//function that Backbone calls every time it attempts to read or save a model to the server.
 
         var resp;
         // console.log("Backbone.sync ---------------->"+method+" id="+model.id);
@@ -166,7 +171,13 @@ window.csvStore = {
                 resp = csvStore.create(model);
                 break;
             case "update":
-                resp = csvStore.update(model);
+                // resp = csvStore.update(model);
+                csvStore.update(model).then(function(resp){
+                        console.log("memoryCsv.js sync update --->"+JSON.stringify(resp.attributes));
+                    },function(err){
+                        console.log("memoryCsv.js sync update ERROR --->");
+                    }
+                );
                 break;
             case "delete":
                 resp = csvStore.destroy(model);

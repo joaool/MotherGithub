@@ -141,10 +141,10 @@ jQuery(document).ready(function($){
 									'<span id="_signIn" style="font-size: 1.2em;"> Sign In</span>'+
 								'</a>'+
 								// '<a class="pull-right text-muted" style="margin-right:1.5em" href="javascript:FL.tourIn()" >'+
-								'<a class="pull-right" style="margin-right:1.5em;" href="javascript:FL.tourIn()" >'+
-									'<i  class="glyphicon glyphicon-eye-open" style="font-size: 1.5em;color:black;"></i>'+
-									'<span style="font-size: 1.2em;"> Tour</span>'+
-								'</a>'+
+								// '<a class="pull-right" style="margin-right:1.5em;" href="javascript:FL.tourIn()" >'+
+								// 	'<i  class="glyphicon glyphicon-eye-open" style="font-size: 1.5em;color:black;"></i>'+
+								// 	'<span style="font-size: 1.2em;"> Tour</span>'+
+								// '</a>'+
 							'</div>';
 			if(user) {
 				htmlToInject = '<div style="line-height:2.2em;"><span class="small hidden-xs" style="margin-left:6.5em">'+
@@ -156,10 +156,10 @@ jQuery(document).ready(function($){
 										'<span id="_signIn" style="font-size: 1.2em;"> '+ user +'</span>'+
 									'</a>'+
 									// '<a class="pull-right text-muted" style="margin-right:1.5em" href="javascript:FL.tourIn()" >'+
-									'<a class="pull-right" style="margin-right:1.5em;" href="javascript:FL.tourIn()" >'+
-										'<i class="glyphicon glyphicon-eye-open" style="font-size: 1.5em;color:black;"></i>'+
-										'<span style="font-size: 1.2em;"> Tour</span>'+
-									'</a>'+
+									// '<a class="pull-right" style="margin-right:1.5em;" href="javascript:FL.tourIn()" >'+
+									// 	'<i class="glyphicon glyphicon-eye-open" style="font-size: 1.5em;color:black;"></i>'+
+									// 	'<span style="font-size: 1.2em;"> Tour</span>'+
+									// '</a>'+
 								'</div>';
 			}
 			FL.domInject("_login",htmlToInject );
@@ -243,7 +243,7 @@ jQuery(document).ready(function($){
 				detail:{} //format is array with {attribute:<attribute name>,description:<attr description>,statement;<phrase>}
 			};
 			// FL.common.makeModal("B"," FrameLink Login","loginTemplate",{icon:"user",button1:"Logout",button2:"Login"},function(result){// "Cancel and "Ok" will be assumed with result = true for "Ok"
-			FL.common.editMasterDetail("B"," Sign in to FrameLink","loginTemplate",masterDetailItems,{type:"primary", icon:"user",button1:"Cancel",button2:"Sign in"},function(result){
+			FL.common.editMasterDetail("B"," Sign in to FrameLink","loginTemplate",masterDetailItems,{type:"primary", icon:"user",button1:"Logout",button2:"Sign in"},function(result){
 				if(result){//user choosed login
 					var email = $('#login_email').val();
 					var password = $('#login_password').val();
@@ -254,7 +254,7 @@ jQuery(document).ready(function($){
 						if(!userExists){
 							FL.common.makeModalInfo(
 								"Invalid Email/password.<br> - If you are an existing user please correct your EMail/password.<br>" +
-								" - If you are a <strong>new user</strong> please press <strong>'Cancel'</strong> and then " +
+								" - If you are a <strong>new user</strong> please press <strong>'Logout'</strong> and then " +
 								"<strong>'Get started'</strong> button.<br>", function(){
 								console.log("makeModalInfo --->pressed 'Ok' after Invalid Email/password email="+loginObject.email);
 								return def.resolve(false,loginObject);//true ==>continue false=>repeat						
@@ -381,6 +381,7 @@ jQuery(document).ready(function($){
 		var newUserAccess = function(loginObject){//when login email is valid and other data acceptable - {email:email,userName:userName,password:password};
 			// loginObject = {email:email,userName:userName,password:password};
 			var def = $.Deferred();
+			FL.API.debug = true;
 			var loginPromise = null;
 			// check if the user exists - if it does not exist => creates it.
 			console.log("loginAccess not a guest -------------------------------------------------------> checks if user exists");
@@ -392,8 +393,22 @@ jQuery(document).ready(function($){
 					var userName = FL.common.stringBeforeLast(loginObject.email,"@");
 					createUserPromise = FL.API.createUserAndDefaultApp(loginObject.email,loginObject.password, "First app of " + userName)
 						.then(function(){
-							console.log("FLLoadCss2 ->newUserAccess-> success creating a new user!");
-							return def.resolve(true);//true ==>user was created
+							console.log("FLLoadCss2 ->newUserAccess-> success creating a new user! ->now we create _histoMail");
+							
+							var histoPromise=FL.API.createHistoMails_ifNotExisting();
+							histoPromise.done(function(){
+								// FL.login.checkSignIn();
+								// displaySignInUser(loginObject.email);
+								// return loginAccessCB(null,loginObject);
+								console.log("FLLoadCss2.js newUserAccess _histoMail SUCESSFULLY created for new user");
+								return def.resolve(true);//true ==>user was created
+							});
+							histoPromise.fail(function(err){
+								alert("FLLoadCss2.js newUserAccess _histoMail FAILURE creating _histoMail err="+err);
+								// return newUserAccessCB(err,loginObject);
+								return def.reject("FLLoadCss2.js newUserAccess _histoMail FAILURE creating _histoMail err="+err);
+							});
+							// return def.resolve(true);//true ==>user was created
 							},function(err){console.log("FLLoadCss2 ->newUserAccess->fail");return def.reject(err);});
 				}else{//user exist !!!
 					FL.common.makeModalInfo("Cannot sign up because " + loginObject.email + " is already registered.<br> - If " + loginObject.email + " is your Email, please choose <strong>'Sign In'</strong> to enter as an existing user.",function(){
