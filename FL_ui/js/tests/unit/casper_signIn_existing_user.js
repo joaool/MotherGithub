@@ -30,9 +30,9 @@ casper.test.begin("FrameLink UI tests", 8, function suite(test) {
 			test.assert(dialogHTML != "","Login Dialog active !!!");
 			this.fill('form#form_loginTemplate', {
 				'email':        'toto@toto.com',
-				'password':     'client428',
+				'password':     '123',
 			}, false);		
-			console.log('-------------------------->Form was filled with toto@toto.com/client428');
+			console.log('-------------------------->Form was filled with toto@toto.com/123');
 			// var welcomeApp = this.getElementInfo('#_signInDomain').html;
 			// var pos = welcomeApp.lastIndexOf(":");
 			// // console.log(welcomeApp.substr(pos+1));//extracts null from 'Welcome to FrameLink: support@framelink.co App:null'
@@ -49,7 +49,7 @@ casper.test.begin("FrameLink UI tests", 8, function suite(test) {
 			var userHTML = this.getElementInfo('#_signIn').html;
 			test.assert(userHTML == " toto@toto.com","User toto@toto.com is signed in !");
 		});		
-	});		
+	});
 	casper.run(function() {
 		test.done();
 	});

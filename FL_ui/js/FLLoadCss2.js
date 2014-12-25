@@ -26,10 +26,18 @@ jQuery(document).ready(function($){
 				];	
 		var selectBox = function(options, onSelection) {
 			//fills the content of dropdown box with id=options.boxId with array=options.boxArr presenting options.boxCurrent as default
-			//example: selectBox({boxId:"#styleSet", boxCurrent:currentStyle, boxArr:stylesForSelection}, function(selected){
+			//example: selectBox({boxId:"styleSet", boxCurrent:currentStyle, boxArr:stylesForSelection}, function(selected){
 			//             //code with what to do on selection
-			//             alert(selected); //selected is the selected element 
+			//             alert(selected); //selected is the selected object element 
 			//         });
+			//	NOTE:boxArr must have the format example: value and text are non optional keys All other are optional
+				// var stylesForSelection = [
+				// 	{value: 0, text: 'cerulean'},
+				// 	{value: 1, text: 'cosmos'},
+				// 	{value: 2, text: 'readable'},
+				// 	{value: 3, text: 'red'},
+				// 	{value: 4, text: 'spacelab'}
+				// ];
 			// Drop box needs a format like:
 				// <div class="btn-group">
 				// 	<a class="btn btn-primary dropdown-toggle" data-toggle="dropdown" style="font-size:14px;font-weight:bold;margin-right:-4.0em" href="#"> Style Set <span class="caret"></span></a>
@@ -39,22 +47,28 @@ jQuery(document).ready(function($){
 				// 		....
 				// 	</ul>
 				// </div>
+				//onSelection argument is the full object corresponding to the choosed option
+				//   ex. 	{value: 1, text: 'cosmos'}
+
 			//var $styleSet = $("#styleSet");
-			var $dropDownSelect = $(options.boxId);
+			var $dropDownSelect = $("#" + options.boxId);
 			$dropDownSelect.parents('.btn-group').find('.dropdown-toggle').html(options.boxCurrent+' <span class="caret"></span>');//shows current value
 			//... and we load the select box with the current available values
 			$dropDownSelect.empty();//removes the child elements of #styleSet.
 			// _.each(stylesForSelection,function(element){
 			_.each(options.boxArr,function(element){
-				$dropDownSelect.append("<li><a href='#'>" + element.text + "</a></li>");
+				var id = options.boxId + "_" + element.text;
+				$dropDownSelect.append("<li id='" + id + "'><a href='#'>" + element.text + "</a></li>");
 			});
 			// $("#styleSet li a").click(function(){
-			$( options.boxId + " li a").click(function(){
+			$( "#" + options.boxId + " li a").click(function(){
 				var selText = $(this).text();
-				// alert("the choice was:"+selText);
-				// $(this).parents('.btn-group').find('.dropdown-toggle').html(selText+' <span class="caret"></span>');
+				var list = $( "#" + options.boxId + " li a");
+				var index = list.index(this);
+				var elObj = options.boxArr[index];
 				$dropDownSelect.parents('.btn-group').find('.dropdown-toggle').html(selText+' <span class="caret"></span>');
-				onSelection(selText);//runs the callback function
+				// onSelection(selText);//runs the callback function
+				onSelection(elObj);//runs the callback function with the element object as argument
 			});
 		};
 		var messageEnabler = (function(){ //a singleton (to be instantiated by checkSignIn) to receive and dispatch topic messages.http://addyosmani.com/resources/essentialjsdesignpatterns/book/#singletonpatternjavascript
@@ -74,9 +88,10 @@ jQuery(document).ready(function($){
 						$("#fontFamily").parents('.btn-group').find('.dropdown-toggle').html(currentFontFamily +' <span class="caret"></span>');//shows current value
 
 						var xStyle = localStorage.style;
-						selectBox({boxId: "#styleSet",boxCurrent: xStyle,boxArr: stylesForSelection},function(selected){
-							//following code is what is done on selection
-							currentStyle = selected;
+						selectBox({boxId: "styleSet",boxCurrent: xStyle,boxArr: stylesForSelection},function(selected){
+							//select is the full object corresponding to the choosed option
+							// alert("styleSet "+ JSON.stringify(selected)+" was selected !");
+							currentStyle = selected.text;
 							localStorage.style = currentStyle;
 							$.Topic( 'styleChange' ).publish( currentStyle);//broadcast that will be received by FL.tour
 							FL.mix("ChangeStyle",{"newStyle":currentStyle});
@@ -86,10 +101,10 @@ jQuery(document).ready(function($){
 							resetStyle(true);
 						});
 						var xFont = localStorage.fontFamily;
-						selectBox({boxId:"#fontFamily",boxCurrent: xFont, boxArr:fontFamilyForSelection},function(selected){
+						selectBox({boxId:"fontFamily",boxCurrent: xFont, boxArr:fontFamilyForSelection},function(selected){
 							//following code is what is done on selection
-							// alert("font "+selected+" was selected !");
-							currentFontFamily = selected;
+							// alert("font "+ JSON.stringify(selected)+" was selected !");
+							currentFontFamily = selected.text;
 							localStorage.fontFamily = currentFontFamily;
 							FL.mix("ChangeFontFamily",{"newFont":currentFontFamily});
 							// alert("FL.loadCss2  receiver... STYLE CHANGE will call FL.server.syncLocalStoreToServer()");
@@ -243,7 +258,10 @@ jQuery(document).ready(function($){
 				detail:{} //format is array with {attribute:<attribute name>,description:<attr description>,statement;<phrase>}
 			};
 			// FL.common.makeModal("B"," FrameLink Login","loginTemplate",{icon:"user",button1:"Logout",button2:"Login"},function(result){// "Cancel and "Ok" will be assumed with result = true for "Ok"
-			FL.common.editMasterDetail("B"," Sign in to FrameLink","loginTemplate",masterDetailItems,{type:"primary", icon:"user",button1:"Logout",button2:"Sign in"},function(result){
+			var btn1Caption = "Cancel";//if it enters in logout mode the first button is "Cancel"
+			if(FL.login.token.fl)
+				btn1Caption = "Logout";//if it enters in loggedin mode the first button is "Logout"
+			FL.common.editMasterDetail("B"," Sign in to FrameLink","loginTemplate",masterDetailItems,{type:"primary", icon:"user",button1:btn1Caption,button2:"Sign in"},function(result){
 				if(result){//user choosed login
 					var email = $('#login_email').val();
 					var password = $('#login_password').val();
@@ -260,6 +278,7 @@ jQuery(document).ready(function($){
 								return def.resolve(false,loginObject);//true ==>continue false=>repeat						
 							});
 						}else{
+							$('#trigger1').show();$('#trigger2').show();$('#trigger3').show();
 							var okToContinue = true;
 							return def.resolve(okToContinue,loginObject);
 						}
@@ -273,18 +292,22 @@ jQuery(document).ready(function($){
 							return def.reject("Login access error err="+JSON.stringify(err));
 						}
 					});
-				}else{//the user choosed logout
+				}else{//the user choosed Cancel or Logout (it is the same button)
 					var z = $('#__FLDialog_button2').attr("class");
 					console.log("()()()()()()()->z="+z);
 
 					// logOutMenu();//displays menu and homepage for logout status
 					// FL.login.signOut();
-					var disconnectPromise = FL.API.disconnect();
-					disconnectPromise.then(function(){
-						logOutMenu();//displays menu and homepage for logout status
-						FL.login.signOut();
+					if (btn1Caption == "Cancel") {				
 						return def.resolve(true,loginObject);
-					},function(err){return def.reject(err);});
+					}else{
+						var disconnectPromise = FL.API.disconnect();
+						disconnectPromise.then(function(){
+							logOutMenu();//displays menu and homepage for logout status
+							FL.login.signOut();
+							return def.resolve(true,loginObject);
+						},function(err){return def.reject(err);});
+					}
 				}
 			});//OK	
 			return def.promise();
@@ -484,16 +507,21 @@ jQuery(document).ready(function($){
 						"</div>",
 			defaultPageOnLogout: "<div class='jumbotron'>" +
 									"<h1>FrameLink Platform</h1>" +
-									"<p>Please <strong>Sign In</strong> as a designer (upper right corner) to use your account or choose " +
+									"<p>Please <strong>Sign In</strong> as a designer (upper right corner) or choose " +
 									"<strong>Get started</strong> if you are a first time user.</p>" +
 									"<p>" +
 										// "<a href='#' class='btn btn-primary btn-large' onclick='FL.showTourStep0 = true; FL.tourIn();'>Tour</a>" +
-										"<a href='#' class='btn btn-primary btn-large' onclick='FL.login.getStarted();'>Get started</a>" +
+										"<a href='#' class='btn btn-primary btn-large' onclick='FL.login.getStarted();'>Get started with a FREE beta account</a>" +
 									"</p>" +
 								"</div>",					
 			fl: new flMain(),//FL.login.fl
 			fa: null,
+			emailContentTemplate:null, //used on FLmenulinks - if not null it is ready to send newsletter
+			emailTemplateName:null,
 			ServerByPass:true,
+			selectBox: function(options, onSelection) {
+				selectBox(options, onSelection);
+			},
 			signOut: function(){//saves logout in local storage ->hide slide panels  ->updates upper right corner display
 				// localStorage.setItem("login", "");
 				// FL.login.signOut()
@@ -512,38 +540,6 @@ jQuery(document).ready(function($){
 				displaySignInUser();//displays no user, just icon and "Sign In" link
 				FL.mix("Entering",{});
 			},
-			// XcheckSignIn:function(is_recoverLastMenu) {//updates DOM login line with local saved status. If logged in shows slidePanels -  returns true/false acording with logIn/logOut
-			// 	//if is_recoverLastMenu = true =>LastMenu will be recovered and will be passed to FL.menu
-			// 	messageEnabler.getInstance();//a singleton to listen for "slidePanel" broadcasts 
-			// 	var loggedIn = false;
-			// 	var lastLogin = null;
-			// 	var htmlToInject = null;
-			// 	if (typeof(Storage) != undefined) {//browser supports storage
-			// 		var lastLoginStr = localStorage.login;// Retrieve format {email:x1,userName:x2,password:x3};
-			// 		if (lastLoginStr == "undefined" || lastLoginStr == "")
-			// 			lastLoginStr = null;
-			// 		if(lastLoginStr != null) {
-			// 			var lastLoginObj = JSON.parse(lastLoginStr);
-			// 			displaySignInUser(lastLoginObj.email);
-			// 			$('#trigger1').show();$('#trigger2').show();$('#trigger3').show();
-			// 			$.Topic( 'signInDone' ).publish( true ); //informs FL.menu that edition is allowed
-			// 			if(is_recoverLastMenu){
-			// 				recoverLastMenu();//recover locally saved tour status and menu and informs FL.menu about the new menu if any
-			// 			}
-			// 		}else{//the status is signed out
-			// 			displaySignInUser();//displays no user, just icon and "Sign In" link
-			// 			$('#trigger1').hide();$('#trigger2').hide();$('#trigger3').hide();
-			// 			$.Topic( 'signInDone' ).publish( false ); //informs FL.menu that edition is not allowed
-			// 			$.Topic( 'sidePanelOpened' ).publish( false ); //informs FL.menu that sidePanel is closed 
-			// 			FL.mix("Entering",{});
-			// 		}
-			// 		recoverLastTourActiveStatus();
-			// 		resetStyle(true);//the status is login 
-			// 	}else{
-			// 		FL.common.makeModalInfo('No menu persistence because your browser does not support Web Storage...');
-			// 	}
-			// 	return loggedIn;
-			// },
 			checkSignIn2:function() {
 				//checkSignIn2 ->recover last saved loginObject and:
 				//	if user/password exists ->logs in -> shows slide panels ->updates upper right corner

@@ -55,7 +55,26 @@ FL["common"] = (function(){//name space FL.common
 			//			{attribute:"postal code", description:"postal reference for delivery",statement:"The postal code of the client is the postal reference for delivery"}
 			//		]
 			//	};
-			var masterDetailItems = masterDetailJson ;
+            // options - {type:"primary", icon:"send",button1:"Cancel",button2:"Send Newsletter",dropdown:{"#_sendNewsletter_templates":{arr:["op1","op2"],onSelect:function(){console.log("choise was "+selected);}}}
+			//   notice the optional dropdown key in options. This is a way to send dropdown options yp edit masterdetail
+            //     for each dropdown editmaster detail must receive: the set of values to present, the function to run on selection
+            //     Example:
+            //          dropdown:{
+            //              "#dropdownId1":{ arr:['a','b','c','d','e'],
+            //                                  default:"c",
+            //                                  onSelect:function(selected){
+            //                                        console.log("The choice was "+selected);    
+            //                                  }
+            //                             },                                   
+            //              "#dropdownId2":{ arr:['a1','a2','a3','a4','a5'],
+            //                                  default:"a3",
+            //                                  onSelect:function(selected){
+            //                                        console.log("For id2 the choice was "+selected);    
+            //                                  }                                   
+            //                            }
+            //               }
+            //          }
+            var masterDetailItems = masterDetailJson ;
 			this.makeModal(id,title,templateName,options,function(result){
 				if(result){
 					fillMasterForTemplate(templateName,masterDetailJson.master);
@@ -176,6 +195,9 @@ FL["common"] = (function(){//name space FL.common
             //      type - success, primary, info, warning and danger
             //      button1 - name of first button
             //      button2 - name of second button (null =>only one button is available)
+            //      dropdown - optional to be used when template has dropdowns
+            //          dropdown:{ "#_sendNewsletter_templates":{ arr:["op1","op2"],default:"op2",onSelect:function(){console.log("choise was "+selected);} } }
+            //
             //  callback - to return result example:
             //          makeModal(" Juakim","dictTemplate",{type:"primary", icon:"search",button1:"Close",button2:"Save Changes"},function(result){
             //              if(result){
@@ -200,6 +222,8 @@ FL["common"] = (function(){//name space FL.common
 				var z= 32;
 			}
 			options = _.extend( {icon:null,type:"success",button1:"Cancel",button2:"Ok"},options);
+
+
             var modalId = "__FLmodalId_"+id;
             var htmlIn = null;
             // alert("Inside:"+templateName.substring(0,0));
@@ -258,7 +282,19 @@ FL["common"] = (function(){//name space FL.common
             // $modalDialog.empty();// "#_modalDialog" is the DOM reserved slot for dialog boxes
             // $modalDialog.html(fullHTML);           
             $modalDialog.empty().append(fullHTML);
-            var $modal = $('#' + modalId );
+            if(options.dropdown){//dropdown is an object with one key per drop down - the key is #id of dropdown on template
+                 _.each(options.dropdown, function(value,key){
+                    if(value.default && value.arr && value.onSelect ){                      
+                        // var arrOfObjs =_.map(value.arr,function(element,index){ //converted to format {value:0,text:arr[0]},{value:1,text:arr[1]}...etc
+                        //     return {value:index,text:element};
+                        // });
+                        FL.login.selectBox({boxId: key,boxCurrent: value.default,boxArr: value.arr},value.onSelect);
+                    }else{
+                        alert("FLcommon2.js makeModal - Error dropdown definition missing - check default or arr or onselect");
+                    }
+                });                
+            }            
+            var $modal = $('#' + modalId ); 
 
 			form = $("#form_" + templateName );
 			form.parsley();

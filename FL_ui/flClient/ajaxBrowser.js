@@ -29,6 +29,10 @@ function  callAjax(protocol, srv, port, path, jsonData, inSession, callBack, flT
         return callBack('API not available', null);
     }
 
+    // disconnect a disconnected session just exit
+    if (path === "/api/application/disconnect" && sId == undefined){
+        return callBack(true, true);
+    }
 
     if(flTraceSession !=undefined && flTraceSession >= 0){
         js.ctrl.sessTrace=flTraceSession;
@@ -145,7 +149,7 @@ function  callAjax(protocol, srv, port, path, jsonData, inSession, callBack, flT
    }
    module.exports = callAx;
 */
-	// BROWSER SPECIFIC - FL.API.consoleTrace
+	// BROWSER SPECIFIC
 	var url=protocol+'//'+srv+':'+port + path;
 	if (url == "" || url.length < 5){
 		return callBack("bad parameters url: " + url, null);

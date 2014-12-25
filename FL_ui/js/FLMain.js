@@ -40,14 +40,14 @@ var FL = FL || {};
 			FL["domain"] = FL.common.getLastTagInString(fullUrl,"=","#");//FL.domain is globally defined - the last # is disregarded
 			// alert("FL.domain="+FL.domain);
 		}
-		// $('#panel1').slidePanel({
-		// 	triggerName: '#trigger1',
-		// 	position: 'fixed',
-		// 	triggerTopPos: '110px',
-		// 	panelTopPos: '110px',
-		// 	ajax: true,
-		// 	ajaxSource: 'FL_ui/sidepanel/fl_settings.html'
-		// });
+		$('#panel1').slidePanel({
+			triggerName: '#trigger1',
+			position: 'fixed',
+			triggerTopPos: '110px',
+			panelTopPos: '110px',
+			ajax: true,
+			ajaxSource: 'FL_ui/sidepanel/fl_settings.html'
+		});
 		$('#panel2').slidePanel({
 			triggerName: '#trigger2',
 			position: 'fixed',

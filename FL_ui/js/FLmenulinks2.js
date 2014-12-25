@@ -13,7 +13,126 @@
 		var internalTest = function ( x) { //returns a 2 bytes string from number 
 			console.log( "FLmenulinks2.js internalTest -->"+x );
 		};
+		var getMailchimpHTML = function(cId) {
+			var def = $.Deferred();
+			var arr = null;
+			var fl = FL.login.token.fl;
+			if(fl){
+				var mc = new fl.mailChimp();
+				mc.campaignContent({cid: cId}, function(err, data){
+					if(!err){
+						console.log("campaignlist returns no error data="+JSON.stringify(data.html));
+						def.resolve(data.html);
+					}else{
+						return def.reject( "FLmenulink2.js getMailchimpHTML - ERROR:"+err );
+					}
+				});
+			}else{
+				return def.reject("FLmenulink2.js getMailchimpHTML ->ERROR: token is empty");
+			}
+			return def.promise();
+		};	
+		var getMailchimpTemplates = function() {
+			var def = $.Deferred();
+			var arr = null;
+			var fl = FL.login.token.fl;
+			if(fl){
+				var mc = new fl.mailChimp();
+				mc.campaignList( {data:1}, function(err, data){
+					// console.log("campaignlist returns no error data="+JSON.stringify(data.data));
+					if(!err){
+						var arrOfObj = [];
+						var item = null;
+						_.each(data.data, function(element,index){
+							item = {value:index,text:element.title,cId:element.id};
+							arrOfObj.push(item);
+						});
+						// arrCid = _.pluck(data.data,"id");
+						// arrTitles = _.pluck(data.data,"title");
+						def.resolve(arrOfObj);
+						// oneCampaign=data.data[data.data.length-1];
+						// console.log("requesting content for cid: " + oneCampaign.id);					
+					}else{
+						return def.reject( "FLmenulink2.js getTemplates -ERROR:"+err );
+					}
+				});
+			}else{
+				return def.reject("FLmenulink2.js getTemplates ->ERROR: token is empty");
+			}
+			return def.promise();
+		};
 		var displayDefaultGrid = function(entityName) {
+			$("#_newsletter").click(function () {
+				// alert("Newsletter");
+				//FL.login.selectBox({boxId:"#styleSet", boxCurrent:currentStyle, boxArr:stylesForSelection}
+				//var senderObj = {from_name:"jojo",from_email:"support@framelink.co",subject:"test #17 -  from FrameLink support team"};
+				// var templatesForSelection = [
+				// 	{value: 0, text: 'a'},
+				// 	{value: 1, text: 'b'},
+				// 	{value: 2, text: 'c'},
+				// 	{value: 3, text: 'd'},
+				// 	{value: 4, text: 'e'}
+				// ];
+				// FL.login.selectBox({boxId: "_sendNewsletter_templates",boxCurrent: "my template",boxArr: templatesForSelection},function(selected){
+				// 	alert("The value "+selected + " was selected");
+				// });
+				var pos = FL.login.token.userName.indexOf("@");
+				var shortUserName = FL.login.token.userName.substring(0,pos);
+				var masterDetailItems = {
+					master:{toEmail:shortUserName,email:FL.login.token.userName,subject:"",testEmail:FL.login.token.userName},
+					detail:{} //format is array with {attribute:<attribute name>,description:<attr description>,statement;<phrase>}
+				};
+				FL.login.emailContentTemplate = null;
+				var getTemplatesPromise = getMailchimpTemplates();
+				getTemplatesPromise.done(function(arrOfObj){
+					//arrOfObj has the format: {value:index,text:element.title,cId:element.id}
+					// alert("getTemplatesPromise done getTemplates-->"+_.pluck(arrOfObj,"text"));
+
+					var options = {
+						type:"primary", 
+						icon:"send",
+						button1:"Cancel",
+						button2:"Send Newsletter",
+						dropdown:{
+							"_sendNewsletter_template":{
+								arr:arrOfObj,//titles,
+								default:"No template",
+								onSelect:function(objSelected){
+									// console.log("Template choice was "+objSelected.text + " cId=" + objSelected.cId);
+									// alert("displayDefaultGrid objSelected =>"+JSON.stringify(objSelected));
+									//now we will get the html for the selected cId
+									var getMailchimpHTMLPromise = getMailchimpHTML(objSelected.cId);
+									getMailchimpHTMLPromise.done(function(data){
+										// alert("getMailchimpHTMLPromise OK =>"+JSON.stringify(data));
+										FL.login.emailContentTemplate = data;
+										FL.login.emailTemplateName = objSelected.text;
+									});
+									getMailchimpHTMLPromise.fail(function(err){
+										console.log(">>>>>FLmenulinks2.js displayDefaultGrid onSelect inside dropdown FAILURE <<<<<"+err);
+									});
+
+
+								}
+							}
+						}
+					};
+					FL.common.editMasterDetail("B"," Send email/Newsletter","_sendNewsletterTemplate",masterDetailItems,options,function(result){
+						if(result){//user choosed login
+							// FL.links.testEmail();
+							var toArr = csvStore.extractEmailArray();//to arr becomes: [{"email":"e1@live.com"},{"email":"email2@gmail.com"}..]
+							// FL.links.sendEmail("zzz",mailHTML,toArr,senderObj,FL.login.emailTemplateName);
+							alert("newsletter " + FL.login.emailTemplateName + " sent  to " + toArr.length + "recipients !!!");
+
+						}else{
+							alert("newsletter canceled");
+						}
+					});
+					return;
+				});
+				getTemplatesPromise.fail(function(err){
+					console.log(">>>>>FLmenulinks2.js displayDefaultGrid  FAILURE <<<<<"+err);
+				});
+			});
 			var promise=FL.API.loadTable(entityName);
 			promise.done(function(data){
 				console.log("New %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
@@ -26,6 +145,8 @@
 				FL.clearSpaceBelowMenus();
 				$("#addGrid").show();
 				$("#addGrid").html(" Add Row");
+				$("#_newsletter").show();
+				$("#_newsletter").html(" Newsletter");
 				var columnsArr = utils.backGridColumnsExtractedFromDictionary(entityName);//extracts attributes from dictionary and prepares columns object for backgrid
 				console.log("New &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&& entity="+entityName);
 				console.log("show columnsArr="+JSON.stringify(columnsArr));
@@ -38,23 +159,6 @@
 
 
 		};
-		var XdisplayDefaultGrid = function(entityName) {
-			FL.server.loadCsvStoreFromEntity(entityName,function(err){//all csvStore will be stored in server as "order" content
-				console.log("loadCsvStoreFromEntity is done !!! Error:"+err);
-				// FL.server.disconnect();
-				console.log("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% entity="+entityName);
-				console.log("show csvStore="+JSON.stringify(csvStore.csvRows));
-
-				FL.clearSpaceBelowMenus();
-				$("#addGrid").show();
-				$("#addGrid").html("Add Row");
-				var columnsArr = utils.backGridColumnsExtractedFromDictionary(entityName);//extracts attributes from dictionary and prepares columns object for backgrid
-				console.log("&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&& entity="+entityName);
-				console.log("show columnsArr="+JSON.stringify(columnsArr));
-
-				utils.mountGridInCsvStore(columnsArr);//mount backbone views and operates grid - 
-			});
-		};		
 		return{
 			abc: "abc",
 			test: function(x) {//call with menu key "uri": "javascript:FL.links.test('JOJO')"
@@ -68,67 +172,6 @@
 					alert("Fl.link.pageEditor PLEASE CONNECT TO THE DATABASE ");
 					return;
 				}
-				// "uri":"./page_editor.html?d=joao"
-				// location.href = "./page_editor.html?d=joao";
-				//localStorage.connection = connectionString; //this was already done in FL.server.connectServer()
-				
-				// FL.server.disconnect();
-				// var style = localStorage.style;
-				// var font = localStorage.fontFamily;
-				// // location.href = "./page_editor.html?connectionString="+connectionString+"#page=" + xPage + "#style=" + style + "#font="+font;
-				// // location.href = "./page_editor.html?connectionString="+connectionString+"#page=" + xPage + "#style=" + style + "#font="+font;
-				// var child = window.open("./page_editor.html?connectionString="+connectionString+"#page=" + xPage + "#style=" + style + "#font="+font, 'theWindow');
-				// if (window.focus) {
-				// 	child.focus();
-				// }
-
-				// var timer = setInterval(checkChild, 500);
-				// function checkChild() {
-				// 	if (child.closed) {
-				// 		alert("FrameLink Page Editor was closed \nconnectionString="+connectionString);
-				// 		clearInterval(timer);
-				// 		//restore home page
-				// 		FL.server.restorePageFromConnectionString("home",connectionString,function(err,htmlStr){
-				// 			if (err){
-				// 				alert('FLmenulinks2.js after closing page_editor window ERROR restoring home page err=' + JSON.stringify(err));
-				// 			}
-				// 			FL.menu.homeMemory = htmlStr; //this means that this will be displayed
-				// 			FL.menu.currentMenuObj.menuRefresh();
-				// 		});
-				// 	}else{
-				// 		// child.focus();
-				// 	}
-				// }
-
-				// FL.server.disconnect(function(){
-				// 	alert("inside disconnect callback ");
-				// 	var style = localStorage.style;
-				// 	var font = localStorage.fontFamily;
-				// 	// location.href = "./page_editor.html?connectionString="+connectionString+"#page=" + xPage + "#style=" + style + "#font="+font;
-				// 	// location.href = "./page_editor.html?connectionString="+connectionString+"#page=" + xPage + "#style=" + style + "#font="+font;
-				// 	var child = window.open("./page_editor.html?connectionString="+connectionString+"#page=" + xPage + "#style=" + style + "#font="+font, 'theWindow');
-				// 	if (window.focus) {
-				// 		child.focus();
-				// 	}
-
-				// 	var timer = setInterval(checkChild, 500);
-				// 	function checkChild() {
-				// 		if (child.closed) {
-				// 			alert("FrameLink Page Editor was closed \nconnectionString="+connectionString);
-				// 			clearInterval(timer);
-				// 			//restore home page
-				// 			FL.server.restorePageFromConnectionString("home",connectionString,function(err,htmlStr){
-				// 				if (err){
-				// 					alert('FLmenulinks2.js after closing page_editor window ERROR restoring home page err=' + JSON.stringify(err));
-				// 				}
-				// 				FL.menu.homeMemory = htmlStr; //this means that this will be displayed
-				// 				FL.menu.currentMenuObj.menuRefresh();
-				// 			});
-				// 		}else{
-				// 			// child.focus();
-				// 		}
-				// 	}
-				// });
 				// alert("Fl.link.pageEditor call with:\npage=" + xPage + "\nconnectionString="+connectionString);
 				var style = localStorage.style;
 				var font = localStorage.fontFamily;
@@ -142,14 +185,6 @@
 						// alert("FrameLink Page Editor was closed \nconnectionString="+connectionString);
 						clearInterval(timer);
 						FL.login.home();
-						//restore home page
-					// FL.server.restorePageFromConnectionString("home",connectionString,function(err,htmlStr){
-					// 	if (err){
-					// 		alert('FLmenulinks2.js after closing page_editor window ERROR restoring home page err=' + JSON.stringify(err));
-					// 	}
-					// 	FL.menu.homeMemory = htmlStr; //this means that this will be displayed
-					// 	FL.menu.currentMenuObj.menuRefresh();
-					// });
 					}else{
 						// child.focus();
 					}
@@ -159,6 +194,7 @@
 				// alert("this an alert after calling PageEditor");
 			},
 			setDefaultGrid: function(entityName) {//call with menu key "uri": "javascript:FL.links.setDefaultGrid('JOJO')"
+				FL.API.debug = true;
 				if(!FL.server.offline){
 					if(FL.dd.isEntityInLocalDictionary(entityName)){
 						displayDefaultGrid(entityName);
@@ -222,18 +258,84 @@
 				FL.server.syncLocalStoreToServer();
 				FL.menu.topicUpdateJsonMenu(oMenu);
 			},
-			testEmail: function() {//sends a sample email with mandrill javascript API
-				var eCN = FL.dd.getCEntity("_histoMail");
-				var fCN = FL.dd.getFieldCompressedName("_histoMail","msg");
-				var dbName = FL.login.token.dbName;
-				var xhr = new XMLHttpRequest();
-				xhr.open("GET", "http://www.codecademy.com/", false);//4 verbs - GET, POST, PUT, DELETE
-				xhr.send();
-				console.log(xhr.status);
-				console.log(xhr.statusText);
+			sendEmail:function(entityName,mailHTML,recipientsArrayOfObj,senderObj,NewsletterName){//sends an email to the recipients
+				//recipientsArrayOfObj = [{"email":"joaoccoliveira@live.com"},{"email":"joaocarloscoliveira@gmail.com"}]
+				var eCN = FL.dd.getCEntity("_histoMail");//necessary for metadata. Later on we need this for each table (that has an email field) in framelink
+				var fCN = FL.dd.getFieldCompressedName("_histoMail","msg");//necessary for metadata
+				var dbName = FL.login.token.dbName;//necessary for metadata		
+				var m = new mandrill.Mandrill('vVC6R5SZJEHq2hjEZfUwRg');
+				var toEmail = null;
+				var count = 0;
+				var total_toSend = recipientsArrayOfObj.length;
+				_.each(recipientsArrayOfObj, function(element){
+					count++;
+					console.log("sendEmail "+ count +"/"+total_toSend+ " -->" + element.email + " with label=" +NewsletterName);
+					var params2 = {
+						"message": {
+							"from_email": senderObj.from_email,
+							"from_name" : senderObj.from_name,
+							"to":[element],//[{"email":"joaoccoliveira@live.com"}],//{"email":"joaocarloscoliveira@gmail.com"},{"email":"nicolas@cuvillier.net"}],
+							// "to":[{"email":"joaoccoliveira@live.com"}],
+							// "to":[{"email":"joaocarloscoliveira@gmail.com"}],
+							"subject": senderObj.subject,
+							"html": mailHTML,
+							"autotext":true,
+							"track_opens":true,
+							"track_clicks":true,
+							"metadata": {
+								"dbName": dbName,//"45829",//it is in token
+								"eCN": eCN,	//"111",
+								"fCN": fCN,   //456",
+								"NName": NewsletterName  //Newsletter Name
+							}				
+						}
+					};
+					m.messages.send(params2,function(res){console.log(res);},function(err){console.log(err);});
+					//how to recover from an accident ?			
+				});
+			},
+			sendEmailTest: function() {//sends a sample email with eMail/newsletter
+				if(FL.login.emailContentTemplate){
+					// var mailHTML = '<p>Thank you for selecting <a href="http://www.framelink.co"><strong>FrameLink version 8</strong></a> to build your backend site !</p>';			
+					var mailHTML = FL.login.emailContentTemplate;
+					
+					var name = $("#_sendNewsletter_name").val();
+					var email = $("#_sendNewsletter_email").val();
+					var subject = $("#_sendNewsletter_subject").val();
+					var testEmail =  $("#_sendNewsletter_testEmail").val();
+					var senderObj = {from_name:name,from_email:email,subject:subject};
+					
+					var toArr = [{"email":testEmail}];
+					console.log("Sends test email to from_name:"+senderObj.from_name+" email:"+senderObj.from_email+" subject:"+senderObj.subject);
+					console.log("Sends to -->"+JSON.stringify(toArr));
+					console.log("Sends HTML -->"+mailHTML);
+					console.log("----------------------------------------------------------------------");
+					FL.links.sendEmail("zzz",mailHTML,toArr,senderObj,"test");
+				}else{
+					alert("Email content is empty - choose a template and try again ");
+				}
+				// FL.links.sendEmail("not working for the time being",mailHTML,toArr,senderObj);		
+			},
+			testEmail: function(x) {//sends a sample email with mandrill javascript API
+				alert(x);
+				FL.API.debug = true;
+				csvStore.extractEmailArray();
+				//http://getairmail.com/
+				var mailHTML = '<p>Thank you for selecting <a href="http://www.framelink.co"><strong>FrameLink version 7</strong></a> to build your backend site !</p>';			
+				var senderObj = {from_name:"jojo",from_email:"support@framelink.co",subject:"test #17 -  from FrameLink support team"};
+				// var toArr = [{"email":"joaoccoliveira@live.com"},{"email":"joaocarloscoliveira@gmail.com"},{email:"wpngca@clrmail.com"}]
+				var toArr = csvStore.extractEmailArray();//to arr becomes: [{"email":"e1@live.com"},{"email":"email2@gmail.com"}..]
+				// FL.links.sendEmail("zzz",mailHTML,toArr,senderObj);
+				return;
 
+				var eCN = FL.dd.getCEntity("_histoMail");//necessary for metadata
+				var fCN = FL.dd.getFieldCompressedName("_histoMail","msg");//necessary for metadata
+				var dbName = FL.login.token.dbName;//necessary for metadata
+				
 				var m = new mandrill.Mandrill('vVC6R5SZJEHq2hjEZfUwRg');
 				m.users.ping(function(res){console.log(res);},function(err){console.log(err);});
+				var mailHTML = '<p>Thank you for selecting <a href="http://www.framelink.co"><strong>FrameLink version 3</strong></a> to build your backend site !</p>';			
+				//var apikey ="04c0cdcfe7d52fbc844dfa496f1d78d5-us8";//mailchimp key
 				// create a variable for the API call parameters
 				var params = {
 					"message": {
@@ -251,7 +353,7 @@
 						// "to":[{"email":"joaoccoliveira@live.com"}],
 						// "to":[{"email":"joaocarloscoliveira@gmail.com"}],
 						"subject": "test #15 -  from FrameLink support team",
-						"html": '<p>Thank you for selecting <a href="http://www.framelink.co"><strong>FrameLink</strong></a> to build your backend site !</p>',
+						"html": mailHTML,
 // "html":'<body style="margin:0; padding:0;" bgcolor="#F0F0F0" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0"><!-- 100% background wrapper (grey background) --><table border="0" width="100%" height="100%" cellpadding="0" cellspacing="0" bgcolor="#F0F0F0"><tr>   <td align="center" valign="top" bgcolor="#F0F0F0" style="background-color: #F0F0F0;"><br><!-- 600px container (white background) --><table border="0" width="600" cellpadding="0" cellspacing="0" class="container" style="width:600px;max-width:600px"><tr><td class="container-padding header" align="left" style="font-family:Helvetica, Arial, sans-serif;font-size:24px;font-weight:bold;padding-bottom:12px;color:#DF4726;padding-left:24px;padding-right:24px">Antwort v1.0</td></tr><tr><td class="container-padding content" align="left" style="padding-left:24px;padding-right:24px;padding-top:12px;padding-bottom:12px;background-color:#ffffff"><br><div class="title" style="font-family:Helvetica, Arial, sans-serif;font-size:18px;font-weight:600;color:#374550">Single Column Fluid Layout</div><br><div class="body-text" style="font-family:Helvetica, Arial, sans-serif;font-size:14px;line-height:20px;text-align:left;color:#333333">This is an example of a single column fluid layout. There are no columns. Because the container table width is set to 100%, it automatically resizes itself to all devices. The magic of good old fashioned HTML.<br><br>The media query change we make is to decrease the content margin from 24px to 12px for devices up to max width of 400px.<br><br></div></td></tr><tr><td class="container-padding footer-text" align="left" style="font-family:Helvetica, Arial, sans-serif;font-size:12px;line-height:16px;color:#aaaaaa;padding-left:24px;padding-right:24px"><br><br>Sample Footer text: © 2014 Acme, Inc.<br><br>You are receiving this email because you opted in on our website. Update your <a href="#" style="color:#aaaaaa">email preferences</a> or <a href="#" style="color:#aaaaaa">unsubscribe</a>.<br><br><strong>Acme, Inc.</strong><br><span class="ios-footer">123 Main St.<br>Springfield, MA 12345<br></span><a href="http://www.acme-inc.com" style="color:#aaaaaa">www.acme-inc.com</a><br><br><br></td></tr></table><!--/600px container --></td></tr></table><!--/100% background wrapper--></body>',
 // "html":'<body style="margin:0; padding:0;" bgcolor="#F0F0F0" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0"><!-- 100% background wrapper (grey background) --><table border="0" width="100%" height="100%" cellpadding="0" cellspacing="0" bgcolor="#F0F0F0"><tr><td align="center" valign="top" bgcolor="#F0F0F0" style="background-color: #F0F0F0;"><br><!-- 600px container (white background) --><table border="0" width="600" cellpadding="0" cellspacing="0" class="container" style="width:600px;max-width:600px"><tr><td class="container-padding header" align="left" style="font-family:Helvetica, Arial, sans-serif;font-size:24px;font-weight:bold;padding-bottom:12px;color:#DF4726;padding-left:24px;padding-right:24px">Test 3 columns & Pictures</td></tr><tr><td class="content" align="left" style="padding-top:12px;padding-bottom:12px;background-color:#ffffff"><table width="600" border="0" cellpadding="0" cellspacing="0" class="force-row" style="width: 600px;"><tr><td class="content-wrapper" style="padding-left:24px;padding-right:24px"><br><div class="title" style="font-family:Helvetica, Arial, sans-serif;font-size:18px;font-weight:600;color:#374550">Three Columns</div></td></tr><tr><td class="cols-wrapper" style="padding-left:12px;padding-right:12px"><!--[if mso]><table border="0" width="576" cellpadding="0" cellspacing="0" style="width: 576px;"><tr><td width="192" style="width: 192px;" valign="top"><![endif]--><table width="192" border="0" cellpadding="0" cellspacing="0" align="left" class="force-row" style="width: 192px;"><tr><td class="col" valign="top" style="padding-left:12px;padding-right:12px;padding-top:18px;padding-bottom:12px"><img src="http://amerikaihirujsag.com/wp-content/uploads/2012/11/555-192x125.jpg" border="0" alt="The White Whale" width="168" height="110" hspace="0" vspace="0" style="max-width:100%; " class="image"><div class="subtitle" style="font-family:Helvetica, Arial, sans-serif;font-size:16px;font-weight:600;color:#2469A0;margin-top:18px">The White Whale</div><div class="col-copy" style="font-family:Helvetica, Arial, sans-serif;font-size:13px;line-height:20px;text-align:left;color:#333333;margin-top:12px">I take the good old <a href="http://www.framelink.co"><strong>FrameLink</strong></a> ground that the whale is a fish, and call upon holy Jonah to back me. This fundamental thing settled, the next point is, in what internal respect does the whale differ from other fish.</div><br></td></tr></table>'+
 // '<!--[if mso]></td><td width="192" style="width: 192px;" valign="top"><![endif]--><table width="192" border="0" cellpadding="0" cellspacing="0" align="left" class="force-row" style="width: 192px;"><tr><td class="col" valign="top" style="padding-left:12px;padding-right:12px;padding-top:18px;padding-bottom:12px"><img src="http://eltcasino.com/wp-content/uploads/2013/12/EN-192x125-Blade-CRM.jpg" border="0" alt="I am Ishmael" width="168" height="110" hspace="0" vspace="0" style="max-width:100%; " class="image"><div class="subtitle" style="font-family:Helvetica, Arial, sans-serif;font-size:16px;font-weight:600;color:#2469A0;margin-top:18px">I am Ishmael</div><div class="col-copy" style="font-family:Helvetica, Arial, sans-serif;font-size:13px;line-height:20px;text-align:left;color:#333333;margin-top:12px">Here upon the very point of starting for the voyage, Captain Peleg and Captain Bildad were going it with a high hand on the quarter-deck, just as if they were to be joint-commanders at sea, as well as to all appearances in port.</div><br></td></tr></table><!--[if mso]></td><td width="192" style="width: 192px;" valign="top"><![endif]--><table width="192" border="0" cellpadding="0" cellspacing="0" align="left" class="force-row" style="width: 192px;"><tr><td class="col" valign="top" style="padding-left:12px;padding-right:12px;padding-top:18px;padding-bottom:12px"><img src="http://www.momentumlife.tv/wp-content/uploads/2013/01/012413_1442_MotherhoodI1-192x125.png" border="0" alt="The Albatross" width="168" height="110" hspace="0" vspace="0" style="max-width:100%; " class="image"><div class="subtitle" style="font-family:Helvetica, Arial, sans-serif;font-size:16px;font-weight:600;color:#2469A0;margin-top:18px">The Albatross</div><div class="col-copy" style="font-family:Helvetica, Arial, sans-serif;font-size:13px;line-height:20px;text-align:left;color:#333333;margin-top:12px">And somehow, at the time, I felt a sympathy and a sorrow for him, but for I dont know what, unless it was the cruel loss of his leg. And yet I also felt a strange awe of him; but that sort of awe, which I cannot at all describe.</div><br></td></tr></table>'+

@@ -455,7 +455,7 @@ mixpanel.init("19ada1cb259cc3272c67085eb1bf03fc");</script><!-- end Mixpanel -->
 	<script id="getStartedTemplate" type="text/template"> 
 		<div class="getStartedExample" style="margin-top:0px;">
 			<form id="form_getStartedTemplate" novalidate="novalidate">
-			<legend>Sign up and press <strong>'Start now'</strong> button.<br>You may leave Email/password blank to sign up later.</legend>
+			<legend>Sign up and press <strong>'Start now'</strong> button.</legend>
 				<div class="row">
 					<div class="col-xs-12" >
 						<div class="input-group" style="line-height:0px;">
@@ -470,7 +470,50 @@ mixpanel.init("19ada1cb259cc3272c67085eb1bf03fc");</script><!-- end Mixpanel -->
 		    	</div>
 			</form>
 		</div>
-	</script>	
+	</script>
+	<script id="_sendNewsletterTemplate" type="text/template"> 
+		<div class="_sendNewsletterTemplate" style="margin-top:0px;">
+			<form id="form__sendNewsletterTemplate" novalidate="novalidate">
+				<div class="row">
+					<div class="col-xs-12" >
+						<div class="input-group" style="line-height:0px;">
+							<span class="input-group-addon">From name:</span>
+							<input type="text" class="form-control" id="_sendNewsletter_name" placeholder="ex:John" value="<%= masterDetailItems.master.toEmail %>" data-parsley-trigger="change" >
+							<span class="input-group-addon"><span class="glyphicon glyphicon-user"></span></span>
+					    </div>
+						<div class="input-group" style="line-height:0px;">
+							<span class="input-group-addon">From email:</span>
+					        <input type="email" class="form-control" id="_sendNewsletter_email" placeholder="full email sender ex:support@framelink.co" value="<%= masterDetailItems.master.email %>" data-parsley-trigger="change" >
+							<span class="input-group-addon"><span class="glyphicon glyphicon-envelope"></span></span>
+					    </div>
+						<div class="input-group" style="line-height:0px;">
+							<span class="input-group-addon">Subject:</span>
+							<input type="text" class="form-control" id="_sendNewsletter_subject" placeholder="email subject" value="<%= masterDetailItems.master.subject %>" required data-parsley-trigger="change" >
+							<span class="input-group-addon"><span class="glyphicon glyphicon-pencil"></span></span>
+					    </div>
+					    <div class="input-group" style="line-height:0px;">
+							<span class="input-group-addon">Choose a template:</span>
+							<div class="btn-group">
+								<a class="btn btn-default dropdown-toggle" data-toggle="dropdown" style="font-size:14px;font-weight:bold;margin-right:-4.0em" href="#"> Choose Template <span class="caret"></span></a>
+								<ul id="_sendNewsletter_template" class="dropdown-menu">
+									<li><a href="#">templ1</a></li>
+									<li><a href="#">templ2</a></li>
+								</ul>
+							</div>
+						</div>			    
+					    <legend><br>Test Email</legend>
+						<div class="input-group" style="line-height:0px;">
+							<span class="input-group-addon">Test email:</span>
+					        <input type="email" class="form-control" id="_sendNewsletter_testEmail" placeholder="full email sender ex:jessica.costa@weadvice.pt" value="<%= masterDetailItems.master.testEmail %>" >
+							<span class="input-group-addon"><span class="glyphicon glyphicon-envelope"></span></span>
+					    </div>					    
+                        <button type="submit" class="btn btn-default" onclick="FL.links.sendEmailTest()">Send test email</button>
+
+				    </div>
+		    	</div>
+			</form>
+		</div>
+	</script>		
 <script id="dictTemplate23" type="text/template"> 
 	<div class="container">
 	    <div class="row">
@@ -648,6 +691,7 @@ mixpanel.init("19ada1cb259cc3272c67085eb1bf03fc");</script><!-- end Mixpanel -->
 				</div>				
 				<div class="col-md-12 backgrid-container">
 					<button id="addGrid" class="edit btn btn-info glyphicon glyphicon-plus-sign"></button>
+					<button id="_newsletter" class="edit btn btn-success glyphicon glyphicon-envelope"></button>
 					<div id="grid"></div>			
 					<div id="paginator"></div>				
 				</div>

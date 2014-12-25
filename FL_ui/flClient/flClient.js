@@ -842,6 +842,31 @@ TODO
 
             return relation;
         })();
+        //////////////////////
+        /// mailChimp API
+        //////////////////////
+        flMain.prototype.mailChimp=(function(){
+            var mailChimp = function() {
+            }
+            // API going to the server
+            mailChimp.prototype.ping = function(data, callBack){
+                //console.dir(data);
+                if(typeof data == 'function')
+                    {   callBack=data;
+                        data=undefined;
+                    }
+                console.log("ping: callback type: "+ typeof callBack);
+                sendCommand(2, 'mailchimp/ping', "0", data, { }, callBack);
+            }
+            // iNet should be like: {"query":{"_id":eCN}, projection:{}}
+            mailChimp.prototype.campaignList = function(data, callBack){
+                sendCommand(2, 'campaign/list', "0", data, { }, callBack);
+            }
+            mailChimp.prototype.campaignContent = function(data, callBack){
+                sendCommand(2, 'campaign/content', "0", data, { }, callBack);
+            }
+            return mailChimp;
+        })();
 
         ///////////////////////
         // return our instance

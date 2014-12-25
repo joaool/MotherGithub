@@ -26,6 +26,17 @@ window.csvStore = {
     getEntityName: function(){
         return this.entityName;
     },
+    extractEmailArray: function(){//returns an array of emails with format [{"email":"e1@live.com"},{"email":"email2@gmail.com"}..]
+        var attrArr = this.getAttributesArr();
+        // console.log("-xxxx-->"+JSON.stringify(attrArr));
+        var attrEl = _.find(attrArr,function(element){return element.typeUI == "emailbox";});//find first email among fields
+        // console.log("-zzz-->"+JSON.stringify(attrEl));
+        var nameOfFirstEmailField = attrEl.name;
+        // console.log("-name-->"+nameOfFirstEmailField);
+        var arrOfEmails = _.map(this.csvRows,function(value,key){return {"email":value[nameOfFirstEmailField]}; });
+        // console.log("-www-->"+JSON.stringify(arrOfEmails));
+        return arrOfEmails
+    },    
     store: function( arrToStore ) {//arrToStore is an array of objects [{},{},....{}] where id field is mandatory inside {}
         var arrOfIds = _.map(arrToStore,function(element){return element.id;});
         this.csvRows = _.object(arrOfIds,arrToStore); //becomes ->{1:arrToStore[1],2:arrToSAtore[2]....} 

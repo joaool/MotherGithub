@@ -21,10 +21,13 @@ function isEmpty(obj) {
     return true;
 }
 callAx.prototype.callAjax = function(protocol, srv, port, path, jsonData, inSession, callBack, flTraceSession, flTraceServer){
+    // getsId to test session Mgt in client apps
     if (path == 'getsId')
         return sId;
 
     var js={ctrl:{ } };
+
+    // not sure this code works...
     if (path.indexOf('session') >= 0){
         switch (path){
             case 'session/get':
@@ -48,6 +51,12 @@ callAx.prototype.callAjax = function(protocol, srv, port, path, jsonData, inSess
         js.ctrl.srvTrace=flTraceServer;
         flTraceServer=-1;
     }
+
+    // disconnect a disconnected session just exit
+    if (path === "/api/application/disconnect" && sId == undefined){
+        return callBack(true, true);
+    }
+
 
     if (inSession == true){
         if (path === "/api/application/connect"){
@@ -124,9 +133,9 @@ callAx.prototype.callAjax = function(protocol, srv, port, path, jsonData, inSess
             
             if (resultJson["ctrl"] != null && resultJson["ctrl"]["isOK"] == true){
                 var resultJsonResponse = resultJson.d;
-                console.log('typeof resultJson: ' + typeof resultJson.d + ', isempty: '+isEmpty(resultJson.d)+', val: '+ JSON.stringify(resultJson));
+                //console.log('typeof resultJson: ' + typeof resultJson.d + ', isempty: '+isEmpty(resultJson.d)+', val: '+ JSON.stringify(resultJson));
                 if (typeof resultJson.d === 'object' && isEmpty(resultJson.d)){
-                    console.log('I null resultJson.d');
+                    //console.log('I null resultJson.d');
                     resultJson.d=null;
                 }
 

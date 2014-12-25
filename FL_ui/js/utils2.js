@@ -488,10 +488,23 @@ window.utils = {
             config: {
                // base config to use for each file
                encoding:"ISO-8859-1" // ISO-8859-1 is the good encoding for Portuguese chars  - "UTF-8" or "utf-8", "latin-1", "windows-1255"
+               // encoding:"" // ISO-8859-1 is the good encoding for Portuguese chars  - "UTF-8" or "utf-8", "latin-1", "windows-1255"
             },
             before: function(file,inputElem) {
-                // alert("file name="+file.name);
-                // alert("inputElem="+inputElem);
+                alert("file name="+file.name);
+                alert("inputElem="+inputElem);
+                var z = 32;
+            },
+            cleanData: function(data){
+                alert("Before Cleaning -->"+JSON.stringify(data.results.fields));
+                var arr = [];
+                _.each(data.results.fields,function(element){
+                    if(element !== "")
+                        arr.push(element);
+                });
+                data.results.fields = arr;
+                alert("Aftere Cleaning -->"+JSON.stringify(data.results.fields));
+                return data;
             },
             complete: function(data) {
                 // data is an object data = {errors:{}, meta:{}, results:{fields:[ elements are fields],rows:[elements are objects]} } 
@@ -511,6 +524,9 @@ window.utils = {
                 // this is an alternative without creating any entry in data dictionary
                 // to use backGridColumnsFromArray() we need arrOfColumns with format: [{label:"xx",name:fieldName,type:xtype,enumerable:xEnumerable},{col2}...{}]
                 //  to get arrOfColumns we need a method similar to  createEntityFromCsvAnalisys(rows)
+                
+                //in some cases data.result.fields has an empty field
+                data = this.cleanData(data);
                 var arrOfColumns =  utils.createAttributesArrFromCsvAnalisys(data.results.rows);//returns all coluns from CSV
                 utils.injectId("id",arrOfColumns); //now the first column is an "id" column 
                 var columnsArr = utils.backGridColumnsFromArray(arrOfColumns);//extracts attributes from dictionary and prepares columns object for backgrid
