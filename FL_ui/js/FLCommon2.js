@@ -413,6 +413,10 @@ FL["common"] = (function(){//name space FL.common
 				n = 0;
 			return Array(n+1).join(str);
 		},
+        validateEmail: function(email) {
+            var re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+            return re.test(email);
+        },
 		testFunc: function(x) {
 			alert("FL.common.test() -->"+x);
 		}
@@ -485,10 +489,10 @@ FL["domInject"] = function(id,htmlContent) {//clean and replace content by htmlC
 	if(htmlContent)
 		$id.append( $( htmlContent ) );//with $(htmlContent) we convert htmlStr to a JQuery object
 };
-FL["validateEmail"] = function(email) {
-	var re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-	return re.test(email);
-};
+// FL["validateEmail"] = function(email) {
+// 	var re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+// 	return re.test(email);
+// };
 FL["domain"]  = null;
 FL["mixPanelEnable"]  = false;
 FL["mix"] = function(mixEvent,propObj) {//if FL.mixPanelEnable = true, trigger  events  to mix panel
@@ -510,6 +514,10 @@ FL["clearSpaceBelowMenus"] = function() {
 	$("#csvcontent").empty();
 	$("#grid").empty();
 	$("#paginator").empty();
-	$("#addGrid").empty();
-	$("#addGrid").hide();
+    $("#addGrid").empty();
+    $("#addGrid").hide();
+    $("#_newsletter").empty();
+    $("#_newsletter").hide();
+    $("#_editGrid").empty();
+    $("#_editGrid").hide();
 };

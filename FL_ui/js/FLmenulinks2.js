@@ -13,6 +13,14 @@
 		var internalTest = function ( x) { //returns a 2 bytes string from number 
 			console.log( "FLmenulinks2.js internalTest -->"+x );
 		};
+		var extractSenderObjFromModal = function() { //extracts senderObj from _sendNewsletterTemplate
+			var name = $("#_sendNewsletter_name").val();
+			var email = $("#_sendNewsletter_email").val();
+			var subject = $("#_sendNewsletter_subject").val();
+			var testEmail =  $("#_sendNewsletter_testEmail").val();
+			var senderObj = {from_name:name,from_email:email,subject:subject,testEmail:testEmail};
+			return senderObj;
+		};
 		var getMailchimpHTML = function(cId) {
 			var def = $.Deferred();
 			var arr = null;
@@ -62,6 +70,9 @@
 			return def.promise();
 		};
 		var displayDefaultGrid = function(entityName) {
+			$("#_editGrid").click(function () {
+				FL.common.makeModalInfo("To be implemented soon");
+			});	
 			$("#_newsletter").click(function () {
 				// alert("Newsletter");
 				//FL.login.selectBox({boxId:"#styleSet", boxCurrent:currentStyle, boxArr:stylesForSelection}
@@ -119,9 +130,11 @@
 					FL.common.editMasterDetail("B"," Send email/Newsletter","_sendNewsletterTemplate",masterDetailItems,options,function(result){
 						if(result){//user choosed login
 							// FL.links.testEmail();
+							var senderObj = extractSenderObjFromModal();
 							var toArr = csvStore.extractEmailArray();//to arr becomes: [{"email":"e1@live.com"},{"email":"email2@gmail.com"}..]
-							// FL.links.sendEmail("zzz",mailHTML,toArr,senderObj,FL.login.emailTemplateName);
-							alert("newsletter " + FL.login.emailTemplateName + " sent  to " + toArr.length + "recipients !!!");
+							var mailHTML = FL.login.emailContentTemplate;
+							var sentCount = FL.links.sendEmail("zzz",mailHTML,toArr,senderObj,FL.login.emailTemplateName);
+							alert("newsletter " + FL.login.emailTemplateName + " sent  to " + sentCount + " recipients !!! - total rows checked = "+toArr.length);
 
 						}else{
 							alert("newsletter canceled");
@@ -147,6 +160,9 @@
 				$("#addGrid").html(" Add Row");
 				$("#_newsletter").show();
 				$("#_newsletter").html(" Newsletter");
+				$("#_editGrid").show();
+				$("#_editGrid").html(" Edit Grid");
+
 				var columnsArr = utils.backGridColumnsExtractedFromDictionary(entityName);//extracts attributes from dictionary and prepares columns object for backgrid
 				console.log("New &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&& entity="+entityName);
 				console.log("show columnsArr="+JSON.stringify(columnsArr));
@@ -260,52 +276,74 @@
 			},
 			sendEmail:function(entityName,mailHTML,recipientsArrayOfObj,senderObj,NewsletterName){//sends an email to the recipients
 				//recipientsArrayOfObj = [{"email":"joaoccoliveira@live.com"},{"email":"joaocarloscoliveira@gmail.com"}]
+				//returns the total number of emails sent. Notice that from the recipientsArrayOfObj the methods will skip all those that do not have a valid email
+				if(mailHTML ==="" || mailHTML === null){
+					alert("Send Mail ->Cannot send an empty email !");
+					return 0;
+				}
+				if(NewsletterName === null){
+					alert("Send Mail ->Do document identifier (Newslettername) !");
+					return 0;
+				}
 				var eCN = FL.dd.getCEntity("_histoMail");//necessary for metadata. Later on we need this for each table (that has an email field) in framelink
 				var fCN = FL.dd.getFieldCompressedName("_histoMail","msg");//necessary for metadata
 				var dbName = FL.login.token.dbName;//necessary for metadata		
 				var m = new mandrill.Mandrill('vVC6R5SZJEHq2hjEZfUwRg');
 				var toEmail = null;
 				var count = 0;
+				var countSend = 0;
 				var total_toSend = recipientsArrayOfObj.length;
 				_.each(recipientsArrayOfObj, function(element){
 					count++;
-					console.log("sendEmail "+ count +"/"+total_toSend+ " -->" + element.email + " with label=" +NewsletterName);
-					var params2 = {
-						"message": {
-							"from_email": senderObj.from_email,
-							"from_name" : senderObj.from_name,
-							"to":[element],//[{"email":"joaoccoliveira@live.com"}],//{"email":"joaocarloscoliveira@gmail.com"},{"email":"nicolas@cuvillier.net"}],
-							// "to":[{"email":"joaoccoliveira@live.com"}],
-							// "to":[{"email":"joaocarloscoliveira@gmail.com"}],
-							"subject": senderObj.subject,
-							"html": mailHTML,
-							"autotext":true,
-							"track_opens":true,
-							"track_clicks":true,
-							"metadata": {
-								"dbName": dbName,//"45829",//it is in token
-								"eCN": eCN,	//"111",
-								"fCN": fCN,   //456",
-								"NName": NewsletterName  //Newsletter Name
-							}				
-						}
-					};
-					m.messages.send(params2,function(res){console.log(res);},function(err){console.log(err);});
-					//how to recover from an accident ?			
+					if(FL.common.validateEmail(element.email)){
+						countSend++;
+						console.log("sendEmail() "+ count +"/"+total_toSend+ " --> sent Count=" + countSend + " -->" + element.email + " with label=" +NewsletterName);
+						console.log("	to from_name:"+senderObj.from_name+" email:"+senderObj.from_email+" subject:"+senderObj.subject);
+						console.log("	Sends to -->"+JSON.stringify(element.email));
+						console.log("----------------------------------------------------------------------");
+
+						var params2 = {
+							"message": {
+								"from_email": senderObj.from_email,
+								"from_name" : senderObj.from_name,
+								"to":[element],//[{"email":"joaoccoliveira@live.com"}],//{"email":"joaocarloscoliveira@gmail.com"},{"email":"nicolas@cuvillier.net"}],
+								// "to":[{"email":"joaoccoliveira@live.com"}],
+								// "to":[{"email":"joaocarloscoliveira@gmail.com"}],
+								"subject": senderObj.subject,
+								"html": mailHTML,
+								"autotext":true,
+								"track_opens":true,
+								"track_clicks":true,
+								"metadata": {
+									"dbName": dbName,//"45829",//it is in token
+									"eCN": eCN,	//"111",
+									"fCN": fCN,   //456",
+									"NName": NewsletterName  //Newsletter Name
+								}				
+							}
+						};
+						m.messages.send(params2,function(res){console.log(res);},function(err){console.log(err);});
+						//how to recover from an accident ?	
+					}else{
+						console.log("sendEmail not sent ! "+ count +"/"+total_toSend+ " -->" + element.email + " has a format error and was bypassed");				
+					}
 				});
+				return countSend;		
 			},
 			sendEmailTest: function() {//sends a sample email with eMail/newsletter
 				if(FL.login.emailContentTemplate){
 					// var mailHTML = '<p>Thank you for selecting <a href="http://www.framelink.co"><strong>FrameLink version 8</strong></a> to build your backend site !</p>';			
 					var mailHTML = FL.login.emailContentTemplate;
 					
-					var name = $("#_sendNewsletter_name").val();
-					var email = $("#_sendNewsletter_email").val();
-					var subject = $("#_sendNewsletter_subject").val();
-					var testEmail =  $("#_sendNewsletter_testEmail").val();
-					var senderObj = {from_name:name,from_email:email,subject:subject};
-					
-					var toArr = [{"email":testEmail}];
+					// var name = $("#_sendNewsletter_name").val();
+					// var email = $("#_sendNewsletter_email").val();
+					// var subject = $("#_sendNewsletter_subject").val();
+					// var testEmail =  $("#_sendNewsletter_testEmail").val();
+					// var senderObj = {from_name:name,from_email:email,subject:subject};
+
+					var senderObj = extractSenderObjFromModal();
+					// var toArr = [{"email":testEmail}];
+					var toArr = [{"email":senderObj.testEmail}];
 					console.log("Sends test email to from_name:"+senderObj.from_name+" email:"+senderObj.from_email+" subject:"+senderObj.subject);
 					console.log("Sends to -->"+JSON.stringify(toArr));
 					console.log("Sends HTML -->"+mailHTML);

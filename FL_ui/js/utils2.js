@@ -318,7 +318,15 @@ window.utils = {
         //      if xtype!="enumerable" =>xEnumerable = null 
         //      if xtype="enumerable" =>xEnumerable = array with enumerable elements
         //    ewnumerable -> null or an array of enumerable elements
-        //first column has a delete button, second a non editable  id then the others       
+        //first column has a delete button, second a non editable  id then the others 
+
+        // http://amiliaapp.github.io/backgrid-select-filter/   - filter
+        //https://bugcode.wordpress.com/2013/09/12/adding-action-function-as-a-listener-of-grid-using-backgrid/   - date
+        //http://www.snip2code.com/Snippet/171272/backgrid-datetimepicker-cell-with-bootst date
+        //http://backgridjs.com/ref/extensions/moment-cell.html - http://momentjs.com/docs/ - date
+        //http://www.pythoneye.com/54_23092624/ image cell type
+        //http://vimeo.com/32765088
+        //http://handsontable.com/demo/backbone.html
         var DeleteCell = Backgrid.Cell.extend({
             template: _.template($("#gridDelButton").html()),
             className: "backgridDelColumn",
@@ -491,20 +499,17 @@ window.utils = {
                // encoding:"" // ISO-8859-1 is the good encoding for Portuguese chars  - "UTF-8" or "utf-8", "latin-1", "windows-1255"
             },
             before: function(file,inputElem) {
-                alert("file name="+file.name);
-                alert("inputElem="+inputElem);
-                var z = 32;
-            },
-            cleanData: function(data){
-                alert("Before Cleaning -->"+JSON.stringify(data.results.fields));
-                var arr = [];
+                // alert("file name="+file.name);
+                // alert("inputElem="+inputElem);
+             },
+            checkData: function(data){//returns true if columns are ok..false otherwise
+                // alert("Before Cleaning -->"+JSON.stringify(data.results.fields));
+                var xRet = true;
                 _.each(data.results.fields,function(element){
-                    if(element !== "")
-                        arr.push(element);
+                    if(element === "")
+                        xRet = false;
                 });
-                data.results.fields = arr;
-                alert("Aftere Cleaning -->"+JSON.stringify(data.results.fields));
-                return data;
+                return xRet;
             },
             complete: function(data) {
                 // data is an object data = {errors:{}, meta:{}, results:{fields:[ elements are fields],rows:[elements are objects]} } 
@@ -526,7 +531,10 @@ window.utils = {
                 //  to get arrOfColumns we need a method similar to  createEntityFromCsvAnalisys(rows)
                 
                 //in some cases data.result.fields has an empty field
-                data = this.cleanData(data);
+                if(!this.checkData(data)){
+                    alert("Csv has a problem. Verify columns that have content but title is missing. Please suply a title or remove content.");
+                    return;
+                }
                 var arrOfColumns =  utils.createAttributesArrFromCsvAnalisys(data.results.rows);//returns all coluns from CSV
                 utils.injectId("id",arrOfColumns); //now the first column is an "id" column 
                 var columnsArr = utils.backGridColumnsFromArray(arrOfColumns);//extracts attributes from dictionary and prepares columns object for backgrid

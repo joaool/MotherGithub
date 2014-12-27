@@ -25,6 +25,7 @@ var FL = FL || {};
 	};
 	FL.API.debug = false;
 	FL.oMenu = oMenu; //why is this necessary ? it is !
+	FL.clearSpaceBelowMenus();
 	// FL.oMenu = null;
 	$(document).ready(function() {
 		console.log("FLMain.js begin inside document.ready");
