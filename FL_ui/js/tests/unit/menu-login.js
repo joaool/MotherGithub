@@ -1,7 +1,7 @@
 $(function () {
   module("menu-login");
 
-  test("XXbasic test & FL.common", function () { //one test can have several assertions
+  test("basic test & FL.common & FL.dd", function () { //one test can have several assertions
     var actual = '1';
     var expected = 1;
     ok( actual == expected,"Validated !!!" ); //bolean expression
@@ -220,6 +220,7 @@ $(function () {
     equal("MenuB/T2-II", $('#3').text(), "menuRefresh() no args ->title 'MenuB/T2-II' is on DOM id=3");
     equal("MenuC/T1", $('#4').text(), "menuRefresh() no args ->title 'MenuC/T1' is on DOM id=4");
     // -----------------------------------------------------------------------
+    /*
     //test internal page loading 
     //  - ALL TESTS REFER TO THE oMenu STRUCTURE - (THE FIRST IN THIS CODE...)
     $('<div id="_placeHolder"></div>').appendTo('#qunit-fixture');//necessary to place FrameLink internal pages
@@ -236,7 +237,7 @@ $(function () {
       stop();
       setTimeout(function(){ok($("#_mission").length !== 0, "the internal page '_mission.html' was loaded");start();},100);
     },100);
-
+    /*
     /*    
     var myMenu1 = new FL.menu({jsonMenu:oMenu,initialMenu:"_home",editable:false});
     // ok( myMenu1.settings.jsonMenu.menu[1].title == "MenuB/T1","Getting menu title 'MenuB/T1' (at root)" );
@@ -602,7 +603,8 @@ $(function () {
     FL.dd.createEntity("sales_rep","employee responsable for sales");
     // FL.dd.addAttribute(xSingular,xAttribute,xDescription,xLabel,xType,xTypeUI,arrEnumerable);
     FL.dd.addAttribute("sales_rep","name","sales_rep's name","Rep Name","string","textbox",null);
-    FL.dd.addAttribute("sales_rep","phone","sales_rep's phone","Rep Phone","string","textbox",null);
+    FL.dd.addAttribute("sales_rep","phone","sales_rep's phone","Rep Phone","number","numberbox",null);
+    FL.dd.addAttribute("sales_rep","eMail","sales_rep's eMail","Rep eMail","string","emailbox",null);
 
     FL.dd.addRelation("client","order","has","N",0,true,"En");//
     FL.dd.addRelation("client","sales_rep","is managed by ","1",0,true,"En");
@@ -664,6 +666,37 @@ $(function () {
     actual = FL.dd.isRelation("client","01");
     ok(actual === false, "FL.dd.isRelation --> relation compressed name '01' does not exist");//37
 
+    //now testing is functions
+    actual = FL.dd.isEntityInLocalDictionary("client");
+    ok(actual === true, "FL.dd.isEntityInLocalDictionary --> entity client exists in local dictionary");//37
+    actual = FL.dd.isEntityInLocalDictionary("clientx");
+    ok(actual === false, "FL.dd.isEntityInLocalDictionary --> entity clientx does not exist in local dictionary");//37
+    actual = FL.dd.isEntityWithTypeUI("sales_rep","emailbox");
+    ok(actual === true, "FL.dd.isEntityWithTypeUI --> in sales_rep exists an email field - typeUI='emailbox'");//37
+    actual = FL.dd.isEntityWithTypeUI("client","emailbox");
+    ok(actual === false, "FL.dd.isEntityWithTypeUI --> in client does not exist an email field - typeUI='emailbox'");//37
+    actual = FL.dd.isEntityWithTypeUI("sales_rep","phonebox");
+    ok(actual === false, "FL.dd.isEntityWithTypeUI --> in sales_rep does not exist a phone field - typeUI='phonebox'");//50
+    FL.dd.setFieldTypeUI("sales_rep","phone","phonebox");
+    actual = FL.dd.isEntityWithTypeUI("sales_rep","phonebox");
+    ok(actual === true, "FL.dd.isEntityWithTypeUI --> Now after FL.dd.setFieldTypeUI sales_rep has a phone field - typeUI='phonebox'");//51
+    
+    console.log("====================================================================================");
+    console.log("histoMailPeer for sales_rep is "+FL.dd.histoMailPeer("sales_rep"));
+    console.log("====================================================================================");
+    actual = FL.dd.isHistoMailPeer("sales_rep");
+    ok(actual === false, "FL.dd.isHistoMailPeer --> sales_rep has no " + FL.dd.histoMailPeer("sales_rep") + " =>'_histoMail_<eCN>' peer table");//52
+
+    FL.dd.createHistoMailPeer("sales_rep");
+    actual = FL.dd.isHistoMailPeer("sales_rep");
+    ok(actual === true, "FL.dd.isHistoMailPeer -->after createHistoMailPeer, sales_rep has " + FL.dd.histoMailPeer("sales_rep") + " =>'_histoMail_<eCN>' peer table !");//53
+
+    FL.dd.removeHistoMailPeer("sales_rep");
+    actual = FL.dd.isHistoMailPeer("sales_rep");
+    ok(actual === false, "FL.dd.isHistoMailPeer -->after removeHistoMailPeer, sales_rep has no " + FL.dd.histoMailPeer("sales_rep") + " =>'_histoMail_<eCN>' peer table !");//53
+
+    //creates peer
+  
     // FL.dd.addRelation("client","01","order","orders","N");//(xSingular,rCN,withEntityName,verb,cardinality,side,storedHere)
     // obj = FL.dd.entities["client"].relations[0];
     // deepEqual( obj, {"rCN":"01","withEntity":"order","verb":"orders","cardinality":"N","semantic":"client orders many orders","side":null,"storedHere":null,"withEntityCN":null},"FL.dd.addRelation --> added relation client to order ");//38
@@ -719,6 +752,7 @@ $(function () {
     FL.server.offline = false;
     var oEntity =  FL.dd.getEntityBySingular("order");
     oEntity.csingular = "61";//we force entity compressed name for test
+
     //we need to force field compressed names for test
 
     // FL.server.connect("Joao","oLiVeIrA",function(err){//TEST loadCsvStoreFromEntity

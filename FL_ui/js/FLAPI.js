@@ -738,13 +738,24 @@
 		//-------- END OF OTHER WRAPPERS ------------------		
 		
 		//-------- Exchage data WRAPPERS ------------------		
-		var _findAll = function(ecn){ //entity compressed name
+		var _findAll = function(ecn,query,projection){ //entity compressed name
 			var def = $.Deferred();
 			var fl = FL.login.token.fl; //new flMain();
 			var fd = new fl.data();
 			// var fl = new flMain();
 			// var fa = FL.login.token.fa;//new fl.app();
-			fd.findAll(ecn, {"query":{}}, function(err, data){
+			var findAllParam={};
+			if(!query)
+				findAllParam.query ={};
+			else
+				findAllParam.query =query;
+			if(projection)
+				findAllParam.projection =projection;
+
+
+			// fd.findAll(ecn, {"query":query}, function(err, data){
+			fd.findAll(ecn, findAllParam, function(err, data){
+			// fd.findAll(ecn, {"query":query,"projection":projection}, function(err, data){
 				console.log("............................._findAll...");
 				// err = "abc";
 				if(err){
@@ -1108,7 +1119,7 @@
 				var def = $.Deferred();
 				var save_Menu_style_fontFamily=_saveMainMenuStyleANDfontFamily();
 				save_Menu_style_fontFamily.done(function(){console.log(">>>>> save_Menu_style_fontFamily SUCCESS <<<<< ");def.resolve();});
-				save_Menu_style_fontFamily.fail(function(err){console.log(">>>>> save_Menu_style_fontFamily FAILURE <<<<<"+err);def.reject();});
+				save_Menu_style_fontFamily.fail(function(err){console.log(">>>>> save_Menu_style_fontFamily FAILURE <<<<<"+err);def.reject(err);});
 				return def.promise();
 			},
 			removeTable: function(entityName) {//remove existing or unexisting table - after this we are sure that table does not exist
@@ -1310,6 +1321,25 @@
 				loadTable.fail(function(err){console.log(">>>>> loadTable FAILURE <<<<<"+err);def.reject(err);});
 				return def.promise();
 			},
+			syncLocalStoreToServer: function(){//saves menu,style and font to server, retrieving them from localStore
+				var def = $.Deferred();
+				var lastMenuStr  = localStorage.storedMenu
+				var lastStyleStr = localStorage.style;// Retrieve last saved style ex.red or spacelab
+				var lastFontFamilyStr = localStorage.fontFamily;// Retrieve last saved fontFamily ex.impact or georgia
+				var oMenu = JSON.parse(lastMenuStr);
+				FL.API.setMenu(oMenu);
+				FL.API.setStyle(lastStyleStr);
+				FL.API.setFontFamily(lastFontFamilyStr);
+				var promise = FL.API.save_Menu_style_fontFamily();
+				promise.done(function(){console.log(">>>>> syncLocalStoreToServer SUCCESS <<<<< ");def.resolve();});
+				promise.fail(function(err){console.log(">>>>> syncLocalStoreToServer FAILURE <<<<<"+err);def.reject(err);});
+			
+				// FL.server.saveMainMenu(oMenu,lastStyleStr,lastFontFamilyStr,function(err){
+				// 	console.log("FL.server syncLocalStoreToServer() -> menu style and font saved on server -->"+err);
+				// 	// alert("FLMenu2.js saveMenuToLocalAndServer called FL.server.saveMainMenu with style="+lastStyleStr+ " font="+lastFontFamilyStr);
+				// });
+				return def.promise();
+			},			
 			createHistoMails_ifNotExisting: function() {//checks if histoMails exist. If not creates it
 				var eCN = FL.dd.getCEntity("_histoMail");
 				// eCN = 23;
@@ -1335,6 +1365,73 @@
 				}
 				return def.promise();
 			},
+			createTableHistoMails_ifNotExisting: function(entityName) {// createHistoMails_ifNotExisting: function(entityName) {//creates "_histoMail_<eCN>" where eCN is the Entity Compressed name of entityName
+				//Note: entityName must exist
+				var def = $.Deferred();
+				if(!FL.dd.isEntityInLocalDictionary(entityName)){
+					alert("createTableHistoMails_ifNotExisting ERROR entity " + entityName + " does not exist in Local Data Dictionary");
+				}else{
+					var histoName = FL.dd.histoMailPeer(entityName);
+					var eCN = FL.dd.getCEntity(histoName);
+					console.log(">>>>>> createTableHistoMails_ifNotExisting for " + entityName + ". Peer table is " + histoName + " with eCN=" + eCN + " for table");
+					if(eCN === null){ // does not exist in local DD we should create it
+						console.log("....................................>beginning createTableHistoMails_ifNotExisting....with token="+JSON.stringify(FL.login.token));
+						// FL.dd.createEntity(histoName,"mails histo peer for initial name="+entityName);//update local dict
+						// FL.dd.addAttribute(histoName,'msg','events log','mail event','string','textbox',null);
+						FL.dd.createHistoMailPeer(entityName);
+						// FL.dd.displayEntities();
+						var synch=FL.API.syncLocalDictionaryToServer(histoName);
+						synch.done(function(){
+							console.log(">>>>>createTableHistoMails_ifNotExisting syncLocalDictionaryToServer SUCCESS <<<<<");
+							def.resolve();
+						});
+						synch.fail(function(err){
+							console.log(">>>>>createTableHistoMails_ifNotExisting syncLocalDictionaryToServer FAILURE <<<<< "+err);
+							def.reject(err);
+						});
+					}else{
+						console.log(">>>>>createTableHistoMails_ifNotExisting _histoMail exists !");
+						def.resolve();//it exists already
+					}
+				}
+				return def.promise();
+			},			
+			mailRecipientsOfTemplate: function(entityName,templateName) {//for list entityName and templateName returns all emails received in Webhook
+				//assumes a login to an application exists
+				console.log("....................................>beginning mailRecipientsOfTemplate....with appToken="+JSON.stringify(FL.login.appToken));
+				var def = $.Deferred();
+				// var eCN = FL.dd.getCEntity(entityName);
+				// var eCN = FL.dd.getCEntity("_histoMail");
+				// var fCN = FL.dd.getFieldCompressedName("_histoMail","msg");//the field to search within eCN
+				
+				var histoName = FL.dd.histoMailPeer(entityName);
+				var eCN = FL.dd.getCEntity(histoName);
+				var fCN = FL.dd.getFieldCompressedName(histoName,"msg");//the field to search within eCN
+
+				var par1 = {};
+				par1[fCN+'.metadata.NName'] = templateName;
+				// par1[fCN+'.sender'] = sender;
+
+				var par2 = {};
+				// par2[fCN+'.sender'] = 1;
+				par2[fCN+'.email'] = 1;
+
+
+				// var mailRecipientsTable=_findAll(eCN,{fCN+'.metadata.NName':templateName},{fCN+'.sender':1});
+				var mailRecipientsTable=_findAll(eCN,par1,par2);
+				//fd.findAll(ecn, {"query":{}}, function(err, data){..})
+				mailRecipientsTable.done(function(data){
+					console.log(">>>>> mailRecipientsTable SUCCESS <<<<< ");
+					recipientsArray = _.map(data,function(element){//extracts emails only
+						var xObj = element.d[fCN];
+						return xObj.email;
+					});
+					def.resolve(recipientsArray);
+				});
+				mailRecipientsTable.fail(function(err){console.log(">>>>> mailRecipientsOfTemplate FAILURE <<<<<"+err);def.reject(err);});
+				return def.promise();
+			},			
+
 			customTable: function(entityProps) {
 				// Ex FL.API.customTable({singular:"shipment"});
 				//uses --> FL.dd.createEntity("sales rep","employee responsable for sales");

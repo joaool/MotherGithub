@@ -301,6 +301,7 @@ FL["common"] = (function(){//name space FL.common
 			form.parsley().validate();
 
             if(makeModalCB){
+                $("#__FLDialog_button1").off('click');
                 $modal.on("click","#__FLDialog_button1", function() {
                     // alert("makeModal - You clicked button1"); 
                     console.log("Button 1 was clicked");
@@ -309,6 +310,7 @@ FL["common"] = (function(){//name space FL.common
                     window.masterDetailItems = null;
                     return makeModalCB(false);
                 });
+                $("#__FLDialog_button2").off('click');
                 $modal.on("click","#__FLDialog_button2", function() {
 /*				
 					$modal.off('hidden.bs.modal');
@@ -417,6 +419,54 @@ FL["common"] = (function(){//name space FL.common
             var re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
             return re.test(email);
         },
+        clearSpaceBelowMenus: function() {
+            $("#_placeHolder").empty();
+            $("#personContent").empty();
+            $("#csvcontent").empty();
+            $("#grid").empty();
+            $("#paginator").empty();
+            $("#addGrid").empty();
+            $("#addGrid").hide();
+            $("#_newsletter").empty();
+            $("#_newsletter").hide();
+            $("#_editGrid").empty();
+            $("#_editGrid").hide();
+        },      
+        buildDiff: function(arrOfObjA,arrOfObjB,pivotKey) {
+            //given two arrays of objects A and B, both containing key pivotKey, returns an array with all the elements 
+            //  existing in A whose pivotKey exists in A and not in B.
+            //example
+            //   A = [{_id:"abc1",name:"jojo",email:"jojo@j.com"},{_id:"abc2",name:"toto",email:"toto@t.com"},{_id:"abc3",name:"zozo",email:"zozo@z.com"}];
+            //   B = [{_id:"abc1"]},{_id:"abc2"}];
+            //   FL.common.buildDiff(A,B,"_id") ->[{_id:"abc3",name:"zozo",email:"zozo@z.com"}]
+            var arrA = _.pluck(arrOfObjA, pivotKey) 
+            var arrB = _.pluck(arrOfObjB, pivotKey) 
+            var diffArr = _.difference(arrA, arrB); //returns the values of A not present in B
+            var outArr = _.map(diffArr,function(element){
+               //scn diffArr and return all arrObjA that match the same _id 
+               index = _.find(arrOfObjA, function(elementOfA){return elementOfA[pivotKey] == element}); 
+               return arrOfObjA[index-1];
+            });
+        },
+        shortEmailName: function(email){
+            var pos = email.indexOf("@");
+            return email.substring(0,pos);
+        },
+        enc:  function(str,incr) {//FL.common.enc("o gato patolinas",1) =>fuzzy => FL.common.enc(fuzzy,-1))=>"o gato patolinas"
+           //'H'.charCodeAt(0) =>72 , String.fromCharCode(72) =H
+           // var encoded =  FL.common.enc('{Patolinas},:',1);
+            // alert("Patolinas >"+encoded+"< - >"+FL.common.enc(encoded,-1)+"<");
+            str = str.replace(/"/g,"'");
+            var encoded = "";
+            for (i=0; i<str.length;i++) {
+                var a = str.charCodeAt(i);//returns a number
+                // var b = a ^ 123;    // bitwise XOR with any number, e.g. 123
+
+                encoded = encoded+String.fromCharCode(a+incr);//add a char to the string 
+            }
+            encoded = encoded.replace(/'/g,'"');
+            return encoded;
+        },   
 		testFunc: function(x) {
 			alert("FL.common.test() -->"+x);
 		}

@@ -459,7 +459,7 @@ mixpanel.init("19ada1cb259cc3272c67085eb1bf03fc");</script><!-- end Mixpanel -->
 				<div class="row">
 					<div class="col-xs-12" >
 						<div class="input-group" style="line-height:0px;">
-							<input type="email" class="form-control" id="getStarted_email" placeholder="Email Address or leave blank" value="<%= masterDetailItems.master.eMail %>" data-parsley-trigger="change" >
+							<input type="email" class="form-control" id="getStarted_email" placeholder="Your Email Address" value="<%= masterDetailItems.master.eMail %>" data-parsley-trigger="change" >
 							<span class="input-group-addon"><span class="glyphicon glyphicon-envelope"></span></span>
 					    </div>
 						<div class="input-group" style="line-height:0px;">
@@ -471,6 +471,28 @@ mixpanel.init("19ada1cb259cc3272c67085eb1bf03fc");</script><!-- end Mixpanel -->
 			</form>
 		</div>
 	</script>
+	<script id="_createGridTemplate" type="text/template"> 
+		<div class="_createGridExample" style="margin-top:0px;">
+			<form id="form__createGridTemplate" novalidate="novalidate">
+			<legend>Please define the title and headers of your grid:</legend>
+				<div class="row">
+					<div class="col-xs-12" >
+						<div class="input-group" style="line-height:0px;">
+							<span class="input-group-addon">Title:</span>
+							<input type="text" class="form-control" id="_createGrid_entityName" placeholder="ex:Client" value="<%= masterDetailItems.master.entityName %>" data-parsley-trigger="change" >
+							<span class="input-group-addon"><span class="glyphicon glyphicon-pencil"></span></span>
+					    </div>
+
+						<div class="input-group" style="line-height:0px;">
+							<span class="input-group-addon">Headers (comma separated):</span>
+							<input type="Headers" class="form-control" id="_createGrid_header" placeholder="Example: name,address,email, phone" value="<%= masterDetailItems.master.headerString %>" data-parsley-trigger="change" >
+							<span class="input-group-addon"><span class="glyphicon glyphicon-header"></span></span>
+					    </div>
+				    </div>
+		    	</div>
+			</form>
+		</div>
+	</script>	
 	<script id="_sendNewsletterTemplate" type="text/template"> 
 		<div class="_sendNewsletterTemplate" style="margin-top:0px;">
 			<form id="form__sendNewsletterTemplate" novalidate="novalidate">

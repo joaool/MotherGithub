@@ -47,6 +47,7 @@
 	<!-- necessary for backgrid  -->
 
 	<script src="FL_ui/js/FLdd2.js"></script>            
+	<script src="FL_ui/js/FLCommon2.js"></script>            
 	<script src="FL_ui/flClient/flClient.js"></script>
 	<script src="FL_ui/flClient/ajaxBrowser.js"></script>
 	<!-- <script src="FL_ui/js/FLServer.js"></script> -->
@@ -56,7 +57,7 @@
 
 
 	<script type="text/javascript" src="FL_ui/js/tinymce.js"></script>
-	<script src="FL_ui/js/FLpage_editor.js"></script>
+	<script src="./pageEditor/FLpage_editor.js"></script>
          
 	<!-- <script src="js/main3.js"></script> -->
 
@@ -65,7 +66,7 @@
 </head>
 <script id="pageEditorTemplate" type="text/template"> 
 	<div class="container">
-		<h2 id='pageTitle'>FrameLink Page Editor</h2>
+		<h2 id='pageTitle'>FrameLinkZ Page Editor</h2>
 		<div class="form-actions">
 			<a href="javascript:exitSaving()" class="btn btn-primary save">Save & Exit</a>
 			<a href="javascript:exitNoSave()" class="btn btn-danger">Exit without saving</a>
@@ -76,7 +77,7 @@
 	</div>
 	<footer class="footer">
 		<div class="container">
-			<p>©2014 FrameLink Co. <a href="http://www.framelink.co/contacts.html" target="">@support</a>.</p>
+			<p>©2015 FrameLink Co. <a href="http://www.framelink.co/contacts.html" target="">@support</a>.</p>
 		</div>
 	</footer>
 </script>
@@ -101,6 +102,7 @@
 	<div id="_placeHolder"></div>
 	<script>
 		// alert("inside page_editor");
+		// var z = 32;
 		function browserDetection() { //tested for 5 browsers (updated versions)
 			var xRet = null;  
 			if (navigator.userAgent.search("MSIE") >= 0 || navigator.userAgent.search(".NET") >= 0 ) {

@@ -1,0 +1,10 @@
+draggableSelectors = [
+	{
+		draggable : "#draggable1,#draggable2",
+		droppable : "#droppable1","#droppable2"
+	},
+	{
+		draggable : ["#draggable3","#draggable4"],
+		droppable : ["#droppable1","#droppable2"]
+	}
+]

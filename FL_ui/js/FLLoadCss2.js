@@ -211,7 +211,8 @@ jQuery(document).ready(function($){
 			var loadAppPromise=FL.API.loadAppDataForSignInUser2();//gets data dictionary + main menu + style + fontFamily + home page
 			loadAppPromise.done(function(menuData,homeHTML){
 				console.log("appSetup ---> homeHTML=" + homeHTML);
-				console.log("appSetup --------------------------------------------->first menu=" + menuData.oMenu.menu[0].title);
+				console.log("appSetup ---> menudata=" + JSON.stringify(menuData));
+				// console.log("appSetup --------------------------------------------->first menu=" + menuData.oMenu.menu[0].title);
 
 				// var loginMenu = FL.menu.createMenu({jsonMenu:menuData.oMenu});//FL.oMenu is a global defined  in FLMain.js
 				$.Topic( 'jsonMenuUpdate' ).publish( menuData.oMenu );//broadcast that will be received by FL.menu to update jsonMenu
@@ -492,10 +493,44 @@ jQuery(document).ready(function($){
 			defaultStyle: "readable",
 			defaultFontFamily: "helvetica",
 			defaultMenu: {
+				// "menu" : [
+				// 	{
+				// 		"title" : "User Administration",//0
+				// 		"uri":"javascript:FL.links.userAdministration()"
+				// 	}
+				// ]
 				"menu" : [
 					{
-						"title" : "User Administration",//0
-						"uri":"javascript:FL.links.userAdministration()"
+						"title" : "Settings",//0
+						"uri":"#",				
+						"menu":[
+							{
+								"title" : "User Administration",//0
+								"uri":"javascript:FL.links.userAdministration()"
+							},
+							{
+								"title" : "Preferences",//0
+								"uri":"#",
+								"menu":[
+									{
+										"title" : "Styles and Fonts",//0
+										"uri":"javascript:FL.links.editStylesAndFonts()"
+									},
+									{
+										"title" : "Home Page",//0
+										"uri":"javascript:FL.links.pageEditor('home')"
+									},
+								]
+							},
+							{
+								"title" : "Newsletter templates",
+								"uri":"javascript:FL.links.newsletterEditor()"
+							},							
+							{
+								"title" : "Create Grid",//0
+								"uri":"javascript:FL.grid.createGrid()"
+							}
+						]
 					}
 				]
 			},
@@ -648,7 +683,7 @@ jQuery(document).ready(function($){
 				var loadAppPromise=FL.API.loadAppDataForSignInUser2();//gets data dictionary + main menu + style + fontFamily + home page
 				loadAppPromise.done(function(menuData,homeHTML){
 					console.log("FL.login.home ---> homeHTML=" + homeHTML);
-					console.log("FL.login.home --------------------------------------------->first menu=" + menuData.oMenu.menu[0].title);				
+					// console.log("FL.login.home --------------------------------------------->first menu=" + menuData.oMenu.menu[0].title);				
 					FL.clearSpaceBelowMenus();
 					FL.domInject("_placeHolder",homeHTML );
 				});	

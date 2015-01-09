@@ -134,7 +134,7 @@ jQuery(document).ready(function($){
 					var csvFile = $('input[type=file]');
 					// alert("2---->"+JSON.stringify(csvFile));
 
-					utils.csvToGrid(csvFile);//csvFile is a JQuery object
+					FL.grid.csvToGrid(csvFile);//csvFile is a JQuery object
 					console.log("------------------------------------>"+fileName);
 				});
 			},

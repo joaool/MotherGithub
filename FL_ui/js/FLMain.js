@@ -18,14 +18,43 @@ var FL = FL || {};
 	var oMenu = {
 		"menu" : [
 			{
-				"title" : "User Administration",//0
-				"uri":"javascript:FL.links.userAdministration()"
+				"title" : "Settings",//0
+				"uri":"#",
+				"menu":[
+					{
+						"title" : "User Administration",//0
+						"uri":"javascript:FL.links.userAdministration()"
+					},
+					{
+						"title" : "Preferences",//0
+						"uri":"#",
+						"menu":[
+							{
+								"title" : "Styles and Fonts",//0
+								"uri":"javascript:FL.links.editStylesAndFonts()"
+							},
+							{
+								"title" : "Home Page",//0
+								"uri":"javascript:FL.links.pageEditor('home')"
+							},					
+							
+						]
+					},
+					{
+						"title" : "Newsletter templates",//0
+						"uri":"javascript:FL.links.newsletterEditor()"
+					},
+					{
+						"title" : "Create Grid",//0
+						"uri":"javascript:FL.grid.createGrid()"
+					}
+				]
 			},
 		]
 	};
-	FL.API.debug = false;
+	FL.API.debug = true;
 	FL.oMenu = oMenu; //why is this necessary ? it is !
-	FL.clearSpaceBelowMenus();
+	FL.common.clearSpaceBelowMenus();
 	// FL.oMenu = null;
 	$(document).ready(function() {
 		console.log("FLMain.js begin inside document.ready");
@@ -56,7 +85,7 @@ var FL = FL || {};
 			panelTopPos: '210px',
 			ajax: true,
 			// ajaxSource: 'FL_ui/sidepanel/fl_services.html'
-			ajaxSource: 'FL_ui/sidepanel/fl_builder2.html'
+			ajaxSource: 'FL_ui/sidepanel/fl_builder.html'
 		});
 		// $('#panel3').slidePanel({
 		// 	triggerName: '#trigger3',

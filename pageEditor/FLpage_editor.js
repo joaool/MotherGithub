@@ -40,6 +40,7 @@ var FL = FL || {};
 	$(document).ready(function() {
 		// alert("inside FLpage_editor");
 		var fullUrl = window.location.href;
+		// alert(fullUrl);
 		if(fullUrl){//gets domain from url string ->http://localhost/pdojo/MotherGithub/test_menu13.html?d=myDomain1#
 		// if(false){//gets domain from url string ->http://localhost/pdojo/MotherGithub/test_menu13.html?d=myDomain1#
 			//ex. http://www.framelink.co/app?d=myDomain1 Nico's definition
@@ -48,11 +49,13 @@ var FL = FL || {};
 			//
 			page = FL.common.getTag(fullUrl,"page","#");//FL.domain is globally defined - the last # is disregarded
 			var connectionString = FL.common.getTag(fullUrl,"connectionString","#");//FL.domain is globally defined - the last # is disregarded
+			// alert("FLpage_editor => before enc connectionString="+connectionString);
+			connectionString = FL.common.enc(connectionString,-1);
+			// alert("FLpage_editor => after enc connectionString="+connectionString);
+
 			var loginObject = JSON.parse(connectionString);
 			var style = FL.common.getTag(fullUrl,"style","#");//FL.domain is globally defined - the last # is disregarded
 			var font = FL.common.getTag(fullUrl,"font","#");//FL.domain is globally defined - the last # is disregarded
-			$("#pageTitle").empty();
-			$("#pageTitle").text("FrameLink - editing " + page +" page");
 			FL.common.setStyleAndFont(style,font);			//Now we will restore the style and font
 
 			console.log("FLpage_editor.js fullUrl="+fullUrl);
@@ -68,20 +71,22 @@ var FL = FL || {};
 				var loadAppPromise=FL.API.loadAppDataForSignInUser2();//gets data dictionary + main menu + style + fontFamily + home page
 				loadAppPromise.done(function(menuData,homeHTML){
 					console.log("appSetup ---> homeHTML=" + homeHTML);
-					console.log("appSetup --------------------------------------------->first menu=" + menuData.oMenu.menu[0].title);
+					// console.log("appSetup --------------------------------------------->first menu=" + menuData.oMenu.menu[0].title);
 					// $('#pageEditorTemplate');
 					var templateHTML = $('#pageEditorTemplate').html();
 					FL.domInject("_placeHolder",templateHTML );
+					//-------- Replace headers
+					$("#pageTitle").empty();
+					$("#pageTitle").text("FrameLink - editing " + page +" page");
+					// --------
 					editPage("home",homeHTML);
-				});	
+				});
 				loadAppPromise.fail(function(err){
 					alert("FLpage_editor ->  --> after successfull connectUserToDefaultApp FAILURE in loadAppDataForSignInUser2 <<<<< error="+err);
-					// return def.reject("FLLoadCss2.js  --> loginAccess appSetup FAILURE in loadAppDataForSignInUser2 <<<<< error="+err);
 				});
 			},function(err){
 				console.log("FLpage_editor -> failure connecting to default app  err="+err);
-				// return def.reject(err);
-			});//true ==>continue false=>repeat	
+			});
 		var editPage = function(pageName,htmlStr){
 			// alert("continueFunction !!!! code to develop here !!! pageName="+pageName);
 			tinymce.init({

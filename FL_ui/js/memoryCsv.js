@@ -38,10 +38,20 @@ window.csvStore = {
         return arrOfEmails
     },    
     store: function( arrToStore ) {//arrToStore is an array of objects [{},{},....{}] where id field is mandatory inside {}
-        var arrOfIds = _.map(arrToStore,function(element){return element.id;});
-        this.csvRows = _.object(arrOfIds,arrToStore); //becomes ->{1:arrToStore[1],2:arrToSAtore[2]....} 
-        // this.csvRows = arrToStore;
-        this.numberOfRows = arrOfIds.length;
+        // var arrOfIds = _.map(arrToStore,function(element){
+        //     return element.id;
+        // });
+        // this.csvRows = _.object(arrOfIds,arrToStore); //becomes ->{1:arrToStore[1],2:arrToSAtore[2]....} 
+        // // this.csvRows = arrToStore;
+        // this.numberOfRows = arrOfIds.length;
+ 
+        this.csvRows = {};
+        _.each(arrToStore,function(element,index){
+            var id = (index+1)+"";//the json key is a string
+            element.id = index+1;//to rename the id sequence - id is anumber
+            this.csvRows[id] = element;
+        },this);//this is necessary to refer to window.csvStore instead of window
+        this.numberOfRows = arrToStore.length;
     },
     addOneEmptyRow:function(){//adds one line to csvRrows with empty fields of this.entityName and _id="-1"
         var nextId = this.getNextId();

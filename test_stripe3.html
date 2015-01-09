@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta http-equiv="Content-type" content="text/html; charset=utf-8" />
+        <title>Stripe2 Sample Form</title>
+ 
+        <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js"></script>
+        <script src="FL_ui/js/bootstrap.min.js"></script>
+        <link href="FL_ui/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
+        <!-- <script type="text/javascript" src="https://js.balancedpayments.com/1.1/balanced.js"></script> -->
+       <!--  // <script type="text/javascript" src="https://js.stripe.com/v2/"></script> -->
+        <script type="text/javascript">
+            $(document).ready(function () {
+
+                // Stripe.setPublishableKey('pk_test_6CAFi1bRUlnFyOnfrRVsbiHS');
+                // Stripe.card.createToken({
+                //   number: '4188190022954197',
+                //   cvc: '067',
+                //   exp_month: 10,
+                //   exp_year: 2015
+
+                //   // number:    '6769380064790714',
+                //   // cvc: '149',
+                //   // exp_month: 11,
+                //   // exp_year: 2018
+                // }, stripeResponseHandler);
+                // function stripeResponseHandler(status, response) {
+                //   var $form = $('#payment-form');
+
+                //   if (response.error) {
+                //     // Show the errors on the form
+                //     // $form.find('.payment-errors').text(response.error.message);
+                //     // $form.find('button').prop('disabled', false);
+                //     alert("Stripe returned an error !!!");
+                //   } else { //ok !!!!
+                //     // response contains id and card, which contains additional card details
+                //     // var token = response.id;
+                //     // Insert the token into the form so it gets submitted to the server
+                //     // $form.append($('<input type="hidden" name="stripeToken" />').val(token));
+                //     // and submit
+                //     // $form.get(0).submit();
+                //     var resp = "status=" + status; //200=>ok others=> problem https://stripe.com/docs/api#errors
+                //     resp = resp +"\ntokenId="+response.id;
+                //     resp = resp +"\nbrand="+response.card.brand;
+                //     resp = resp +"\nfunding="+response.card.funding;
+                //     resp = resp +"\ncountry="+response.card.country;
+                //     resp = resp +"\nlivemode="+response.livemode;
+                //     alert(resp);
+                //   }
+                // };
+            });
+        </script>
+    </head>
+    <body>
+        <div class="container">
+            <form action="" method="POST">
+              <script
+                src="https://checkout.stripe.com/checkout.js" class="stripe-button"
+                data-key="pk_test_6CAFi1bRUlnFyOnfrRVsbiHS"
+                data-amount="2000"
+                data-name="Demo Site"
+                data-description="2 widgets ($20.00)"
+                data-image="/128x128.png">
+              </script>
+            </form>   
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="alert alert-info">
+                        <p>Test stripe Interface</p>
+                 
+                    </div>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>      

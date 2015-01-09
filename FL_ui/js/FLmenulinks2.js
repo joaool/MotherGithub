@@ -69,111 +69,229 @@
 			}
 			return def.promise();
 		};
-		var displayDefaultGrid = function(entityName) {
-			$("#_editGrid").click(function () {
-				FL.common.makeModalInfo("To be implemented soon");
-			});	
-			$("#_newsletter").click(function () {
-				// alert("Newsletter");
-				//FL.login.selectBox({boxId:"#styleSet", boxCurrent:currentStyle, boxArr:stylesForSelection}
-				//var senderObj = {from_name:"jojo",from_email:"support@framelink.co",subject:"test #17 -  from FrameLink support team"};
-				// var templatesForSelection = [
-				// 	{value: 0, text: 'a'},
-				// 	{value: 1, text: 'b'},
-				// 	{value: 2, text: 'c'},
-				// 	{value: 3, text: 'd'},
-				// 	{value: 4, text: 'e'}
-				// ];
-				// FL.login.selectBox({boxId: "_sendNewsletter_templates",boxCurrent: "my template",boxArr: templatesForSelection},function(selected){
-				// 	alert("The value "+selected + " was selected");
-				// });
-				var pos = FL.login.token.userName.indexOf("@");
-				var shortUserName = FL.login.token.userName.substring(0,pos);
-				var masterDetailItems = {
-					master:{toEmail:shortUserName,email:FL.login.token.userName,subject:"",testEmail:FL.login.token.userName},
-					detail:{} //format is array with {attribute:<attribute name>,description:<attr description>,statement;<phrase>}
-				};
-				FL.login.emailContentTemplate = null;
-				var getTemplatesPromise = getMailchimpTemplates();
-				getTemplatesPromise.done(function(arrOfObj){
-					//arrOfObj has the format: {value:index,text:element.title,cId:element.id}
-					// alert("getTemplatesPromise done getTemplates-->"+_.pluck(arrOfObj,"text"));
-
-					var options = {
-						type:"primary", 
-						icon:"send",
-						button1:"Cancel",
-						button2:"Send Newsletter",
-						dropdown:{
-							"_sendNewsletter_template":{
-								arr:arrOfObj,//titles,
-								default:"No template",
-								onSelect:function(objSelected){
-									// console.log("Template choice was "+objSelected.text + " cId=" + objSelected.cId);
-									// alert("displayDefaultGrid objSelected =>"+JSON.stringify(objSelected));
-									//now we will get the html for the selected cId
-									var getMailchimpHTMLPromise = getMailchimpHTML(objSelected.cId);
-									getMailchimpHTMLPromise.done(function(data){
-										// alert("getMailchimpHTMLPromise OK =>"+JSON.stringify(data));
-										FL.login.emailContentTemplate = data;
-										FL.login.emailTemplateName = objSelected.text;
-									});
-									getMailchimpHTMLPromise.fail(function(err){
-										console.log(">>>>>FLmenulinks2.js displayDefaultGrid onSelect inside dropdown FAILURE <<<<<"+err);
-									});
-
-
-								}
-							}
-						}
-					};
-					FL.common.editMasterDetail("B"," Send email/Newsletter","_sendNewsletterTemplate",masterDetailItems,options,function(result){
-						if(result){//user choosed login
-							// FL.links.testEmail();
-							var senderObj = extractSenderObjFromModal();
-							var toArr = csvStore.extractEmailArray();//to arr becomes: [{"email":"e1@live.com"},{"email":"email2@gmail.com"}..]
-							var mailHTML = FL.login.emailContentTemplate;
-							var sentCount = FL.links.sendEmail("zzz",mailHTML,toArr,senderObj,FL.login.emailTemplateName);
-							alert("newsletter " + FL.login.emailTemplateName + " sent  to " + sentCount + " recipients !!! - total rows checked = "+toArr.length);
-
-						}else{
-							alert("newsletter canceled");
-						}
+		var editGrid = function(entityName){
+			// FL.common.makeModalInfo("Edit " + entityName + " x To be implemented soon");
+			$("#_editGrid").empty();
+			$("#_modalDialogB").empty();
+			alert('This is a dummy version to edit ' + entityName + '. It is not yet operational');
+			var singular  = entityName;
+			var description = FL.dd.getEntityBySingular(entityName).description;
+			var attributesArrNoId = csvStore.getAttributesArrNoId();//we retrieve all except name="id"
+			var detailItems = utils.buildMasterDetailStructureFromattributesArr(attributesArrNoId);
+			var masterDetailItems = {
+				master:{entityName:singular,entityDescription:description},
+				detailHeader:["#","Attribute","what is it","Statement to validate"],
+				detail:detailItems //format is array with {attribute:<attribute name>,description:<attr description>,statement;<phrase>}
+			};
+			FL.common.editMasterDetail("B"," Define Table Dictionary","_dictEditEntityTemplate",masterDetailItems,{type:"primary", icon:"pencil",button1:"Cancel",button2:"Confirm Table Dictionary"},function(result){
+				if(result){
+					//We update name and description in csvStore.attributesArr and then use it to create dictionary fields. 
+					var attributesArrNoId = csvStore.getAttributesArrNoId();//we retrieve all except name="id"
+					_.each(attributesArrNoId, function(element,index){
+						element["name"] = masterDetailItems.detail[index].attribute;
+						element["description"] = masterDetailItems.detail[index].description;
 					});
-					return;
-				});
-				getTemplatesPromise.fail(function(err){
-					console.log(">>>>>FLmenulinks2.js displayDefaultGrid  FAILURE <<<<<"+err);
+					var singular = masterDetailItems.master.entityName;
+					var description = masterDetailItems.master.entityDescription;
+							// if(FL.dd.createEntityAndFields(singular, description,csvStore.attributesArr)){
+							// 	var oEntity =  FL.dd.getEntityBySingular(singular);
+							// 	var plural = oEntity.plural;
+							// 	// alert(" singular="+singular+" plural="+plural);
+							// 	// var cEntity = FL.dd.getCEntity(masterDetailItems.master.entityName);
+							// 	//now we sync the dictionary for the new entity put grid data ond server and create menu option
+							// 		// FL.server.insertCsvStoreDataTo(singular,function(err){
+							// 		// 	if(err){
+							// 		// 		console.log("Data from entity "+singular+" Error trying to store on server error="+err);
+							// 		// 		return;
+							// 		// 	}
+							// 		// 	FL.clearSpaceBelowMenus();
+							// 		// 	$.Topic( 'createGridOption' ).publish( plural,singular );//broadcast that will be received by FL.menu to add an option
+							// 		// 	FL.dd.displayEntities();
+							// 		// });
+							// 	FL.grid.insertDefaultGridMenu(singular,plural);
+							// }else{
+							// 	// alert("FLSlidePanels Error trying to create existing entity "+singular);
+							// 	FL.common.makeModalConfirm("Entity " + singular + " exists. Do you want to overwrite it ?","Yes - overwrite " + singular + "!","No",function(result){
+							// 		if(result){
+							// 			FL.common.makeModalInfo("Nothing was done"); 
+							// 		}else{
+							// 			alert("is going to overwrite");
+							// 			// FL.grid.insertDefaultGridMenu(singular,plural);
+							// 		}
+							// 	});
+							// }
+				}else{
+					FL.common.makeModalInfo("Nothing was saved.");
+				}
+			});//OK				
+		};
+		var checkDuplicateEmission = function(entityName,NName,recipientsArr,senderObj){
+			// Assumes that NNAme is not null
+			// This method manages the users dialogs for the following cases:
+			//		First time emission - the newsletter was not sent before ->sends  to missingEmails = the whole list (recipientsArr)
+			//		Remission to all recipients - The same newsletter was sent previously - DANGEROUS !!!!
+			//         missing are null in this case ->
+			//		Emission to new recipients that were introduced in the base table, after the last emission - sends to the missingEmails			var promise = FL.API.mailRecipientsOfTemplate(entityName,NName);
+			promise = FL.API.mailRecipientsOfTemplate(entityName,NName);
+			promise.done(function(sent){
+				var toSend =  _.pluck(recipientsArr, "email");
+				console.log("==========================================");
+				console.log("toSend->"+JSON.stringify(toSend));
+				var missingEmails = _.difference(toSend, sent); //if sent = null =>missing = toSend
+
+				// missingEmails = [];//TEST CASE 2 - REEMISSION
+				// missingEmails.splice(0,2);//TEST CASE 3 - NEW ADDITIONS - remove position 0 and 1
+	
+				console.log("Emais to sent->"+JSON.stringify(missingEmails));
+				// alert("missingEmails->"+JSON.stringify(missingEmails));
+				var confirmQuestion = null;
+				var button2 = null;
+				if(missingEmails.length == toSend.length){
+					confirmQuestion = "No risk of duplicates. It is the first emission of template " + NName + ". Do you want to send these " + toSend.length + " emails ?";
+					button2 = "OK execute first emission";
+				}else{
+					var missingHTML = "";
+					_.each(missingEmails,function(element){
+						missingHTML += "<li>" + element + "</li>";
+					});
+					confirmQuestion = NName + " was sent previously, but " + missingEmails.length + " new recipient(s) were added to the send list.<br>Do you want to send only to the new recipient(s) ?<br>"+missingHTML;
+					button2 = "OK send to " + missingEmails.length + " new email(s)";
+					if(missingEmails.length ==0){
+						confirmQuestion = "This emission of " + NName + " was done previously to the same recipients !!! Do you really want to repeat it ?";
+						button2 = "OK resend these emails";
+					}
+				}
+				FL.common.makeModalConfirm(confirmQuestion,"No, cancel the emission",button2, function(result){
+					if(result){
+						var mailHTML = FL.login.emailContentTemplate;
+						// mailHTML = null; //to TEST ONLY
+						var msg = "Newsletter " + FL.login.emailTemplateName + " was not sent !!!. No content to send.";
+						if(mailHTML!== null){
+							if(  button2 == "OK resend these emails") {
+								missingEmails = toSend; //missingEmails now refers to toSend
+								// alert("Resend the emission ->"+JSON.stringify(missingEmails));
+							}
+							var sentCount = FL.links.sendEmail(entityName,mailHTML,missingEmails,senderObj,FL.login.emailTemplateName);
+							// var sentCount = missingEmails.length;
+							msg = "Newsletter " + FL.login.emailTemplateName + " sent  to " + sentCount + " recipients !!!<br> - total rows checked = "+recipientsArr.length;
+						}	
+						FL.common.makeModalInfo(msg);
+					}else{
+						FL.common.makeModalInfo("Canceled !!! you can always send these emails later...");
+					}
 				});
 			});
-			var promise=FL.API.loadTable(entityName);
-			promise.done(function(data){
-				console.log("New %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
-				csvStore.setEntityName(entityName);//stores <entityName> in csvStore object 
-				csvStore.store(data);//data is an array of objects [{},{},....{}] where id field is mandatory inside {}
-				var z=csvStore.csvRows;//only for debugging
-				// alert("New displayDefaultGrid -->import is done");
-				console.log("New displayDefaultGrid -->import is done");
-				console.log("show csvStore="+JSON.stringify(csvStore.csvRows));
+			promise.fail(function(){
+				alert("checkDuplicateEmission ->ERROR !!!");
+			});
+		};
+		var prepareNewsletterEmission = function(entityName){
+			//collects all data to send a newsletter to the current grid. Including the template to use.
+			FL.login.emailTemplateName = null;//cleans any previous template name
+			var pos = FL.login.token.userName.indexOf("@");
+			var shortUserName = FL.login.token.userName.substring(0,pos);
+			var masterDetailItems = {
+				master:{toEmail:shortUserName,email:FL.login.token.userName,subject:"",testEmail:FL.login.token.userName},
+				detail:{} //no detail
+			};
+			// prepares FL.common.editMasterDetail options (including the templates dropdown)
+			FL.login.emailContentTemplate = null;
+			var getTemplatesPromise = getMailchimpTemplates();
+			getTemplatesPromise.done(function(arrOfObj){ //arrOfObj has the format: {value:index,text:element.title,cId:element.id}
+				// alert("getTemplatesPromise done getTemplates-->"+_.pluck(arrOfObj,"text"));
+				var options = {
+					type:"primary", 
+					icon:"send",
+					button1:"Cancel",
+					button2:"Send Newsletter",
+					dropdown:{
+						"_sendNewsletter_template":{
+							arr:arrOfObj,//titles,
+							default:"No template",
+							onSelect:function(objSelected){// console.log("Template choice was "+objSelected.text + " cId=" + objSelected.cId);
+								//now we will get the html for the selected cId saving it in FL.login.emailContentTemplate for future consummation
+								var getMailchimpHTMLPromise = getMailchimpHTML(objSelected.cId);
+								getMailchimpHTMLPromise.done(function(data){
+									// alert("getMailchimpHTMLPromise OK =>"+JSON.stringify(data));
+									FL.login.emailContentTemplate = data;
+									FL.login.emailTemplateName = objSelected.text;
+								});
+								getMailchimpHTMLPromise.fail(function(err){
+									console.log(">>>>>FLmenulinks2.js prepareNewsletterEmission onSelect inside dropdown FAILURE <<<<<"+err);
+								});
+							}
+						}
+					}
+				};
+				FL.common.editMasterDetail("B"," Send email/Newsletter","_sendNewsletterTemplate",masterDetailItems,options,function(result){
+					if(result){//user choosed button2 ==>Send Newsletter button
+						// FL.links.testEmail();
+						var senderObj = extractSenderObjFromModal();//var senderObj = {from_name:name,from_email:email,subject:subject,testEmail:testEmail};
+						var toArr = csvStore.extractEmailArray();//to arr becomes: [{"email":"e1@live.com"},{"email":"email2@gmail.com"}..]
+						var mailHTML = FL.login.emailContentTemplate;
+						// alert("before calling checkDuplicate ->"+FL.login.emailTemplateName);
+						if(FL.login.emailTemplateName !== null)
+							checkDuplicateEmission(entityName,FL.login.emailTemplateName,toArr,senderObj);
+						else
+							FL.common.makeModalInfo("Canceled !!! No template selected.");
+					}else{
+						// alert("newsletter canceled");
+						FL.common.makeModalInfo("Canceled !!! you can always send these emails later...");
+					}
+				});
+				return;
+			});
+			getTemplatesPromise.fail(function(err){
+				console.log(">>>>>FLmenulinks2.js prepareNewsletterEmission  FAILURE <<<<<"+err);
+			});
+		};
+		var set3ButtonsAndGrid = function(entityName){//displays addGrid, newletter and editGrid buttons (with clicks prepared) and display grid
+			$('#_editGrid').off('click');
+			$("#_editGrid").click(function(){
+				editGrid(entityName);
+			});
+			$('#_newsletter').off('click');
+			$("#_newsletter").click(function(){
+				prepareNewsletterEmission(entityName);
+			});
+			FL.clearSpaceBelowMenus();
+			$("#addGrid").show();
+			$("#addGrid").html(" Add Row");
+			$("#_newsletter").show();
+			$("#_newsletter").html(" Newsletter");
+			$("#_editGrid").show();
+			// $("#_editGrid").html(" Edit Grid");
+			FL.grid.displayDefaultGrid(entityName);
+		};
+		var DefaultGridWithNewsLetterAndEditButtons = function(entityName) {
+			//A)shows add button, newsletter and grid edit buttons if an email field exist in entityName
+			//  	checks if _histoMail_<ecn(entityName)> exists. If not creates it.
+			//B)shows add button and grid edit buttons if no email field exist in entityName
+					
+			// FL.dd.setFieldTypeUI(entityName,"email","phonebox");//only for test
+			// FL.dd.displayEntities();
+
+			if(FL.dd.isEntityWithTypeUI(entityName,"emailbox")){//the newsletter option only appears to entities that have an email
+				if(FL.dd.isHistoMailPeer(entityName)){
+					set3ButtonsAndGrid(entityName);//displays addGrid, newletter and editGrid buttons (with clicks prepared) and displays grid
+				}else{
+					// alert("_histoMail for "+entityName+" does not exist! we need to create it");
+					promise = FL.API.createTableHistoMails_ifNotExisting(entityName)
+					.then(function(){
+						// this.setSync(FL.dd.histoMailPeer(entityName),true);
+						set3ButtonsAndGrid(entityName);
+						return;}
+						,function(err){alert("FL.links.DefaultGridWithNewsLetterAndEditButtons ERROR: cannot create histoMail peer for " + entityName + " - "+err); return;});
+					// set3ButtonsAndGrid(entityName);//displays addGrid, newletter and editGrid buttons (with clicks prepared) and displays grid
+				}
+			}else{//no newsletter button because entity has no email field
 				FL.clearSpaceBelowMenus();
 				$("#addGrid").show();
 				$("#addGrid").html(" Add Row");
-				$("#_newsletter").show();
-				$("#_newsletter").html(" Newsletter");
 				$("#_editGrid").show();
-				$("#_editGrid").html(" Edit Grid");
-
-				var columnsArr = utils.backGridColumnsExtractedFromDictionary(entityName);//extracts attributes from dictionary and prepares columns object for backgrid
-				console.log("New &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&& entity="+entityName);
-				console.log("show columnsArr="+JSON.stringify(columnsArr));
-
-				utils.mountGridInCsvStore(columnsArr);//mount backbone views and operates grid -
-			});
-			promise.fail(function(err){
-				alert("displayDefaultGrid Error="+err);
-			});
-
-
+				// $("#_editGrid").html(" Edit Grid");
+				FL.grid.displayDefaultGrid(entityName);
+			}
 		};
 		return{
 			abc: "abc",
@@ -181,50 +299,73 @@
 				internalTest(x);
 				alert("Fl.link.test(x) x="+x);
 			},
-			pageEditor: function(xPage) {//call with menu key "uri": "javascript:FL.links.test('JOJO')"
-				// var connectionString = localStorage.connection;
+			pageEditor: function(xPage) {//call with menu key "uri": "javascript:FL.links.pageEditor('home')"
 				var connectionString = localStorage.login;// Retrieve format {email:x1,password:x3,domain:x4};
 				if(connectionString.length === 0){
 					alert("Fl.link.pageEditor PLEASE CONNECT TO THE DATABASE ");
 					return;
 				}
-				// alert("Fl.link.pageEditor call with:\npage=" + xPage + "\nconnectionString="+connectionString);
+				connectionString = FL.common.enc(connectionString,1);
 				var style = localStorage.style;
 				var font = localStorage.fontFamily;
 				var child = window.open("./page_editor.html?connectionString="+connectionString+"#page=" + xPage + "#style=" + style + "#font="+font, 'theWindow');
+				// var child = window.open("./page_editor.html?connectionString="+connectionString+"#page=" + xPage + "#style=" + style + "#font="+font, "_blank");
 				if (window.focus) {
 					child.focus();
-				}				
+				}
 				var timer = setInterval(checkChild, 500);
 				function checkChild() {
-					if (child.closed) {
+					if (child.closed) {// we need this to show the new home page
 						// alert("FrameLink Page Editor was closed \nconnectionString="+connectionString);
 						clearInterval(timer);
 						FL.login.home();
 					}else{
 						// child.focus();
 					}
-				};
-				// document.getElementById('TheForm').submit();
-
-				// alert("this an alert after calling PageEditor");
+				}
 			},
-			setDefaultGrid: function(entityName) {//call with menu key "uri": "javascript:FL.links.setDefaultGrid('JOJO')"
-				FL.API.debug = true;
-				if(!FL.server.offline){
-					if(FL.dd.isEntityInLocalDictionary(entityName)){
-						displayDefaultGrid(entityName);
-					}else{//entity is not in local dictionary =>we force syncLocalDictionary
-						//TEMPORARY local dictionary adjust to force pair in local dictionary
-						
-						FL.server.syncLocalDictionary(function(){
-							console.log("F.links.setDefaultGrid CB from  SYNC IS DONE !!!!!!!!!!!!!!!!!!!!!!");
-							FL.dd.displayEntities();
-							displayDefaultGrid(entityName);
-						});
+			newsletterEditor: function() {//call with menu key "uri": "javascript:FL.links.pageEditor('home')"
+				var connectionString = localStorage.login;// Retrieve format {email:x1,password:x3,domain:x4};
+				if(connectionString.length === 0){
+					alert("Fl.link.newsletterEditor PLEASE CONNECT TO THE DATABASE ");
+					return;
+				}
+				connectionString = FL.common.enc(connectionString,1);
+				var child = window.open("./newsletter_editor.html?connectionString="+connectionString+"#", 'theWindow');
+				// var child = window.open("./page_editor.html?connectionString="+connectionString+"#page=" + xPage + "#style=" + style + "#font="+font, "_blank");
+				if (window.focus) {
+					child.focus();
+				}
+				var timer = setInterval(checkChild, 500);
+				function checkChild() {
+					if (child.closed) {// we need this to show the new home page
+						// alert("FrameLink Page Editor was closed \nconnectionString="+connectionString);
+						clearInterval(timer);
+						FL.login.home();
+					}else{
+						// child.focus();
 					}
-				}else{
-					alert("FL.links.setDefaultGrid - cannot display grid " + entityName + " because FrameLink is offline.");
+				}
+			},			
+			setDefaultGrid: function(entityName) {//called with menu key "uri": "javascript:FL.links.setDefaultGrid('JOJO')"
+				// alert("setDefaultGrid"+entityName);
+				entityName = entityName.replace(/_/g," ");//if entityName as a space like "test contacts" it will be saved in menu as "test_contact"
+				FL.API.debug = true;
+				if(FL.dd.isEntityInLocalDictionary(entityName)){
+					if(FL.dd.isEntityInSync(entityName) ){//entityName exists in local dictionary and is in sync
+						DefaultGridWithNewsLetterAndEditButtons(entityName);
+					}else{//entityName exists but is not in sync - we force synchronization
+						alert("FL.links.setDefaultGrid - " + entityName + " not in sync we will syncronize local to backend.");
+						FL.API.syncLocalDictionaryToServer(entityName)
+							.then(function(){DefaultGridWithNewsLetterAndEditButtons(entityName);return;}
+								,function(err){alert("FL.links.setDefaultGrid ERROR: cannot sync " + entityName + " to server!"); return;});
+					}
+				}else{//entity is not in local dictionary =>we force an update of local dictionary with server dictionary data
+					FL.API.syncLocalDictionary()
+						.then(function(){DefaultGridWithNewsLetterAndEditButtons(entityName);return;}
+							,function(err){alert("FL.links.setDefaultGrid ERROR: cannot read back end Dictionary !"); return;});
+
+					// alert("FL.links.setDefaultGrid - cannot display grid. Entity " + entityName + " does not exist in Data Dictionary.");
 				}
 			},
 			clearDictionary: function() {
@@ -260,6 +401,9 @@
 				// 	}
 				// });
 			},
+			editStylesAndFonts: function() {//call with menu key "uri": "javascript:FL.links.setDefaultGrid('JOJO')"
+				FL.common.makeModalInfo("Edit styles and fonts to be implemented here. Meanwhile use the cog slide at left");
+			},			
 			resetMenus: function() {//saves factory default menu in current user"
 				// var lastMenuStr  = localStorage.storedMenu
 				var oMenu = {
@@ -274,9 +418,9 @@
 				FL.server.syncLocalStoreToServer();
 				FL.menu.topicUpdateJsonMenu(oMenu);
 			},
-			sendEmail:function(entityName,mailHTML,recipientsArrayOfObj,senderObj,NewsletterName){//sends an email to the recipients
-				//recipientsArrayOfObj = [{"email":"joaoccoliveira@live.com"},{"email":"joaocarloscoliveira@gmail.com"}]
-				//returns the total number of emails sent. Notice that from the recipientsArrayOfObj the methods will skip all those that do not have a valid email
+			sendEmail:function(entityName,mailHTML,recipientsArray,senderObj,NewsletterName){//sends an email to the recipients
+				//recipientsArray = ["joaoccoliveira@live.com","joaocarloscoliveira@gmail.com"]
+				//returns the total number of emails sent. Notice that from the recipientsArray the methods will skip all those that do not have a valid email
 				if(mailHTML ==="" || mailHTML === null){
 					alert("Send Mail ->Cannot send an empty email !");
 					return 0;
@@ -285,28 +429,30 @@
 					alert("Send Mail ->Do document identifier (Newslettername) !");
 					return 0;
 				}
-				var eCN = FL.dd.getCEntity("_histoMail");//necessary for metadata. Later on we need this for each table (that has an email field) in framelink
-				var fCN = FL.dd.getFieldCompressedName("_histoMail","msg");//necessary for metadata
+				// var eCN = FL.dd.getCEntity("_histoMail");//necessary for metadata. Later on we need this for each table (that has an email field) in framelink
+				// var fCN = FL.dd.getFieldCompressedName("_histoMail","msg");//necessary for metadata
+				var eCN = null;
+				var fCN = null;
+				if(entityName !== null){//if the send request comes from sendEmailTest entityName = null
+					eCN = FL.dd.getCEntity(FL.dd.histoMailPeer(entityName));
+					fCN = FL.dd.getFieldCompressedName(FL.dd.histoMailPeer(entityName),"msg");//necessary for metadata
+				}
 				var dbName = FL.login.token.dbName;//necessary for metadata		
 				var m = new mandrill.Mandrill('vVC6R5SZJEHq2hjEZfUwRg');
 				var toEmail = null;
 				var count = 0;
 				var countSend = 0;
-				var total_toSend = recipientsArrayOfObj.length;
-				_.each(recipientsArrayOfObj, function(element){
+				var total_toSend = recipientsArray.length;
+				_.each(recipientsArray, function(element){
 					count++;
-					if(FL.common.validateEmail(element.email)){
+					if(FL.common.validateEmail(element)){
 						countSend++;
-						console.log("sendEmail() "+ count +"/"+total_toSend+ " --> sent Count=" + countSend + " -->" + element.email + " with label=" +NewsletterName);
-						console.log("	to from_name:"+senderObj.from_name+" email:"+senderObj.from_email+" subject:"+senderObj.subject);
-						console.log("	Sends to -->"+JSON.stringify(element.email));
-						console.log("----------------------------------------------------------------------");
 
 						var params2 = {
 							"message": {
 								"from_email": senderObj.from_email,
 								"from_name" : senderObj.from_name,
-								"to":[element],//[{"email":"joaoccoliveira@live.com"}],//{"email":"joaocarloscoliveira@gmail.com"},{"email":"nicolas@cuvillier.net"}],
+								"to":[{email:element}],//[{"email":"joaoccoliveira@live.com"}],//{"email":"joaocarloscoliveira@gmail.com"},{"email":"nicolas@cuvillier.net"}],
 								// "to":[{"email":"joaoccoliveira@live.com"}],
 								// "to":[{"email":"joaocarloscoliveira@gmail.com"}],
 								"subject": senderObj.subject,
@@ -322,10 +468,14 @@
 								}				
 							}
 						};
-						m.messages.send(params2,function(res){console.log(res);},function(err){console.log(err);});
+						console.log("sendEmail() "+ count +"/"+total_toSend+ " --> sent Count=" + countSend + " -->" + element + " with label=" +NewsletterName);
+						console.log("	to from_name:"+senderObj.from_name+" email:"+senderObj.from_email+" subject:"+senderObj.subject);
+						console.log("	Sends to -->"+JSON.stringify(element));
+						console.log("----------------------------------------------------------------------");
+					m.messages.send(params2,function(res){console.log(res);},function(err){console.log(err);});
 						//how to recover from an accident ?	
 					}else{
-						console.log("sendEmail not sent ! "+ count +"/"+total_toSend+ " -->" + element.email + " has a format error and was bypassed");				
+						console.log("sendEmail not sent ! "+ count +"/"+total_toSend+ " -->" + element + " has a format error and was bypassed");				
 					}
 				});
 				return countSend;		
@@ -333,22 +483,16 @@
 			sendEmailTest: function() {//sends a sample email with eMail/newsletter
 				if(FL.login.emailContentTemplate){
 					// var mailHTML = '<p>Thank you for selecting <a href="http://www.framelink.co"><strong>FrameLink version 8</strong></a> to build your backend site !</p>';			
-					var mailHTML = FL.login.emailContentTemplate;
-					
-					// var name = $("#_sendNewsletter_name").val();
-					// var email = $("#_sendNewsletter_email").val();
-					// var subject = $("#_sendNewsletter_subject").val();
-					// var testEmail =  $("#_sendNewsletter_testEmail").val();
-					// var senderObj = {from_name:name,from_email:email,subject:subject};
-
+					var mailHTML = FL.login.emailContentTemplate;			
 					var senderObj = extractSenderObjFromModal();
 					// var toArr = [{"email":testEmail}];
-					var toArr = [{"email":senderObj.testEmail}];
+					var toArr = [senderObj.testEmail];
 					console.log("Sends test email to from_name:"+senderObj.from_name+" email:"+senderObj.from_email+" subject:"+senderObj.subject);
 					console.log("Sends to -->"+JSON.stringify(toArr));
 					console.log("Sends HTML -->"+mailHTML);
 					console.log("----------------------------------------------------------------------");
-					FL.links.sendEmail("zzz",mailHTML,toArr,senderObj,"test");
+					FL.links.sendEmail(null,mailHTML,toArr,senderObj,"test");
+					alert("Email test sent to "+senderObj.testEmail);
 				}else{
 					alert("Email content is empty - choose a template and try again ");
 				}

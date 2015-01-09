@@ -796,7 +796,9 @@ FL["menu"] = (function(){//name space FL.menu
 		this.jsonMenu.menu.push(newMenuItem);
 		this.menuRefresh();
 		localStorage.storedMenu  = JSON.stringify(this.jsonMenu);
-		FL.server.syncLocalStoreToServer();
+		FL.API.syncLocalStoreToServer()
+			.then(function(){return;},function(err){alert("FLMenu2.js createMenuEntryLastTop"); return;});
+		// FL.server.syncLocalStoreToServer();
 	};
 	return{
 		menuArray: null,
@@ -833,6 +835,10 @@ FL["menu"] = (function(){//name space FL.menu
 		},
 		topicUpdateJsonMenu: function(jsonMenu) {//this method is used to subscribe topics on createMenu
 			console.log("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% FLMenu2.js topicUpdateJsonMenu was called");
+			if(_.isEmpty(jsonMenu)){
+				console.log("menu is empty");
+				jsonMenu = FL.login.defaultMenu;
+			}
 			FL.menu.currentMenuObj.updateJsonMenu(jsonMenu);
 		},
 		topicCreateDatabaseAcess: function(optionTitle) {//this method is used to subscribe topics on createMenu

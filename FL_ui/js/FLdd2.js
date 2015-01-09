@@ -38,20 +38,20 @@
 			//				- when sync = true - csingular and all attributes fieldCN are correct
 			//  lastId - number of attributes of entity <singular>
 			//
-			//each attribute (i) is in dDictionary.entities[<sEentity>].arributes[i]
+			//each attribute (i) is in dDictionary.entities[<sEentity>].attributes[i]
 			//     with the format 
-			//		{name:"address",description:"address to send invoices",label:"Address",type:"string",enumerable:null,key:false});
+			//		{name:"address",description:"address to send invoices",label:"Address",type:"string",typeUI:"textbox",enumerable:null,key:false});
 			//
 			//			name -  is the human (logical) attribute name or field name
 			//			description - description of attribute (answer to: "what the <name > of a <entity.singular> ?")
 			//			label - defaul value that will appear in UI labeling the attribute
-			//	OLD>>	type - one of: "string","string:email","string:url"... (others) ,"number","integer","boolean","date","weak" (a json object)
+			//	OLD>>	type - one of: "string","number","integer","boolean","date","weak" (a json object)
 			//			type - string, integer, number, boolean, date, or json (Nico's field "M")
 			//				NOTE: if type is "enumerable", the key enumerable must have an array of enumerables
 			//				NOTE: type "enumerable" is invalid for server. "enumerable" will be send as type="string" to server
 			//			enumerable - an array of enumerables or null (if key type != "enumerable")
 			//			typeUI -type of widget that is used with the field (Nico's field "9")
-			//				textbox, numberbox, textarea, checkbox, datetextbox, combobox, picture
+			//				textbox, numberbox, textarea, checkbox, datetextbox, combobox, picture, emailbox, phonebox, urlbox
 			//			key - boolean. True means the attribute is the  key field of the entity . (only one allowed)
 			//			
 			//          NOTE: to access the field compressed name use L2C() at entity level.
@@ -826,18 +826,96 @@
 				var oEntity = this.entities[xSingular];
 				return oEntity;
 			},
-			isEntityInLocalDictionary: function(entityName) {//returns not null if entityName exists in local dictionary
+			isEntityInLocalDictionary: function(entityName) {//returns true if entityName exists in local dictionary
 				var exists = false;
 				if(this.getEntityBySingular(entityName))//if getEntityBySingular is not null =>exists = true
 					exists = true;
 				return exists;
 			},
+			histoMailPeer: function(entityName){
+				var eCN = this.getCEntity(entityName);
+				return histoName = "_histoMail_" + eCN;
+			},
+			isHistoMailPeer: function(entityName) {//returns true if _histoMail_<ecn(entityName)> exists in local dictionary
+				var exists = false;
+				if(this.isEntityInLocalDictionary( this.histoMailPeer( entityName ) ) ){
+					exists = true;
+				}
+				return exists;
+			},			
+			isEntityWithTypeUI: function(entityName,typeUI) {//returns true if entityName has an Email field 
+				var exists = false;
+				var oEntity = this.entities[entityName];
+				if(oEntity){//searches for the first Email field
+					var el = _.find(oEntity.attributes, function(element){
+						return element.typeUI == typeUI;
+					});
+					if(el){
+						return true;
+					}else{
+						return false;
+					}
+				}else{
+					alert("FL.dd.isEntityWithTypeUI Error: "+entityName+" does not exist ! ");
+					return false;
+				}
+			},
+			isEntityInSync: function(entityName) {//returns true if entityName has in sync status = true
+				var exists = false;
+				var oEntity = this.entities[entityName];
+				if(oEntity){
+					return oEntity.sync;
+				}else{
+					alert("FL.dd.isEntityInSync Error: "+entityName+" does not exist ! ");
+					return false;
+				}
+			},		
 			setSync: function(xSingular,bStatus) {//set sync = true for entity= xSingular - nothing is done if entity does not exist
 				var oEntity = this.entities[xSingular];
 				if(oEntity){
 					oEntity.sync = bStatus;
 				}
 			},
+			setFieldTypeUI: function(xSingular,fieldName,newTypeUI) {//sets typeUI = newTypeUI for field = fieldName in entity xSingular
+				var oEntity = this.entities[xSingular];
+				if(oEntity){
+					var el = _.find(oEntity.attributes, function(element){
+						return element.name == fieldName;
+					});
+					if(el){
+						el.typeUI = newTypeUI;
+						return true;
+					}else{
+						alert("FL.dd.setFieldTypeUI Error: field " + fieldName + " does not exist in entity " + xSingular );
+						return false;
+					}
+				}else{
+					alert("FL.dd.setFieldTypeUI Error: "+xSingular+" does not exist ! ");
+					return false;
+				}
+			},
+			createHistoMailPeer: function(entityName){//create histoMail peer in local dict
+				var fName = this.histoMailPeer(entityName);
+				if(!this.isEntityInLocalDictionary(fName)){
+					this.createEntity(fName,"histoMail peer for initial name="+entityName);
+					//		{name:"address",description:"address to send invoices",label:"Address",type:"string",typeUI:"textbox",enumerable:null,key:false});
+					this.addAttribute(fName,"msg",'events log','mail event','string','textbox',null);
+					this.setSync(fName,false);
+					return true;
+				}else{
+					alert("FL.dd.createHistoMailPeer Error: " + fName + ", the histomail peer for "+entityName+" exists already! ");
+					return false;
+				}
+			},
+			removeHistoMailPeer: function(entityName){//remove histoMail peer in local dict
+				var fName = this.histoMailPeer(entityName);
+				if(this.isEntityInLocalDictionary(fName)){
+					this.removeEntity(fName);
+				}else{
+					alert("FL.dd.removeHistoMailPeer Error: " + fName + ", the histomail peer for "+entityName+" does not exist! ");
+					return false;
+				}
+			},				
 			setFieldCompressedName: function(xSingular,fieldName,fieldCN) {//for entity xSingular and attribute fieldName sets compressed name
 				var oEntity = this.entities[xSingular];
 				if(oEntity){
@@ -953,7 +1031,7 @@
 					});
 				}
 			},
-			removeEntity: function(xSingular) {//removes  entity xSingular
+			removeEntity: function(xSingular) {//removes  entity xSingular in local dictionary
 				//In order to remove an entity we begin by removing the relations of every direct relation of xSingular	and also the inverse relations
 				//		that other entities ,may have with xSingular
 				//	format of each array element:
