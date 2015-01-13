@@ -142,6 +142,11 @@ jQuery(document).ready(function($){
 				lastMenuObject = JSON.parse(lastMenuStr);
 			if(lastMenuObject) {
 				// alert("FL.signIn()  -> Read menu with:\n"+JSON.stringify(lastMenuObject.menu));
+
+				if(lastMenuObject.menu[0].title =="Users" || lastMenuObject.menu[0].title =="Settings" ) //temporarly to correct those that have the old users menu
+					lastMenuObject.menu[0] = FL.login.defaultMenu.menu[0];
+				
+
 				$.Topic( 'jsonMenuUpdate' ).publish( lastMenuObject );//broadcast that will be received by FL.menu to update jsonMenu
 			}
 			$.Topic( 'sidePanelOpened' ).publish( false ); //informs FL.menu that sidePanel is closed 
@@ -230,19 +235,21 @@ jQuery(document).ready(function($){
 				localStorage.login = JSON.stringify(loginObject);
 				$.Topic( 'signInDone' ).publish( true );
 				recoverLastMenu();//recover locally saved menu and informs FL.menu about the new menu if any
-				var histoPromise=FL.API.createHistoMails_ifNotExisting();
-				histoPromise.done(function(){
-					// FL.login.checkSignIn();
-					displaySignInUser(loginObject.email);
-					// return loginAccessCB(null,loginObject);
-					return def.resolve();
-				});
-				histoPromise.fail(function(err){
-					alert("FLLoadCss2.js loginAccess appSetup --> failure creating _histoMail err="+err);
-					// return loginAccessCB(err,loginObject);
-					return def.reject("FLLoadCss2.js loginAccess appSetup--> failure creating _histoMail err="+err);
-				});
-				// def.resolve(menuData,homeHTML);
+				displaySignInUser(loginObject.email);
+				
+				// var histoPromise=FL.API.createHistoMails_ifNotExisting();
+				// histoPromise.done(function(){
+				// 	// FL.login.checkSignIn();
+				// 	displaySignInUser(loginObject.email);
+				// 	// return loginAccessCB(null,loginObject);
+				// 	return def.resolve();
+				// });
+				// histoPromise.fail(function(err){
+				// 	alert("FLLoadCss2.js loginAccess appSetup --> failure creating _histoMail err="+err);
+				// 	// return loginAccessCB(err,loginObject);
+				// 	return def.reject("FLLoadCss2.js loginAccess appSetup--> failure creating _histoMail err="+err);
+				// });
+				def.resolve(menuData,homeHTML);
 			});
 			loadAppPromise.fail(function(err){
 				alert("FLLoadCss2.js  --> loginAccess appSetup FAILURE in loadAppDataForSignInUser2 <<<<< error="+err);

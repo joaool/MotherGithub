@@ -1,6 +1,7 @@
 MailerTemplate.Models.Image = Backbone.Model.extend({
 	m_ImageSource : null,
 	m_styleProperty : null,
+	m_Link : null,
 	
 	initialize : function(){
 		this.setSource("./mailer/images/empty_image-72.png");
@@ -39,19 +40,30 @@ MailerTemplate.Models.Image = Backbone.Model.extend({
 			temp.m_styleProperty[item] = obj[item];
 		});
 		this.set({style:this.m_styleProperty});
-		this.trigger(MailerTemplate.Models.Title.STYLE_OBJ_CHANGE,this.m_styleProperty);
+		this.trigger(MailerTemplate.Models.Image.STYLE_OBJ_CHANGE,this.m_styleProperty);
+	},
+	setLink : function(link){
+		this.m_Link = link;
+		this.set({link:this.m_Link});
+		this.trigger(MailerTemplate.Models.Image.LINK_CHANGE,this.m_Link);
+	},
+	getLink : function(){
+		return this.m_Link;
 	},
 	CloneModel : function(){
 		var newModel = new MailerTemplate.Models.Image();
 		newModel.setSource(this.m_ImageSource);
 		newModel.setStyleObject(this.m_styleProperty);
+		newModel.setLink(this.m_Link);
 		return newModel;
 	},
 	fromJson : function(json){
 		this.setSource(json.source);
 		this.setStyleObject(json.style);
+		this.setLink(json.link);
 	}
 });
 MailerTemplate.Models.Image.IMAGE_CHANGE = "imageChange";
 MailerTemplate.Models.Image.PROPERTY_CHANGE = "propertychange";
 MailerTemplate.Models.Image.STYLE_OBJ_CHANGE = "styleObjchange";
+MailerTemplate.Models.Image.LINK_CHANGE = "imageLink";

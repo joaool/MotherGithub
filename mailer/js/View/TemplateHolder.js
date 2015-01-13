@@ -37,7 +37,7 @@ MailerTemplate.Views.TemplateHolder = Backbone.View.extend({
 		
 		this.m_currentEditableObject = currentElement;
 		
-		this.m_CurrentTemplateViewObject = this.getTemplateObject(currentElement);
+		this.m_CurrentTemplateViewObject = this.getTemplateObject($(currentElement).attr('type'),$(currentElement).attr('id'));
 		if (this.m_CurrentTemplateViewObject)
 		{
 			var model = this.m_lstModel[$(this.m_currentEditableObject).attr("id")];
@@ -59,7 +59,7 @@ MailerTemplate.Views.TemplateHolder = Backbone.View.extend({
 		newModel = model.CloneModel();
 		this.m_lstModel[$(copiedElement).attr("id")] = newModel;
 		
-		this.m_CurrentTemplateViewObject = this.getTemplateObject($(copiedElement));
+		this.m_CurrentTemplateViewObject = this.getTemplateObject($(copiedElement).attr('type'),$(copiedElement).attr('id'));
 		if (this.m_CurrentTemplateViewObject)
 			this.m_CurrentTemplateViewObject.setModel(newModel);
 		
@@ -117,13 +117,14 @@ MailerTemplate.Views.TemplateHolder = Backbone.View.extend({
 			}
 			else
 			{
-				droppingObject = $.parseHTML(this.getElementToDrop(droppedObject));
+				
+				droppingObject = $.parseHTML(this.getElementToDrop($(droppedObject).attr('type')));
 				$(droppingObject).attr("id",$(droppedObject).attr('type')+(++this.m_objCnt));
 				$(droppingObject).insertAfter(droppedObject);
 				$(droppedObject).remove();
 				
-				this.m_CurrentTemplateViewObject = this.getTemplateObject($(droppingObject).filter("div"));
-				newModel = this.getTemplateModel($(droppingObject).filter("div"));
+				this.m_CurrentTemplateViewObject = this.getTemplateObject($($(droppingObject).filter("div")).attr('type'),$($(droppingObject).filter("div")).attr('id'));
+				newModel = this.getTemplateModel($($(droppingObject).filter("div")).attr('type'));
 				
 				if (this.m_CurrentTemplateViewObject)
 				{
@@ -136,8 +137,8 @@ MailerTemplate.Views.TemplateHolder = Backbone.View.extend({
 		this.ApplyHoverEvent();
 		//$(droppableObject).children().filter("#tmp").css({"display":"none"});	
 	},
-	getElementToDrop : function(droppedObject){
-		var type = $(droppedObject).attr('type');
+	getElementToDrop : function(type){
+//		var type = $(droppedObject).attr('type');
 		var childToAppend = $('#' + type + 'DroppedItem').html();
 		return childToAppend;
 	},
@@ -149,8 +150,8 @@ MailerTemplate.Views.TemplateHolder = Backbone.View.extend({
 			
 		}
 	},
-	getTemplateModel : function(object){
-		var type = $(object).attr('type');
+	getTemplateModel : function(type){
+//		var type = $(object).attr('type');
 		switch (type)
 		{
 			case MailerTemplate.TemplateItems.TITLE:
@@ -161,15 +162,15 @@ MailerTemplate.Views.TemplateHolder = Backbone.View.extend({
 				break;
 		}
 	},
-	getTemplateObject : function(object){
-		var type = $(object).attr('type');
+	getTemplateObject : function(type,id){
+//		var type = $(object).attr('type');
 		switch (type)
 		{
 			case MailerTemplate.TemplateItems.TITLE:
-				return new MailerTemplate.Views.Title({el : "#"+$(object).attr("id")});
+				return new MailerTemplate.Views.Title({el : "#"+id});
 				break;
 			case MailerTemplate.TemplateItems.IMAGE:
-				return new MailerTemplate.Views.Image({el : "#"+$(object).attr("id")});
+				return new MailerTemplate.Views.Image({el : "#"+id});
 				break;
 		}
 	},
@@ -181,7 +182,40 @@ MailerTemplate.Views.TemplateHolder = Backbone.View.extend({
 		var ids = {"header" : headerItemIds, "body" : bodyItemIds, "footer":footerItemIds};
 		return { "ids" : ids,
 				 "models" : this.m_lstModel};
-	}
+	},
+	ClearEditor : function(){
+		this.m_Index= 0;
+		this.m_lstModel	= [];
+		this.m_TemplateHoderBody.html("");
+		this.m_TemplateHoderHeader.html("");
+		this.m_TemplateHoderFooter.html("");
+	},
+	LoadJson : function(json){
+		var templateItems = json.templateItems;
+		var header = templateItems.header;
+		var body = templateItems.body;
+		var footer = templateItems.footer;
+		
+		this.ClearEditor();
+		this.AppendTemplate(header,this.m_TemplateHoderHeader);
+		this.AppendTemplate(body,this.m_TemplateHoderBody);
+		this.AppendTemplate(footer,this.m_TemplateHoderFooter);
+		this.ApplyHoverEvent();
+	},
+	AppendTemplate : function(jsonObject, parentElement){
+		var temp = this;
+		$.each(jsonObject,function(i,item){
+			var element = temp.getElementToDrop(item.type);
+			element = $(element).filter("div");
+			$(parentElement).append(element);
+			$(element).prop("id","template"+(temp.m_Index++));
+			var model = temp.getTemplateModel(item.type);
+			model.fromJson(item);
+			var elementView = temp.getTemplateObject(item.type,$(element).attr("id"));
+			elementView.setModel(model);
+			temp.m_lstModel[$(element).attr("id")] = model;
+		});
+	},
 });
 MailerTemplate.Views.TemplateHolder.DISPLAY_PROPERTYPANEL = "displayPropertyPanel";
 MailerTemplate.Views.TemplateHolder.BINDMODEL = "bindModel";

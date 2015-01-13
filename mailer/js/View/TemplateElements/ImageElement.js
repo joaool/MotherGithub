@@ -4,6 +4,7 @@ MailerTemplate.Views.Image = Backbone.View.extend({
 	m_CssStyleConnector : null,
 	m_ImageElement : null,
 	m_previewBlock : null,
+	m_Link : null,
 	
 	initialize : function(){
 		this.m_CssStyleConnector = {};
@@ -11,8 +12,9 @@ MailerTemplate.Views.Image = Backbone.View.extend({
 		$.each(Object.keys($(MailerTemplate.CssStyleConnector)[0]), function(i,item) {
 			temp.m_CssStyleConnector[item] = MailerTemplate.CssStyleConnector[item];
 		});
-		this.m_ImageElement = $($(this.$el.children()[0]).children()[0]);
-		this.m_previewBlock = $($(this.$el.children()[0]).children()[1]);
+		this.m_ImageElement = this.$el.find("img");
+		this.m_previewBlock = this.$el.find("#previewBlock");
+		this.m_Link = this.$el.find("a");
 	},
 	
 	setSource : function(source){
@@ -24,9 +26,11 @@ MailerTemplate.Views.Image = Backbone.View.extend({
 		this.m_Model = model;
 		this.setSource(this.m_Model.getSource());
 		this.setAllStyleProperty(this.m_Model.getStyleProperty());
+		this.updateLink(this.m_Model.getLink());
 		this.listenTo(this.m_Model, MailerTemplate.Models.Image.IMAGE_CHANGE, this.setSource);
 		this.listenTo(this.m_Model, MailerTemplate.Models.Image.PROPERTY_CHANGE, this.setStyleProperty);
 		this.listenTo(this.m_Model, MailerTemplate.Models.Image.STYLE_OBJ_CHANGE, this.setAllStyleProperty);
+		this.listenTo(this.m_Model, MailerTemplate.Models.Image.LINK_CHANGE, this.updateLink);
 	},
 	setAllStyleProperty : function(styles){
 		var temp = this;
@@ -54,5 +58,9 @@ MailerTemplate.Views.Image = Backbone.View.extend({
 		{
 			this.m_ImageElement.css(prop , data.value);
 		}
+	},
+	updateLink : function(link){
+		this.m_Link.prop("href",link);
+		
 	}
 });

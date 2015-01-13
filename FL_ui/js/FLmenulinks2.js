@@ -93,33 +93,6 @@
 					});
 					var singular = masterDetailItems.master.entityName;
 					var description = masterDetailItems.master.entityDescription;
-							// if(FL.dd.createEntityAndFields(singular, description,csvStore.attributesArr)){
-							// 	var oEntity =  FL.dd.getEntityBySingular(singular);
-							// 	var plural = oEntity.plural;
-							// 	// alert(" singular="+singular+" plural="+plural);
-							// 	// var cEntity = FL.dd.getCEntity(masterDetailItems.master.entityName);
-							// 	//now we sync the dictionary for the new entity put grid data ond server and create menu option
-							// 		// FL.server.insertCsvStoreDataTo(singular,function(err){
-							// 		// 	if(err){
-							// 		// 		console.log("Data from entity "+singular+" Error trying to store on server error="+err);
-							// 		// 		return;
-							// 		// 	}
-							// 		// 	FL.clearSpaceBelowMenus();
-							// 		// 	$.Topic( 'createGridOption' ).publish( plural,singular );//broadcast that will be received by FL.menu to add an option
-							// 		// 	FL.dd.displayEntities();
-							// 		// });
-							// 	FL.grid.insertDefaultGridMenu(singular,plural);
-							// }else{
-							// 	// alert("FLSlidePanels Error trying to create existing entity "+singular);
-							// 	FL.common.makeModalConfirm("Entity " + singular + " exists. Do you want to overwrite it ?","Yes - overwrite " + singular + "!","No",function(result){
-							// 		if(result){
-							// 			FL.common.makeModalInfo("Nothing was done"); 
-							// 		}else{
-							// 			alert("is going to overwrite");
-							// 			// FL.grid.insertDefaultGridMenu(singular,plural);
-							// 		}
-							// 	});
-							// }
 				}else{
 					FL.common.makeModalInfo("Nothing was saved.");
 				}
@@ -324,7 +297,7 @@
 					}
 				}
 			},
-			newsletterEditor: function() {//call with menu key "uri": "javascript:FL.links.pageEditor('home')"
+			newsletterEditor: function() {//call with menu key "uri": "javascript:FL.links.newsletterEditor()"
 				var connectionString = localStorage.login;// Retrieve format {email:x1,password:x3,domain:x4};
 				if(connectionString.length === 0){
 					alert("Fl.link.newsletterEditor PLEASE CONNECT TO THE DATABASE ");

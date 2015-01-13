@@ -1,12 +1,3 @@
-div#template_holder_header, #template_holder_footer {
-    width: 100%;
-    background-color: #F0F0F0;
-}
-
-div#templateHolder {
-    height: 100%;
-}
-
 div#template_holder_body {
     /* height: 100%; */
 }

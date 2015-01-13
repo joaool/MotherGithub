@@ -1,6 +1,11 @@
 var mainView;
 var designView
 $(document).ready(function(){
+	$("#templates").load("HBTemplate.html",OnTemplatesLoaded);
+});
+
+function OnTemplatesLoaded()
+{
 	$("#sidebar-wrapper,#page-content-wrapper").css({"height":window.innerHeight});
 	mainView = new MailerTemplate.Views.MainView({el : "#wrapper"});
 	$('#sidebar-wrapper ul:first li label').click(function(){
@@ -13,4 +18,4 @@ $(document).ready(function(){
 		}
 	});
 	$('#templateDesign').css("display","none");
-});
+}

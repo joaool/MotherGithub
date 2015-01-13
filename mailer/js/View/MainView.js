@@ -9,6 +9,7 @@ MailerTemplate.Views.MainView = Backbone.View.extend({
 	m_DesignPageFooter : null,
 	m_saveTemplate : null,
 	m_jsonGenerator : null,
+	m_loadTemplate : null,
 	
 	initialize : function(expenses){
 		this.m_jsonGenerator = new JsonGenerator();
@@ -21,6 +22,7 @@ MailerTemplate.Views.MainView = Backbone.View.extend({
 		this.m_PropertyPanel = new MailerTemplate.Views.PropertyPanel({el : "#propertyPanel"});
 		
 		this.m_saveTemplate = $("#saveTempalate");
+		this.m_loadTemplate = $("#loadTemplate");
 		
 //		this.m_DesignTab = new MailerTemplate.Views.DesignTemplatePage({el : "#DesignPageDiv"}); 
 //		this.m_DesignPageHeader = new MailerTemplate.Views.DesignTemplatePageHeader({el : "#DesignPageDiv"}); 
@@ -28,13 +30,44 @@ MailerTemplate.Views.MainView = Backbone.View.extend({
 //		this.m_DesignPageFooter = new MailerTemplate.Views.DesignTemplateFooter({el : "#DesignPageDiv"}); 
 	},
 	events : {
-		"click #saveTempalate" : "OnSaveBtnClick"
+		"click #saveTempalate" : "OnSaveBtnClick",
+		"click #loadTemplate" : "OnLoadTemplateBtnClick"
 	},
 	OnSaveBtnClick : function(evt){
 		var modelData = this.m_Editor.generatePlainHtml();
 		var jsonData = this.m_jsonGenerator.GenerateJson(modelData);
+		var jsonString = JSON.stringify(jsonData);
+		console.log(jsonString);
+		// save this jsonString
 		window.jsonObject = jsonData;
 		window.open("./mailer/TemplatePreview.html","_blank");
+	},
+	OnLoadTemplateBtnClick : function(){
+		var temp = this;
+		$.ajax({
+			url : "TemplateSample.json",
+			type: 'get',
+			data : 'text',
+			success : function(data) { temp.LoadTemplate(data); },
+			error : this.OnError
+		});
+	},
+	LoadTemplate : function(data){
+		try{
+			if(typeof data == 'string')
+			{
+				data = JSON.parse(data);
+			}
+			this.m_Editor.LoadJson(data);
+		}
+		catch(e)
+		{
+			console.log("Json parse Error")
+		}
+		
+	},
+	OnError : function(){
+		console.log("Error loading template");
 	},
 	ShowProptertyPanel: function(data){
 		this.m_PropertyPanel.clear();

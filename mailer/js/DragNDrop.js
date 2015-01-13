@@ -3,8 +3,8 @@ DragNDrop = function(){
 	var connectionString = FL.common.getTag(fullUrl,"connectionString","#");//FL.domain is globally defined - the last # is disregarded
 	connectionString = FL.common.enc(connectionString,-1);
 	var loginObject = JSON.parse(connectionString);//ex {"email":"toto114@toto.com","userName":"","password":"123"}
-	FL.common.makeModalInfo('Hello ' + FL.common.shortEmailName(loginObject.email) + ' !!!. Welcome to the Newsletter Editor...<br>'+
-			'This is a dummy version (only for the dev team) it is not yet operational.');
+	FL.common.makeModalInfo('Hello ' + FL.common.shortEmailName(loginObject.email) + ' !!!. Welcome to the Newsletter Editor...<br>' +
+		'This is a dummy version (only for the dev team) it is not yet operational.');
 };
 exitSaving = function(){
 	// alert("exitNoSave");
@@ -27,7 +27,6 @@ window.onbeforeunload = function (e) {//works for close tab - and for close brow
 	}
 	return 'You are exiting FrameLink newsletterpage editor...';
 };
-
 DragNDrop.getInstance = function(){
 	if (!this.oDragNDrop)
 	{

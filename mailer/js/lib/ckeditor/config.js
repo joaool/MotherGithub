@@ -4,35 +4,46 @@
  */
 
 CKEDITOR.editorConfig = function( config ) {
-	// Define changes to default configuration here.
-	// For complete reference see:
-	// http://docs.ckeditor.com/#!/api/CKEDITOR.config
-
-	// The toolbar groups arrangement, optimized for two toolbar rows.
-	config.toolbarGroups = [
-		{ name: 'clipboard',   groups: [ 'clipboard', 'undo' ] },
-		{ name: 'editing',     groups: [ 'find', 'selection', 'spellchecker' ] },
-		{ name: 'links' },
-		{ name: 'insert' },
-		{ name: 'forms' },
-		{ name: 'tools' },
-		{ name: 'document',	   groups: [ 'mode', 'document', 'doctools' ] },
-		{ name: 'others' },
-		'/',
-		{ name: 'basicstyles', groups: [ 'basicstyles', 'cleanup' ] },
-		{ name: 'paragraph',   groups: [ 'list', 'indent', 'blocks', 'align', 'bidi' ] },
-		{ name: 'styles' },
-		{ name: 'colors' },
-		{ name: 'about' }
+	// Define changes to default configuration here. For example:
+	// config.language = 'fr';
+	// config.uiColor = '#AADC6E';
+	
+	// Toolbar configuration generated automatically by the editor based on config.toolbarGroups.
+	config.toolbar = [
+//		{ name: 'clipboard', groups: [ 'clipboard', 'undo' ], items: [ 'Cut', 'Copy', 'Paste', '-', 'Undo', 'Redo' ] },
+//		{ name: 'editing', groups: [ 'find', 'selection', 'spellchecker' ], items: [ 'Find', 'Replace', '-', 'SelectAll', '-', 'Scayt' ] },
+//		{ name: 'forms', items: [ 'Form', 'Checkbox', 'Radio', 'TextField', 'Textarea', 'Select', 'Button', 'ImageButton', 'HiddenField' ] },
+//		'/',
+		{ name: 'basicstyles', groups: [ 'basicstyles', 'cleanup'], items: [ 'Bold', 'Italic', 'Underline', '-', 'Strike', 'Subscript','Superscript'] },
+		{name : 'textStyles', items : ['TextColor', 'BGColor']},
+		{name : 'link', items : ['Link']},
+		{ name: 'paragraph', items: [ 'JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock' ] },
+//		{ name: 'textStyles', items: ['TextColor', 'BGColor', '-', 'Link' ] },
+//		{ name: 'insert', items: [ 'Image', 'Flash', 'Table', 'HorizontalRule', 'Smiley', 'SpecialChar', 'PageBreak', 'Iframe' ] },
+//		'/',
+		{ name: 'styles', items: [ 'FontSize' ,  'Font' ] },
+//		{ name: 'colors', items: [ 'TextColor', 'BGColor' ] },
+//		{ name: 'tools', items: [ 'Maximize', 'ShowBlocks' ] },
+//		{ name: 'others', items: [ '-' ] },
+//		{ name: 'about', items: [ 'About' ] }
 	];
 
-	// Remove some buttons provided by the standard plugins, which are
-	// not needed in the Standard(s) toolbar.
-	config.removeButtons = 'Underline,Subscript,Superscript';
-
-	// Set the most common block elements.
-	config.format_tags = 'p;h1;h2;h3;pre';
-
-	// Simplify the dialog windows.
-	config.removeDialogTabs = 'image:advanced;link:advanced';
+	// Toolbar groups configuration.
+	config.toolbarGroups = [
+//		{ name: 'document', groups: [ 'mode', 'document', 'doctools' ] },
+//		{ name: 'clipboard', groups: [ 'clipboard', 'undo' ] },
+//		{ name: 'editing', groups: [ 'find', 'selection', 'spellchecker' ] },
+//		{ name: 'forms' },
+//		'/',
+		{ name: 'basicstyles', groups: [ 'basicstyles', 'cleanup'] },
+//		{ name: 'paragraph', groups: [ 'list', 'indent', 'blocks', 'align', 'bidi' ] },
+//		{ name: 'textStyles', groups: ['textStyles'] },
+//		{ name: 'insert' },
+//		'/',
+//		{ name: 'styles' },
+//		{ name: 'colors' },
+//		{ name: 'tools' },
+//		{ name: 'others' },
+//		{ name: 'about' }
+	];
 };
