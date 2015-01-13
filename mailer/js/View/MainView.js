@@ -31,14 +31,10 @@ MailerTemplate.Views.MainView = Backbone.View.extend({
 		"click #saveTempalate" : "OnSaveBtnClick"
 	},
 	OnSaveBtnClick : function(evt){
-		alert("ZXZXZXZXZ");
-		FL.common.makeModalInfo('Welcome to the Newsletter Editor...',function(){
-			alert("XXX");
-		});
 		var modelData = this.m_Editor.generatePlainHtml();
 		var jsonData = this.m_jsonGenerator.GenerateJson(modelData);
 		window.jsonObject = jsonData;
-		window.open("TemplatePreview.html","_blank");
+		window.open("./mailer/TemplatePreview.html","_blank");
 	},
 	ShowProptertyPanel: function(data){
 		this.m_PropertyPanel.clear();

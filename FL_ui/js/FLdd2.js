@@ -897,9 +897,9 @@
 			createHistoMailPeer: function(entityName){//create histoMail peer in local dict
 				var fName = this.histoMailPeer(entityName);
 				if(!this.isEntityInLocalDictionary(fName)){
-					this.createEntity(fName,"histoMail peer for initial name="+entityName);
+					this.createEntity(fName,"histoMail peer for " + entityName);
 					//		{name:"address",description:"address to send invoices",label:"Address",type:"string",typeUI:"textbox",enumerable:null,key:false});
-					this.addAttribute(fName,"msg",'events log','mail event','string','textbox',null);
+					this.addAttribute(fName,"msg",fName + "'s msg","XXX","string","textbox",null);
 					this.setSync(fName,false);
 					return true;
 				}else{

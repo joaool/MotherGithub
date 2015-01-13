@@ -132,7 +132,7 @@
 			//		Remission to all recipients - The same newsletter was sent previously - DANGEROUS !!!!
 			//         missing are null in this case ->
 			//		Emission to new recipients that were introduced in the base table, after the last emission - sends to the missingEmails			var promise = FL.API.mailRecipientsOfTemplate(entityName,NName);
-			promise = FL.API.mailRecipientsOfTemplate(entityName,NName);
+			var promise = FL.API.mailRecipientsOfTemplate(entityName,NName);
 			promise.done(function(sent){
 				var toSend =  _.pluck(recipientsArr, "email");
 				console.log("==========================================");

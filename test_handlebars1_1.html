@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>handlebars v1.1</title>
+    <script src="FL_ui/js/jquery-1.11.1.js" type="text/javascript"></script>
+    <script src="FL_ui/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="FL_ui/css/FLcerulean.css">
+    <script src="FL_ui/js/underscore.js"></script>
+    <script src="./mailer/js/lib/handlebars-v1.3.0.js"></script>
+</head>
+<style>
+    body {
+        font:15px arial,sans-serif;
+    }
+    h1 {
+        margin: 0 0 10px 0;
+        padding: 5px;
+        font-size: 24px;
+        background-color: #999;
+        color: #fff;
+    }
+    table {
+        margin: 10px;
+    }
+    th, td {
+        padding: 5px;
+        border: 1px solid #999;
+    }
+    th {
+        background: #ccc;
+    }
+    tr:nth-child(odd) {
+        background: #eee;
+    }
+    td a {
+        color: #000;
+        text-decoration: underline;
+    }    
+</style>
+<body>
+    <h1>Handlebars JS Example 1.1</h1>
+    <script id="inText" type="text/x-handlebars-template"> 
+        <div class="input-group" style="line-height:0px;">
+            <span class="input-group-addon">{{leftLabel}}</span>
+             <input type={{type}} class="form-control" id={{id}} placeholder={{placeholder}} value={{value}} data-parsley-trigger={{trigger}}>
+            <span class="input-group-addon"><span class="glyphicon {{icon}}"></span></span>
+        </div>
+    </script>
+    <script id="inTextLabel" type="text/x-handlebars-template">
+        <legend>{{label}}</legend>
+        <div class="input-group" style="line-height:0px;">
+            <span class="input-group-addon">{{leftLabel}}</span>
+            <input type={{type}} class="form-control" id={{id}} placeholder={{placeholder}} value={{value}} data-parsley-trigger={{trigger}}>
+            <span class="input-group-addon"><span class="glyphicon {{icon}}"></span></span>
+        </div>
+    </script>    
+    <script id="inTextareaLabel" type="text/x-handlebars-template"> 
+        <label class="control-label" for="_dictEditEntityTemplate_entityDescription" id="_dictEditEntityTemplate_whatIsLabel" >What is a </label>
+        <div class="input-group" style="line-height:0px;">
+            <span class="input-group-addon">Description:</span>
+            <textarea class="form-control" id="_dictEditEntityTemplate_entityDescription" name="entityDescription" onkeyup="FL.slidePanels.dictTemplateChangeDescription(this.form)" rows="2"><%= masterDetailItems.master.entityDescription %></textarea>
+        </div>
+    </script>
+    <script id="button" type="text/x-handlebars-template"> 
+        <button type="submit" class="btn btn-default" onclick="{{onClick}}">{{caption}}</button>
+    </script>
+                           
+    <script id="some-template" type="text/x-handlebars-template"> 
+        <table>
+            <thead> 
+                <th>Name</th> 
+                <th>Job Title</th> 
+                <th>Twitter</th> 
+            </thead> 
+            <tbody> 
+                {{#users}} 
+                <tr> 
+                    <td>{{fullName person}}</td> 
+                    <td>{{jobTitle}}</td> 
+                    <td><a href="https://twitter.com/{{twitter}}">@{{twitter}}</a></td> 
+                </tr> 
+                {{/users}} 
+            </tbody> 
+        </table> 
+    </script>
+    <script>
+        var source = $("#some-template").html(); 
+        var template = Handlebars.compile(source); 
+
+        var data = { 
+            users: [ { 
+                person: {
+                    firstName: "Garry", 
+                    lastName: "Finch"
+                },
+                jobTitle: "Front End Technical Lead",
+                twitter: "gazraa" 
+            }, {
+                person: {
+                    firstName: "Garry", 
+                    lastName: "Finch"
+                }, 
+                jobTitle: "Photographer",
+                twitter: "photobasics"
+            }, {
+                person: {
+                    firstName: "Garry", 
+                    lastName: "Finch"
+                }, 
+                jobTitle: "LEGO Geek",
+                twitter: "minifigures"
+            } ]
+        }; 
+
+        Handlebars.registerHelper('fullName', function(person) {
+          return person.firstName + " <----> " + person.lastName;
+        });
+        //the function template receives the JSON data (an object with an array of users) and for each array element applies the compiled template source 
+
+        data1 = {
+            id: "getStarted_email",
+            type: "email",
+            placeholder:"Your Email Address",
+            value:"Joaquim",
+            trigger: "change"
+        };
+        data2 ={
+            elements:[
+                {
+                    element: "inText",
+                    type: "email",
+                    leftLabel:"Your Name:",
+                    placeholder:"Please introduce your name",
+                    value:"Antonio",
+                    icon: "glyphicon-envelope",
+                    trigger: "change",
+                    icon: "glyphicon-envelope"
+                },
+                {
+                    element: "inTextLabel",
+                    type: "password",
+                    leftLabel:"Password:",
+                    placeholder:"Password",
+                    value:"Antonio123",
+                    icon: "glyphicon-lock",
+                    trigger: "change",
+                    label:"Please introduce your password:"
+                },
+                {
+                    element: "button",
+                    onClick:"clickTest()",
+                    caption:"Test"
+                },                
+            ]
+        };
+
+        var source1 = $("#inText").html(); 
+        var template1 = Handlebars.compile(source1); 
+        var source2 = $("#inText").html(); 
+        var template2 = Handlebars.compile(source2); 
+        var clickTest = function(){
+            alert("TEST");
+        };
+        var formMaker = function(jsonForm){
+            var arrOfObj = jsonForm.elements;
+            _.each(arrOfObj, function(element){
+                console.log(element.element + "/" + element.type);
+                var source = $("#"+element.element).html(); 
+                var template = Handlebars.compile(source); 
+                $('body').append(template(element));                 
+            });
+        };
+        formMaker(data2);
+
+        // $('body').append(template1(data1)); 
+
+        console.log(document.title+"......  END..");
+    </script>   
+<body>
+</html>
