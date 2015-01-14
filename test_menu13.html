@@ -52,7 +52,7 @@ mixpanel.init("19ada1cb259cc3272c67085eb1bf03fc");</script><!-- end Mixpanel -->
 
 	<!-- <script src="FL_ui/js/bootstrap-tour.min.js"></script> -->
 	<script src="FL_ui/js/bootstrap-tour.js"></script>
-
+	<script src="FL_ui/js/spin.min.js"></script>
 	<script src="FL_ui/js/FLMenu2.js"></script>
 	<script src="FL_ui/js/FLLoadCss2.js"></script>
 	<script src="FL_ui/js/FLCommon2.js"></script>
@@ -378,7 +378,12 @@ mixpanel.init("19ada1cb259cc3272c67085eb1bf03fc");</script><!-- end Mixpanel -->
 	div ximg {/* FrameLink specific to adjust logo size line 638*/
 	  max-height: 218px;
 	  width:auto;
-	}	
+	}
+    .spinner {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+    }
 /*	.backgrid .backgridId {
 	  background-color: green;
 	  width:300px;
@@ -597,6 +602,7 @@ mixpanel.init("19ada1cb259cc3272c67085eb1bf03fc");</script><!-- end Mixpanel -->
 	<div id="_modalDialog"></div>
     <div id="_modalDialogA"></div>
     <div id="_modalDialogB"></div>
+    <div id='spinnerDiv'></div>
 	<script id="personTemplate" type="text/template"> 
 	    <span><strong><%= name %></strong> (<%= age %>) - <%= occupation %></span> 
 	    <button class="edit btn btn-primary">Edit</button>

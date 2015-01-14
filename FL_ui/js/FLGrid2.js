@@ -270,6 +270,9 @@
 		    },
 			displayDefaultGrid: function(entityName) { //loads entity from server and display the grid
 				entityName = entityName.replace(/_/g," ");
+				// FL.common.spin(true);
+				var spinner=FL.common.loaderAnimationON('spinnerDiv');
+				// setInterval(function(){spinner.stop();},1000);
 				var promise=FL.API.loadTable(entityName);
 				promise.done(function(data){
 					console.log("New %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
@@ -282,9 +285,12 @@
 					var columnsArr = utils.backGridColumnsExtractedFromDictionary(entityName);//extracts attributes from dictionary and prepares columns object for backgrid
 					console.log("New &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&& entity="+entityName);
 					console.log("show columnsArr="+JSON.stringify(columnsArr));
+					// FL.common.spin(false);
+					spinner.stop();
 					utils.mountGridInCsvStore(columnsArr);//mount backbone views and operates grid -	
 				});
 				promise.fail(function(err){
+					spinner.stop();
 					alert("DefaultGridWithNewsLetterAndEditButtons Error="+err);
 				});				
 			},		    

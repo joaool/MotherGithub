@@ -42,6 +42,8 @@ FL["common"] = (function(){//name space FL.common
 		});
 	};
 	return{
+        spinner: null,//to be used by FL.common.spin(true/false)
+        spinner_div: 0,//to be used by FL.common.spin(true/false)
         editMasterDetail: function(id,title,templateName,masterDetailJson,options,editMasterDetailCB) {
 			// returns masterDetailJson with new values collected from modal dialog  with title and templateName - options like makeModa()
 			//  EXEMPLE OF FORMAT FOR masterDetailJson:
@@ -294,7 +296,7 @@ FL["common"] = (function(){//name space FL.common
                     }
                 });                
             }            
-            var $modal = $('#' + modalId ); 
+            var $modal = $('#' + modalId );
 
 			form = $("#form_" + templateName );
 			form.parsley();
@@ -350,7 +352,7 @@ FL["common"] = (function(){//name space FL.common
              }
             // $('#' + modalId ).modal('show');//to launch it immediatly when calling makeModal
             $modal.modal('show');//to launch it immediatly when calling makeModal	
-		},		
+		},
 		setStyleAndFont: function(styleName,fontName){//the css files FL<styleName>.css and FLfont_<fontName>.css must exist in FL_ui/css
 			loadCSS("FL" + styleName + ".css");
 			loadCSS("FLfont_" + fontName + ".css");
@@ -466,7 +468,42 @@ FL["common"] = (function(){//name space FL.common
             }
             encoded = encoded.replace(/'/g,'"');
             return encoded;
-        },   
+        },
+        Xspin: function(status) { //makes the spin on if true, or stops the spin if status=false
+            var spinner_div = $('#spinner').get(0);
+            if(status){              
+                if(this.spinner === null) {
+                    this.spinner = new Spinner(opts).spin(spinner_div);
+                } else {
+                  spinner.spin(spinner_div);
+                }
+            }else{
+                spinner.stop(spinner_div);
+            }
+        },
+        loaderAnimationON: function(div) {
+            var opts = {
+                lines: 13, // The number of lines to draw
+                length: 20, // The length of each line
+                width: 10, // The line thickness
+                radius: 30, // The radius of the inner circle
+                corners: 1, // Corner roundness (0..1)
+                rotate: 0, // The rotation offset
+                direction: 1, // 1: clockwise, -1: counterclockwise
+                color: '#000', // #rgb or #rrggbb or array of colors
+                speed: 1, // Rounds per second
+                trail: 60, // Afterglow percentage
+                shadow: false, // Whether to render a shadow
+                hwaccel: false, // Whether to use hardware acceleration
+                className: 'spinner', // The CSS class to assign to the spinner
+                zIndex: 2e9, // The z-index (defaults to 2000000000)
+                top: '50%', // Top position relative to parent in px
+                left: '50%' // Left position relative to parent in px
+            };
+            var target = document.getElementById(div);
+            var spinner = new Spinner(opts).spin(target);
+            return spinner;
+        },
 		testFunc: function(x) {
 			alert("FL.common.test() -->"+x);
 		}

@@ -15,6 +15,8 @@ var FL = FL || {};
   };
 })();
 (function() { //App is a name space.
+	var spinner=FL.common.loaderAnimationON('spinnerDiv');
+	setInterval(function(){spinner.stop();},3000);
 	var oMenu = {
 		"menu" : [
 			{

@@ -682,7 +682,7 @@ $(function () {
     ok(actual === true, "FL.dd.isEntityWithTypeUI --> Now after FL.dd.setFieldTypeUI sales_rep has a phone field - typeUI='phonebox'");//51
     
     console.log("====================================================================================");
-    console.log("histoMailPeer for sales_rep is "+FL.dd.histoMailPeer("sales_rep"));
+    console.log("histoMailPeer for sales_rep is "+FL.dd.histoMailPeer("histoMail","sales_rep"));
     console.log("====================================================================================");
     actual = FL.dd.isHistoMailPeer("sales_rep");
     ok(actual === false, "FL.dd.isHistoMailPeer --> sales_rep has no " + FL.dd.histoMailPeer("sales_rep") + " =>'_histoMail_<eCN>' peer table");//52

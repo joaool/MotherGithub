@@ -836,6 +836,10 @@
 				var eCN = this.getCEntity(entityName);
 				return histoName = "_histoMail_" + eCN;
 			},
+			peerTypeFor: function(typeOfPeer,entityName){//for type histoMail and entity ecn=55 forms "_histomail_55"
+				var eCN = this.getCEntity(entityName);
+				return histoName = "_" + typeOfPeer + "_" + eCN;
+			},			
 			isHistoMailPeer: function(entityName) {//returns true if _histoMail_<ecn(entityName)> exists in local dictionary
 				var exists = false;
 				if(this.isEntityInLocalDictionary( this.histoMailPeer( entityName ) ) ){
