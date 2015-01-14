@@ -387,14 +387,18 @@ jQuery(document).ready(function($){
 				existingUserPromise.done(function(exist){
 					console.log("existingUserPromise.done------------------------------------------------------------>next will text exist !!!");
 					if(exist){//the user exists
+						var spinner=FL.common.loaderAnimationON('spinnerDiv');
+						// setInterval(function(){spinner.stop();},3000);
 						console.log("existingUserPromise.done------------------------------------------------------------> user exists !!!");
 						setupExistingUserPromise = FL.API.connectUserToDefaultApp(loginObject.email,loginObject.password)
 							.then(function(){return appSetup(loginObject);})
 							.then(function(){
 								console.log("FLLoadCss2 -> success connecting to default app and doing app setup!");
+								spinner.stop();
 								return def.resolve(true,loginObject);//true =>user exists
 								},function(err){
 									console.log("loginAccess ===>fail ->err="+err);
+									spinner.stop();
 									return def.reject(err);
 								});//true ==>continue false=>repeat	
 							// alert("xxxzzz");
