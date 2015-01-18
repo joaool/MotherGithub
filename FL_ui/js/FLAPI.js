@@ -850,6 +850,7 @@
 		};
 		//-------- END OF OTHER WRAPPERS ------------------		
 		return{
+			xx: "test",
 			fl: new flMain(),//FL.server.fl
 			fa: null,
 			data:{},
@@ -862,7 +863,39 @@
 			// },
 			clearServerToken: function(){
 				FL.login.token = tokenClear();
-			},		
+			},
+			convertArrC2LForEntity: function(entityName,serverArr){//serverArr =>[{"_id":123,d:{},r:[]},{"_id":124,d:{},r:[]},....{"_id":125,d:{},r:[]}]
+				//Use the dictionary for entityName to convert compressed field names in keys in serverArr to logical field names
+				//Ex: from server [{"d":{"01":true,"02":"Super 1","00":1},"r":[]},{"d":{"01":false,"02":"Super 2","00":2},"r":[]}]
+				//     ==============> [{"_id":123,id:1,"shipped":true,"product":"Super 1","id":1},{"_id":124,id:2,"shipped":false,"product":"Super 2","id":2}]	
+				// If serverArr elements inside d object have no compressed name corresponding to "id" in local dictionary, id will be added
+				// if serverArr elements have a "_id" property/value "_id" will be included in the return array 
+				var oEntity =  FL.dd.getEntityBySingular(entityName);
+				var arrOfCKeys = null;
+				var arrOfValues = null;
+				var arrOfLKeys = null;
+				var dContent = null;
+				var el = null;
+				var index = 1;
+				var retArr = _.map(serverArr, function(element){//each element is JSON =>{"_id":123,d:{},r:[]}
+					dContent = element.d;//only d will be processed. d is a JSON ex.=>{ "62":1, "63":true,"64":"Super 1" }
+					arrOfCKeys = _.keys(dContent);//ex. ["62","63","64"]
+					arrOfValues = _.values(dContent);//ex. [1,true,"Super1"]
+					arrOfLKeys = _.map(arrOfCKeys, function(element2){ 
+						var logicalName = oEntity.C2L[element2];
+						// return oEntity.C2L[element2]; 
+						return logicalName; 
+					});
+					el = _.object(arrOfLKeys,arrOfValues);//reassembles the object from two aligned arrays
+					if(!el.id)
+						el["id"] = index;
+					index++;
+					if(element._id)
+						el["_id"] = element._id;
+					return el;
+				});
+				return retArr;
+			},
 			prepareTrialApp: function() {///create adHoc client, create adHoc user, create adHoc app 
 				var def = $.Deferred();
 				var fl = new flMain();//FL.server.fl
@@ -958,7 +991,7 @@
 				// console.log("....................................>beginning connectUserToDefaultApp....with token="+JSON.stringify(FL.login.token));
 				console.log("....................................>beginning connectUserToDefaultApp....");
 				var def = $.Deferred();
-				var tokenBackup = FL.login.token;//if it fails we will recover the initial token this backup
+				var tokenBackup = FL.login.token;//if it fails we will recover the initial token with this backup
 				var fl = null;
 				var fa = null;
 				// if (FL === null || FL.login === null || FL.login.token === null){//FL.login.token is null
@@ -980,8 +1013,12 @@
 				}
 				FL.login.token.userName = userName;
 				FL.login.token.userPassWord = password;
-				var connectUserToDefaultApp=_login().then(_connect);
-				connectUserToDefaultApp.done(function(){console.log(">>>>> connectUserToDefaultApp SUCCESS <<<<<");def.resolve();});
+				var connectUserToDefaultApp=_login()
+					.then(_connect);
+				connectUserToDefaultApp.done(function(){
+					console.log(">>>>> connectUserToDefaultApp SUCCESS <<<<<");
+					def.resolve();
+				});
 				connectUserToDefaultApp.fail(function(err){
 					if( err == "no application available"){//we will try to recover the error creating one application
 						// alert("Recovering from no application");
@@ -996,6 +1033,18 @@
 					}
 				});
 				return def.promise();	
+			},
+			isConnected: function(){//returns true if is connected, false otherwise
+				isConnected = false;
+				var tk = FL.login.token["fl"];
+				var conn = null;
+				if(tk){
+					conn = tk.getsId();//flMain.getsId() - it will return a number if it is connected
+					// console.log("FL.API.isConnected() -->conn="+conn);
+					if(!isNaN(conn))
+						isConnected = true;
+				}
+				return isConnected;
 			},
 			isUserExist: function(userName){
 				var def = $.Deferred();
@@ -1312,8 +1361,8 @@
 					console.log(">>>>> loadTable SUCCESS <<<<< ");
 					//dataArray has a format: [{"_id":1,"d":{"53":"line 1 content of field1","54":"line 1 content of field2"},"v":0},
 					//							{"_id":2,"d":{"53":"line 2 content of field1","54":"line 2 content of field2"},"v":0}...,]
-					var arrLocallyTranslated = FL.server.convertArrC2LForEntity(entityName,dataArray);//dataArray =>[{"_id":123,d:{},r:[]},{"_id":124,d:{},r:[]},....{"_id":125,d:{},r:[]}]
-					//arrLocallyTranslated has the format:
+					var arrLocallyTranslated = FL.API.convertArrC2LForEntity(entityName,dataArray);//dataArray =>[{"_id":123,d:{},r:[]},{"_id":124,d:{},r:[]},....{"_id":125,d:{},r:[]}]
+					//arrLocallyTranslated is flatted with the format:
 					// alert("arrLocallyTranslated="+arrLocallyTranslated);
 					//[{"_id":123234234,"id":1,produto":"High","nome":"Rota dos Numeros, Lda","marca":"Rota dos Numeros","morada":"Av Ceuta, 21 B","cod postal":"2700-188","localidade":"Amadora","telefone":"21 4945431 ","email":"rota.dos.numeros@sapo.pt ","id":1,"_id":"545b4f9afa2b1a3233bb6781"},
 					def.resolve(arrLocallyTranslated);
@@ -1395,7 +1444,32 @@
 					}
 				}
 				return def.promise();
-			},			
+			},
+			createTemplates_ifNotExisting: function() {//checks if templates exist. If not creates it
+				var eCN = FL.dd.getCEntity("_templates");
+				// eCN = 23;
+				var def = $.Deferred();
+				console.log(">>>>>> createTemplates_ifNotExisting eCN="+eCN);
+				if(eCN === null){ // does not exist we should create it
+					console.log("....................................>beginning createTemplates_ifNotExisting....with token="+JSON.stringify(FL.login.token));
+					FL.dd.createEntity("_templates","templates entity");//update local dict
+					FL.dd.addAttribute("_templates",'jsonTemplate','json of template','json of template','string','textbox',null);
+					// FL.dd.displayEntities();
+					var synch=FL.API.syncLocalDictionaryToServer('_templates');
+					synch.done(function(){
+						console.log(">>>>>createTemplates_ifNotExisting syncLocalDictionaryToServer SUCCESS <<<<<");
+						def.resolve();
+					});
+					synch.fail(function(err){
+						console.log(">>>>>createTemplates_ifNotExisting syncLocalDictionaryToServer FAILURE <<<<< "+err);
+						def.reject(err);
+					});
+				}else{
+					console.log(">>>>>createTemplates_ifNotExisting _templates exists !");
+					def.resolve();//it exists already
+				}
+				return def.promise();
+			},						
 			mailRecipientsOfTemplate: function(entityName,templateName) {//for list entityName and templateName returns all emails received in Webhook
 				//assumes a login to an application exists
 				console.log("....................................>beginning mailRecipientsOfTemplate....with appToken="+JSON.stringify(FL.login.appToken));
@@ -1482,6 +1556,39 @@
 				return def.promise();
 				// alert("FL.server.test() -->"+x);
 			},
+			getFLContextFromBrowserLocationBar: function() {//to be used at the entry point of independent applications
+				//reads the browser adress bar to get the connection string then connects to the default application
+				var def = $.Deferred();
+				if(FL.API.isConnected()){
+					// alert("getFLContextFromBrowserLocationBar --> independent app already connected !!! how is this possible ?");
+					def.reject("getFLContextFromBrowserLocationBar --> independent app already connected !!! how is this possible ?");
+				}else{
+					var fullUrl = window.location.href;
+					var connectionString = FL.common.getTag(fullUrl,"connectionString","#");
+					if(connectionString){
+						connectionString = FL.common.enc(connectionString,-1);
+						var loginObject = JSON.parse(connectionString);//ex {"email":"toto114@toto.com","userName":"","password":"123"}				
+						// alert("getFLContextFromBrowserLocationBar ->"+loginObject.email+" token="+JSON.stringify(FL.API.token));
+						var spinner=FL.common.loaderAnimationON('spinnerDiv');
+						var connectionPromise = FL.API.connectUserToDefaultApp(loginObject.email,loginObject.password)
+						// .then(function(){return appSetup(loginObject);})
+							.then(function(){
+								spinner.stop();
+								console.log(">>>>> getFLContextFromBrowserLocationBar -> SUCCESS connecting to default app !<<<<< ");
+								console.log("after connection->"+JSON.stringify(FL.login.token));
+								def.resolve();
+							},function(err){
+								spinner.stop();
+								console.log(">>>>> getFLContextFromBrowserLocationBar FAILURE <<<<<"+err);
+								def.reject(err);
+							});						
+					}else{
+						alert("getFrameLinkContext --> No connectionString available !!!");
+						return;
+					}
+				}
+				return def.promise();
+			},			
 			testFunc: function(x) {
 				alert("FL.server.test() -->"+x);
 			}

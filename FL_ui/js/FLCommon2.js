@@ -135,7 +135,7 @@ FL["common"] = (function(){//name space FL.common
                             '<div class="modal-dialog">' +
                                 '<div class="modal-content">' +
                                     '<div class="modal-header modal-header-' + options.type + '">' +
-                                        '<button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>'+
+                                        '<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>'+
                                         // '<h3 style="color:white;" class="modal-title">' + title + '</h3>' +
                                         // '<h3 style="color:white;" class="modal-title"><i class="glyphicon glyphicon-thumbs-up"></i>' + title + '</h3>' +
                                         '<h3 style="color:white;" class="modal-title">' + iconHTML + title + '</h3>' +
@@ -259,7 +259,7 @@ FL["common"] = (function(){//name space FL.common
                             '<div class="modal-dialog">' +
                                 '<div class="modal-content">' +
                                     '<div class="modal-header modal-header-' + options.type + '">' +
-                                        '<button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>'+
+                                        '<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>'+
                                         // '<h3 style="color:white;" class="modal-title">' + title + '</h3>' +
                                         // '<h3 style="color:white;" class="modal-title"><i class="glyphicon glyphicon-thumbs-up"></i>' + title + '</h3>' +
                                         '<h3 style="color:white;" class="modal-title">' + iconHTML + title + '</h3>' +
@@ -360,32 +360,37 @@ FL["common"] = (function(){//name space FL.common
 			//ex. FL.common.getTag(fullUrl,"connectionString","#") -->returns  "abc" for fullUrl="#connectionString=abc#pag=home"
 			var retTag = null;
 			retTag = this.getLastTagInString(str,tagName+"=",tagTerminator);
-			var firstChar = retTag.substring(0,1);
-			if(firstChar == "{"){//tag is the string format of a JSON
-				retTag=retTag.replace(/%22/g,'"');
-				retTag=retTag.replace(/%20/g,' ');
-			}
+            if(retTag){
+                var firstChar = retTag.substring(0,1);
+                if(firstChar == "{"){//tag is the string format of a JSON
+                    retTag=retTag.replace(/%22/g,'"');
+                    retTag=retTag.replace(/%20/g,' ');
+                }
+            }
 			return retTag;
 		},
 		stringAfterLast: function(str,separator) {//returns the content of str after the last separator character or string - no separator found  =>null
 			//ex. FL.common.stringAfterLast("http://www.framelink.co/app?d=myDomain1","=") -->returns  "myDomain1"
 			var retStr = null;
-			var pos = str.lastIndexOf(separator);
-			var separatorLen = separator.length;
-			if(pos>=0)
-				retStr = str.substring(pos+separatorLen);
+            if(str){
+    			var pos = str.lastIndexOf(separator);
+    			var separatorLen = separator.length;
+    			if(pos>=0)
+    				retStr = str.substring(pos+separatorLen);               
+            }
 			return retStr;
 		},
 		stringBeforeLast: function(str,separator) {//simply returns the content of str before the last separator character or string - no separator found  =>null
 			//ex. FL.common.stringBeforeLast("this is (one) or (two) values","(") -->returns  "this is (one) or "
 			var retStr = null;
-			var pos = str.lastIndexOf(separator);
-			var separatorLen = separator.length;
-			if(pos>=0)
-				retStr = str.substring(0,pos);
+            if(str){
+    			var pos = str.lastIndexOf(separator);
+    			var separatorLen = separator.length;
+    			if(pos>=0)
+    				retStr = str.substring(0,pos);
+            }    
 			return retStr;
 		},
-
 		getLastTagInString: function(str,separator,tagTerminator) {//returns the content after the last separator until end or terminal char
 			// str - string that will be processed
 			// separator - last ocurrence to be identified in string

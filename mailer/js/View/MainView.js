@@ -1,4 +1,7 @@
 MailerTemplate.Views.MainView = Backbone.View.extend({
+	
+	// el: $('#charge_dialog_container'),
+
 	m_Model : null,
 	m_TemplateItems : null,
 	m_Editor : null,
@@ -12,6 +15,12 @@ MailerTemplate.Views.MainView = Backbone.View.extend({
 	m_loadTemplate : null,
 	
 	initialize : function(expenses){
+        // this.render();
+        // this.$el.modal({'backdrop': 'static'});
+        // var template = _.template($('#charge_dialog_template').html());
+        // this.$el.html(template);
+
+
 		this.m_jsonGenerator = new JsonGenerator();
 		
 		this.m_TemplateItems = new MailerTemplate.Views.TemplateItems({el : "#templateItems"});
@@ -31,26 +40,67 @@ MailerTemplate.Views.MainView = Backbone.View.extend({
 	},
 	events : {
 		"click #saveTempalate" : "OnSaveBtnClick",
-		"click #loadTemplate" : "OnLoadTemplateBtnClick"
+		"click #loadTemplate" : "OnLoadTemplateBtnClick",
+		"click #exitSaving" : "OnExitSaving",
+		"click #exitNoSave" : "OnExitNoSave"
 	},
+
+    // render: function() {
+    //     var template = _.template($('#charge_dialog_template').html());
+    //     this.$el.html(template);
+    // },
+
 	OnSaveBtnClick : function(evt){
 		var modelData = this.m_Editor.generatePlainHtml();
 		var jsonData = this.m_jsonGenerator.GenerateJson(modelData);
 		var jsonString = JSON.stringify(jsonData);
 		console.log(jsonString);
+		alert("Preview will use json="+jsonString);
 		// save this jsonString
 		window.jsonObject = jsonData;
 		window.open("./mailer/TemplatePreview.html","_blank");
 	},
 	OnLoadTemplateBtnClick : function(){
-		var temp = this;
-		$.ajax({
-			url : "TemplateSample.json",
-			type: 'get',
-			data : 'text',
-			success : function(data) { temp.LoadTemplate(data); },
-			error : this.OnError
+		// var temp = this;
+		// $.ajax({
+		// 	url : "TemplateSample.json",
+		// 	type: 'get',
+		// 	data : 'text',
+		// 	success : function(data) { temp.LoadTemplate(data); },
+		// 	error : this.OnError
+		// });
+		console.log("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
+		console.log("before loading templates->"+JSON.stringify(FL.login.token));
+		// alert("before loading templates->"+JSON.stringify(FL.login.token));
+		var spinner=FL.common.loaderAnimationON('spinnerDiv');
+		var promise=FL.API.loadTable("_templates");
+		promise.done(function(data){
+			console.log("MainView.js -> _templates successfully loaded");
+			spinner.stop();
+			if( data.length == 0 ){
+				FL.common.makeModalInfo('No templates available. Save your templates with Save button');
+			}else{
+				alert("_templates content="+JSON.stringify(data));
+			}	
 		});
+		promise.fail(function(err){
+			spinner.stop();
+			alert("DefaultGridWithNewsLetterAndEditButtons Error="+err);
+		});		
+	},
+	OnExitSaving: function(){
+		var modelData = this.m_Editor.generatePlainHtml();
+		var jsonData = this.m_jsonGenerator.GenerateJson(modelData);
+		var jsonString = JSON.stringify(jsonData);
+		alert("jsonString is:"+jsonString);
+ 	},
+	OnExitNoSave: function(){
+		alert("exitNoSave");
+		window.close();
+		// FL.API.disconnect()
+		// .then(function(){console.log("DragNDrop->no save --> disconnect ok!");window.close();return;} 
+		// 	,function(err){console.log("DragNDrop->no save -->failure on disconnect err ="+err);return;}
+		// );
 	},
 	LoadTemplate : function(data){
 		try{

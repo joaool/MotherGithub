@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>handlebars v3.0</title>
+    <script src="FL_ui/js/jquery-1.11.1.js" type="text/javascript"></script>
+    <script src="FL_ui/js/bootstrap.min.js"></script>
+    <link href="FL_ui/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
+
+
+    <!--<link rel="stylesheet" href="FL_ui/css/FLcerulean.css">-->
+    <script src="FL_ui/js/underscore.js"></script>
+    <script src="./mailer/js/lib/handlebars-v1.3.0.js"></script>
+    <script>
+    window.ParsleyConfig = {
+        classHandler: function ( elem, isRadioOrCheckbox ) {
+          // specify where parsley error-success classes are set
+          return $(elem).parents(".form-group");
+        },
+        errorsWrapper: '<span class="parsley-help-block"></span>',
+        errorTemplate: '<span></span>' 
+       };
+    </script>
+    <script src="FL_ui/js/parsley.js"></script>
+    <link type="text/css" rel="stylesheet" href="FL_ui/css/parsley.css" />      
+</head>
+<style>
+    body {
+        font:15px arial,sans-serif;
+    }
+    h1 {
+        margin: 0 0 10px 0;
+        padding: 5px;
+        font-size: 24px;
+        background-color: #999;
+        color: #fff;
+    }
+    table {
+        margin: 10px;
+    }
+    th, td {
+        padding: 5px;
+        border: 1px solid #999;
+    }
+    th {
+        background: #ccc;
+    }
+    tr:nth-child(odd) {
+        background: #eee;
+    }
+    td a {
+        color: #000;
+        text-decoration: underline;
+    }    
+</style>
+<body>
+    <h1>Handlebars JS Example 3.0</h1>
+    <script id="__text" type="text/x-handlebars-template">
+        <div class="input-group" style="padding:5px 300px 5px">
+            <div class="input-group" style="line-height:0px;">
+                <span class="input-group-addon">{{leftLabel}}</span>
+                 <input id="{{id}}" type={{type}} class="form-control" placeholder={{placeholder}} value={{value}} data-parsley-trigger={{trigger}} data-toggle="tooltip" data-placement="top" title="{{tooltip}}">
+                <span class="input-group-addon"><span class="glyphicon {{icon}}"></span></span>
+            </div>
+        </div>    
+    </script>
+    <script id="__textLabel" type="text/x-handlebars-template">
+        <div class="input-group" style="padding:5px 300px 5px">
+            <legend>{{label}}</legend>
+            <div class="input-group" style="line-height:0px;">
+                <span class="input-group-addon">{{leftLabel}}</span>
+                <input id="{{id}}" type={{type}} class="form-control" id={{id}} placeholder={{placeholder}} value={{value}} data-parsley-trigger={{trigger}} data-toggle="tooltip" data-placement="top" title="{{tooltip}}">
+                <span class="input-group-addon"><span class="glyphicon {{icon}}"></span></span>
+            </div>
+        </div>
+    </script>    
+    <script id="inTextareaLabel" type="text/x-handlebars-template"> 
+        <label class="control-label" for="_dictEditEntityTemplate_entityDescription" id="_dictEditEntityTemplate_whatIsLabel" >What is a </label>
+        <div class="input-group" style="line-height:0px;">
+            <span class="input-group-addon">Description:</span>
+            <textarea class="form-control" id="_dictEditEntityTemplate_entityDescription" name="entityDescription" onkeyup="FL.slidePanels.dictTemplateChangeDescription(this.form)" rows="2"><%= masterDetailItems.master.entityDescription %></textarea>
+        </div>
+    </script>
+    <script id="__button" type="text/x-handlebars-template"> 
+        <div class="pull-right" style="padding:5px 300px 5px;" >
+            <button type="button" class="btn btn-{{btnType1}} {{buttonHide1}}" onclick="{{onClick1}}" data-toggle="tooltip" data-placement="top" title="{{tooltip1}}" >{{label1}}</button>
+            <button type="button" class="btn btn-{{btnType2}} {{buttonHide2}}" onclick="{{onClick2}}" data-toggle="tooltip" data-placement="top" title="{{tooltip2}}">{{label2}} </button>
+            <button type="button" class="btn btn-{{btnType3}} {{buttonHide3}}" onclick="{{onClick3}}" data-toggle="tooltip" data-placement="top" title="{{tooltip3}}">{{label3}} </button>
+            <button type="button" class="btn btn-{{btnType4}} {{buttonHide4}}" onclick="{{onClick4}}" data-toggle="tooltip" data-placement="top" title="{{tooltip4}}">{{label4}} </button>
+            <button type="button" class="btn btn-{{btnType5}}  {{buttonHide5}}" onclick="{{onClick5}}" data-toggle="tooltip" data-placement="top" title="{{tooltip5}}" >{{label5}} </button>
+
+        </div>
+    </script>
+    <script id="__checkbox" type="text/x-handlebars-template"> 
+        <div id="{{id}}" class="input-group" style="padding:5px 300px 5px">
+            <label class="checkbox-inline {{chkHide1}}"><input type="checkbox" {{checked1}} value="1">{{label1}}</label>
+            <label class="checkbox-inline {{chkHide2}}"><input type="checkbox" {{checked2}} value="2">{{label2}}</label>
+            <label class="checkbox-inline {{chkHide3}}"><input type="checkbox" {{checked3}} value="3">{{label3}}</label>
+            <label class="checkbox-inline {{chkHide4}}"><input type="checkbox" {{checked4}} value="4">{{label4}}</label>
+            <label class="checkbox-inline {{chkHide5}}"><input type="checkbox" {{checked5}} value="5">{{label5}}</label>
+        </div>
+    </script>
+    <script id="__radiobox" type="text/x-handlebars-template"> 
+        <div id="{{id}}" class="input-group" style="padding:5px 300px 5px">
+            <label class="radio-inline {{radioHide1}}"><input type="radio" {{checked1}} name="optradio" value="1">{{label1}}</label>
+            <label class="radio-inline {{radioHide2}}"><input type="radio" {{checked2}} name="optradio" value="2">{{label2}}</label>
+            <label class="radio-inline {{radioHide3}}"><input type="radio" {{checked3}} name="optradio" value="3">{{label3}}</label>
+            <label class="radio-inline {{radioHide4}}"><input type="radio" {{checked4}} name="optradio" value="4">{{label4}}</label>
+            <label class="radio-inline {{radioHide5}}"><input type="radio" {{checked5}} name="optradio" value="5">{{label5}}</label>
+        </div>
+    </script>    
+    <script id="__combo" type="text/x-handlebars-template">    
+        <div class="input-group" style="line-height:0px;padding:5px 300px 5px">
+            <span class="input-group-addon">{{leftLabel}}</span>
+            <div class="btn-group">
+                <button type="button" class="btn btn-{{btnType}} dropdown-toggle" data-toggle="dropdown">
+                    <span id="{{id}}" data-bind="label" data-toggle="tooltip" data-placement="top" title="{{tooltip}}" >{{comboLabel}}</span>&nbsp;<span class="caret"></span>
+                </button> 
+                <ul id="{{id}}Items" class="dropdown-menu">
+                    <li><a href="#">templ1</a></li>
+                    <li><a href="#">templ2</a></li>
+                </ul>
+            </div>
+        </div>    
+    </script>
+    <script id="getStartedTemplate" type="text/template"> 
+        <div class="getStartedExample" style="margin-top:0px;">
+            <form id="form_getStartedTemplate" novalidate="novalidate">
+            <legend>Sign up and press <strong>'Start now'</strong> button.</legend>
+                <div class="row">
+                    <div class="col-xs-12" >
+                        {{#el}} 
+                     </div>
+                </div>
+            </form>
+        </div>
+    </script>    
+    <script id="baseGetStartedTemplate" type="text/template"> 
+        <div class="getStartedExample" style="padding: 10px 100px 10px;">
+            <form id="form_getStartedTemplate" novalidate="novalidate" role="form">
+                <div class="row">
+                    <div class="col-xs-12" >
+                        <div class="input-group" style="padding:5px 300px 5px">
+                            <legend>Sign up and press <strong>'Start now'</strong> button.</legend>
+                        </div>
+                        <div class="input-group" style="line-height:0px;padding:5px 300px 5px">
+                            <span class="input-group-addon">Email:</span>
+                            <input type="email" class="form-control" id="getStarted_email" placeholder="Your Email Address" value="Joao" name="email" data-parsley-trigger="change" required data-toggle="tooltip" data-placement="top" title="please introduce your email here" >
+                            <span class="input-group-addon"><span class="glyphicon glyphicon-envelope"></span></span>
+                        </div>
+                        <div class="input-group" style="line-height:0px;padding:5px 300px 5px">
+                            <span class="input-group-addon">Password:</span>
+                            <input type="password" class="form-control" id="getStarted_password" placeholder="Password" value="jo123" data-toggle="tooltip" data-placement="top" title="please introduce your password here">
+                            <span class="input-group-addon"><span class="glyphicon glyphicon-lock"></span></span>
+                        </div>
+                        <div class="input-group" style="line-height:0px;padding:5px 300px 5px">
+                            <span class="input-group-addon">Choose a template:</span>
+                            <div class="btn-group">
+                                <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+                                   <span data-bind="label" data-toggle="tooltip" data-placement="top" title="please select  your template here" >Select One</span>&nbsp;<span class="caret"></span>
+                                </button>   
+                                <ul id="_sendNewsletter_template" class="dropdown-menu" role="menu">
+                                    <li><a href="#">templ1</a></li>
+                                    <li><a href="#">templ2</a></li>
+                                </ul>
+                                <a href="#"> ------------ <span class="badge">New</span></a>
+                            </div>
+                        </div>
+                        <div class="input-group" style="padding:5px 300px 5px">
+                            <label class="checkbox-inline"><input type="checkbox" value="">Option 1</label>
+                            <label class="checkbox-inline"><input type="checkbox" value="">Option 2</label>
+                            <label class="checkbox-inline"><input type="checkbox" value="">Option 3</label>
+                            <label class="checkbox-inline"><input type="checkbox" value="">Option 4</label>
+                            <label class="checkbox-inline"><input type="checkbox" value="">Option 5</label>
+                        </div>
+                        <div class="input-group" style="padding:5px 300px 5px">
+                            <label class="radio-inline"><input type="radio" name="optradio">Option 1</label>
+                            <label class="radio-inline"><input type="radio" name="optradio">Option 2</label>
+                            <label class="radio-inline"><input type="radio" name="optradio">Option 3</label>
+                            <label class="radio-inline"><input type="radio" name="optradio">Option 4</label>
+                            <label class="radio-inline"><input type="radio" name="optradio">Option 5</label>
+                        </div>
+                        <div class="input-group" style="padding:5px 300px 5px">
+                             <label for="comment">Comment:</label>
+                             <textarea class="form-control" rows="5" id="comment" data-toggle="tooltip" data-placement="top" title="please introduce your comment here"></textarea>
+                        </div>
+                        <div class="btn-group pull-right" role="group" aria-label="..." style="padding:5px 300px 5px;">
+                            <button type="submit" class="btn btn-primary" onclick="clickTest('btn1')" data-toggle="tooltip" data-placement="top" title="This is a special button VNF " >Button1</button>
+                            <button type="submit" class="btn btn-success xhide" onclick="clickTest('btn2')" data-toggle="tooltip" data-placement="top" title="This is a green button" >Button2</button>
+                            <button type="submit" class="btn btn-danger" onclick="clickTest('btn3')" data-toggle="tooltip" data-placement="top" title="This is a red button" >Button3</button>
+
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </script>                         
+    <script id="some-template" type="text/x-handlebars-template"> 
+        <table>
+            <thead> 
+                <th>Name</th> 
+                <th>Job Title</th> 
+                <th>Twitter</th> 
+            </thead> 
+            <tbody> 
+                {{#users}} 
+                <tr> 
+                    <td>{{fullName person}}</td> 
+                    <td>{{jobTitle}}</td> 
+                    <td><a href="https://twitter.com/{{twitter}}">@{{twitter}}</a></td> 
+                </tr> 
+                {{/users}} 
+            </tbody> 
+        </table> 
+    </script>
+    <script>
+        $(function () { $("[data-toggle='tooltip']").tooltip(); });
+        $( document.body ).on( 'click', '.dropdown-menu li', function( event ) {
+
+              var $target = $( event.currentTarget );
+
+              $target.closest( '.btn-group' )
+                 .find( '[data-bind="label"]' ).text( $target.text() )
+                    .end()
+                 .children( '.dropdown-toggle' ).dropdown( 'toggle' );
+
+              return false;
+        });       
+    </script>    
+    <script>
+        //http://coolestguidesontheplanet.com/bootstrap/modal.php
+        var source = $("#some-template").html(); 
+        var template = Handlebars.compile(source); 
+
+        var data = { 
+            users: [ { 
+                person: {
+                    firstName: "Garry", 
+                    lastName: "Finch"
+                },
+                jobTitle: "Front End Technical Lead",
+                twitter: "gazraa" 
+            }, {
+                person: {
+                    firstName: "Garry", 
+                    lastName: "Finch"
+                }, 
+                jobTitle: "Photographer",
+                twitter: "photobasics"
+            }, {
+                person: {
+                    firstName: "Garry", 
+                    lastName: "Finch"
+                }, 
+                jobTitle: "LEGO Geek",
+                twitter: "minifigures"
+            } ]
+        }; 
+
+        Handlebars.registerHelper('fullName', function(person) {
+          return person.firstName + " <----> " + person.lastName;
+        });
+        //the function template receives the JSON data (an object with an array of users) and for each array element applies the compiled template source 
+
+        data1 = {
+            id: "getStarted_email",
+            type: "email",
+            placeholder:"Your Email Address",
+            value:"Joaquim",
+            trigger: "change"
+        };
+        data2 ={
+            elements:[
+                {
+                    element: "text",
+                    type: "email",
+                    leftLabel:"Your Name:",
+                    placeholder:"Please introduce your name",
+                    value:"Antonio",
+                    icon: "glyphicon-envelope",
+                    trigger: "change",
+                    icon: "glyphicon-envelope",
+                    tooltip:"This is a nice email"
+                },
+                {
+                    element: "textLabel",
+                    type: "password",
+                    leftLabel:"Password:",
+                    placeholder:"Password",
+                    value:"Antonio123",
+                    icon: "glyphicon-lock",
+                    trigger: "change",
+                    label:"Please introduce your password:",
+                    tooltip:"This is a nice password"
+                },
+                {
+                    element: "checkbox",
+                    chkArr:[
+                        {label:"first checkbox",checked:true,onChange:null},
+                        {label:"checkbox two",checked:false,onChange:null},
+                        {label:"Like FrameLink",checked:true,onChange:null}
+                    ]
+                 },
+                {
+                    element: "checkbox",
+                    chkArr:[
+                        {label:"Are you ready ?",checked:false,onChange:null},
+                     ]
+                 },
+                {
+                    element: "radiobox",
+                    radioArr:[
+                        {label:"Poor",onChange:null},
+                        {label:"Good",checked:true,onChange:null},
+                        {label:"Excellent",onChange:null},
+                        {label:"No idea",onChange:null},
+                     ]
+                },                 
+                {
+                    element: "combo",
+                    leftLabel:"Please choose a template:",
+                    tooltip:"Hi zz, please select  your template here",
+                    comboLabel:"Select One Template",
+                    onClick:"clickTest('combo')",
+                    comboArr:["first choice","second one","option 3"],
+                    caption:"Test",
+                    btnType:"default" //deafult, primary,info, success, danger,warning
+                },                                
+                {
+                    element: "button",
+                    buttonArr:[
+                        {btnType:"info",label:"Press 1",onClick:"clickTest('btn1')",tooltip:"please press1"},
+                        {btnType:"success",label:"Joakim Almeida",onClick:"clickTest('btn2')",tooltip:"please press2"},
+                        {btnType:"danger",label:"Press 3",onClick:"clickTest('btn3')",tooltip:"please press3"},
+                        {btnType:"primary",label:"Special",onClick:"clickTest('Special')",tooltip:"please press special"},
+                    ]
+                },
+            ]
+        };
+        var clickTest = function(msg){
+            // retrieveFormMakerValues
+            retrieveFormMakerValues();
+            alert("-->"+msg);
+        };
+
+        // var source1 = $("#inText").html(); 
+        // var template1 = Handlebars.compile(source1); 
+        // var source2 = $("#inText").html(); 
+        // var template2 = Handlebars.compile(source2); 
+        var checkboxSetup = function(lineId,elementObj){//returns a JSON to be used by handlebars for the checkbox element
+            //example of elementObj ->{ element: "checkbox",chkArr:[{label:"first checkbox",checked:true,onChange:null}]}
+            console.log("---------------------------------->It is a checkbox");
+            var chkJson = {chkHide1:"hide",chkHide2:"hide",chkHide3:"hide",chkHide4:"hide",chkHide5:"hide"};
+             if(elementObj.chkArr){
+                console.log("---------------------------------->chkArr exists in checkbox");
+                chkJson["id"] = lineId;
+                _.each(elementObj.chkArr, function(element,index){
+                    var indexSuffix = (index+1)+"";
+                    // chkJson["id"+indexSuffix] = lineId+indexSuffix;//{{id1}} becomes "__line_51" for line 5
+                    chkJson["chkHide"+indexSuffix] = "";//removes the initial hide
+                    chkJson["checked"+indexSuffix] = element.checked ? "checked": "";
+                    chkJson["label"+indexSuffix] = element.label;
+                });
+            }else{
+                alert("formMaker - checkboxSetup ERROR - chkArr is mandatory in checkbox element and it is missing in form JSON.(Check all your checkbox elements)");
+            }
+            return chkJson;
+        };
+        var radioboxSetup = function(lineId,elementObj){//returns a JSON to be used by handlebars for the radiobox element
+            //example of elementObj ->{ element: "checkbox",chkArr:[{label:"first checkbox",checked:true,onChange:null}]}
+            console.log("---------------------------------->It is a radiobox");
+            var radioJson = {radioHide1:"hide",radioHide2:"hide",radioHide3:"hide",radioHide4:"hide",radioHide5:"hide"};
+             if(elementObj.radioArr){
+                console.log("---------------------------------->radioArr exists in checkbox");
+                radioJson["id"] = lineId;
+                _.each(elementObj.radioArr, function(element,index){
+                    var indexSuffix = (index+1)+"";
+                    radioJson["radioHide"+indexSuffix] = "";//removes the initial hide
+                    radioJson["checked"+indexSuffix] = element.checked ? "checked": "";
+                    radioJson["label"+indexSuffix] = element.label;
+                    // console.log("****************>"+JSON.stringify(radioJson));
+                });
+            }else{
+                alert("formMaker - radioboxSetup ERROR - radioArr is mandatory in radiobox element and it is missing in form JSON.(Check all your radiobox elements)");
+            }
+            return radioJson;
+        };
+        var buttonSetup = function(elementObj){//returns a JSON to be used by handlebars for the button element
+            //example of elementObj ->{ element: "checkbox",chkArr:[{label:"first checkbox",checked:true,onChange:null}]}
+            console.log("---------------------------------->It is a button");
+            var buttonJson = {buttonHide1:"hide",buttonHide2:"hide",buttonHide3:"hide",buttonHide4:"hide",buttonHide5:"hide"};
+             if(elementObj.buttonArr){
+                console.log("---------------------------------->buttonArr exists in button element");
+                _.each(elementObj.buttonArr, function(element,index){
+                    var indexSuffix = (index+1)+"";
+                    buttonJson["buttonHide"+indexSuffix] = "";//removes the initial hide
+                    buttonJson["btnType"+indexSuffix] = element.btnType;
+                    buttonJson["onClick"+indexSuffix] = element.onClick;
+                    buttonJson["label"+indexSuffix] = element.label;
+                    buttonJson["tooltip"+indexSuffix] = element.tooltip;
+                    console.log("****************>"+JSON.stringify(buttonJson));
+                });
+            }else{
+                alert("formMaker - buttonSetup ERROR - buttonArr is mandatory in button element and it is missing in form JSON.(Check all your button elements)");
+            }        
+            return buttonJson;
+        };
+        var insertOptionsInCombo = function(lineId,elementObj){//returns a JSON to be used by handlebars for the button element
+            //example of elementObj ->{ element: "checkbox",chkArr:[{label:"first checkbox",checked:true,onChange:null}]}
+            console.log("---------------------------------->It is a combo");
+            var comboJson = elementObj;
+             if(elementObj.comboArr){
+                console.log("---------------------------------->comboArr exists in combo element");
+                $("#"+lineId+"Items").empty();
+                var optionHTML = null;
+                _.each(elementObj.comboArr,function(element){
+                    optionHTML = "<li><a href='#'>" + element + "</a></li>";
+                    $("#"+lineId+"Items").append(optionHTML);                  
+                });
+            }        
+            return comboJson;
+        };           
+        var retrieveFormMakerValues = function(){
+            var arrOfObj = window.arrOfObj;
+            if(arrOfObj){
+                _.each(arrOfObj, function(element,index){
+                    var lineId = "__line_" + index;
+                    var value = null;
+                    if(element.element == "combo"){
+                        value = $("#"+lineId).text();
+                    }else if(element.element == "checkbox"){
+                        var allVals = [];
+                        $('#' + lineId + ' :checked').each(function() {
+                            allVals.push(this.value);
+                        });
+                        value = JSON.stringify(allVals);
+                    }else if(element.element == "radiobox"){
+                        value = $('#' + lineId + ' :checked').val();
+                    }else{
+                        value = $("#"+lineId).val();
+                    }
+                    console.log(index + " --> " + lineId + " ** "+ element.element +" ** ==>" + value);
+                });
+                var checkedValue = $('input:checkbox:selected').val();
+            }else{
+                alert("retrieveFormMakerValues ERROR window.arrOfObj is undefined !");
+            }    
+        };
+        var formMaker = function(jsonForm){
+            var arrOfObj = jsonForm.elements;
+            window.arrOfObj = arrOfObj;//only one is active each time
+            var elJson = null;
+            _.each(arrOfObj, function(element,index){
+                console.log(index + " - " + element.element + "/" + element.type);
+                var lineId = "__line_" + index;
+                var source = $("#__"+element.element).html(); 
+                var template = Handlebars.compile(source);
+                if(element.element == "checkbox"){
+                    elJson = checkboxSetup(lineId,element);
+                     // $('body').append(template(elJson));                                                      
+                }else if(element.element == "radiobox") {
+                    elJson = radioboxSetup(lineId,element);
+                }else if(element.element == "button") {
+                    elJson = buttonSetup(element);                
+                }else{
+                    //$('body').append(template(element));
+                    elJson = element;
+                    elJson["id"] = lineId;
+                }
+                $('body').append(template(elJson));
+                if(element.element == "combo"){
+                    insertOptionsInCombo(lineId,element);//this is done after placing the combo in the DOM
+                }   
+            });
+        };
+       var formMaker2 = function(jsonForm,frameTemplate){
+            var fData = {el:[]};// ex:{el:[{html:"<p>hello1</p>"},{html:"<p>hello2</p>"}]}
+            var arrOfObj = jsonForm.elements;
+            // _.each(arrOfObj, function(element){
+            //     console.log(element.element + "/" + element.type);
+            //     var source = $("#"+element.element).html(); 
+            //     var template = Handlebars.compile(source); 
+            //     fData.el.push({"html":template(element)})
+            // });
+            fData = {el:[{html:"<p>hello1</p>"},{html:"<p>hello2</p>"}]};
+            var frameSource = $("#"+frameTemplate).html();
+            var template = Handlebars.compile(frameSource); 
+            $('body').append(template(fData));                 
+
+
+        };        
+        formMaker(data2);//ALTERNATE ACTIVATION WITH BASE
+        // formMaker2(data2,"getStartedTemplate");
+        
+        //ACTIVATE BASE TO VIEW THE BASE REFERENCE
+        // var frameSource = $("#baseGetStartedTemplate").html();//this is the reference - everything coded in the template
+        // $('body').append(frameSource);                 
+
+        // $('body').append(template1(data1)); 
+
+        console.log(document.title+"......  END..");
+    </script>   
+<body>
+</html>

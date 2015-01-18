@@ -120,7 +120,7 @@
 				var confirmQuestion = null;
 				var button2 = null;
 				if(missingEmails.length == toSend.length){
-					confirmQuestion = "No risk of duplicates. It is the first emission of template " + NName + ". Do you want to send these " + toSend.length + " emails ?";
+					confirmQuestion = "Do you confirm the emission of " + toSend.length + " emails, using template '" + NName + "' ?";
 					button2 = "OK execute first emission";
 				}else{
 					var missingHTML = "";

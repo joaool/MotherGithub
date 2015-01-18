@@ -21,9 +21,26 @@
 		<script src="./mailer/bootstrap/js/bootstrap.min.js"></script>
 		<script src="./mailer/js/lib/formpicker/js/bootstrap-formhelpers.min.js"></script>
 		<script src="./mailer/js/bussinesslogic/JsonGenerator.js"></script>
-
+	    <script>
+			window.ParsleyConfig = {
+				classHandler: function ( elem, isRadioOrCheckbox ) {
+					// specify where parsley error-success classes are set
+					return $(elem).parents(".form-group");
+				},
+				errorsWrapper: '<span class="parsley-help-block"></span>',
+				errorTemplate: '<span></span>' 
+			};
+	    </script>
+	    <script src="FL_ui/js/parsley.js"></script>
+	   	<link href="FL_ui/css/FLred.css" rel="stylesheet">
+		<script src="FL_ui/flClient/flClient.js"></script>
+		<script src="FL_ui/flClient/ajaxBrowser.js"></script>
+		<script src="FL_ui/js/spin.min.js"></script>
 		<script src="FL_ui/js/FLCommon2.js"></script>
-
+		<script src="FL_ui/js/FLdd2.js"></script>           
+		<script src="FL_ui/js/FLLoadCss2.js"></script>
+		<script src="FL_ui/js/FLAPI.js"></script>
+		
 		<script src="./mailer/js/Common.js"></script>
 		<script src="./mailer/js/MailerTemplate.js"></script>
 		
@@ -47,14 +64,160 @@
 		<script src="./mailer/js/DragNDrop.js"></script>
 		
 	</head>
+	<style>
+		.modal-header-success {
+		    color:#fff;
+		    padding:9px 15px;
+		    border-bottom:1px solid #eee;
+		    background-color: #5cb85c;
+		    -webkit-border-top-left-radius: 5px;
+		    -webkit-border-top-right-radius: 5px;
+		    -moz-border-radius-topleft: 5px;
+		    -moz-border-radius-topright: 5px;
+		     border-top-left-radius: 5px;
+		     border-top-right-radius: 5px;
+		}
+		.modal-header-warning {
+		    color:#fff;
+		    padding:9px 15px;
+		    border-bottom:1px solid #eee;
+		    background-color: #f0ad4e;
+		    -webkit-border-top-left-radius: 5px;
+		    -webkit-border-top-right-radius: 5px;
+		    -moz-border-radius-topleft: 5px;
+		    -moz-border-radius-topright: 5px;
+		     border-top-left-radius: 5px;
+		     border-top-right-radius: 5px;
+		}
+		.modal-header-danger {
+		    color:#fff;
+		    padding:9px 15px;
+		    border-bottom:1px solid #eee;
+		    background-color: #d9534f;
+		    -webkit-border-top-left-radius: 5px;
+		    -webkit-border-top-right-radius: 5px;
+		    -moz-border-radius-topleft: 5px;
+		    -moz-border-radius-topright: 5px;
+		     border-top-left-radius: 5px;
+		     border-top-right-radius: 5px;
+		}		
+		.modal-header-info {
+		    color:#fff;
+		    padding:9px 15px;
+		    border-bottom:1px solid #eee;
+		    background-color: #5bc0de;
+		    -webkit-border-top-left-radius: 5px;
+		    -webkit-border-top-right-radius: 5px;
+		    -moz-border-radius-topleft: 5px;
+		    -moz-border-radius-topright: 5px;
+		     border-top-left-radius: 5px;
+		     border-top-right-radius: 5px;
+		}
+		.modal-header-primary {
+		    color:#fff;
+		    padding:9px 15px;
+		    border-bottom:1px solid #eee;
+		    background-color: #428bca;
+		    -webkit-border-top-left-radius: 5px;
+		    -webkit-border-top-right-radius: 5px;
+		    -moz-border-radius-topleft: 5px;
+		    -moz-border-radius-topright: 5px;
+		     border-top-left-radius: 5px;
+		     border-top-right-radius: 5px;
+		}
+	    .spinner {
+	      position: fixed;
+	      top: 50%;
+	      left: 50%;
+	    }
+		.dropGroup{
+			/*right: 0;*/
+			color:white;
+			/*width:580px;*/
+			margin-left:-1px;
+		}
+	</style>
+	<script id="_templateForm" type="text/template"> 
+		<div class="_templateForm" style="margin-top:0px;">
+			<form id="form__templateForm" novalidate="novalidate">
+				<div class="row">
+					<div class="col-xs-12" >
+					    <legend>Save the current template</legend>		    
+						<div class="input-group" style="line-height:0px;">
+							<span class="input-group-addon">Template name:</span>
+							<input type="text" class="form-control" id="_template_name" placeholder="Give a name to your template" value="<%= masterDetailItems.master.name %>" data-parsley-trigger="change" >
+							<span class="input-group-addon"><span class="glyphicon glyphicon-edit"></span></span>
+					    </div>
+					    <div class="input-group" style="line-height:0px;">
+							<span class="input-group-addon">Overwrite an existing template:</span>
+							<div class="btn-group">
+								<a class="btn btn-default dropdown-toggle" data-toggle="dropdown" style="font-size:14px;font-weight:bold;margin-right:-4.0em" href="#"> Choose Template <span class="caret"></span></a>
+								<ul id="_sendNewsletter_template" class="dropdown-menu">
+									<li><a href="#">templ1</a></li>
+									<li><a href="#">templ2</a></li>
+								</ul>
+							</div>
+						</div>			    
+ 				    </div>
+		    	</div>
+			</form>
+		</div>
+	</script>
+	<script id="_test" type="text/template"> 
+ 		<!-- Button trigger modal -->
+ 		<a data-toggle="modal" href="#myModal1" class="btn btn-primary btn-lg">Launch demo modal</a>
+		<!-- Modal -->
+		<div class="modal fade" id="myModal1" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+		    <div class="modal-dialog">
+		      <div class="modal-content">
+
+		        <div class="modal-header">
+		          <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+		          <h4 class="modal-title">Modal title</h4>
+		        </div>
+		        <div class="modal-body">
+		          Modal body content...
+		        </div>
+		        <div class="modal-footer">
+		          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+		          <button type="button" class="btn btn-primary">Save changes</button>
+		        </div>
+
+		      </div><!-- /.modal-content -->
+		    </div><!-- /.modal-dialog -->
+		</div><!-- /.modal -->
+  	</script>
+	<script id="charge_dialog_template" type="text/template">
+		<div class="modal fade" id="myModal1" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+		    <div class="modal-dialog">
+		      <div class="modal-content">
+
+		        <div class="modal-header">
+		          <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+		          <h4 class="modal-title">Modal title</h4>
+		        </div>
+		        <div class="modal-body">
+		          Modal body content...
+		        </div>
+		        <div class="modal-footer">
+		          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+		          <button type="button" class="btn btn-primary">Save changes</button>
+		        </div>
+
+		      </div><!-- /.modal-content -->
+		    </div><!-- /.modal-dialog -->
+		</div><!-- /.modal -->
+
+	</script>
 	<body>
+		<!-- -->
 		<div id="_modalDialog"></div>
 	    <div id="_modalDialogA"></div>
-	    <div id="_modalDialogB"></div>		
+	    <div id="_modalDialogB"></div>
+	    <div id='spinnerDiv'></div>	
 		<div id="_placeHolder"></div>
 		<div id="templates"></div>
 		<div id="wrapper">
-		
         <!-- Sidebar -->
         <div id="sidebar-wrapper">
 			<ul  class="ButtonHolder">
@@ -233,11 +396,11 @@
                 <div class="row">
                     <div class="col-lg-12">
 						<div>
-                        <h1><center>Framelink Mail Editor</center></h1>
+                        	<h1><center>FrameLink Mail Editor</center></h1>
 							<div style="position:absolute;top:0px;left:0px">
-								<a href="javascript:exitSaving()" class="btn btn-primary save">Save & Exit</a>
-								<a href="javascript:exitNoSave()" class="btn btn-danger">Exit</a>
-								<a href="#" class="btn btn-primary" id="loadTemplate">Load Preview</a>
+								<a href="#" class="btn btn-success" id="exitSaving">Save & Exit</a>
+								<a href="#" class="btn btn-danger" id="exitNoSave">Exit</a>
+								<a href="#" class="btn btn-info" id="loadTemplate">Load template</a>
 							</div>
 							<div style="position:absolute;top:0px;right:0px">
 								<a href="#" class="btn btn-success" id="saveTempalate">Generate Preview</a>
@@ -281,7 +444,7 @@
         </div>
 		
         <!-- /#page-content-wrapper -->
-    </div>
+    </div>   
 	</body>
 
 </html>
