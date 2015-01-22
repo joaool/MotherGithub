@@ -578,10 +578,10 @@
 				return xRet;
 			},
 			nextEntityBeginningBy: function(singularPrefix) {//proposes a name 
-				//example   var nextUnNamed = FL.dd.nextEntityBeginningBy("_unNamed");
-				//   if there is no entity  begginning by _unNamed --> returns "_unNamed"
-				//   if there is "_unNamed"  --> returns "_unNamed1"
-				//   if there is "_unNamed1"  --> returns "_unNamed2"
+				//example   var nextUnNamed = FL.dd.nextEntityBeginningBy("unNamed");
+				//   if there is no entity  begginning by unNamed --> returns "unNamed"
+				//   if there is "unNamed"  --> returns "unNamed1"
+				//   if there is "unNamed1"  --> returns "unNamed2"
 				var nextEntityName = singularPrefix;
 				var count = this.countEntitiesBeginningBy(singularPrefix);
 				if(count>0){
@@ -630,6 +630,7 @@
 					oEntity = this.entities[xSingular];
 					oEntityUpdate = _.extend(oEntity, xOptions); 
 					this.entities[xSingular] = oEntityUpdate;
+					oEntity.sync = false;
 					xRet = true;
 				}else{//xSingular does not exists in dictionary
 					alert("FL.dd.updateEntityBySingular Error: you tried update "+xSingular+" but it does not exists in Dictionary");
@@ -650,6 +651,7 @@
 					delete this.entities[oldSingular];
 					var newSingular =  oEntityUpdate.singular;
 					this.entities[newSingular] = oEntityUpdate;
+					this.entities[newSingular].sync = false;
 					xRet = true;
 				}else{//xCName does not exists in dictionary
 					alert("FL.dd.updateEntityByCName Error: you tried to update an entity with compressedName="+xCName+" but it does not exists in local Dictionary");
@@ -736,6 +738,7 @@
 
 						//oEntity.attributes[xIndex].key=xKey;
 					}
+					oEntity.sync = false;
 					//dDictionary.save(xSingular,oEntity);
 				}else{
 					alert("FL.dd.addAttribute Error: you tried to add attribute "+xAttribute+" to a non existing entity "+xSingular);
@@ -788,7 +791,7 @@
 
 							var relation2 = prepareRelation(withEntityName,rCN,xSingular,verb2,cardinality2,side2,storedHere2,xLanguage);
 							oToEntity.relations.push(relation2);
-
+							oToEntity.sync = false;
 						}
 					}else{
 						alert("FL.dd.addRelation Error: you tried to add a relation between "+xSingular+" and a non existing entity "+withEntityName);
@@ -883,6 +886,7 @@
 			setFieldTypeUI: function(xSingular,fieldName,newTypeUI) {//sets typeUI = newTypeUI for field = fieldName in entity xSingular
 				var oEntity = this.entities[xSingular];
 				if(oEntity){
+					oEntity.sync = false;
 					var el = _.find(oEntity.attributes, function(element){
 						return element.name == fieldName;
 					});
@@ -923,6 +927,7 @@
 			setFieldCompressedName: function(xSingular,fieldName,fieldCN) {//for entity xSingular and attribute fieldName sets compressed name
 				var oEntity = this.entities[xSingular];
 				if(oEntity){
+					oEntity.sync = false;
 					var oldCFieldName = oEntity.L2C[fieldName];
 					if(oldCFieldName){
 						delete oEntity.C2L[oldCFieldName];
@@ -1012,6 +1017,8 @@
 				var oReverseEntity = this.entities[sRightEntity];
 
 				if(oDirectEntity && oReverseEntity){
+					oDirectEntity.sync = false;
+					oReverseEntity.sync = false;
 					// var xIndex=dDictionary.relationIndex(xSingular,sRightEntity);
 					var directRelationsArr = oDirectEntity.relations;//all direct relations - we need to isolate those with sRightEntity
 					var indexArr=[];

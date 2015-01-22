@@ -1222,7 +1222,7 @@
 				return def.promise();
 			},
 			saveTable: function(entityName,recordsArray) {//creates a table (overriding any existing one) and saves a set of records in it
-				//assumes a login to an application exists
+				//assumes a login to an application exists - if table is not in synch it synchs it
 				//recordsArray [{"number":12,"code":"abc"},....]
 				//returns array with input data and _id for each record
 				console.log("....................................>beginning saveTable....with appToken="+JSON.stringify(FL.login.appToken));
@@ -1510,7 +1510,7 @@
 				// Ex FL.API.customTable({singular:"shipment"});
 				//uses --> FL.dd.createEntity("sales rep","employee responsable for sales");
 				var def = $.Deferred();
-				var singularDefault = FL.dd.nextEntityBeginningBy("_unNamed");
+				var singularDefault = FL.dd.nextEntityBeginningBy("unNamed");
 				entityProps = _.extend( {singular:singularDefault,description:null},entityProps);
 				if(!entityProps.description)
 					entityProps.description = entityProps.singular + "'s description";

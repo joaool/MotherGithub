@@ -152,7 +152,7 @@ jQuery(document).ready(function($){
 			$.Topic( 'sidePanelOpened' ).publish( false ); //informs FL.menu that sidePanel is closed 
 		};
 		var displaySignInUser = function(user) {//if user is null displays signIn icon+"Sign In" otherwise displays user
-			var htmlToInject = '<div style="line-height:2.2em;"><span id="_signInDomain" class="small hidden-xs" style="margin-left:6.5em">'+
+			var htmlToInject = '<div style="line-height:2.2em;"><span id="_signInDomain" class="small hidden-xs" style="margin-left:6.5em" >'+
 									'Welcome to FrameLink: support@framelink.co App:'+  FL.domain +
 								'</span>'+
 								// '<a class="pull-right text-muted" href="javascript:FL.signIn()" style="margin-right:12em">'+
@@ -538,9 +538,19 @@ jQuery(document).ready(function($){
 								"uri":"javascript:FL.links.newsletterEditor()"
 							},							
 							{
-								"title" : "Create Grid",//0
-								"uri":"javascript:FL.grid.createGrid()"
-							}
+								"title" : "Grids",//0
+								"uri":"#",
+								"menu":[
+									{
+										"title" : "Create Grid",//0
+										"uri":"javascript:FL.grid.createGrid()"
+									},
+									{
+										"title" : "Import CSV Spreadsheet",//0
+										"uri":"javascript:javascript:FL.grid.importGrid()"
+									}
+								]
+							}						
 						]
 					}
 				]
