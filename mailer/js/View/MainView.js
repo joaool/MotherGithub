@@ -44,6 +44,20 @@ MailerTemplate.Views.MainView = Backbone.View.extend({
 		"click #exitSaving" : "OnExitSaving",
 		"click #exitNoSave" : "OnExitNoSave"
 	},
+	openModal: function() {
+        var view = new MailerTemplate.Views.ModalView();
+		view.setHtml("Do you sure you want to save this template ?")
+		this.listenTo(view,MailerTemplate.Views.ModalView.OkClicked, this.onModalOkClicked);
+        var modal = new Backbone.BootstrapModal({
+            content: view,
+            title: 'Save',
+            animate: true
+        });
+        modal.open(function(){ console.log('clicked OK') });
+    },
+	onModalOkClicked : function(){
+		window.open("./mailer/TemplatePreview.html","_blank");
+	},
 
     // render: function() {
     //     var template = _.template($('#charge_dialog_template').html());
@@ -57,8 +71,9 @@ MailerTemplate.Views.MainView = Backbone.View.extend({
 		console.log(jsonString);
 		alert("Preview will use json="+jsonString);
 		// save this jsonString
+		this.openModal();
 		window.jsonObject = jsonData;
-		window.open("./mailer/TemplatePreview.html","_blank");
+		//window.open("TemplatePreview.html","_blank");
 	},
 	OnLoadTemplateBtnClick : function(){
 		// var temp = this;
