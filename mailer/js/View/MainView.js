@@ -1,7 +1,4 @@
 MailerTemplate.Views.MainView = Backbone.View.extend({
-	
-	// el: $('#charge_dialog_container'),
-
 	m_Model : null,
 	m_TemplateItems : null,
 	m_Editor : null,
@@ -44,21 +41,30 @@ MailerTemplate.Views.MainView = Backbone.View.extend({
 		"click #exitSaving" : "OnExitSaving",
 		"click #exitNoSave" : "OnExitNoSave"
 	},
-
-    // render: function() {
-    //     var template = _.template($('#charge_dialog_template').html());
-    //     this.$el.html(template);
-    // },
-
+	openModal: function() {
+        var view = new MailerTemplate.Views.ModalView();
+		view.setHtml("Do you sure you want to save this template ?");
+		this.listenTo(view,MailerTemplate.Views.ModalView.OkClicked, this.onModalOkClicked);
+        var modal = new Backbone.BootstrapModal({
+            content: view,
+            title: 'Save',
+            animate: true
+        });
+		modal.open(function(){ console.log('clicked OK');});
+    },
+	onModalOkClicked : function(){
+		window.open("TemplatePreview.html","_blank");
+	},
 	OnSaveBtnClick : function(evt){
 		var modelData = this.m_Editor.generatePlainHtml();
 		var jsonData = this.m_jsonGenerator.GenerateJson(modelData);
 		var jsonString = JSON.stringify(jsonData);
 		console.log(jsonString);
-		alert("Preview will use json="+jsonString);
-		// save this jsonString
 		window.jsonObject = jsonData;
-		window.open("./mailer/TemplatePreview.html","_blank");
+		this.openModal();
+		// alert("Preview will use json="+jsonString);
+		// save this jsonString
+		// window.open("./mailer/TemplatePreview.html","_blank");
 	},
 	OnLoadTemplateBtnClick : function(){
 		// var temp = this;

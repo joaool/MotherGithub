@@ -815,15 +815,9 @@ FL["menu"] = (function(){//name space FL.menu
 			$.Topic( 'signInDone' ).subscribe( FL.menu.topicSetEditable );
 			$.Topic( 'jsonMenuUpdate' ).subscribe( FL.menu.topicUpdateJsonMenu );
 			$.Topic( 'createOption' ).subscribe( FL.menu.topicCreateDatabaseAcess );
-			// $.Topic( 'createGridOption' ).subscribe( this.createGrid );
 			$.Topic( 'createGridOption' ).subscribe( FL.menu.topicCreateGrid );
-			// newMenuObj.setEditable(false);		
-			// console.log(newMenuObj.toString());
+			$.Topic( 'createGridOptionByCN' ).subscribe( FL.menu.topicCreateGridByCN );
 			console.log("createMenu ->end");
-			// var z = new car("Roskoff",1969);
-			// console.log("****"+z.phrase());
-			// z.update("Balufa");
-			// console.log("************"+z.phrase());
 			return newMenuObj;
 		},
 		topicSetEditable: function(status) {//this method is used to subscribe topics on createMenu
@@ -863,6 +857,19 @@ FL["menu"] = (function(){//name space FL.menu
 			// console.log(FL.menu.currentMenuObj.toString());
 			// alert("FL.menu.topicCreateGrid with optionTitle="+optionTitle+ " singular="+singular);
 		},
+		topicCreateGridByCN: function(optionTitle, eCN) {//this method is used to subscribe topics on createMenu
+			// $.Topic( 'topicCreateGridByCN' ).subscribe( FL.menu.topicCreateGrid );
+			// FL.menu.currentMenuObj.X_createMenuEntryLastTop(optionTitle,singular);
+
+			var uri ="javascript:FL.links.setDefaultGridByCN('" + eCN + "')";
+			//"javascript:FL.links.setDefaultGrid('Order')"
+
+			FL.menu.currentMenuObj.createMenuEntryLastTop(optionTitle,uri);
+
+			console.log("======================================================================");
+			// console.log(FL.menu.currentMenuObj.toString());
+			// alert("FL.menu.topicCreateGrid with optionTitle="+optionTitle+ " singular="+singular);
+		},		
 		set: function(x) {
 			alert("FL.menu.test() -->"+x);
 		},

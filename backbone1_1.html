@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 	<meta charset="UTF-8">
-    <title>Backbone v1.0</title>
+    <title>Backbone v1.1</title>
 </head>
 <body>
     <!--<script type="text/javascript" charset="utf-8" src="../rivets/dist/rivets.js" ></script>-->
@@ -21,6 +21,10 @@
 			this.on("invalid", function(model,error) { //for the error binding we receive the model itself an the error
 				console.log("Error:"+error);
 			});
+			this.on("change:name", function() {
+				console.log("The name attribute was changed to:"+this.get("name"));
+			});
+
 		},
 		defaults:{
 			name:"cavaco",
@@ -44,6 +48,9 @@
 	console.log("b) " + person.get("name")+" - "+person.get("height"));
 	console.log(person.toJSON());
 
+	person.set("name","Mr Miguel");
+	// jojo.set("name","Mr Joao");//change handler will be skiped
+	jojo.set("name","Mr Joao",{silent:true});//change and bind handler will be skiped
 	person.test();
 	jojo.test();
 

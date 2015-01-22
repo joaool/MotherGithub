@@ -319,7 +319,22 @@
 						// child.focus();
 					}
 				}
-			},			
+			},
+			setDefaultGridByCN: function(eCN) {//called with menu key "uri": "javascript:FL.links.setDefaultGridByCN('55')"
+				var entityName = FL.dd.getEntityByCName(eCN);
+				
+				if(entityName == "_unNamed"){
+					FL.dd.updateEntityByCName(eCN,{singular:"unNamed"});
+					entityName = "unNamed";
+				}
+				alert("entityName="+entityName+" eCN="+eCN+" synch="+FL.dd.isEntityInSync(entityName));
+				
+				if(entityName){
+					this.setDefaultGrid(entityName);
+				}else{
+					alert("FL.links.setDefaultGridByCN ERROR: EntityCompressedName=" + eCN + " does not exist !!!");
+				}
+			},
 			setDefaultGrid: function(entityName) {//called with menu key "uri": "javascript:FL.links.setDefaultGrid('JOJO')"
 				// alert("setDefaultGrid"+entityName);
 				entityName = entityName.replace(/_/g," ");//if entityName as a space like "test contacts" it will be saved in menu as "test_contact"
@@ -334,11 +349,12 @@
 								,function(err){alert("FL.links.setDefaultGrid ERROR: cannot sync " + entityName + " to server!"); return;});
 					}
 				}else{//entity is not in local dictionary =>we force an update of local dictionary with server dictionary data
-					FL.API.syncLocalDictionary()
-						.then(function(){DefaultGridWithNewsLetterAndEditButtons(entityName);return;}
-							,function(err){alert("FL.links.setDefaultGrid ERROR: cannot read back end Dictionary !"); return;});
+					// FL.API.syncLocalDictionary()
+					// 	.then(function(){DefaultGridWithNewsLetterAndEditButtons(entityName);return;}
+					// 		,function(err){alert("FL.links.setDefaultGrid ERROR: cannot read back end Dictionary !"); return;});
 
-					// alert("FL.links.setDefaultGrid - cannot display grid. Entity " + entityName + " does not exist in Data Dictionary.");
+					alert("FL.links.setDefaultGrid - cannot display grid. Entity -->" + entityName + "<-- does not exist in Local Data Dictionary.");
+					return;
 				}
 			},
 			clearDictionary: function() {

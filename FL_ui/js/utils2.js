@@ -205,7 +205,7 @@ window.utils = {
         csvStore.store(csvrows);
     },
     createEntityFromCsvAnalisys: function(rows){//creates a dd entry from a set of rows
-        var entityName = "_unNamed";
+        var entityName = "unNamed";
         //this new entity will be called "unNamed" + <num> - we need to evaluate how many unNamed<#> are already in dd.
         entityName = FL.dd.nextEntityBeginningBy(entityName);
         // FL.dd.createEntity("Client152","Individual or Company to whom we may send invoices");//singular, plural, description

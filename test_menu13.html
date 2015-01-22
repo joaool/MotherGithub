@@ -87,6 +87,8 @@ mixpanel.init("19ada1cb259cc3272c67085eb1bf03fc");</script><!-- end Mixpanel -->
 	<script src="FL_ui/js/backgrid-paginator.js"></script>
 
 	<script src="FL_ui/js/jquery.parse.min.js"></script> <!-- to load csv reader http://papaparse.com/  -->
+	<script src="FL_ui/js/papaparse.min.js"></script> <!-- to load csv reader http://papaparse.com/  -->
+
 	<script src="FL_ui/js/utils2.js"></script>            
 	<script src="FL_ui/js/FLdd2.js"></script>            
 	<script src="FL_ui/js/FLmenulinks2.js"></script>            
@@ -497,7 +499,28 @@ mixpanel.init("19ada1cb259cc3272c67085eb1bf03fc");</script><!-- end Mixpanel -->
 		    	</div>
 			</form>
 		</div>
-	</script>	
+	</script>
+	<script id="_importCSV" type="text/template"> 
+		<div class="_importCSV" style="margin-top:0px;">
+			<form id="form__importCSV" novalidate="novalidate">
+			<legend>Please select the CSV file to upload:</legend>
+				<div class="row">
+					<div class="col-xs-12" >
+						<div class="input-group" style="line-height:0px;">
+							<span class="input-group-addon">Give a singular name to a table row:</span>
+							<input type="text" class="form-control" id="_importCSV_entityName" placeholder="Ex. client, supplier, member, partner..." value="<%= masterDetailItems.master.entityName %>" data-parsley-trigger="change" >
+							<span class="input-group-addon"><span class="glyphicon glyphicon-pencil"></span></span>
+					    </div>
+						<div class="input-group" style="line-height:0px;">
+							<span class="input-group-addon">Choose the CSV file:</span>
+							<input type="file" class="form-control" id="_importCSV_fileName" accept=".csv"value="<%= masterDetailItems.master.fileName %>" onchange="FL.grid.validateCSV(this.files)" >
+							<span class="input-group-addon"><span class="glyphicon glyphicon-cloud-upload"></span></span>
+					    </div>
+				    </div>
+		    	</div>
+			</form>
+		</div>
+	</script>		
 	<script id="_sendNewsletterTemplate" type="text/template"> 
 		<div class="_sendNewsletterTemplate" style="margin-top:0px;">
 			<form id="form__sendNewsletterTemplate" novalidate="novalidate">
@@ -684,7 +707,7 @@ mixpanel.init("19ada1cb259cc3272c67085eb1bf03fc");</script><!-- end Mixpanel -->
 				<a class="pull-right text-muted" href="javascript:FL.signIn()"> <i class="glyphicon glyphicon-log-in"></i>
 	  				<span> Login</span> </a> -->
 			</div>
-			<div id="menuContainer" class="container" style="margin-left:3.2em;width:95.0em;margin-right:1.0em;margin-top:0.0em;">
+			<div id="menuContainer" class="container" style="margin-left:3.2em;width:87.0em;margin-right:1.0em;margin-top:0.0em;">
 				<div class="navbar navbar-default" role="navigation">
 					<div class="navbar-header">
 						<button  type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
