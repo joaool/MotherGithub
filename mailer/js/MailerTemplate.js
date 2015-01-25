@@ -8,18 +8,30 @@ function OnTemplatesLoaded(){
 	// alert("entry point !!!");
 	var promise=FL.API.getFLContextFromBrowserLocationBar();
 	promise.done(function(data){
-		console.log("*********** OnTemplatesLoaded ->getFLContextFromBrowserLocationBar SUCCESS <<<<< ");
-		var templatePromise=FL.API.createTemplates_ifNotExisting();
-		templatePromise.done(function(){
-			instantiateMainView();
-			return;
+		console.log("MailerTemplate.js OnTemplatesLoaded ->getFLContextFromBrowserLocationBar SUCCESS <<<<< ");
+		var loadAppPromise=FL.API.loadAppDataForSignInUser2();//gets data dictionary + main menu + style + fontFamily + home page
+		loadAppPromise.done(function(menuData,homeHTML){
+			console.log("appSetup ---> homeHTML=" + homeHTML);
+			console.log("appSetup ---> menudata=" + JSON.stringify(menuData));
+			var templatePromise=FL.API.createTemplates_ifNotExisting();
+			templatePromise.done(function(){
+				instantiateMainView();
+				return;
+			});
+			templatePromise.fail(function(err){
+				alert("MailerTemplate.js after getFLContextFromBrowserLocationBar ->FAILURE with createTemplates_ifNotExisting err="+err);
+				return;
+			});	
 		});
-		templatePromise.fail(function(err){
-			alert("MailerTemplate.js after getFLContextFromBrowserLocationBar ->FAILURE with createTemplates_ifNotExisting err="+err);
-			return;
+		loadAppPromise.fail(function(err){
+			alert("MailerTemplate.js OnTemplatesLoaded  --> loginAccess appSetup FAILURE in loadAppDataForSignInUser2 <<<<< error="+err);
+			// return loginAccessCB(err,loginObject);
+			return def.reject("MailerTemplate.js OnTemplatesLoaded  --> loginAccess appSetup FAILURE in loadAppDataForSignInUser2 <<<<< error="+err);
 		});
 	});
-	promise.fail(function(err){alert("*********** getFLContextFromBrowserLocationBar FAILURE <<<<<"+err);return;});
+	promise.fail(function(err){alert("MailerTemplate.js OnTemplatesLoaded  getFLContextFromBrowserLocationBar FAILURE <<<<<"+err);return;});
+
+	
 }
 function instantiateMainView(){
 	//--------------- Kartik code -----------------------------------------------

@@ -170,7 +170,7 @@
 			// prepares FL.common.editMasterDetail options (including the templates dropdown)
 			FL.login.emailContentTemplate = null;
 			var getTemplatesPromise = getMailchimpTemplates();
-			getTemplatesPromise.done(function(arrOfObj){ //arrOfObj has the format: {value:index,text:element.title,cId:element.id}
+			getTemplatesPromise.done(function(arrOfObj){ 	
 				// alert("getTemplatesPromise done getTemplates-->"+_.pluck(arrOfObj,"text"));
 				var options = {
 					type:"primary", 

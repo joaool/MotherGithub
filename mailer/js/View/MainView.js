@@ -36,9 +36,9 @@ MailerTemplate.Views.MainView = Backbone.View.extend({
 //		this.m_DesignPageFooter = new MailerTemplate.Views.DesignTemplateFooter({el : "#DesignPageDiv"}); 
 	},
 	events : {
-		"click #saveTempalate" : "OnSaveBtnClick",
+		"click #previewTemplate" : "OnPreview",
 		"click #loadTemplate" : "OnLoadTemplateBtnClick",
-		"click #exitSaving" : "OnExitSaving",
+		"click #saveTemplate" : "OnSaveTemplate",
 		"click #exitNoSave" : "OnExitNoSave"
 	},
 	openModal: function() {
@@ -55,58 +55,31 @@ MailerTemplate.Views.MainView = Backbone.View.extend({
 	onModalOkClicked : function(){
 		window.open("TemplatePreview.html","_blank");
 	},
-	OnSaveBtnClick : function(evt){
+	OnPreview : function(evt){
 		var modelData = this.m_Editor.generatePlainHtml();
 		var jsonData = this.m_jsonGenerator.GenerateJson(modelData);
 		var jsonString = JSON.stringify(jsonData);
 		console.log(jsonString);
 		this.openModal();
 		window.jsonObject = jsonData;
-		this.openModal();
-		// alert("Preview will use json="+jsonString);
-		// save this jsonString
-		// window.open("./mailer/TemplatePreview.html","_blank");
+		// this.openModal();
+		window.open("./mailer/TemplatePreview.html","_blank");
 	},
 	OnLoadTemplateBtnClick : function(){
-		// var temp = this;
-		// $.ajax({
-		// 	url : "TemplateSample.json",
-		// 	type: 'get',
-		// 	data : 'text',
-		// 	success : function(data) { temp.LoadTemplate(data); },
-		// 	error : this.OnError
-		// });
-		console.log("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
-		console.log("before loading templates->"+JSON.stringify(FL.login.token));
-		// alert("before loading templates->"+JSON.stringify(FL.login.token));
-		var spinner=FL.common.loaderAnimationON('spinnerDiv');
-		var promise=FL.API.loadTable("_templates");
-		promise.done(function(data){
-			console.log("MainView.js -> _templates successfully loaded");
-			spinner.stop();
-			if( data.length == 0 ){
-				FL.common.makeModalInfo('No templates available. Save your templates with Save button');
-			}else{
-				alert("_templates content="+JSON.stringify(data));
-			}	
-		});
-		promise.fail(function(err){
-			spinner.stop();
-			alert("DefaultGridWithNewsLetterAndEditButtons Error="+err);
-		});		
+		this.loadTemplateUI(this)
 	},
-	OnExitSaving: function(){
+	OnSaveTemplate: function(){
 		var modelData = this.m_Editor.generatePlainHtml();
 		var jsonData = this.m_jsonGenerator.GenerateJson(modelData);
-		var jsonString = JSON.stringify(jsonData);
-		alert("jsonString is:"+jsonString);
- 	},
+		this.storeTemplateUI(this,jsonData);
+	},
 	OnExitNoSave: function(){
-		alert("exitNoSave");
+		// alert("exitNoSave");
+		FL.common.makeModalInfo('You will leave....');
 		window.close();
 		// FL.API.disconnect()
-		// .then(function(){console.log("DragNDrop->no save --> disconnect ok!");window.close();return;} 
-		// 	,function(err){console.log("DragNDrop->no save -->failure on disconnect err ="+err);return;}
+		// .then(function(){console.log("MainView.js ->no save --> disconnect ok!");window.close();return;} 
+		// 	,function(err){console.log("MainView.js->no save -->failure on disconnect err ="+err);return;}
 		// );
 	},
 	LoadTemplate : function(data){
@@ -132,7 +105,149 @@ MailerTemplate.Views.MainView = Backbone.View.extend({
 	},
 	bindModelToPanel : function(model){
 		this.m_PropertyPanel.setModel(model);
-	}
+	},
+	isTemplateEmpty: function(templateObj){
+		return (templateObj.templateItems.header.length == 0 && templateObj.templateItems.body.length == 0 && templateObj.templateItems.footer.length == 0);
+	},
+	storeTemplateUI: function(context,jsonData){
+		var spinner=FL.common.loaderAnimationON('spinnerDiv');
+		var thiz=context;
+		var promise=FL.API.loadTableId("_templates");
+		promise.done(function(data){
+			spinner.stop();
+			var arrOfObj = thiz.convertsIdsToArrOfObj(data); //converts templateOptionsArr to arrOfObjects
+			//ex:arrOfObj=[{value:1,text: "t 115",template:"dfdfdg"},{value:2,text: "t 116",template:"dfgd"}]
+			thiz.storeTemplateForm(jsonData,arrOfObj);
+		});
+		promise.fail(function(err){
+			spinner.stop();
+			alert("OnSaveTemplate unable to load templates Error="+err);
+			return;
+		});
+	},
+	storeTemplateForm: function(jsonData,arrOfObj){//store jsonData on server eventually overlaping one of existing arrOfObj
+		var jsonString = JSON.stringify(jsonData);
+		var selectedTemplateName = null;
+		if (this.isTemplateEmpty(jsonData)){
+			FL.common.makeModalInfo('No template to save. Build a template before saving it.');
+		}else{
+			var masterDetailItems = {
+				master:{name:""},
+				detail:{}
+			};
+			var options = {
+				type:"primary",
+				icon:"pencil",
+				button1:"Cancel",
+				button2:"Save this template",
+				dropdown:{
+					"_templateForm_template":{
+						arr:arrOfObj,//titles,
+						default:"Not overwriting any template",
+						onSelect:function(objSelected){
+							// alert("Template selected =>"+JSON.stringify(objSelected));
+							selectedTemplateName = objSelected.text;
+							$("#_templateForm_name").val('');//if user wants to overwrite, name is cleared
+						}
+					}
+				}
+			};
+			FL.common.editMasterDetail("B"," Save the current template","_templateForm",masterDetailItems,options,function(result){
+				if(result){
+					var name = $("#_templateForm_name").val();
+					// var template = $("#_templateForm_template ul").text();
+					if(selectedTemplateName)
+						name = selectedTemplateName;
+					var record = {jsonTemplate:jsonString};
+					var promise = FL.API.upsertByKey(name,"_templates",record);//"_id"yField,keyFieldValue,entityName,record
+					promise.done(function(){
+						console.log("OnSaveTemplate storeTemplateInterface upsertByKey SUCCESS !");
+					});
+					promise.fail(function(err){
+						alert("OnSaveTemplate storeTemplateInterface upsertByKey	FAILURE");
+					});
+				}else{
+					// alert("-->Nope");//the user select close
+					FL.common.makeModalInfo('Nothing was saved');
+				}
+			});
+		}
+	},
+	loadTemplateUI: function(context){
+		var spinner=FL.common.loaderAnimationON('spinnerDiv');
+		var thiz=context;
+		var promise=FL.API.loadTableId("_templates","jsonTemplate");
+		promise.done(function(data){
+			spinner.stop();
+			if( data.length === 0 ){
+				FL.common.makeModalInfo('No templates available. You must have at least one template saved.');
+			}else{
+				var selectedTemplatePromise = thiz.loadTemplateForm(data);
+				selectedTemplatePromise.done(function(selectedTemplate){
+					console.log(">>>>>OnLoadTemplateBtnClick selectedTemplatePromise SUCCESS <<<<< ");
+					data = JSON.parse(selectedTemplate);
+					thiz.m_Editor.LoadJson(data);
+					return;
+				});
+				selectedTemplatePromise.fail(function(err){console.log(">>>>>OnLoadTemplateBtnClick selectedTemplatePromise FAILURE <<<<<"+err);return def.reject(err);});
+			}
+		});
+		promise.fail(function(err){
+			spinner.stop();
+			alert("DefaultGridWithNewsLetterAndEditButtons Error="+err);
+		});
+	},
+	loadTemplateForm: function(templateOptionsArr){//returns a promise
+		var def = $.Deferred();
+		var arrOfObj = this.convertsToArrOfObj(templateOptionsArr); //converts templateOptionsArr to arrOfObjects
+		//ex:arrOfObj=[{value:1,text: "t 115",template:"dfdfdg"},{value:2,text: "t 116",template:"dfgd"}]
+
+		var selectedTemplate = null;
+		var masterDetailItems = {
+			master:{name:""},
+			detail:{}
+		};
+		var options = {
+			type:"primary",
+			icon:"cloud-download",
+			button1:"Cancel",
+			button2:"Ok to Load",
+			dropdown:{
+				"_loadTemplateForm_name":{
+					arr:arrOfObj,//titles,
+					default:"No template",
+					onSelect:function(objSelected){
+						// alert("Template selected =>"+JSON.stringify(objSelected));
+						selectedTemplate = objSelected.template;
+					}
+				}
+			}
+		};
+		FL.common.editMasterDetail("B"," Load an existing template","_loadTemplateForm",masterDetailItems,options,function(result){
+			if(result){
+				var template = $("#_loadTemplateForm_option").text();
+				if(template.trim() == "No template"){
+					FL.common.makeModalInfo('No template was loaded.');
+					return def.resolve(null);
+				}else{
+					// alert("loadTemplateInterface template="+template);
+					return 	def.resolve(selectedTemplate);
+				}
+			}else{
+				// alert("-->Nope");//the user select close
+				return def.resolve(null);
+			}
+		});
+		return def.promise();
+	},
+	convertsToArrOfObj: function(templateOptionsArr){
+		//receives [{"_id": "t 115",jsonTemplate:"dfdfdg"},{"_id": "t 116",jsonTemplate:"dfgd"}] and returns [{value:1,text: "t 115",template:"dfdfdg"},{value:2,text: "t 116",template:"dfgd"}]
+		return _.map(templateOptionsArr, function(el,index){ return {"value":index+1,"text":el._id,"template":el.jsonTemplate}; });
+	},
+	convertsIdsToArrOfObj: function(templateOptionsArr){
+		//receives [{"_id": "t 115"},{"_id": "t 116"}] and returns [{value:1,text: "t 115"},{value:2,text: "t 116"}]
+		return _.map(templateOptionsArr, function(el,index){ return {"value":index+1,"text":el._id}; });
+	}	
 });
 
 

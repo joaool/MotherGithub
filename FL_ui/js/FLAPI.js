@@ -790,14 +790,14 @@
 			});
 			return def.promise();
 		};
-		var _update = function(ecn,_id,jsonToSend){ //update a single row within table ecn entity compressed name, _id and jsonToSend (a single record)
+		var _update = function(ecn,_idValue,jsonToSend){ //update a single row within table ecn entity compressed name, _idValue and jsonToSend (a single record)
 			//	format of jsonToSend ->{"51":"cli1","52":"Lx","53":"Pt"}
 			var def = $.Deferred();
 			var fl = FL.login.token.fl; //new flMain();
 			var fd = new fl.data();
 
-			fd.update(ecn, {"query":{"_id":_id},"update":jsonToSend, upsert:true}, function(err, result){
-				console.log("............................._update....i_id="+_id+" To ->"+JSON.stringify(jsonToSend));
+			fd.update(ecn, {"query":{"_id":_idValue},"update":jsonToSend, "options":{"upsert":true}}, function(err, result){
+				console.log("............................._update....i_id="+_idValue+" To ->"+JSON.stringify(jsonToSend));
 				if(err){
 					console.log("======================>ERROR ON _update err="+err);
 					def.reject(err);
@@ -1370,6 +1370,31 @@
 				loadTable.fail(function(err){console.log(">>>>> loadTable FAILURE <<<<<"+err);def.reject(err);});
 				return def.promise();
 			},
+			loadTableId: function(entityName,field2) {//returns only the _id field and optionally a second field from server
+				//assumes a login to an application exists
+				console.log("....................................>beginning loadTableId....with appToken="+JSON.stringify(FL.login.appToken));
+				var def = $.Deferred();
+				var ecn = FL.dd.getCEntity(entityName);
+				var projections = {"_id":1};
+				if(field2){
+					var fCN=FL.dd.getFieldCompressedName(entityName,field2);
+					projections[fCN] = 1;
+				}	
+				// var loadTableId=_findAll(ecn,{},{"_id":1});
+				var loadTableId=_findAll(ecn,{},projections);
+				loadTableId.done(function(dataArray){
+					console.log(">>>>> loadTableId SUCCESS <<<<< ");
+					//dataArray has a format: [{"_id":1,"d":{"53":"line 1 content of field1","54":"line 1 content of field2"},"v":0},
+					//							{"_id":2,"d":{"53":"line 2 content of field1","54":"line 2 content of field2"},"v":0}...,]
+					var arrLocallyTranslated = FL.API.convertArrC2LForEntity(entityName,dataArray);//dataArray =>[{"_id":123,d:{},r:[]},{"_id":124,d:{},r:[]},....{"_id":125,d:{},r:[]}]
+					//arrLocallyTranslated is flatted with the format:
+					// alert("arrLocallyTranslated="+arrLocallyTranslated);
+					//[{"_id":123234234,"id":1,produto":"High","nome":"Rota dos Numeros, Lda","marca":"Rota dos Numeros","morada":"Av Ceuta, 21 B","cod postal":"2700-188","localidade":"Amadora","telefone":"21 4945431 ","email":"rota.dos.numeros@sapo.pt ","id":1,"_id":"545b4f9afa2b1a3233bb6781"},
+					def.resolve(arrLocallyTranslated);
+				});
+				loadTableId.fail(function(err){console.log(">>>>> loadTableId FAILURE <<<<<"+err);def.reject(err);});
+				return def.promise();
+			},			
 			syncLocalStoreToServer: function(){//saves menu,style and font to server, retrieving them from localStore
 				var def = $.Deferred();
 				var lastMenuStr  = localStorage.storedMenu
@@ -1505,7 +1530,52 @@
 				mailRecipientsTable.fail(function(err){console.log(">>>>> mailRecipientsOfTemplate FAILURE <<<<<"+err);def.reject(err);});
 				return def.promise();
 			},			
-
+			upsertByKey: function(keyFieldValue,entityName,record) {
+				//upsert record for <keyField>=<keyFieldValue> in table entityName
+				//record is a JSON that may contain _id key ex: {"_id":12345,"id":1,"code":"abc"}
+				console.log("....................................>beginning upsertByKey....with appToken="+JSON.stringify(FL.login.appToken));
+				var def = $.Deferred();
+				var eCN = FL.dd.getCEntity(entityName);
+				if(eCN === null){
+					console.log("........FL.API.upsertByKey() table="+entityName+ " not in local dict !");
+					return def.reject("upsertByKey table="+entityName+ " does not exist in local dict !");
+				}else{//the table exists in local dict but may be unsynchronized
+					var oEntity = FL.dd.entities[entityName];
+					if(!oEntity.sync){//table exists in local dict but is not in sync with server	
+						console.log("........FL.API.upsertByKey() table="+entityName+ " exists in local dict but is not in sync");
+						return def.reject("upsertByKey table="+entityName+ " not in sync");//
+					}else{//table exists and is in sync
+						console.log("........FL.API.upsertByKey() table="+entityName+ " is ok. We will upsert!");
+						// var _id = record["_id"];//it can be null or existing
+						var recordWithFCN = convertOneRecordTo_arrToSend(entityName,record);//returns {"d":{"51":"cli1","52":"Lx","53":"Pt"}} 
+						var upsertPromise = this.upsertByKeyOnECN(keyFieldValue,eCN,recordWithFCN.d);
+						upsertPromise.done(function(){
+							console.log(">>>>> FL.API.upsertByKey() upsertPromise SUCCESS <<<<< record updated!");
+							return def.resolve();
+						});
+						upsertPromise.fail(function(err){console.log(">>>>> FL.API.upsertByKey() upsertPromise FAILURE <<<<<"+err); return def.reject(err);});
+					}
+				}
+				return def.promise();
+			},
+			upsertByKeyOnECN: function(keyFieldValue,eCN,recordWithFCN) {//upsert for <keyField>=<keyFieldValue>for list entityName and templateName returns all emails received in Webhook
+				//if _id exists =>direct update
+				//upsert record with field compressed names  for <fCNkey>=<keyFieldValue> in table with compressed name eCN
+				// assumes that: eCN exists and fCNKey exists in local dict and is in synch with server
+				//ex FL.API.upsertByKeyOnECN('51','123','50',{"d":{"51":"cli1","52":"Lx","53":"Pt"}});
+				console.log("....................................>beginning upsertByKeyOnECN....with appToken="+JSON.stringify(FL.login.appToken));
+				var def = $.Deferred();
+				
+				_update(eCN,keyFieldValue,recordWithFCN)
+				.then(function(){
+					return def.resolve();
+				}
+					,function(err){
+						console.log(">>>> upsertByKeyOnECN with _id =>unable to insert");
+						return def.reject("upsertByKeyOnECN with _id unable to insert err="+err);
+					});
+				return def.promise();
+			},	
 			customTable: function(entityProps) {
 				// Ex FL.API.customTable({singular:"shipment"});
 				//uses --> FL.dd.createEntity("sales rep","employee responsable for sales");
