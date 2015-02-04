@@ -496,7 +496,7 @@ $(function () {
   //     ok($("#repaymentAmount").length != 0, "total repayment amount output element exists");
   //     ok($("#totalToRepay").length != 0, "total amount to repay output button element exists");
   // });
-  test("util2 tests", function () { 
+  test("util2 tests", function () {
     //typeOf
     var xVar = "abc";
     var success = utils.typeOf(xVar);
@@ -513,15 +513,45 @@ $(function () {
     xVar = [1,2,3];
     success = utils.typeOf(xVar);
     ok(success == "array" , "FL.util.typeOf([1,2,3]) -->'array'");//5
-    xVar = "abc@link.com";
-    success = utils.typeOf(xVar);
-    ok(success == "email" , "FL.util.typeOf('abc@link.com') -->'email'");//6
+
+    // xVar = "abc@link.com";
+    // success = utils.typeOf(xVar);
+    // ok(success == "email" , "FL.util.typeOf('abc@link.com') -->'email'");//6
+
     xVar = new Date();
     success = utils.typeOf(xVar);
-    ok(success == "date" , "FL.util.typeOf(new Date()) -->'date'");//6
+    ok(success == "date" , "utils.typeOf(new Date()) -->'date'");//6
     var foo;
     success = utils.typeOf(foo);
-    ok(success == "undefined" , "FL.util.typeOf(foo) foo is undefined -->'undefined'");//6
+    ok(success == "undefined" , "utils.typeOf(foo) foo is undefined -->'undefined'");//7
+
+    xVar = "abc@link.com";
+    success = utils.typeUIOf(xVar);
+    ok(success == "email" , "utils.typeUIOf('abc@link.com') -->'email'");//8
+    
+    xVar = "jojo@mail.telepac.pt";
+    success = utils.typeUIOf(xVar);
+    ok(success == "email" , "utils.typeUIOf('jojo@mail.telepac.pt') -->'email'");//9
+
+    xVar = "jojo@.mail.telepac.pt";
+    success = utils.typeUIOf(xVar);
+    ok(success === null , "utils.typeUIOf('jojo@.mail.telepac.pt') -->'invalid email'");//10
+
+    xVar = "http://www.framelink.co";
+    success = utils.typeUIOf(xVar);
+    ok(success == "url" , "utils.typeUIOf('http://www.framelink.co') -->'url'");//11
+
+    xVar = "http://www.framelink..co";
+    success = utils.typeUIOf(xVar);
+    ok(success === null , "utils.typeUIOf('http://www.framelink..co') -->'invalid url'");//12
+    
+    xVar = "351219244558";
+    success = utils.typeUIOf(xVar);
+    ok(success == "phone" , "utils.typeUIOf('351219244558') -->'valid phone'");//13
+
+    xVar = "951219244558";
+    success = utils.typeUIOf(xVar);
+    ok(success === null , "utils.typeUIOf('951219244558') -->'invalid phone'");//14
 
   });
   test("client Dictionary tests", function () { //one test can have several assertions

@@ -60,7 +60,7 @@ MailerTemplate.Views.MainView = Backbone.View.extend({
 		var jsonData = this.m_jsonGenerator.GenerateJson(modelData);
 		var jsonString = JSON.stringify(jsonData);
 		console.log(jsonString);
-		this.openModal();
+		// this.openModal();
 		window.jsonObject = jsonData;
 		// this.openModal();
 		window.open("./mailer/TemplatePreview.html","_blank");

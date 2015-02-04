@@ -845,6 +845,43 @@
 			});
 			return {d:retObj,r:[]};
 		};
+		var _mandrillRejectListForSender = function(senderEmail){ //update a single row within table ecn entity compressed name, _idValue and jsonToSend (a single record)
+			//	format of jsonToSend ->{"51":"cli1","52":"Lx","53":"Pt"}
+			var def = $.Deferred();
+			var fl = FL.login.token.fl; //new flMain();
+			// var fd = new fl.data();
+			var md = new fl.mandrill();
+			md.rejectList( {include_expired: true, sender: senderEmail}, function(err, data){
+				console.log("............................._mandrillRejectListForSender....result="+JSON.stringify(data));
+				if(err){
+					console.log("======================>ERROR ON _mandrillRejectListForSender err="+err);
+					def.reject(err);
+				}else{
+					console.log("=====================================>_mandrillRejectListForSender: OK ");
+					def.resolve(data);
+				}
+			});
+			return def.promise();
+		};
+		var _mandrillDeleteFromReject = function(arrayOfEmails){ //update a single row within table ecn entity compressed name, _idValue and jsonToSend (a single record)
+			//	format of jsonToSend ->{"51":"cli1","52":"Lx","53":"Pt"}
+			var def = $.Deferred();
+			var fl = FL.login.token.fl; //new flMain();
+			// var fd = new fl.data();
+			var md = new fl.mandrill();
+			md.rejectDelete( {email:arrayOfEmails[0]}, function(err, data){
+				console.log("............................._mandrillDeleteFromReject....->"+JSON.stringify(data));
+				if(err){
+					console.log("======================>ERROR ON _mandrillDeleteFromReject err="+err);
+					def.reject(err);
+				}else{
+					console.log("=====================================>_mandrillDeleteFromReject: OK deleted=" + data.deleted );
+					console.log("............................._mandrillDeleteFromReject...SUCCESS .->"+JSON.stringify(data));
+					def.resolve();
+				}
+			});
+			return def.promise();
+		};
 		var _test =	function(){
 			console.log("--- test ----");
 		};
@@ -1061,7 +1098,7 @@
 			temporaryRebuildsLocalDictionaryFromServer: function(entities){
 				// console.log("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx entities=" + entities + " xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
 				console.log("xxxxxxxxx #$%#%#%5 xxxxxxx");
-			},		
+			},
 			syncLocalDictionary: function() {//clears local dictionary and updates it from server dictionary
 				console.log("....................................>beginning syncLocalDictionary....with token="+JSON.stringify(FL.login.token));
 				var def = $.Deferred();
@@ -1394,7 +1431,7 @@
 				});
 				loadTableId.fail(function(err){console.log(">>>>> loadTableId FAILURE <<<<<"+err);def.reject(err);});
 				return def.promise();
-			},			
+			},		
 			syncLocalStoreToServer: function(){//saves menu,style and font to server, retrieving them from localStore
 				var def = $.Deferred();
 				var lastMenuStr  = localStorage.storedMenu
@@ -1575,7 +1612,33 @@
 						return def.reject("upsertByKeyOnECN with _id unable to insert err="+err);
 					});
 				return def.promise();
-			},	
+			},
+			mandrillRejectListForSender: function(senderEmail) {//get reject list from mandrill only for sender=sender
+				console.log("....................................>beginning mandrillRejectListForSender....with appToken="+JSON.stringify(FL.login.appToken));
+				var def = $.Deferred();		
+				_mandrillRejectListForSender(senderEmail)
+				.then(function(data){
+					return def.resolve(data);
+				}
+					,function(err){
+						console.log(">>>> mandrillRejectListForSender FAILURE");
+						return def.reject("mandrillRejectListForSender FAILURE err="+err);
+					});
+				return def.promise();
+			},
+			mandrillDeleteFromReject: function(arrayOfEmails) {//get reject list from mandrill only for sender=sender
+				console.log("....................................>beginning mandrillDeleteFromReject....with appToken="+JSON.stringify(FL.login.appToken));
+				var def = $.Deferred();		
+				_mandrillDeleteFromReject(arrayOfEmails)
+				.then(function(data){
+					return def.resolve();
+				}
+					,function(err){
+						console.log(">>>> mandrillDeleteFromReject FAILURE");
+						return def.reject("mandrillDeleteFromReject FAILURE err="+err);
+					});
+				return def.promise();
+			},
 			customTable: function(entityProps) {
 				// Ex FL.API.customTable({singular:"shipment"});
 				//uses --> FL.dd.createEntity("sales rep","employee responsable for sales");

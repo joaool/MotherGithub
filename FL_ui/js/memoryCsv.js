@@ -27,13 +27,25 @@ window.csvStore = {
         return this.entityName;
     },
     extractEmailArray: function(){//returns an array of emails with format [{"email":"e1@live.com"},{"email":"email2@gmail.com"}..]
+        //only retrieves valid email formats
         var attrArr = this.getAttributesArr();
         // console.log("-xxxx-->"+JSON.stringify(attrArr));
-        var attrEl = _.find(attrArr,function(element){return element.typeUI == "emailbox";});//find first email among fields
+        var attrEl = _.find(attrArr,function(element){return element.typeUI == "email";});//find first email among fields
+        if(typeof attrEl =="undefined")
+            attrEl = _.find(attrArr,function(element){return element.typeUI == "emailbox";});//find first email among fields old format
+        if(typeof attrEl =="undefined"){
+            alert("memoryCsv.js extractEmailArray NO FIELD WITH typUI = email !!!!");
+        }
         // console.log("-zzz-->"+JSON.stringify(attrEl));
         var nameOfFirstEmailField = attrEl.name;
         // console.log("-name-->"+nameOfFirstEmailField);
-        var arrOfEmails = _.map(this.csvRows,function(value,key){return {"email":value[nameOfFirstEmailField]}; });
+        var arrOfEmails = _.map(this.csvRows,function(value,key){
+            return {"email":value[nameOfFirstEmailField]}; 
+        });
+        var arrOfEmails = _.filter(arrOfEmails,function(element){
+            return utils.is_email(element.email); //filters only valid emails
+        });
+
         // console.log("-www-->"+JSON.stringify(arrOfEmails));
         return arrOfEmails
     },    

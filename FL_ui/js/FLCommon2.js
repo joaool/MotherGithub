@@ -495,6 +495,16 @@ FL["common"] = (function(){//name space FL.common
             var spinner = new Spinner(opts).spin(target);
             return spinner;
         },
+        makeFirstElementsSample: function(arr,sampleSize){//returns a similar array with max size of sampleSize
+			var sample = [];
+			var len = arr.length;
+			if(len > sampleSize)
+				len=sampleSize;
+			for(var i=0;i<len;i++){
+				sample.push(arr[i]);
+			}
+			return sample;
+        },
 		testFunc: function(x) {
 			alert("FL.common.test() -->"+x);
 		}
@@ -596,6 +606,10 @@ FL["clearSpaceBelowMenus"] = function() {
     $("#addGrid").hide();
     $("#_newsletter").empty();
     $("#_newsletter").hide();
+    
+    $("#_newsletterMC").empty();
+    $("#_newsletterMC").hide();
+
     $("#_editGrid").empty();
     $("#_editGrid").hide();
 };

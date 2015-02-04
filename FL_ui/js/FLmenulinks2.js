@@ -39,7 +39,138 @@
 				return def.reject("FLmenulink2.js getMailchimpHTML ->ERROR: token is empty");
 			}
 			return def.promise();
-		};	
+		};
+		var convertsToArrOfObj = function(templateOptionsArr){
+			//receives [{"_id": "t 115",jsonTemplate:"dfdfdg"},{"_id": "t 116",jsonTemplate:"dfgd"}] and returns [{value:1,text: "t 115",template:"dfdfdg"},{value:2,text: "t 116",template:"dfgd"}]
+			return _.map(templateOptionsArr, function(el,index){ return {"value":index+1,"text":el._id,"template":el.jsonTemplate}; });
+		};
+		var mountTemplate = function(jsonObj,header,body,footer) {
+			window.templateCounter = 0;
+			appendTemplate(jsonObj.templateItems.header,header);
+			appendTemplate(jsonObj.templateItems.body,body);
+			appendTemplate(jsonObj.templateItems.footer,footer);
+		};
+		var tt = function(){
+			console.log("tt");
+		};
+		var addImageToMandrillImageArr = function(name,imageFromJson){//mandrillImagesArr is formed to FL.login.emailImagesArray
+			var srcContent = imageFromJson.substring(23);//removes the beginning chars:"data:image/jpeg;base64,"
+			var imageArrElement = {name:name, type:"image/jpg", content:srcContent};
+			FL.login.emailImagesArray.push(imageArrElement);
+		};
+		var checkSocialblock = function(item){//HACK to introduce social links if text Item has "socialblock"
+			var is_social = false;
+			if(item.type == "title"){//TEMPORARY to be a social element it must be type="title" and content = "socialblock"
+				var elementStr = item.title;
+				var element = $.parseHTML(elementStr);
+				var titleText = $(element).text();
+				if(titleText == "socialblock")
+					is_social = true
+			}
+			return is_social;
+		}	
+		var appendTemplate = function(jsonObject, parentElement){
+			// jsonObject - array jsons corresponding to a parentElement (ex.header, body or footer) 
+			// ex:[{"title":"<p>Mastruncio1</p>","style":{"fontColor":"#000","fontFamily":"Arial",...."imagePadding":"10px"},"type":"title"}]
+			$.each(jsonObject,function(i,item){//item is array element i
+				// var element = temp.getElementToDrop(item.type);
+				var element = null;
+				if( checkSocialblock(item) ){//HACK 
+					element = $("#socialblockDroppedItem").html();
+					$(parentElement).append(element);
+				}else{
+					var elementId = item.type + "DroppedItem";
+					element = $("#"+elementId).html();
+					element = $(element).filter("div");			
+					$(parentElement).append(element);
+					$(element).prop("id","template"+ window.templateCounter);
+					if( item.type == "title" ) {
+						$(element).css(item.style);
+						$(element).html(item.title);
+					}else if(item.type == "image"){
+						var elementImg = $('#'+"template"+ window.templateCounter+ ' img');//Id already assigned we search the sub element image
+						var elementAnchor = $('#'+"template"+ window.templateCounter+ ' a');//Id already assigned we search the sub element anchor
+						if (item.link)
+							$(elementAnchor).attr('href',item.link);	
+						addImageToMandrillImageArr("template"+ window.templateCounter,item.source);
+						$(elementImg).attr('src','cid:template'+ window.templateCounter);
+						$(elementImg).css(item.style);
+					}
+					window.templateCounter++;
+				}	
+			});
+		};
+		var getHTMLContent = function(jsonTemplate){
+			// alert(jsonTemplate);
+			var jsonObj = JSON.parse(jsonTemplate);
+			var content = $("#templatePreview").html();
+			// var template = _.template($("#templatePreview").html());
+			var header = $("#template_holder_header");
+			var body = $("#template_holder_body");
+			var footer = $("#template_holder_footer");
+			header.empty();
+			body.empty();
+			footer.empty();
+			FL.login.emailImagesArray = [];
+			// mountTemplate(jsonObj,header,body,footer);
+			window.templateCounter = 0;
+			appendTemplate(jsonObj.templateItems.header,header);
+			appendTemplate(jsonObj.templateItems.body,body);
+			appendTemplate(jsonObj.templateItems.footer,footer);
+			return $("#templateHolder").html();
+		};
+		var newsletterEmissionUI = function(templateOptionsArr) {
+			var def = $.Deferred();
+			FL.login.emailTemplateName = null;//cleans any previous template name
+			FL.login.emailContentTemplate = null;
+			FL.login.emailImagesArray = [];
+			var arrOfObj = convertsToArrOfObj(templateOptionsArr); //converts templateOptionsArr to arrOfObjects
+			//ex:arrOfObj=[{value:1,text: "t 115",template:"dfdfdg"},{value:2,text: "t 116",template:"dfgd"}]
+
+			var pos = FL.login.token.userName.indexOf("@");
+			var shortUserName = FL.login.token.userName.substring(0,pos);
+			var masterDetailItems = {
+				master:{toEmail:shortUserName,email:FL.login.token.userName,subject:"",testEmail:FL.login.token.userName},
+				detail:{} //no detail
+			};
+			var options = {
+				type:"primary", 
+				icon:"send",
+				button1:"Cancel",
+				button2:"Send Newsletter",
+				dropdown:{
+					"_sendNewsletter_template":{
+						arr:arrOfObj,//titles,
+						default:"No template",
+						onSelect:function(objSelected){// console.log("Template choice was "+objSelected.text + " cId=" + objSelected.cId);
+							FL.login.emailTemplateName = objSelected.text;
+							var htmlTemplate = getHTMLContent(objSelected.template);
+							FL.login.emailContentTemplate = htmlTemplate;
+							// alert("Template choice was "+objSelected.text);
+						}
+					}
+				}
+			};
+			FL.common.editMasterDetail("B"," Send email/Newsletter","_sendNewsletterTemplate",masterDetailItems,options,function(result){
+				if(result){//user choosed button2 ==>Send Newsletter button
+					if(FL.login.emailTemplateName !== null){
+						var senderObj = extractSenderObjFromModal();//var senderObj = {from_name:name,from_email:email,subject:subject,testEmail:testEmail};
+						var toArr = csvStore.extractEmailArray();//to arr becomes: [{"email":"e1@live.com"},{"email":"email2@gmail.com"}..]
+						var mailHTML = FL.login.emailContentTemplate;// we also have FL.login.emailTemplateName
+						//checkDuplicateEmission(entityName,FL.login.emailTemplateName,toArr,senderObj);
+						alert("FLmenulinks2 newsletterEmissionUI Ready to send after checking duplicates.....template=" + mailHTML);
+						FL.clearSpaceBelowMenus();
+						$("#_placeHolder").html(mailHTML);
+					}else{}
+						FL.common.makeModalInfo("Canceled !!! No template selected.");
+				}else{
+					// alert("newsletter canceled");
+					FL.common.makeModalInfo("Canceled !!! you can always send these emails later...");				
+				}
+				return def.resolve();
+			});			
+			return def.promise();
+		};
 		var getMailchimpTemplates = function() {
 			var def = $.Deferred();
 			var arr = null;
@@ -137,6 +268,7 @@
 				FL.common.makeModalConfirm(confirmQuestion,"No, cancel the emission",button2, function(result){
 					if(result){
 						var mailHTML = FL.login.emailContentTemplate;
+						var imagesArr = FL.login.emailImagesArray;
 						// mailHTML = null; //to TEST ONLY
 						var msg = "Newsletter " + FL.login.emailTemplateName + " was not sent !!!. No content to send.";
 						if(mailHTML!== null){
@@ -144,7 +276,7 @@
 								missingEmails = toSend; //missingEmails now refers to toSend
 								// alert("Resend the emission ->"+JSON.stringify(missingEmails));
 							}
-							var sentCount = FL.links.sendEmail(entityName,mailHTML,missingEmails,senderObj,FL.login.emailTemplateName);
+							var sentCount = FL.links.sendEmail(entityName,mailHTML,imagesArr,missingEmails,senderObj,FL.login.emailTemplateName);
 							// var sentCount = missingEmails.length;
 							msg = "Newsletter " + FL.login.emailTemplateName + " sent  to " + sentCount + " recipients !!!<br> - total rows checked = "+recipientsArr.length;
 						}	
@@ -159,6 +291,31 @@
 			});
 		};
 		var prepareNewsletterEmission = function(entityName){
+			var getTemplatesPromise = FL.API.loadTableId("_templates","jsonTemplate");//("_templates","jsonTemplate");
+			getTemplatesPromise.done(function(data){
+				console.log(">>>>>FLmenulinks2.js prepareNewsletterEmission  SUCCESS <<<<<");
+				if( data.length === 0 ){
+					FL.common.makeModalInfo('No templates available. You must have at least one template saved.');
+				}else{
+					// alert("FLmenulinks2.js prepareNewsletterEmission =>\n" + JSON.stringify(data));//data array of objects
+					var emissionPromise = newsletterEmissionUI(data);
+					emissionPromise.done(function(data){
+						alert("FLmenulinks2 prepareNewsletterEmission emission done !");
+						return;// def.resolve(data);					
+					});
+					emissionPromise.fail(function(){
+						alert("FLmenulinks2 prepareNewsletterEmission ->ERROR !!!");
+						return;
+					});
+
+				}
+			});
+			getTemplatesPromise.fail(function(err){
+				console.log(">>>>>FLmenulinks2.js prepareNewsletterEmission  FAILURE <<<<<"+err);
+				return;
+			});
+		};
+		var prepareNewsletterMCEmission = function(entityName){
 			//collects all data to send a newsletter to the current grid. Including the template to use.
 			FL.login.emailTemplateName = null;//cleans any previous template name
 			var pos = FL.login.token.userName.indexOf("@");
@@ -176,7 +333,7 @@
 					type:"primary", 
 					icon:"send",
 					button1:"Cancel",
-					button2:"Send Newsletter",
+					button2:"Send MC Newsletter",
 					dropdown:{
 						"_sendNewsletter_template":{
 							arr:arrOfObj,//titles,
@@ -190,13 +347,13 @@
 									FL.login.emailTemplateName = objSelected.text;
 								});
 								getMailchimpHTMLPromise.fail(function(err){
-									console.log(">>>>>FLmenulinks2.js prepareNewsletterEmission onSelect inside dropdown FAILURE <<<<<"+err);
+									console.log(">>>>>FLmenulinks2.js prepareNewsletterMCEmission onSelect inside dropdown FAILURE <<<<<"+err);
 								});
 							}
 						}
 					}
 				};
-				FL.common.editMasterDetail("B"," Send email/Newsletter","_sendNewsletterTemplate",masterDetailItems,options,function(result){
+				FL.common.editMasterDetail("B"," Send MC email/Newsletter","_sendNewsletterTemplate",masterDetailItems,options,function(result){
 					if(result){//user choosed button2 ==>Send Newsletter button
 						// FL.links.testEmail();
 						var senderObj = extractSenderObjFromModal();//var senderObj = {from_name:name,from_email:email,subject:subject,testEmail:testEmail};
@@ -215,7 +372,7 @@
 				return;
 			});
 			getTemplatesPromise.fail(function(err){
-				console.log(">>>>>FLmenulinks2.js prepareNewsletterEmission  FAILURE <<<<<"+err);
+				console.log(">>>>>FLmenulinks2.js prepareNewsletterMCEmission  FAILURE <<<<<"+err);
 			});
 		};
 		var set3ButtonsAndGrid = function(entityName){//displays addGrid, newletter and editGrid buttons (with clicks prepared) and display grid
@@ -227,11 +384,18 @@
 			$("#_newsletter").click(function(){
 				prepareNewsletterEmission(entityName);
 			});
+			$('#_newsletterMC').off('click');
+			$("#_newsletterMC").click(function(){
+				prepareNewsletterMCEmission(entityName);
+			});			
 			FL.clearSpaceBelowMenus();
 			$("#addGrid").show();
 			$("#addGrid").html(" Add Row");
 			$("#_newsletter").show();
 			$("#_newsletter").html(" Newsletter");
+			$("#_newsletterMC").show();
+			$("#_newsletterMC").html(" MC");
+
 			$("#_editGrid").show();
 			// $("#_editGrid").html(" Edit Grid");
 			FL.grid.displayDefaultGrid(entityName);
@@ -244,7 +408,7 @@
 			// FL.dd.setFieldTypeUI(entityName,"email","phonebox");//only for test
 			// FL.dd.displayEntities();
 
-			if(FL.dd.isEntityWithTypeUI(entityName,"emailbox")){//the newsletter option only appears to entities that have an email
+			if( FL.dd.isEntityWithTypeUI(entityName,"emailbox") || FL.dd.isEntityWithTypeUI(entityName,"email") ){//the newsletter option only appears to entities that have an email
 				if(FL.dd.isHistoMailPeer(entityName)){
 					set3ButtonsAndGrid(entityName);//displays addGrid, newletter and editGrid buttons (with clicks prepared) and displays grid
 				}else{
@@ -327,7 +491,7 @@
 					FL.dd.updateEntityByCName(eCN,{singular:"unNamed"});
 					entityName = "unNamed";
 				}
-				alert("entityName="+entityName+" eCN="+eCN+" synch="+FL.dd.isEntityInSync(entityName));
+				// alert("entityName="+entityName+" eCN="+eCN+" synch="+FL.dd.isEntityInSync(entityName));
 				
 				if(entityName){
 					this.setDefaultGrid(entityName);
@@ -407,7 +571,7 @@
 				FL.server.syncLocalStoreToServer();
 				FL.menu.topicUpdateJsonMenu(oMenu);
 			},
-			sendEmail:function(entityName,mailHTML,recipientsArray,senderObj,NewsletterName){//sends an email to the recipients
+			sendEmail:function(entityName,mailHTML,imagesArr,recipientsArray,senderObj,NewsletterName){//sends an email to the recipients
 				//recipientsArray = ["joaoccoliveira@live.com","joaocarloscoliveira@gmail.com"]
 				//returns the total number of emails sent. Notice that from the recipientsArray the methods will skip all those that do not have a valid email
 				if(mailHTML ==="" || mailHTML === null){
@@ -446,6 +610,7 @@
 								// "to":[{"email":"joaocarloscoliveira@gmail.com"}],
 								"subject": senderObj.subject,
 								"html": mailHTML,
+								"images": imagesArr,
 								"autotext":true,
 								"track_opens":true,
 								"track_clicks":true,
@@ -461,7 +626,7 @@
 						console.log("	to from_name:"+senderObj.from_name+" email:"+senderObj.from_email+" subject:"+senderObj.subject);
 						console.log("	Sends to -->"+JSON.stringify(element));
 						console.log("----------------------------------------------------------------------");
-					m.messages.send(params2,function(res){console.log(res);},function(err){console.log(err);});
+					 m.messages.send(params2,function(res){console.log(res);},function(err){console.log(err);});
 						//how to recover from an accident ?	
 					}else{
 						console.log("sendEmail not sent ! "+ count +"/"+total_toSend+ " -->" + element + " has a format error and was bypassed");				
@@ -469,10 +634,32 @@
 				});
 				return countSend;		
 			},
+			getMandrillRejectListForSender: function(senderEmail) {//returns Madrill rejectList for sender=senderEmail
+				if(!senderEmail)
+					senderEmail=null;
+				promise = FL.API.mandrillRejectListForSender(senderEmail);
+				promise.done(function(data){
+					console.log(">>>>> FL.API.getMandrillRejectListForSender() SUCCESS <<<<< list returned!");
+					alert("getMandrillRejectListForSender:"+JSON.stringify(data));
+					return;
+				});
+				promise.fail(function(err){console.log(">>>>> FL.API.getMandrillRejectListForSender() FAILURE returning list<<<<<"+err); return def.reject(err);});
+			},
+			setMandrillDeleteFromReject: function(arrayOfEmails) {//delete Emails from  Madrill rejectList
+				promise = FL.API.mandrillRejectListForSender(senderEmail);
+				promise.done(function(data){
+					console.log(">>>>> FL.API.getMandrillRejectListForSender() SUCCESS <<<<< list returned!");
+					alert("getMandrillRejectListForSender:"+JSON.stringify(data));
+					return;
+				});
+				promise.fail(function(err){console.log(">>>>> FL.API.getMandrillRejectListForSender() FAILURE returning list<<<<<"+err); return def.reject(err);});
+
+			},
 			sendEmailTest: function() {//sends a sample email with eMail/newsletter
 				if(FL.login.emailContentTemplate){
 					// var mailHTML = '<p>Thank you for selecting <a href="http://www.framelink.co"><strong>FrameLink version 8</strong></a> to build your backend site !</p>';			
-					var mailHTML = FL.login.emailContentTemplate;			
+					var mailHTML = FL.login.emailContentTemplate;
+					var imagesArr = FL.login.emailImagesArray;
 					var senderObj = extractSenderObjFromModal();
 					// var toArr = [{"email":testEmail}];
 					var toArr = [senderObj.testEmail];
@@ -480,7 +667,7 @@
 					console.log("Sends to -->"+JSON.stringify(toArr));
 					console.log("Sends HTML -->"+mailHTML);
 					console.log("----------------------------------------------------------------------");
-					FL.links.sendEmail(null,mailHTML,toArr,senderObj,"test");
+					FL.links.sendEmail(null,mailHTML,imagesArr,toArr,senderObj,"test");
 					alert("Email test sent to "+senderObj.testEmail);
 				}else{
 					alert("Email content is empty - choose a template and try again ");

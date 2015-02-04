@@ -237,18 +237,6 @@ jQuery(document).ready(function($){
 				recoverLastMenu();//recover locally saved menu and informs FL.menu about the new menu if any
 				displaySignInUser(loginObject.email);
 				
-				// var histoPromise=FL.API.createHistoMails_ifNotExisting();
-				// histoPromise.done(function(){
-				// 	// FL.login.checkSignIn();
-				// 	displaySignInUser(loginObject.email);
-				// 	// return loginAccessCB(null,loginObject);
-				// 	return def.resolve();
-				// });
-				// histoPromise.fail(function(err){
-				// 	alert("FLLoadCss2.js loginAccess appSetup --> failure creating _histoMail err="+err);
-				// 	// return loginAccessCB(err,loginObject);
-				// 	return def.reject("FLLoadCss2.js loginAccess appSetup--> failure creating _histoMail err="+err);
-				// });
 				def.resolve(menuData,homeHTML);
 			});
 			loadAppPromise.fail(function(err){
@@ -548,7 +536,11 @@ jQuery(document).ready(function($){
 									{
 										"title" : "Import CSV Spreadsheet",//0
 										"uri":"javascript:javascript:FL.grid.importGrid()"
-									}
+									},
+									{
+										"title" : "Test Rejected List",//0
+										"uri":"javascript:javascript:FL.links.getMandrillRejectListForSender()"
+									}									
 								]
 							}						
 						]
@@ -574,6 +566,7 @@ jQuery(document).ready(function($){
 			fa: null,
 			emailContentTemplate:null, //used on FLmenulinks - if not null it is ready to send newsletter
 			emailTemplateName:null,
+			emailImagesArray:[], //used on FLmenulinks - getHTMLContent to prepare a Mandrill array with all base64 images
 			ServerByPass:true,
 			selectBox: function(options, onSelection) {
 				selectBox(options, onSelection);

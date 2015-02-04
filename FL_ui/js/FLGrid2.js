@@ -27,90 +27,121 @@
 			// return {name: el,description: el + "'description",label: el,type: "string", typeUI: "textbox", enumerable: null, key: false};
 			return [emptyObj];
 		};
-	    var injectId = function(idTitle,arrOfColumns){//injects a first id column into the array
-	        arrOfColumns.splice(0, 0, {label:idTitle,name:"id",description: "order of lines",type:"number",typeUI:"numberbox",enumerable:null,key:true});
-	    };
-	    var firstRowAnalisys = function(rows, percent) {
-	        // assumes that all rows have the same json pattern with same type in the whole array - assumes type of row = type of first row
-	        // If column row type is "string" search for enumerables within that column
-	        //    if [(total number of groups)/(number of rows) < percent ] assumes enumerable and identifies an array of enumerables
-	        // returns
-	        //   [ {name:{fieldType:"string", label:"Name"}}, ...., {service:{fieldType:"enumerable", label:"Name", enumerable:[*]}} ]
-	        //      if fieldType="enumerable" the property enumerable has an array with the enumerable options.
-	        var numOfRows = rows.length;
-	        var arrOfKeys = _.keys( rows[0] );//at least row[0] must exist
-	        var arrOfTypes = [];
-	        _.each(arrOfKeys, function(element, index){
-	            var obj = {};
-	            var dataType = utils.typeOf((rows[0][element]));//one of  "number","string","email","boolean","object","array","null","undefined","date"
-	            // console.log(index+" firstRowAnalisys looking for enumerables -->"+element+ " dataType="+dataType);
-	            if (dataType == "string") {//possible datatypes:string, integer, number, boolean, date, or json 
+		var injectId = function(idTitle,arrOfColumns){//injects a first id column into the array
+			arrOfColumns.splice(0, 0, {label:idTitle,name:"id",description: "order of lines",type:"number",typeUI:"numberbox",enumerable:null,key:true});
+		};
+		var extractUniqueFromArray = function(arr) { //http://stackoverflow.com/questions/18878571/underscore-js-find-the-most-frequently-occurring-value-in-an-array
+			//returns an object {empties:no_of empties,uniqueArr:uniqueArr} where:
+			//		empties - number of empties ocurrences in arr
+			// 		uniqueArr - array with all unique occurences in arr including "" if it exists
+			var arrWrap = _.chain(arr).countBy().pairs(); //arrGroups gives us the number of different elements
+			var arrGroups = arrWrap._wrapped; //arrGroups gives us the number of different elements
+			//arrGroups has the format: [ ["High",40], ["Medium",47], ["Premium",5], ]
+			var emptyPair = _.find(arrGroups,function(pair){return pair[0]==="";});
+			var empties = 0;
+			if(typeof emptyPair !== 'undefined'){
+				empties = emptyPair[1];
+			}
+			var uniqueArr = _.map(arrGroups,function(element){return element[0];});
+			return {empties:empties,uniqueArr:uniqueArr};
+		};
+		var dataRowAnalisys = function(rows, percent) {
+			// assumes that all rows have the same json pattern with same type in the whole array - assumes type of row = type of first row
+			// If column row type is "string" search for enumerables within that column
+			//    if [(total number of groups)/(number of rows) < percent ] assumes enumerable and identifies an array of enumerables
+			// returns
+			//   [ {name:{fieldType:"string", label:"Name"}}, ...., {service:{fieldType:"enumerable", label:"Name", enumerable:[*]}} ]
+			//      if fieldType="enumerable" the property enumerable has an array with the enumerable options.
+			var numOfRows = rows.length;
+			var rowsSample = FL.common.makeFirstElementsSample(rows,50); //reduces max size of array to 50
+			var numOfSampleRows = rowsSample.length;
+			var arrOfKeys = _.keys( rows[0] );//at least row[0] must exist
+			var arrOfTypes = [];
+			_.each(arrOfKeys, function(element, index){
+				var obj = {};
+				var dataType = utils.typeOf((rows[0][element]));//one of  "number","string","email","boolean","object","array","null","undefined","date"
+				if (dataType == "string") {//possible datatypes:string, integer, number, boolean, date, or json 
+					//analysis of the first 50 elements or all if length<50
+					var arrOfRowValues = _.pluck(rowsSample,element);
+					var uniqueObj = extractUniqueFromArray(arrOfRowValues);//returns {empties:no_of empties,uniqueArr:uniqueArr}
+					//percent = (total diferent cases excluding empty)/(total non empty cases)
+					var columnPercent = ( uniqueObj.uniqueArr.length - ((uniqueObj.empties == 0) ? 0 : 1))/( numOfSampleRows - uniqueObj.empties );
+					if ( columnPercent < percent ) { //we have an enumerable
+						var arrOfAllRowValues = _.pluck(rows,element);
+						var fullUniqueObj = extractUniqueFromArray(arrOfAllRowValues);
+						obj[element.toLowerCase()] = {"fieldType":"string","fieldTypeUI":"combobox",enumerable:fullUniqueObj.uniqueArr, label:element};
+					}else{//not an enumerable
+						obj[element.toLowerCase()] = {"fieldType":"string","fieldTypeUI":"textbox",enumerable:null,label:element};
+						if( is_ColumnOfSubtype( "email",uniqueObj.uniqueArr ) )
+							obj[element.toLowerCase()]["fieldTypeUI"] = "email";
+						else if( is_ColumnOfSubtype( "url",uniqueObj.uniqueArr ) )
+							obj[element.toLowerCase()]["fieldTypeUI"] = "url";
+						else if( is_ColumnOfSubtype( "phone",uniqueObj.uniqueArr ) )
+							obj[element.toLowerCase()]["fieldTypeUI"] = "phone";
+					}
+				}else{
+					if (dataType == "number") {//possible datatypes:string, integer, number, boolean, date, or json 
+						obj[element.toLowerCase()] = {"fieldType":"number","fieldTypeUI":"numberbox",enumerable:null, label:element};
+					}else if(dataType == "email") {
+						obj[element.toLowerCase()] = {"fieldType":"string","fieldTypeUI":"emailbox",enumerable:null, label:element};
+					}else if(dataType == "boolean") {
+						obj[element.toLowerCase()] = {"fieldType":"boolean","fieldTypeUI":"checkbox",enumerable:null, label:element};
+					}else if(dataType == "date") {
+						obj[element.toLowerCase()] = {"fieldType":"date","fieldTypeUI":"datetextbox",enumerable:null, label:element};
+					}else{
+						obj[element.toLowerCase()] = {"fieldType":"string","fieldTypeUI":"textbox",enumerable:null,label:element};
+					}
+				}
+				arrOfTypes.push(obj);
+				var z=32;
+			});
+			return arrOfTypes;
+		};
+		var createAttributesArrFromCsvAnalisys = function(rows){//creates the equivalent to a dd entry from a set of rows
+			// returns an array with the same format as dd dictionary array of attributes. Each element has the following format:
+			//      ex: {name:"address",description:"address to send invoices",label:"Address",type:"string",enumerable:null,key:false});
+			var attributesArr = [];
+			var arrOfAttributes = dataRowAnalisys(rows, 0.5);
+			_.each(arrOfAttributes, function(element,index){
+				var attrName = _.keys(element)[0];
+				var fieldType =element[attrName].fieldType;
+				var fieldTypeUI =element[attrName].fieldTypeUI;
+				var label =element[attrName].label;
+				var enumerable = null;
+				// if(fieldType=="enumerable"){
+				//     enumerable = element[attrName].enumerable;
+				// }
+				if(fieldType=="string" && fieldTypeUI == "combobox"){
+					enumerable = element[attrName].enumerable;
+				}
+				console.log(index+" - createAttributesArrFromCsvAnalisys "+attrName +" type="+fieldType+" label="+label + +" typeUI="+fieldTypeUI );
+				attributesArr.push({name: attrName,description: "description of " + attrName,label: label,type: fieldType, typeUI: fieldTypeUI, enumerable: enumerable, key: false});
 
-	                var arrOfRowValues = _.pluck(rows,element);
-	                // var zz= _.chain(arrOfRowValues).countBy().pairs().max(_.last).value();
-	                //http://stackoverflow.com/questions/18878571/underscore-js-find-the-most-frequently-occurring-value-in-an-array
-	                var arrWrap = _.chain(arrOfRowValues).countBy().pairs(); //arrGroups gives us the number of different elements
-	                var arrGroups = arrWrap._wrapped; //arrGroups gives us the number of different elements
-	                //arrGroups has the format: [ ["High",40], ["Medium",47], ["Premium",5], ]
-	                // because a group of ["",138] cannot count, we must calculate how many empty and add it to numerator
-	                var empties = 0;
-	                var emptyPair = _.find(arrGroups,function(pair){return pair[0]==="";});
-					if(typeof emptyPair !== 'undefined'){
-						empties = emptyPair[1];
-					};
-	                var columnPercent = (arrGroups.length + empties)/numOfRows;
-	                if ( columnPercent < percent ) { //we have an enumerable
-	                    // console.log(index+" firstRowAnalisys looking for enumerables -->"+element+ " fieldType="+fieldType+" is enumerable ");
-	                    var enumerableArr = _.map(arrGroups, function(element){ return element[0]; });
-	                    obj[element.toLowerCase()] = {"fieldType":"string","fieldTypeUI":"combobox",enumerable:enumerableArr, label:element};
-	                }else{
-	                    obj[element.toLowerCase()] = {"fieldType":"string","fieldTypeUI":"textbox",enumerable:null,label:element};
-	                }
-
-	            }else{
-	                if (dataType == "number") {//possible datatypes:string, integer, number, boolean, date, or json 
-	                    obj[element.toLowerCase()] = {"fieldType":"number","fieldTypeUI":"numberbox",enumerable:null, label:element};
-	                }else if(dataType == "email") {
-	                    obj[element.toLowerCase()] = {"fieldType":"string","fieldTypeUI":"emailbox",enumerable:null, label:element};
-	                }else if(dataType == "boolean") {
-	                    obj[element.toLowerCase()] = {"fieldType":"boolean","fieldTypeUI":"checkbox",enumerable:null, label:element};
-	                }else if(dataType == "date") {
-	                    obj[element.toLowerCase()] = {"fieldType":"date","fieldTypeUI":"datetextbox",enumerable:null, label:element};
-	                }else{
-	                   obj[element.toLowerCase()] = {"fieldType":"string","fieldTypeUI":"textbox",enumerable:null,label:element};
-	                }
-	            }
-	            arrOfTypes.push(obj);
-	            var z=32;
-	        });
-	        return arrOfTypes;
-	    };	    
-	    var createAttributesArrFromCsvAnalisys = function(rows){//creates the equivalent to a dd entry from a set of rows
-        // returns an array with the same format as dd dictionary array of attributes. Each element has the following format:
-        //      ex: {name:"address",description:"address to send invoices",label:"Address",type:"string",enumerable:null,key:false});
-        var attributesArr = [];
-        var arrOfAttributes = firstRowAnalisys(rows, 0.5);
-        _.each(arrOfAttributes, function(element,index){
-            var attrName = _.keys(element)[0];
-            var fieldType =element[attrName].fieldType;
-            var fieldTypeUI =element[attrName].fieldTypeUI;
-            var label =element[attrName].label;
-            var enumerable = null;
-            // if(fieldType=="enumerable"){
-            //     enumerable = element[attrName].enumerable;
-            // }
-            if(fieldType=="string" && fieldTypeUI == "combobox"){
-                enumerable = element[attrName].enumerable;
-            }
-
-            console.log(index+" - createAttributesArrFromCsvAnalisys -->"+attrName +" type="+fieldType+" label="+label );
-            attributesArr.push({name: attrName,description: "description of " + attrName,label: label,type: fieldType, typeUI: fieldTypeUI, enumerable: enumerable, key: false});
-
-            // FL.dd.addAttribute(entityName, attrName,entityName+"' "+attrName,label,fieldType,enumerable);//xEntity,xAttribute,xDescription,xLabel,xType,xEnumerable
-        });
-        // attributesArr.push({label:"Order",name:"id",description: "order of lines",type:"string",enumerable:null,key:true}); //injects id exactly like dd
-        return attributesArr;
-    };
+				// FL.dd.addAttribute(entityName, attrName,entityName+"' "+attrName,label,fieldType,enumerable);//xEntity,xAttribute,xDescription,xLabel,xType,xEnumerable
+			});
+			// attributesArr.push({label:"Order",name:"id",description: "order of lines",type:"string",enumerable:null,key:true}); //injects id exactly like dd
+			return attributesArr;
+		};
+		var is_ColumnOfSubtype = function(subtype,sampleArr){//scans all elements of sampleArr and returns true if all non empty elements belongs to subtype
+			//example 
+			//		if( is_ColumnOfSubtype("email",arrOfRowValues) )
+			//		if( is_ColumnOfSubtype("url",arrOfRowValues) )
+			//		if( is_ColumnOfSubtype("phone",arrOfRowValues) )
+			//  the subtype must be one of the existing subtypes in FL.utils.typeUIOf() 				
+			var is=false;
+			var len = sampleArr.length;
+			for(var i=0;i<len;i++){
+				if (sampleArr[i].trim().length > 0 ){
+					if( utils.typeUIOf(sampleArr[i]) == subtype ){
+						is = true;
+					}else{
+						is = false;
+						break;
+					}
+				}
+			}
+			return is;
+		};
 		var internalTest = function(x) {//
 			alert("grid internalTest() -->"+x);
 		};
@@ -121,6 +152,7 @@
 			// },
 			csvFile: null,
 			csvFileDelimiter: null,
+			csvEncoding: null,
 			createGrid: function() {//call with menu key "uri": "javascript:FL.grid.createGrid()"
 				// FL.common.makeModalInfo("Create Grid to be implemented soon");
 				var masterDetailItems = {
@@ -179,11 +211,14 @@
 				//	if delimiter diferent from null means that probabily the delimiter is the specified
 				//  NOTE: to choose the delimiter it checks the first field.
 				//			if fistfields has more 
+				//  encoding is the encoding recomendation - PC =>
 				var ok=true;
 				var fieldArray = metaFieldsArr.fields;
 				var numberOfFields = 0;
 				var emptyFields = 0;
 				var delimiter = null;
+				var linebreak = metaFieldsArr.linebreak;
+				var encoding = null;
 				var semi_colon_repetitions=0;
 				var comma_repetitions=0;
 				_.each(fieldArray, function(element, index){
@@ -198,6 +233,12 @@
 				});
 				if(metaFieldsArr.aborted)
 					ok=false;//one criteria to repeat
+				if(linebreak.length == 1 && linebreak.charCodeAt(0)==13 )
+					encoding="MacRoman";//standard for mac
+				else if(linebreak.length == 2 && linebreak.charCodeAt(0)==13 && linebreak.charCodeAt(1)==10 ) //CR + LF
+					encoding="windows-1252";//standard for PC
+				else 
+					encoding="windows-1252";//standard for PC
 				if(emptyFields>0){
 					if(semi_colon_repetitions>numberOfFields){ //one heuristic criteria
 						delimiter = ";"//recomended for next try
@@ -207,7 +248,7 @@
 						ok=false;//one criteria to repeat
 					}
 				}
-				return {ok:ok,delimiter:delimiter,numberOfFields:numberOfFields,emptyFields:emptyFields,comma_repetitions:comma_repetitions,semi_colon_repetitions:semi_colon_repetitions};
+				return {ok:ok,linebreak:linebreak,delimiter:delimiter,encoding:encoding,numberOfFields:numberOfFields,emptyFields:emptyFields,comma_repetitions:comma_repetitions,semi_colon_repetitions:semi_colon_repetitions};
 			},
 			validateCSV: function(fileObj){//this is called directly from template id="_importCSV" ->onchange="FL.grid.validateCSV(this.files)" 
 				// if there is an error FL.grid.csvFile will be null. No error => FL.grid.csvFile = csvFile
@@ -231,6 +272,7 @@
 							// alert("Loaded rows:" + rowsOnAttempt1 +  "\nAborted--->" + results.meta.aborted + "\nDelimiter--->"+JSON.stringify(results.meta.delimiter) + "\nFields--->"+JSON.stringify(results.meta.fields) + "\n Errors--->"+JSON.stringify(results.errors));
 							var resultObj = FL.grid.verifyPapaFields(results.meta);
 							// alert("Result of verification:-->"+JSON.stringify(resultObj));
+							FL.grid.csvEncoding = resultObj.encoding;
 							if(resultObj.ok){
 								console.log("OK on first attempt !!!!!!!!!!!!!! FILE IS A GOOD CSV ");
 								// alert("OK on first attempt !!!!!!!!!!!!!! FILE IS A GOOD CSV ");
@@ -241,6 +283,7 @@
 								Papa.parse(csvFile, {
 									delimiter: resultObj.delimiter,
 									dynamicTyping: true,
+									encoding: resultObj.encoding,
 									complete: function(results) {
 										data = results;
 										if (results.data.length<rowsOnAttempt1){//refuse because lines will be lost
@@ -298,7 +341,8 @@
 								
 								var csvFile = FL.grid.csvFile;//set by FL.grid.validateCSV(this.files) --- was val = $('input[type=file]');
 								var delimiter = FL.grid.csvFileDelimiter;
-								FL.grid.csvToGrid2(csvFile,delimiter,entityName);//csvFile is not a JQuery object
+								var encoding = FL.grid.csvEncoding;
+								FL.grid.csvToGrid2(csvFile,delimiter,encoding,entityName);//csvFile is not a JQuery object
 							}
                 			// utils.mountGridInCsvStore(columnsArr);//mount backbone views and operates grid - columnsArr must be prepared to backGrid
 						}
@@ -470,7 +514,7 @@
 		            }
 		        });
 		    },
-	   		csvToGrid2: function(csvFile,delimiter,entityName){//input is a file object obtained from DOM	//http://papaparse.com/  
+	   		csvToGrid2: function(csvFile,delimiter,encoding,entityName){//input is a file object obtained from DOM	//http://papaparse.com/  
 						//csvFile - file to load file from local computer
 						//delimiter - eventual delimiter to use instead of auto delimiter. This is decided by onchange="FL.grid.validateCSV(this.files)"
 						// var spinner=FL.common.loaderAnimationON('spinnerDiv');
@@ -484,7 +528,8 @@
 							dynamicTyping: true,
 							delimiter: delimiter,
 							skipEmptyLines: skipEmptyLines,
-							encoding:"ISO-8859-1",// ISO-8859-1 is the good encoding for Portuguese chars  - "UTF-8" or "utf-8", "latin-1", "windows-1255"
+							// encoding:"ISO-8859-1",// ISO-8859-1 is the good encoding for Portuguese chars  - "UTF-8" or "utf-8", "latin-1", "windows-1255"
+				            encoding: encoding, //defined in verifyPapaFields()
 				            complete: function(data) {
 				                // data is an object data = {errors:{}, meta:{}, results:{fields:[ elements are fields],rows:[elements are objects]} } 
 				                // data.results.fields - array with columns titles to show

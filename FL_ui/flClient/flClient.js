@@ -64,9 +64,9 @@ TODO
     }
     var tabCodec=[{1: 'OK'}];
     var urlMainProt='http:';
-    var urlMainSrv='62.210.97.101';
+    var urlMainSrv='framelink.co';
     //urlMainSrv='localhost';
-    var urlMainPort =8123;
+    var urlMainPort =8123; // port
 
     var urlAbeProt;
     var urlAbeSrv;
@@ -866,6 +866,21 @@ TODO
                 sendCommand(2, 'campaign/content', "0", data, { }, callBack);
             }
             return mailChimp;
+        })();
+        //////////////////
+        ///  Mandrill
+        //////////////////
+        flMain.prototype.mandrill=(function(){
+            var mandrill = function() {
+            }
+            // API going to the server
+            mandrill.prototype.rejectList = function(data, callBack){
+                sendCommand(2, 'mandrill/rejectlist', "0", data, { }, callBack);
+            }
+            mandrill.prototype.rejectDelete = function(data, callBack){
+                sendCommand(2, 'mandrill/rejectdelete', "0", data, { }, callBack);
+            }
+            return mandrill;
         })();
 
         ///////////////////////

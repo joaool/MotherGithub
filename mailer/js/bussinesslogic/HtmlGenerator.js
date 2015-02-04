@@ -77,7 +77,10 @@ $(document).ready(function(){
 });
 function OnTemplatesLoaded()
 {
+	var html = $("#templatePreview").html();//to remove
 	var template = _.template($("#templatePreview").html());
+	var html1 = template(); //to remove
+	var z = $.parseHTML(html1);//to remove
 	$(document.body).append($.parseHTML(template()));
 	header = $("#template_holder_header");
 	body = $("#template_holder_body");
