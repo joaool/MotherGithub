@@ -21,7 +21,7 @@ function OnTemplatesLoaded(){
 			templatePromise.fail(function(err){
 				alert("MailerTemplate.js after getFLContextFromBrowserLocationBar ->FAILURE with createTemplates_ifNotExisting err="+err);
 				return;
-			});	
+			});
 		});
 		loadAppPromise.fail(function(err){
 			alert("MailerTemplate.js OnTemplatesLoaded  --> loginAccess appSetup FAILURE in loadAppDataForSignInUser2 <<<<< error="+err);

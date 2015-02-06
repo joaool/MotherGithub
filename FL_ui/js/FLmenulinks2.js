@@ -131,7 +131,7 @@
 			appendTemplate(jsonObj.templateItems.footer,footer);
 			return $("#templateHolder").html();
 		};
-		var newsletterEmissionUI = function(templateOptionsArr) {
+		var newsletterEmissionUI = function(templateOptionsArr, entityName) {
 			var def = $.Deferred();
 			FL.login.emailTemplateName = null;//cleans any previous template name
 			FL.login.emailContentTemplate = null;
@@ -169,14 +169,12 @@
 						var senderObj = extractSenderObjFromModal();//var senderObj = {from_name:name,from_email:email,subject:subject,testEmail:testEmail};
 						var toArr = csvStore.extractEmailArray();//to arr becomes: [{"email":"e1@live.com"},{"email":"email2@gmail.com"}..]
 						var mailHTML = FL.login.emailContentTemplate;// we also have FL.login.emailTemplateName
-						//checkDuplicateEmission(entityName,FL.login.emailTemplateName,toArr,senderObj);
-						alert("FLmenulinks2 newsletterEmissionUI Ready to send after checking duplicates.....template=" + mailHTML);
-						FL.clearSpaceBelowMenus();
-						$("#_placeHolder").html(mailHTML);
-					}else{}
+						// alert("FLmenulinks2 newsletterEmissionUI Ready to send after checking duplicates.....template=" + mailHTML);
+						checkDuplicateEmission(entityName,FL.login.emailTemplateName,toArr,senderObj);
+					}else{
 						FL.common.makeModalInfo("Canceled !!! No template selected.");
+					}	
 				}else{
-					// alert("newsletter canceled");
 					FL.common.makeModalInfo("Canceled !!! you can always send these emails later...");				
 				}
 				return def.resolve();
@@ -304,13 +302,14 @@
 		};
 		var prepareNewsletterEmission = function(entityName){
 			var getTemplatesPromise = FL.API.loadTableId("_templates","jsonTemplate");//("_templates","jsonTemplate");
+			var entityName = entityName;
 			getTemplatesPromise.done(function(data){
 				console.log(">>>>>FLmenulinks2.js prepareNewsletterEmission  SUCCESS <<<<<");
 				if( data.length === 0 ){
 					FL.common.makeModalInfo('No templates available. You must have at least one template saved.');
 				}else{
 					// alert("FLmenulinks2.js prepareNewsletterEmission =>\n" + JSON.stringify(data));//data array of objects
-					var emissionPromise = newsletterEmissionUI(data);
+					var emissionPromise = newsletterEmissionUI(data,entityName);
 					emissionPromise.done(function(data){
 						alert("FLmenulinks2 prepareNewsletterEmission emission done !");
 						return;// def.resolve(data);					
@@ -394,7 +393,15 @@
 			});
 			$('#_newsletter').off('click');
 			$("#_newsletter").click(function(){
-				prepareNewsletterEmission(entityName);
+				var templatePromise=FL.API.createTemplates_ifNotExisting();
+				templatePromise.done(function(){
+					prepareNewsletterEmission(entityName);
+					return;
+				});
+				templatePromise.fail(function(err){
+					alert("FLmenulinks2.js set3ButtonsAndGrid ->FAILURE with createTemplates_ifNotExisting err="+err);
+					return;
+				});			
 			});
 			$('#_newsletterMC').off('click');
 			$("#_newsletterMC").click(function(){

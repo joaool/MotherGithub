@@ -863,9 +863,10 @@ FL["menu"] = (function(){//name space FL.menu
 
 			var uri ="javascript:FL.links.setDefaultGridByCN('" + eCN + "')";
 			//"javascript:FL.links.setDefaultGrid('Order')"
-
-			FL.menu.currentMenuObj.createMenuEntryLastTop(optionTitle,uri);
-
+			if(FL.login.permissionToAddMenu){//HACK to prevent double call
+				FL.menu.currentMenuObj.createMenuEntryLastTop(optionTitle,uri);
+				FL.login.permissionToAddMenu = false;
+			}
 			console.log("======================================================================");
 			// console.log(FL.menu.currentMenuObj.toString());
 			// alert("FL.menu.topicCreateGrid with optionTitle="+optionTitle+ " singular="+singular);

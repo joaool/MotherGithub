@@ -1412,6 +1412,10 @@
 				console.log("....................................>beginning loadTableId....with appToken="+JSON.stringify(FL.login.appToken));
 				var def = $.Deferred();
 				var ecn = FL.dd.getCEntity(entityName);
+				if(!ecn){
+					alert("Error in FL.API.loadTableId the table <<" + entityName + ">> not in local dictiionary!");
+					return def.reject("Error in FL.API.loadTableId the table <<" + entityName + ">> not in local dictiionary!" );
+				}
 				var projections = {"_id":1};
 				if(field2){
 					var fCN=FL.dd.getFieldCompressedName(entityName,field2);

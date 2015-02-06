@@ -491,6 +491,7 @@ jQuery(document).ready(function($){
 			appToken: {},
 			defaultStyle: "readable",
 			defaultFontFamily: "helvetica",
+			permissionToAddMenu: true,
 			defaultMenu: {
 				// "menu" : [
 				// 	{

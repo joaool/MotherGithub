@@ -34,12 +34,15 @@
 			//returns an object {empties:no_of empties,uniqueArr:uniqueArr} where:
 			//		empties - number of empties ocurrences in arr
 			// 		uniqueArr - array with all unique occurences in arr including "" if it exists
+			arr = _.filter(arr, function(element){
+				return typeof element !="undefined";
+			});//exclude undefined elements
 			var arrWrap = _.chain(arr).countBy().pairs(); //arrGroups gives us the number of different elements
 			var arrGroups = arrWrap._wrapped; //arrGroups gives us the number of different elements
 			//arrGroups has the format: [ ["High",40], ["Medium",47], ["Premium",5], ]
 			var emptyPair = _.find(arrGroups,function(pair){return pair[0]==="";});
 			var empties = 0;
-			if(typeof emptyPair !== 'undefined'){
+			if(typeof emptyPair !== 'undefined'){//the case where there is no emptyPair =>undefined
 				empties = emptyPair[1];
 			}
 			var uniqueArr = _.map(arrGroups,function(element){return element[0];});
@@ -416,6 +419,7 @@
 				saveTablePromise.done(function(data){
 					console.log("FL.grid.storeCurrentCSVToServerAndInsertMenu --> dict synch and saveTable sucessfull ->"+JSON.stringify(data));
 					var eCN = FL.dd.getCEntity(entityName);
+					FL.login.permissionToAddMenu = true;//forces true...tis flag is set to false in FL.menu.topicCreateGridByCN to prevent 2 calls
 					$.Topic( 'createGridOptionByCN' ).publish( menuName,eCN );//broadcast that will be received by FL.menu to add an option
 					FL.clearSpaceBelowMenus();
 					spinner.stop();

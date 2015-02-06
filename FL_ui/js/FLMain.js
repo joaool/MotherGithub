@@ -17,48 +17,11 @@ var FL = FL || {};
 (function() { //App is a name space.
 	var spinner=FL.common.loaderAnimationON('spinnerDiv');
 	setInterval(function(){spinner.stop();},1000);
-	var oMenu = {
-		"menu" : [
-			{
-				"title" : "Settings",//0
-				"uri":"#",
-				"menu":[
-					{
-						"title" : "User Administration",//0
-						"uri":"javascript:FL.links.userAdministration()"
-					},
-					{
-						"title" : "Preferences",//0
-						"uri":"#",
-						"menu":[
-							{
-								"title" : "Styles and Fonts",//0
-								"uri":"javascript:FL.links.editStylesAndFonts()"
-							},
-							{
-								"title" : "Home Page",//0
-								"uri":"javascript:FL.links.pageEditor('home')"
-							},					
-							
-						]
-					},
-					{
-						"title" : "Newsletter templates",//0
-						"uri":"javascript:FL.links.newsletterEditor()"
-					},
-					{
-						"title" : "Create Grid",//0
-						"uri":"javascript:FL.grid.createGrid()"
-					}
-				]
-			},
-		]
-	};
-	FL.API.debug = true;
-	FL.oMenu = oMenu; //why is this necessary ? it is !
-	FL.common.clearSpaceBelowMenus();
-	// FL.oMenu = null;
 	$(document).ready(function() {
+		FL.API.debug = true;
+		FL.oMenu = FL.login.defaultMenu; //why is this necessary ? it is !
+		FL.common.clearSpaceBelowMenus();
+
 		console.log("FLMain.js begin inside document.ready");
 		var fullUrl = window.location.href;
 		if(fullUrl){//gets domain from url string ->http://localhost/pdojo/MotherGithub/test_menu13.html?d=myDomain1#
