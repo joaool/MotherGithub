@@ -87,8 +87,11 @@ mixpanel.init("19ada1cb259cc3272c67085eb1bf03fc");</script><!-- end Mixpanel -->
 	<script src="FL_ui/js/backgrid-paginator.js"></script>
 
 	<script src="FL_ui/js/jquery.parse.min.js"></script> <!-- to load csv reader http://papaparse.com/  -->
+	<script src="FL_ui/js/papaparse.min.js"></script> <!-- to load csv reader http://papaparse.com/  -->
+
 	<script src="FL_ui/js/utils2.js"></script>            
-	<script src="FL_ui/js/FLdd2.js"></script>            
+	<script src="FL_ui/js/FLdd2.js"></script> 
+	<script src="FL_ui/js/FLemailServices2.js"></script>
 	<script src="FL_ui/js/FLmenulinks2.js"></script>            
 	<script src="FL_ui/js/FLSlidePanels.js"></script> <!-- TO BE REMOVED SOON -->           
 	<script src="FL_ui/js/memoryCsv.js"></script>  
@@ -98,6 +101,7 @@ mixpanel.init("19ada1cb259cc3272c67085eb1bf03fc");</script><!-- end Mixpanel -->
 	<script src="FL_ui/flClient/flClient.js"></script>
 	<script src="FL_ui/flClient/ajaxBrowser.js"></script>
 	<script src="FL_ui/js/FLServer.js"></script> <!-- TO BE REMOVED SOON has offline TBR-->  
+	<script src="FL_ui/js/phoneparser.js"></script>
 
 	<script src="FL_ui/js/FLAPI.js"></script>
 
@@ -406,7 +410,7 @@ mixpanel.init("19ada1cb259cc3272c67085eb1bf03fc");</script><!-- end Mixpanel -->
                             <label class="control-label" for="_dictEditEntityTemplate_entityDescription" id="_dictEditEntityTemplate_whatIsLabel" >What is a </label>
                             <div class="input-group" style="line-height:0px;">
                                 <span class="input-group-addon">Description:</span>
-                                <textarea class="form-control" id="_dictEditEntityTemplate_entityDescription" name="entityDescription" onkeyup="FL.slidePanels.dictTemplateChangeDescription(this.form)" rows="2"><%= masterDetailItems.master.entityDescription %></textarea>
+                             <textarea class="form-control" id="_dictEditEntityTemplate_entityDescription" name="entityDescription" onkeyup="FL.   slidePanels.dictTemplateChangeDescription(this.form)" rows="2"><%= masterDetailItems.master.entityDescription %></textarea>
                             </div>                      
                             <div>
                                 <h4 id="_dictEditEntityTemplate_plural"></h4>
@@ -497,7 +501,45 @@ mixpanel.init("19ada1cb259cc3272c67085eb1bf03fc");</script><!-- end Mixpanel -->
 		    	</div>
 			</form>
 		</div>
+	</script>
+	<script id="_importCSV" type="text/template"> 
+		<div class="_importCSV" style="margin-top:0px;">
+			<form id="form__importCSV" novalidate="novalidate">
+			<legend>Please select the CSV file to upload:</legend>
+				<div class="row">
+					<div class="col-xs-12" >
+						<div class="input-group" style="line-height:0px;">
+							<span class="input-group-addon">Give a singular name to a table row:</span>
+							<input type="text" class="form-control" id="_importCSV_entityName" placeholder="Ex. client, supplier, member, partner..." value="<%= masterDetailItems.master.entityName %>" data-parsley-trigger="change" >
+							<span class="input-group-addon"><span class="glyphicon glyphicon-pencil"></span></span>
+					    </div>
+						<div class="input-group" style="line-height:0px;">
+							<span class="input-group-addon">Choose the CSV file:</span>
+							<input type="file" class="form-control" id="_importCSV_fileName" accept=".csv"value="<%= masterDetailItems.master.fileName %>" onchange="FL.grid.validateCSV(this.files)" >
+							<span class="input-group-addon"><span class="glyphicon glyphicon-cloud-upload"></span></span>
+					    </div>
+				    </div>
+		    	</div>
+			</form>
+		</div>
 	</script>	
+	<script id="templatePreview" type="text/template"> 
+		<div class="col-lg-12">
+			<div id="templateHolder" class="template_holder">
+				<div id="template_holder_header" class="header" >
+					<%= header %>
+				</div>
+				<br><br>
+				<div id="template_holder_body" class="template_holder_body">
+					<%= body %>
+				</div>
+				<br/><br>
+				<div id="template_holder_footer" class="footer">
+					<%= footer %>
+				</div>
+			</div>
+		</div>
+	</script>
 	<script id="_sendNewsletterTemplate" type="text/template"> 
 		<div class="_sendNewsletterTemplate" style="margin-top:0px;">
 			<form id="form__sendNewsletterTemplate" novalidate="novalidate">
@@ -598,6 +640,31 @@ mixpanel.init("19ada1cb259cc3272c67085eb1bf03fc");</script><!-- end Mixpanel -->
 		</div>
 	</div>      
 </script>
+<script type="text/template" id="titleDroppedItem">
+	<div class="titleDroppedItem droppedObject ui-state-default" id="titleTemplateItem0" type="title"> 
+		Put your Text Here 
+	</div>
+</script>
+<script type="text/template" id="imageDroppedItem">
+	<div id="titleTemplateItem0" class="imageDroppedItem droppedObject ui-state-default" type="image"> 
+		<a id="imageLink" href="#" target="_blank">
+			<div> 
+				<img class="" src="./mailer/images/empty_image-72.png" />
+			</div>
+		</a>
+	</div>
+</script>
+
+<script type="text/template" id="socialblockDroppedItem" align="center">
+	<div style="text-align: center">
+		<a href="https://www.facebook.com/Weadvice.living.web"><img id="facebook" title="Facebook" src="images/social/Facebook.png" alt="Facebook" width="48" height="48"></a>
+		<a href="https://plus.google.com/112849724150312489427/posts"><img id="googlePlus" title="Google Plus" src="images/social/Google-Plus.png" alt="Google Plus" width="48" height="48" ></a>
+		<a href="https://www.linkedin.com/company/weadvice"><img id="linkedin" title="LinkedIn" src="images/social/Linkedin.png" alt="LinkedIn" width="48" height="48" ></a>
+		<a href="https://www.youtube.com/user/weadvice4"><img id="youtube" title="Youtube" src="images/social/Youtube.png" alt="Youtube" width="48" height="48" ></a>
+	</div>
+</script>
+
+
 <body style="padding-top:10px;">
 	<div id="_modalDialog"></div>
     <div id="_modalDialogA"></div>
@@ -684,7 +751,7 @@ mixpanel.init("19ada1cb259cc3272c67085eb1bf03fc");</script><!-- end Mixpanel -->
 				<a class="pull-right text-muted" href="javascript:FL.signIn()"> <i class="glyphicon glyphicon-log-in"></i>
 	  				<span> Login</span> </a> -->
 			</div>
-			<div id="menuContainer" class="container" style="margin-left:3.2em;width:95.0em;margin-right:1.0em;margin-top:0.0em;">
+			<div id="menuContainer" class="container" style="margin-left:3.2em;width:87.0em;margin-right:1.0em;margin-top:0.0em;">
 				<div class="navbar navbar-default" role="navigation">
 					<div class="navbar-header">
 						<button  type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
@@ -720,6 +787,7 @@ mixpanel.init("19ada1cb259cc3272c67085eb1bf03fc");</script><!-- end Mixpanel -->
 				<div class="col-md-12 backgrid-container">
 					<button id="addGrid" class="edit btn btn-info glyphicon glyphicon-plus-sign"></button>
 					<button id="_newsletter" class="edit btn btn-success glyphicon glyphicon-envelope"></button>
+					<button id="_newsletterMC" class="edit btn btn-success glyphicon glyphicon-envelope"></button>
 					<button id="_editGrid" class="edit btn btn-success glyphicon glyphicon-pencil"></button>
 					<div id="grid"></div>			
 					<div id="paginator"></div>				
@@ -727,6 +795,34 @@ mixpanel.init("19ada1cb259cc3272c67085eb1bf03fc");</script><!-- end Mixpanel -->
 			</div>
 		</div>	
 	</div><!-- masthead -->
+
+	<div id="templateHolder" class="template_holder">
+		<table align="center" border="1" cellpadding="0" cellspacing="0" width="600px">
+ 			<tr>
+  				<td bgcolor="#dedbd7" style="padding-top: 10px; padding-right: 15px; padding-bottom: 8px; padding-left: 15px;">
+					<div id="template_holder_header" class="header sortable droppable" >		
+
+					</div>
+					<br/><br/>
+  				</td>
+ 			</tr>
+			<tr>
+ 				<td bgcolor="#dedbd7" style="padding-top: 10px; padding-right: 15px; padding-bottom: 8px; padding-left: 15px;">
+					<div id="template_holder_body" class="template_holder_body sortable droppable">
+						
+					</div>
+					<br/><br/>
+				</td>
+			</tr> 			
+			<tr>
+ 				<td bgcolor="#dedbd7" style="padding-top: 10px; padding-right: 15px; padding-bottom: 8px; padding-left: 15px;">
+					<div id="template_holder_footer" class="footer sortable droppable">
+						
+					</div>
+				</td>
+			</tr>
+		</table>	
+	</div>
 
 	<footer class="footer">
 		<div class="container">

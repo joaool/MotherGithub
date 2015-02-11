@@ -1635,7 +1635,7 @@
 				var def = $.Deferred();		
 				_mandrillDeleteFromReject(arrayOfEmails)
 				.then(function(data){
-					return def.resolve();
+					return def.resolve(data);
 				}
 					,function(err){
 						console.log(">>>> mandrillDeleteFromReject FAILURE");

@@ -38,20 +38,20 @@ var FL = FL || {};
 		$('#panel1').slidePanel({
 			triggerName: '#trigger1',
 			position: 'fixed',
-			triggerTopPos: '110px',
-			panelTopPos: '110px',
+			triggerTopPos: '45px',
+			panelTopPos: '45px',
 			ajax: true,
 			ajaxSource: 'FL_ui/sidepanel/fl_settings.html'
 		});
-		$('#panel2').slidePanel({
-			triggerName: '#trigger2',
-			position: 'fixed',
-			triggerTopPos: '210px',
-			panelTopPos: '210px',
-			ajax: true,
-			// ajaxSource: 'FL_ui/sidepanel/fl_services.html'
-			ajaxSource: 'FL_ui/sidepanel/fl_builder.html'
-		});
+		// $('#panel2').slidePanel({
+		// 	triggerName: '#trigger2',
+		// 	position: 'fixed',
+		// 	triggerTopPos: '210px',
+		// 	panelTopPos: '210px',
+		// 	ajax: true,
+		// 	// ajaxSource: 'FL_ui/sidepanel/fl_services.html'
+		// 	ajaxSource: 'FL_ui/sidepanel/fl_builder.html'
+		// });
 		// $('#panel3').slidePanel({
 		// 	triggerName: '#trigger3',
 		// 	position: 'fixed',

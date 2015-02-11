@@ -90,7 +90,8 @@ mixpanel.init("19ada1cb259cc3272c67085eb1bf03fc");</script><!-- end Mixpanel -->
 	<script src="FL_ui/js/papaparse.min.js"></script> <!-- to load csv reader http://papaparse.com/  -->
 
 	<script src="FL_ui/js/utils2.js"></script>            
-	<script src="FL_ui/js/FLdd2.js"></script>            
+	<script src="FL_ui/js/FLdd2.js"></script> 
+	<script src="FL_ui/js/FLemailServices2.js"></script>
 	<script src="FL_ui/js/FLmenulinks2.js"></script>            
 	<script src="FL_ui/js/FLSlidePanels.js"></script> <!-- TO BE REMOVED SOON -->           
 	<script src="FL_ui/js/memoryCsv.js"></script>  
@@ -409,7 +410,7 @@ mixpanel.init("19ada1cb259cc3272c67085eb1bf03fc");</script><!-- end Mixpanel -->
                             <label class="control-label" for="_dictEditEntityTemplate_entityDescription" id="_dictEditEntityTemplate_whatIsLabel" >What is a </label>
                             <div class="input-group" style="line-height:0px;">
                                 <span class="input-group-addon">Description:</span>
-                                <textarea class="form-control" id="_dictEditEntityTemplate_entityDescription" name="entityDescription" onkeyup="FL.slidePanels.dictTemplateChangeDescription(this.form)" rows="2"><%= masterDetailItems.master.entityDescription %></textarea>
+                             <textarea class="form-control" id="_dictEditEntityTemplate_entityDescription" name="entityDescription" onkeyup="FL.   slidePanels.dictTemplateChangeDescription(this.form)" rows="2"><%= masterDetailItems.master.entityDescription %></textarea>
                             </div>                      
                             <div>
                                 <h4 id="_dictEditEntityTemplate_plural"></h4>

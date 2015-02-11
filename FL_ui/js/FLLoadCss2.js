@@ -523,8 +523,30 @@ jQuery(document).ready(function($){
 								]
 							},
 							{
-								"title" : "Newsletter templates",
-								"uri":"javascript:FL.links.newsletterEditor()"
+								"title" : "emails/Newsletter templates",
+								"uri":"#",
+								"menu":[
+									{
+										"title" : "Newsletter templates",//0
+										"uri":"javascript:FL.links.newsletterEditor()"
+									},
+									{
+										"title" : "Display rejected list",//0
+										"uri":"javascript:FL.links.getMandrillRejectListForSender()"
+									},
+									{
+										"title" : "remove jojo from rejected list",//0
+										"uri":"javascript:FL.links.setMandrillDeleteFromReject(['jojo@mailinator.com'])"
+									},
+									{
+										"title" : "remove zwnfabhn from rejected list",//0
+										"uri":"javascript:FL.links.setMandrillDeleteFromReject(['zwnfabhn@sharklasers.com'])"
+									},
+									{
+										"title" : "email Statistics",//0
+										"uri":"javascript:FL.links.displayStatistics()"
+									},									
+								]
 							},							
 							{
 								"title" : "Grids",//0
@@ -537,11 +559,7 @@ jQuery(document).ready(function($){
 									{
 										"title" : "Import CSV Spreadsheet",//0
 										"uri":"javascript:javascript:FL.grid.importGrid()"
-									},
-									{
-										"title" : "Test Rejected List",//0
-										"uri":"javascript:javascript:FL.links.getMandrillRejectListForSender()"
-									}									
+									}
 								]
 							}						
 						]

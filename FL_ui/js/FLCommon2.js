@@ -606,6 +606,8 @@ FL["clearSpaceBelowMenus"] = function() {
     $("#addGrid").hide();
     $("#_newsletter").empty();
     $("#_newsletter").hide();
+
+    $("#templateHolder").hide();
     
     $("#_newsletterMC").empty();
     $("#_newsletterMC").hide();
