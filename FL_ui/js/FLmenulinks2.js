@@ -214,7 +214,6 @@
 			// FL.common.makeModalInfo("Edit " + entityName + " x To be implemented soon");
 			$("#_editGrid").empty();
 			$("#_modalDialogB").empty();
-			alert('This is a dummy version to edit ' + entityName + '. It is not yet operational');
 			var singular  = entityName;
 			var description = FL.dd.getEntityBySingular(entityName).description;
 			var attributesArrNoId = csvStore.getAttributesArrNoId();//we retrieve all except name="id"
@@ -222,9 +221,26 @@
 			var masterDetailItems = {
 				master:{entityName:singular,entityDescription:description},
 				detailHeader:["#","Attribute","what is it","Statement to validate"],
-				detail:detailItems //format is array with {attribute:<attribute name>,description:<attr description>,statement;<phrase>}
+				detail:detailItems //format is array with {attribute:<attribute name>,description:<attr description>,statement:<phrase>,type:<type>}
 			};
-			FL.common.editMasterDetail("B"," Define Table Dictionary","_dictEditEntityTemplate",masterDetailItems,{type:"primary", icon:"pencil",button1:"Cancel",button2:"Confirm Table Dictionary"},function(result){
+			var arrOfObj=[{value:1,text:"number",something:"abc"},{value:2,text:"text",something:"abc"},{value:3,text:"email",something:"abc"},{value:4,text:"phone",something:"abc"},{value:5,text:"enumerable",something:"abc"},{value:6,text:"date",something:"abc"}];
+			var options = {
+				type:"primary",
+				icon:"pencil",
+				button1:"Cancel",
+				button2:"Confirm Table Dictionary",
+				detailDropdown:{
+					"type":{
+						arr:arrOfObj,//array of types
+						//default:"text", This is included in masterDetailItems.detail for mandatory key "default"
+						onSelect:function(objSelected){
+		            		selectedType = objSelected.text;
+		            		alert("The selection was "+selectedType);
+		            	}	
+					}
+	          	}
+			};
+			FL.common.editMasterDetail("B"," Define Table Dictionary","_dictEditEntityTemplate",masterDetailItems,options,function(result){
 				if(result){
 					//We update name and description in csvStore.attributesArr and then use it to create dictionary fields. 
 					var attributesArrNoId = csvStore.getAttributesArrNoId();//we retrieve all except name="id"

@@ -427,11 +427,20 @@ mixpanel.init("19ada1cb259cc3272c67085eb1bf03fc");</script><!-- end Mixpanel -->
                                              <% var xId = "_dictEditEntityTemplate__f"+(index+1) %><!-- create more variables -->
                                             <tr>
                                                 <!-- use variables -->
-                                                <td><%= index+1 %></td>
+                                                <td rowspan="2"><%= index+1 %></td>
                         <td><input type="text" class="form-control" id="<%= xId %>_attribute" name="attr<%= index+1 %>" value="<%= item.attribute %>" onkeyup="FL.slidePanels.dictTemplateAttributeValidation(this.form,<%= index+1 %>)"></td>
-                        <td><textarea rows="2" id="<%= xId %>_description" onkeyup="FL.slidePanels.dictTemplateAttributeValidation(this.form,<%= index+1 %>)"><%= item.description %></textarea></td>
-                                                 <td id="<%= xId %>_statement" ><%= item.statement %></td>
-                                            </tr>
+                        <td rowspan="2"><textarea rows="4" id="<%= xId %>_description" onkeyup="FL.slidePanels.dictTemplateAttributeValidation(this.form,<%= index+1 %>)"><%= item.description %></textarea></td>
+                                                <td rowspan="2" id="<%= xId %>_statement" ><%= item.statement %></td>
+                                             </tr>
+                                              	<td>
+ 													<div class="btn-group">
+											          <a class="btn btn-default dropdown-toggle" data-toggle="dropdown" style="font-size:14px;font-weight:bold;" id="<%= xId %>_type" href="#"> Type <span class="caret"></span></a>
+											          <ul id="<%= xId %>_type_options" class="dropdown-menu">
+															<li><a href="#">templ1</a></li>
+															<li><a href="#">templ2</a></li>
+											          </ul>
+													</div>
+                                              	</td>
                                         <% }); %>
                                      </tbody>    
                                 </table>
