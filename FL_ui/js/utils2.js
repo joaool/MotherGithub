@@ -296,8 +296,13 @@ window.utils = {
         //http://www.snip2code.com/Snippet/171272/backgrid-datetimepicker-cell-with-bootst date
         //http://backgridjs.com/ref/extensions/moment-cell.html - http://momentjs.com/docs/ - date
         //http://www.pythoneye.com/54_23092624/ image cell type
+        //http://www.lostiemposcambian.com/blog/javascript/backgrid-componente-datagrid-para-backbone/ image
         //http://vimeo.com/32765088
         //http://handsontable.com/demo/backbone.html
+        //http://amiliaapp.github.io/backgrid-object-cell/
+        //https://github.com/DJCrossman/backgrid-subgrid-cell
+        //http://blog.joshsoftware.com/2011/09/28/filter-js-client-side-search-filtering-using-json-and-jquery/
+        //http://techwuppet.com/backgrid_poc_demo/ - resize columns, search
         var DeleteCell = Backgrid.Cell.extend({
             template: _.template($("#gridDelButton").html()),
             className: "backgridDelColumn",
@@ -318,6 +323,146 @@ window.utils = {
             }
         });
         var columns = [{name: "del", label: "Delete", cell: DeleteCell }];
+        //http://pastie.org/pastes/8312516
+        var DialogButtonCell = Backgrid.Cell.extend({
+            title: 'Title',
+            allowCancel: true,
+            cancelButtonType: 'danger',
+            okButtonType: 'success',
+            getDialog: function() {
+              var dialogClass = this.dialogClass;
+              var dialog = new dialogClass();
+              return dialog;
+            },
+            onClick: function() {
+              var dialog = this.getDialog();
+              dialog.show();
+            },
+            onOk: function(e) {},
+        });
+        MyDatePickerCellEditor = Backgrid.InputCellEditor.extend({
+            events:{},
+            initialize:function(){
+                //https://github.com/eternicode/bootstrap-datepicker - the code is in bootstrap-editable.js and css in bootstrap-editable.css
+                //http://jsfiddle.net/qiruiwei/B4BzK/
+                Backgrid.InputCellEditor.prototype.initialize.apply(this, arguments);
+                var input = this;
+                var columnName = input.column.get("name");
+                var currentDateValue = this.model.attributes[columnName];
+                window.currentDateValue = currentDateValue;//terrible HACK !!!
+                window.input = input;//terrible HACK !!!
+                $(this.el).datepicker({
+                    autoclose: true,
+                    todayBtn: "linked",
+                    format: "yyyy-M-dd",//the format that will be displayed after we select a date in calendar              
+                    // onClose: function(newValue){
+                    //     var command = new Backgrid.Command({});
+                    //     input.model.set(input.column.get("name"), newValue);
+                    //     input.model.trigger("backgrid:edited", input.model, input.column, command);
+                    //     command = input = null;
+                    //     // alert("On close MyDatePickerCellEditor");
+                    //     this.render();
+                    // }
+                }).on('show', function(ev) {//necessary to convert 
+                    console.log("show calendar !!!");
+                    var z=  ev.target.value;
+                    console.log("--->"+z);
+                    // ev.target.value = window.currentDateValue;////terrible HACK !!!
+                    var formatedValue = window.input.formatter.fromRaw(window.currentDateValue.toISOString());
+                    ev.target.value = formatedValue;////terrible HACK !!!
+                }).on('hide', function(ev) {
+                    var formatedValue = ev.target.value;
+                    var newDateValue = new Date(formatedValue);
+                    //if only date is selected we will consider mid day
+                    if( newDateValue.getHours() === 0 && newDateValue.getMinutes() === 0 && newDateValue.getSeconds() === 0 && newDateValue.getMilliseconds() === 0){
+                        newDateValue.setHours(12);
+                    }
+                    input.model.set(input.column.get("name"),newDateValue);
+                    console.log("hide calendar !!!");
+                });
+                // $(this.el).datepicker("setDate",new Date(2006, 11, 24));
+                $(this.el).datepicker("setDate", currentDateValue);
+                $(this.el).datepicker("update");
+                // $('.datepicker').datepicker().on("changeDate", function(e){
+                //     //# `e` here contains the extra attributes
+                // });
+                // $( ".datepicker prev icon-arrow-left" ).addClass( "glyphicon arrow-left" );
+
+                console.log("datepicker initialize()");
+                var z=32;
+            },
+        });
+        DateCell =Backgrid.Extension.MomentCell.extend({
+            //1) all cell contents will be text
+            // 2) all cell contents will be exactly the (formatted) corresponding model attribute
+            //http://stackoverflow.com/questions/18781358/how-do-i-add-a-datepicker-for-a-backgrid-cell       
+            modelFormat: "YYYY/M/D",//"YYYY-MMM-DD" gives error
+            // You can specify the locales of the model and display formats too
+            // displayLang: "zh-tw",
+            displayFormat: "YYYY-MMM-DD",
+            editor: MyDatePickerCellEditor,
+            render: function () {
+                var dateValue = this.model.get(this.column.get("name"));
+                if( dateValue === "" || dateValue == "Invalid Date"){//if it is a new line dateValue = "" =>the default is today
+                    dateValue = new Date();
+                }
+                var formatedValue = this.formatter.fromRaw(dateValue.toISOString());
+                console.log("render----->"+dateValue + " formated->"+formatedValue);
+                this.$el.html(formatedValue);
+                this.delegateEvents();
+                return this;
+            }
+        });
+
+        var BooleanCell = Backgrid.BooleanCell.extend({
+            //http://stackoverflow.com/questions/28368744/avoid-clicking-twice-to-begin-editing-boolean-checkbox-cell-in-backgrid/28420049#28420049
+            editor: Backgrid.BooleanCellEditor.extend({
+                render: function () {
+                    var model = this.model;
+                    var columnName = this.column.get("name");
+                    var val = this.formatter.fromRaw(model.get(columnName), model);
+
+                    /*
+                     * Toggle checked property since a click is what triggered enterEditMode
+                    */
+                    this.$el.prop("checked", !val);
+                    model.set(columnName, !val);
+
+                    return this;
+                }
+            })
+        });
+        var EmailCell = Backgrid.EmailCell.extend({
+            className: "email-cell",
+            render: function () {
+                this.$el.empty();
+                var formattedValue = this.formatter.fromRaw(this.model.get(this.column.get("name")));
+                this.$el.append($("<a>", {
+                    tabIndex: -1,
+                    // href: "mailto:" + formattedValue,
+                    title: formattedValue
+                }).text(formattedValue));
+                this.delegateEvents();
+                return this;
+            }
+        });
+        var DateTimeCell = Backgrid.Extension.MomentCell.extend({
+            modelInUTC: true,
+            modelFormat: "YYYY-MM-DDTHH:mm:ss.SSSZ",
+            displayFormat: "MMMM Do YYYY, h:mm:ss a",
+            displayInUTC: false
+            // render: function() {
+            //   Backgrid.Extension.MomentCell.prototype.render.call(this);
+            //   this.$el.addClass('friendly-datetime-cell');
+            //   return this;
+            // },
+          });
+
+        // columns.push({name: "diag", label: "Dialog", cell: DialogButtonCell });
+        // var MomentCell = Backgrid.Extension.MomentCell.extend({
+        //     modelFormat: "YYYY/M/D",
+        //     displayFormat: "YYYY-MMM-DD",
+        // });
         // var oEntity = FL.dd.getEntity(entityName);
         _.each(arrOfColumns, function(element,index){
             console.log("utils2 backGridColumnsFromArray defaultEntityColumns *********************--->"+element.name);
@@ -337,6 +482,9 @@ window.utils = {
                  });
                 column["label"] = element.label;
                 column["cell"] = MySelectCell;
+            }else if(element.type=="string" && element.typeUI=="email"){
+                column["label"] = element.label;
+                column["cell"] = EmailCell;
             }else{
                 // ex {label:"Col4",name:"f4",type:"integer",enumerable:null}, "date", "url"
                 //     "number","string","email","boolean","object","array","null","undefined"
@@ -347,7 +495,7 @@ window.utils = {
                 }else if(element.type=="integer"){
                     column["cell"] = "integer";//An integer cell is a number cell that displays humanized integers
                 }else if(element.type=="date"){
-                    column["cell"] = "date";
+                    column["cell"] = DateCell;//MyDatePickerCell;
                 }else if(element.type=="url"){
                     column["cell"] = "url";
                 }else{
@@ -398,7 +546,7 @@ window.utils = {
                 // alert("CsvElement modelAdd !!!! --->"+ JSON.stringify(this.toJSON()));
                 console.log("mountGridInCsvStore CsvElement Add model id="+this.id+" marca="+this.attributes.marca+" _id="+this.attributes._id);
 
-            },      
+            },
             // sync:csvStore.sync
             sync:function(method, model, options){
                 return csvStore.sync(method, model, options);
@@ -441,8 +589,9 @@ window.utils = {
         });
 
         $("#csvcontent").empty();
+        $('#addGrid').off('click');
         $("#addGrid").click(function () {
-             csvStore.addOneEmptyRow();
+            csvStore.addOneEmptyRow();
             var lastKeyInStore = csvStore.getNextId() - 1; //get the highest key in csvStore.csvRows
             var CsvElementModel = Backbone.Model.extend({});
 
@@ -466,7 +615,8 @@ window.utils = {
         var items = [];
         var detailLine = null;
         _.each(attributesArr, function(element,index){
-            detailLine = {attribute:element.name, description:element.description, statement: "The " + element.name + " of entity is..."};
+            var userType = FL.dd.userType(element);
+            detailLine = {attribute:element.name, description:element.description, statement: "The " + element.name + " of entity is...",type:userType};
             items.push(detailLine);
         });
         return items;

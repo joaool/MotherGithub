@@ -26,6 +26,17 @@ FL["common"] = (function(){//name space FL.common
 			masterJson[key] = newValue;
 		});
 	};
+	var getValueForAnyTag = function(id){
+		//ex of id = "#_dictEditEntityTemplate__f1_attribute" - DO NOT FORGET THE #
+		var value = $(id).val();//this works for input tags and textarea tags. Not for td or a tags
+		var tag = $(id).prop("tagName");
+		if ( tag =="A"){
+			value = $(id).text();
+		}else if(tag =="TD"){
+			value = $(id).text();
+		}
+		return value;
+	};
 	var fillDetailForTemplate = function(templateName,detailJson) {
 		// returns the array detailJson with new values retrieved from the lines in the detailled section of template
 		// equivalent to (example for line 1...similar for all other lines)
@@ -35,12 +46,60 @@ FL["common"] = (function(){//name space FL.common
 		_.each(detailJson, function(element,index){
 			_.each(element, function(value,key){
 				var domTarget = "#" + templateName + "__f" + (index + 1) + "_" + key;
-				var newValue = $(domTarget).val();
+				var newValue = getValueForAnyTag(domTarget);
+				// var newValue = $(domTarget).val();//this works for input tags and textarea tags. Not for td or a tags
 				element[key] = newValue;
 			});
 			detailJson[index] = element;
 		});
 	};
+	var selectBox = function(options, onSelection) {
+		//fills the content of dropdown box with id=options.boxId with array=options.boxArr presenting options.boxCurrent as default
+		//example: selectBox({boxId:"styleSet", boxCurrent:currentStyle, boxArr:stylesForSelection}, function(selected){
+		//             //code with what to do on selection
+		//             alert(selected); //selected is the selected object element 
+		//         });
+		//	NOTE:boxArr must have the format example: value and text are non optional keys All other are optional
+			// var stylesForSelection = [
+			// 	{value: 0, text: 'cerulean'},
+			// 	{value: 1, text: 'cosmos'},
+			// 	{value: 2, text: 'readable'},
+			// 	{value: 3, text: 'red'},
+			// 	{value: 4, text: 'spacelab'}
+			// ];
+		// Drop box needs a format like:
+			// <div class="btn-group">
+			// 	<a class="btn btn-primary dropdown-toggle" data-toggle="dropdown" style="font-size:14px;font-weight:bold;margin-right:-4.0em" href="#"> Style Set <span class="caret"></span></a>
+			// 	<ul id="styleSet" class="dropdown-menu">
+			// 		<li><a href="#">xxcerulean</a></li>
+			// 		<li><a href="#">xxxcosmos</a></li>
+			// 		....
+			// 	</ul>
+			// </div>
+			//onSelection argument is the full object corresponding to the choosed option
+			//   ex. 	{value: 1, text: 'cosmos'}
+
+		//var $styleSet = $("#styleSet");
+		var $dropDownSelect = $("#" + options.boxId);
+		$dropDownSelect.parents('.btn-group').find('.dropdown-toggle').html(options.boxCurrent+' <span class="caret"></span>');//shows current value
+		//... and we load the select box with the current available values
+		$dropDownSelect.empty();//removes the child elements of #styleSet.
+		// _.each(stylesForSelection,function(element){
+		_.each(options.boxArr,function(element){
+			var id = options.boxId + "_" + element.text;
+			$dropDownSelect.append("<li id='" + id + "'><a href='#'>" + element.text + "</a></li>");
+		});
+		// $("#styleSet li a").click(function(){
+		$( "#" + options.boxId + " li a").click(function(){
+			var selText = $(this).text();
+			var list = $( "#" + options.boxId + " li a");
+			var index = list.index(this);
+			var elObj = options.boxArr[index];
+			$dropDownSelect.parents('.btn-group').find('.dropdown-toggle').html(selText+' <span class="caret"></span>');
+			// onSelection(selText);//runs the callback function
+			onSelection(elObj);//runs the callback function with the element object as argument
+		});
+	};	
 	return{
         editMasterDetail: function(id,title,templateName,masterDetailJson,options,editMasterDetailCB) {
 			// returns masterDetailJson with new values collected from modal dialog  with title and templateName - options like makeModa()
@@ -288,12 +347,31 @@ FL["common"] = (function(){//name space FL.common
                         // var arrOfObjs =_.map(value.arr,function(element,index){ //converted to format {value:0,text:arr[0]},{value:1,text:arr[1]}...etc
                         //     return {value:index,text:element};
                         // });
-                        FL.login.selectBox({boxId: key,boxCurrent: value.default,boxArr: value.arr},value.onSelect);
+                        selectBox({boxId: key,boxCurrent: value.default,boxArr: value.arr},value.onSelect);
                     }else{
                         alert("FLcommon2.js makeModal - Error dropdown definition missing - check default or arr or onselect");
                     }
                 });                
-            }            
+            }
+            if(options.detailDropdown){//detailDropdown is an object with one key per drop down in detail - the key is #id of dropdown on template
+                var templateName = templateName; //to make it accessible inside _.each
+                var index = 0;
+                _.each(options.detailDropdown, function(value,key){//each key is a dropdown inside detail
+                	index ++;//the line number inside detail
+                    if( value.arr && value.onSelect ){                      
+                        // var arrOfObjs =_.map(value.arr,function(element,index){ //converted to format {value:0,text:arr[0]},{value:1,text:arr[1]}...etc
+                        //     return {value:index,text:element};
+                        // });
+                		_.each(window.masterDetailItems.detail, function(element,index){//within each dropdown for each detail line. 
+                			var lineKey = templateName +  "__f" + (index+1) + "_" + key +"_options";
+                			var defaultValue = element[key]; //masterDetailItems.detail always has a default value !!!!
+	                        selectBox({boxId: lineKey,boxCurrent: defaultValue,boxArr: value.arr},value.onSelect);
+                		});
+                    }else{
+                        alert("FLcommon2.js makeModal - Error detailDropdown definition missing - check default or arr or onselect");
+                    }
+                });                
+            }                        
             var $modal = $('#' + modalId );
 
 			form = $("#form_" + templateName );
@@ -504,6 +582,63 @@ FL["common"] = (function(){//name space FL.common
 				sample.push(arr[i]);
 			}
 			return sample;
+        },
+    	selectBox: function(options, onSelection) {
+			selectBox(options, onSelection);
+		},
+        is_dateArrInStringFormat: function(arrOfRowValues){//returns true if all array elements are a valid string format
+            //var d = Date.parse("March 21, 2012");//1332288000000
+            //var d = Date.parse("03-21-12");//1332288000000
+            //var d = Date.parse("15-21-12");//NaN
+            //var d = Date.parse("03/21/12 0:01");//1332288060000
+            //var d = Date.parse("21-Mar-2012");//1332288000000
+            //var d = Date.parse("21-Mar-12");//1332288000000
+            //var d = Date.parse("21-Mar-1112");//-27069033600000
+            //var d = Date.parse("Wednesday,March 21,2012");//1332288000000
+            //var d = Date.parse("Wednesday,  March 21,  2012");//1332288000000
+            //var d = Date.parse("Wednesday ,  March 21 ,  2012");//1332288000000
+            //var d = Date.parse("Friday,  March 21 ,  2012");//1332288000000
+            //var d = Date.parse("Friday,  MARCH 21 ,  2012");//1332288000000
+            //var d = Date.parse("Friday MARCH21 2012");//1332288000000         
+            var is_date = false;
+            var dateCandidate = null;
+            var failElement = _.find(arrOfRowValues, function(element){ //if failElement is undefined => all elements are a valid date format
+                if (element && element.trim().length>0){//skips null,"" and spaces - it enters test if it is a valid element
+                    return isNaN(Date.parse(element));//a non empty element that is not a date
+                }
+                return false;
+            });
+            if( _.isUndefined(failElement) )
+                is_date = true;
+            return is_date;
+        },
+        is_enumerableArr: function(arrOfRowValues,percent){//returns true arrOfRowValues can colapse to less than percent with unique values
+            //normally arrOfRowValues is a sample of the whole array, only to decide if it is enumerable or not
+            var is_enumerable = false;
+            var numOfSampleRows = arrOfRowValues.length;
+            var uniqueObj = this.extractUniqueFromArray(arrOfRowValues);//returns {empties:no_of empties,uniqueArr:uniqueArr}
+            var columnPercent = ( uniqueObj.uniqueArr.length - ((uniqueObj.empties == 0) ? 0 : 1))/( numOfSampleRows - uniqueObj.empties );
+            if ( columnPercent < percent ) 
+                is_enumerable = true;
+            return is_enumerable;
+        },
+        extractUniqueFromArray: function(arr){//returns object with {empties:no_of empties,uniqueArr:uniqueArr}
+            //returns an object {empties:no_of empties,uniqueArr:uniqueArr} where:
+            //      empties - number of empties ocurrences in arr
+            //      uniqueArr - array with all unique occurences in arr including "" if it exists
+            var arr = _.filter(arr, function(element){
+                return typeof element !="undefined";
+            });//exclude undefined elements
+            var arrWrap = _.chain(arr).countBy().pairs(); //arrGroups gives us the number of different elements
+            var arrGroups = arrWrap._wrapped; //arrGroups gives us the number of different elements
+            //arrGroups has the format: [ ["High",40], ["Medium",47], ["Premium",5], ]
+            var emptyPair = _.find(arrGroups,function(pair){return pair[0]==="";});
+            var empties = 0;
+            if(typeof emptyPair !== 'undefined'){//the case where there is no emptyPair =>undefined
+                empties = emptyPair[1];
+            }
+            var uniqueArr = _.map(arrGroups,function(element){return element[0];});
+            return {empties:empties,uniqueArr:uniqueArr};
         },
 		testFunc: function(x) {
 			alert("FL.common.test() -->"+x);

@@ -23,54 +23,7 @@ jQuery(document).ready(function($){
 					{value: 4, text: 'lucida'},
 					{value: 5, text: 'tahoma'},
 					{value: 6, text: 'elite'}
-				];	
-		var selectBox = function(options, onSelection) {
-			//fills the content of dropdown box with id=options.boxId with array=options.boxArr presenting options.boxCurrent as default
-			//example: selectBox({boxId:"styleSet", boxCurrent:currentStyle, boxArr:stylesForSelection}, function(selected){
-			//             //code with what to do on selection
-			//             alert(selected); //selected is the selected object element 
-			//         });
-			//	NOTE:boxArr must have the format example: value and text are non optional keys All other are optional
-				// var stylesForSelection = [
-				// 	{value: 0, text: 'cerulean'},
-				// 	{value: 1, text: 'cosmos'},
-				// 	{value: 2, text: 'readable'},
-				// 	{value: 3, text: 'red'},
-				// 	{value: 4, text: 'spacelab'}
-				// ];
-			// Drop box needs a format like:
-				// <div class="btn-group">
-				// 	<a class="btn btn-primary dropdown-toggle" data-toggle="dropdown" style="font-size:14px;font-weight:bold;margin-right:-4.0em" href="#"> Style Set <span class="caret"></span></a>
-				// 	<ul id="styleSet" class="dropdown-menu">
-				// 		<li><a href="#">xxcerulean</a></li>
-				// 		<li><a href="#">xxxcosmos</a></li>
-				// 		....
-				// 	</ul>
-				// </div>
-				//onSelection argument is the full object corresponding to the choosed option
-				//   ex. 	{value: 1, text: 'cosmos'}
-
-			//var $styleSet = $("#styleSet");
-			var $dropDownSelect = $("#" + options.boxId);
-			$dropDownSelect.parents('.btn-group').find('.dropdown-toggle').html(options.boxCurrent+' <span class="caret"></span>');//shows current value
-			//... and we load the select box with the current available values
-			$dropDownSelect.empty();//removes the child elements of #styleSet.
-			// _.each(stylesForSelection,function(element){
-			_.each(options.boxArr,function(element){
-				var id = options.boxId + "_" + element.text;
-				$dropDownSelect.append("<li id='" + id + "'><a href='#'>" + element.text + "</a></li>");
-			});
-			// $("#styleSet li a").click(function(){
-			$( "#" + options.boxId + " li a").click(function(){
-				var selText = $(this).text();
-				var list = $( "#" + options.boxId + " li a");
-				var index = list.index(this);
-				var elObj = options.boxArr[index];
-				$dropDownSelect.parents('.btn-group').find('.dropdown-toggle').html(selText+' <span class="caret"></span>');
-				// onSelection(selText);//runs the callback function
-				onSelection(elObj);//runs the callback function with the element object as argument
-			});
-		};
+				];
 		var messageEnabler = (function(){ //a singleton (to be instantiated by checkSignIn) to receive and dispatch topic messages.http://addyosmani.com/resources/essentialjsdesignpatterns/book/#singletonpatternjavascript
 			var instantiated;
 			function init() {
@@ -88,7 +41,7 @@ jQuery(document).ready(function($){
 						$("#fontFamily").parents('.btn-group').find('.dropdown-toggle').html(currentFontFamily +' <span class="caret"></span>');//shows current value
 
 						var xStyle = localStorage.style;
-						selectBox({boxId: "styleSet",boxCurrent: xStyle,boxArr: stylesForSelection},function(selected){
+						FL.common.selectBox({boxId: "styleSet",boxCurrent: xStyle,boxArr: stylesForSelection},function(selected){
 							//select is the full object corresponding to the choosed option
 							// alert("styleSet "+ JSON.stringify(selected)+" was selected !");
 							currentStyle = selected.text;
@@ -101,7 +54,7 @@ jQuery(document).ready(function($){
 							resetStyle(true);
 						});
 						var xFont = localStorage.fontFamily;
-						selectBox({boxId:"fontFamily",boxCurrent: xFont, boxArr:fontFamilyForSelection},function(selected){
+						FL.common.selectBox({boxId:"fontFamily",boxCurrent: xFont, boxArr:fontFamilyForSelection},function(selected){
 							//following code is what is done on selection
 							// alert("font "+ JSON.stringify(selected)+" was selected !");
 							currentFontFamily = selected.text;
@@ -587,9 +540,6 @@ jQuery(document).ready(function($){
 			emailTemplateName:null,
 			emailImagesArray:[], //used on FLmenulinks - getHTMLContent to prepare a Mandrill array with all base64 images
 			ServerByPass:true,
-			selectBox: function(options, onSelection) {
-				selectBox(options, onSelection);
-			},
 			signOut: function(){//saves logout in local storage ->hide slide panels  ->updates upper right corner display
 				// localStorage.setItem("login", "");
 				// FL.login.signOut()

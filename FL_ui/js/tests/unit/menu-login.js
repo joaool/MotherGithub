@@ -554,6 +554,27 @@ $(function () {
     ok(success === null , "utils.typeUIOf('951219244558') -->'invalid phone'");//14
 
   });
+  test("FL.common tests", function () {
+    //typeOf
+    var arrOfRowValues = [
+           "March 21, 2012",
+           "03-21-12",
+            //var d = Date.parse("15-21-12");//NaN
+           "03/21/12 0:01",
+           "21-Mar-2012"
+    ];
+    var success = FL.common.is_dateArrInStringFormat(arrOfRowValues);
+    ok(success == true , "FL.common.is_dateArrInStringFormat('array of values with all valid') -->'true'" );//1
+    arrOfRowValues = [
+           "March 21, 2012",
+           "03-21-12",
+           "15-21-12",//ofending value
+           "03/21/12 0:01",
+           "21-Mar-2012"
+    ];    
+    success = FL.common.is_dateArrInStringFormat(arrOfRowValues);
+    ok(success == false , "FL.common.is_dateArrInStringFormat('array of values with one invalid') -->'false'" );//2
+  });
   test("client Dictionary tests", function () { //one test can have several assertions
     //client
     var success = FL.dd.createEntity("client","company we may invoice");

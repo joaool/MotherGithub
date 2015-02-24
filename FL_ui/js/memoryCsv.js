@@ -2,8 +2,9 @@
 window.csvStore = {
     csvRows:{}, //a JSON of JSONs  {1:{},2:{}...n:{}}; //NOTE:each row  should have a boolean sync field to work in offline mode
     numberOfRows:0,
+    attributesArr: null,
     setAttributesArr: function(attributesArr){
-        //format [{label:"xx",name:fieldName,description:xDescription,type:xtype,enumerable:xEnumerable},{col2}...{}]
+        //format [{label:"xx",name:fieldName,description:xDescription,type:xtype,typeUI:xTypeUI,enumerable:xEnumerable,key:xKey},{col2}...{}]
         this.attributesArr = attributesArr;
     },
     getAttributesArr: function(){
@@ -48,7 +49,16 @@ window.csvStore = {
 
         // console.log("-www-->"+JSON.stringify(arrOfEmails));
         return arrOfEmails
-    },    
+    },
+    getAttributesOfType: function(typeToSelect){//from this.attributesArr return a subset with type= typeToSelect
+        var retArr = _.filter(this.attributesArr, function(element){
+            //attributesArr format [{label:"xx",name:fieldName,description:xDescription,type:xtype,typeUI:xTypeUI,enumerable:xEnumerable,key:xKey},{col2}...{}]
+            return element["type"] == typeToSelect;
+        });
+        if(_.isUndefined(retArr))
+            retArr = null;
+        return retArr;
+    },
     store: function( arrToStore ) {//arrToStore is an array of objects [{},{},....{}] where id field is mandatory inside {}
         // var arrOfIds = _.map(arrToStore,function(element){
         //     return element.id;
@@ -58,10 +68,23 @@ window.csvStore = {
         // this.numberOfRows = arrOfIds.length;
  
         this.csvRows = {};
-        _.each(arrToStore,function(element,index){
+        var arrOfDateAttributes = this.getAttributesOfType("date");
+        _.each(arrToStore,function(element,index){//scans each row (an Object)
             var id = (index+1)+"";//the json key is a string
             element.id = index+1;//to rename the id sequence - id is anumber
             this.csvRows[id] = element;
+            
+            //code to convert dateInStringFormat (if any) to date in Javascript date format
+            if(arrOfDateAttributes){
+                _.each(arrOfDateAttributes, function(elementCol){
+                    if(typeof element[elementCol.name] != "date" ){
+                        // element[elementCol.name] = new Date(Date.parse(element[elementCol.name]));//old content in string is converted to date
+                        element[elementCol.name] = new Date( element[elementCol.name] );//old content in string is converted to date
+                    }    
+                });
+            }
+            //-------------------
+
         },this);//this is necessary to refer to window.csvStore instead of window
         this.numberOfRows = arrToStore.length;
     },
@@ -71,7 +94,10 @@ window.csvStore = {
         // var oEntity = FL.dd.getEntityBySingular(this.entityName);
         // columnsArr --> Format: [{label:"xx",name:fieldName,type:xtype,enumerable:xEnumerable},{col2}...{}]
         var columnsArr = this.getAttributesArr();//returns an array of fields with empty content
-        var newRow = utils.defaultNewGridRow(columnsArr, nextId);
+        // var newRow = utils.defaultNewGridRow(columnsArr, nextId);
+        var newRow = FL.dd.emptyRowForArrOfTypes(columnsArr);
+        newRow.id = nextId;
+
 
         this.csvRows[nextId] = newRow;//becomes ->{93:arrToStore[1],2:arrToSAtore[2]....} 
         this.csvRows[nextId]["_id"] = "-1";//this means a new line that must be inserted in the server
@@ -134,12 +160,17 @@ window.csvStore = {
     update: function (model) {
         var def = $.Deferred();
         // alert("memoryCsv.js Update was called !!!");
-        this.csvRows[model.id] = model;//it is used !!!
+    // this.csvRows[model.id] = model;//it is used !!!
         //alert("memoryCsv.js update modelUpdate !!!! --->"+ model.get("id") + " _id="+ model.get("_id") + " nome="+model.get("nome"));
         console.log("memoryCsv.js update modelUpdate !!!! --->"+JSON.stringify(model));
+        var rowToSave = model.attributes;
+        rowToSave = _.omit(rowToSave, "_id");//we exclude the _id key
         var promise = null;
-        if(model.attributes._id == "-1"){//this is an update over a new line =>insert in db
-            promise=FL.API.addRecordsToTable(this.entityName,[model.attributes]);
+    //if(model.attributes._id == "-1"){//this is an update over a new line =>insert in db
+        if(this.csvRows[model.id]._id == "-1"){//this is an update over a new line =>insert in db
+            // promise=FL.API.addRecordsToTable(this.entityName,[model.attributes]);
+            var thiz = this;
+            promise=FL.API.addRecordsToTable(this.entityName,[rowToSave]);
             promise.done(function(data){
                 console.log(">>>>>memoryCsv update addRecordsToTable  SUCCESS <<<<<");
                 console.log("memoryCsv.js update addRecordsToTable !!!! --->"+JSON.stringify(data));
@@ -151,6 +182,8 @@ window.csvStore = {
                 //     "_id":"53e1bf93f9b224b302c2a572"}
                 // ]
             // return model;
+                model.attributes._id =  data[0]._id;
+                thiz.csvRows[model.id] = model.attributes;//copy of server database _id to memory copy
                 return def.resolve(model);
             });
             promise.fail(function(err){console.log(">>>>>memoryCsv update addRecordsToTable FAILURE <<<<<"+err);return def.reject(err);});

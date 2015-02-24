@@ -223,7 +223,7 @@
 				detailHeader:["#","Attribute","what is it","Statement to validate"],
 				detail:detailItems //format is array with {attribute:<attribute name>,description:<attr description>,statement:<phrase>,type:<type>}
 			};
-			var arrOfObj=[{value:1,text:"number",something:"abc"},{value:2,text:"text",something:"abc"},{value:3,text:"email",something:"abc"},{value:4,text:"phone",something:"abc"},{value:5,text:"enumerable",something:"abc"},{value:6,text:"date",something:"abc"}];
+			var arrOfObj = FL.dd.arrOfUserTypesForDropdown();
 			var options = {
 				type:"primary",
 				icon:"pencil",

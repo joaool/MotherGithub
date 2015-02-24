@@ -944,7 +944,7 @@
 				}
 				return fieldCN;
 			},
-			getArrayOfFields: function(xSingular) {//for entity xSingular return an array of JSON 
+			getArrayOfFields: function(xSingular) {//for entity xSingular return an array of JSON including statment
 				// The array has an object for each field with {attribute:xName, description:xDescription,statement:xStatement}
 				// Ex: returning items (excepting id)
 		        //  items = [
@@ -963,6 +963,11 @@
 							el["attribute"] = element.name;
 							el["description"] = element.description;
 							el["statement"] = attributeSemantics(element.name,element.description,oEntity,"En");
+							//--- added at 12/2/2015
+							el["type"] = element.type;
+							el["enumerable"] = element.enumerable;
+							el["typeUI"] = element.typeUI;
+							// ----
 							xRetArr.push(el);
 						}
 					});
@@ -970,6 +975,70 @@
 					alert("FL.dd.getArrayOfFields Error: entity "+xSingular+" does not exit in FrameLink dictionary.");
 				}
 				return xRetArr;
+			},
+			userTypes: {///the opposite of userType() -->for a single userType returns type and typeUI. Ex FL.dd.userTypes.email =>{type:"string",typeUI:"emailbox"}
+				"number":{type:"number",typeUI:"numberbox"},
+				"text"  :{type:"string",typeUI:"textbox"},//"textbox" is hard coded in FLgrid2.js --> dataRowAnalisys(rows,percent) for most basic type
+				"textarea":{type:"string",typeUI:"textarea"},
+				"email" :{type:"string",typeUI:"emailbox"},
+				"phone" :{type:"string",typeUI:"phonebox"},
+				"date" :{type:"date",typeUI:"datebox"},
+				"combo list":{type:"string",typeUI:"combobox"}
+			},
+			arrOfUserTypesForDropdown: function(){//returns an array of objects with keys value and text, mandatory for dropdowns.
+				//	var arrOfObj=[{value:1,text:"number",something:"abc"},{value:2,text:"text",something:"abc"},{value:3,text:"email",something:"abc"},{value:4,text:"phone",something:"abc"},{value:5,text:"enumerable",something:"abc"},{value:6,text:"date",something:"abc"}];
+				var retArr = _.keys(this.userTypes);
+				retArr = _.map(retArr, function(element,index){
+					return {"value":index+1,"text":element};
+				});
+				return retArr;
+			},
+			userType: function(attributesElement){//an element of attributesArr produced by csvStore.getAttributesArrNoId() or FL.dd.getArrayOfFields(entityName);//we retrieve all except name="id
+				//given a pair type an typeUI of a local dictionary field, returns the corresponding userType
+				//this method is a centralization of userType attributes. For the user an email is diferent form a textbox or a phone.
+				// for a pair type,typeUI returns a single userType
+				var type = null;
+				if(attributesElement.type == "string"){//type is one of: string, integer, number, boolean, date, or json (Nico's field "M")
+					type = attributesElement.typeUI;
+				}else{
+					type = attributesElement.type;
+				}
+				return type;
+			},
+			emptyRow: function(xSingular){//returns an object with keys for every attribute and empty values for each attribute
+				//the name is emprtyRow because it was first used for grid new lines
+				var oEntity = this.entities[xSingular];
+				var newRow = null;
+				if(oEntity){
+					var columnsArr = this.getArrayOfFields(xSingular);
+					// columnsArr format: [{label:"xx",name:fieldName,type:xtype,enumerable:xEnumerable,typeUI:xTypeUI},{col2}...{}]
+					newRow = this.emptyRowForArrOfTypes(columnsArr);
+					if(newRow.id)
+						newRow.id = oEntity.lastId+1;
+				}else{
+					alert("FL.dd.emptyRow Error: "+xSingular+" does not exist ! ");
+				}
+				return newRow;////returns {attribute1:emptyValue1,attribute2:emptyValue2...etc} or null
+			},
+			emptyRowForArrOfTypes: function(columnsArr){//returns an object with keys for every attribute and empty values for each attrobute
+				//columns array is an array of objects where each object must have the keys name and type
+				//      example: [{label:"xx",name:fieldName,type:xtype,enumerable:xEnumerable},{col2}...{}]
+				//returns {attribute1:emptyValue1,attribute2:emptyValue2...etc}
+				var newRow = {};
+				_.each(columnsArr, function(element,index){
+					var fieldName = element.name;
+					if(element.type=="number"){
+						newRow[fieldName] = 0;
+					}else if(element.type=="date"){
+						newRow[fieldName] = new Date();
+					}else if(element.type=="enumerable"){
+						newRow[fieldName] = '';
+					}else{
+						newRow[fieldName] = '';
+					}
+					// console.log("defaultNewGridRow newRow="+JSON.stringify(newRow));
+				});
+				return newRow;
 			},
 			createEntityAndFields: function(entityName,entityDescription,fieldDefinitionArray) {//creates a dd entity with a set of fields 
 				//	fieldDefinitionArray - array of JSON (one element per field) with format definition

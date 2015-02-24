@@ -49,6 +49,10 @@
 			return {empties:empties,uniqueArr:uniqueArr};
 		};
 		var dataRowAnalisys = function(rows, percent) {
+			// this methods decides the date type of every single column in rows by analysing a sample (rows).
+			// returns an array of attributes (one element per column) each element  with  format:
+			//		 {"fieldType":"string","fieldTypeUI":"textbox",enumerable:null,label:element};
+			//
 			// assumes that all rows have the same json pattern with same type in the whole array - assumes type of row = type of first row
 			// If column row type is "string" search for enumerables within that column
 			//    if [(total number of groups)/(number of rows) < percent ] assumes enumerable and identifies an array of enumerables
@@ -65,23 +69,49 @@
 				var dataType = utils.typeOf((rows[0][element]));//one of  "number","string","email","boolean","object","array","null","undefined","date"
 				if (dataType == "string") {//possible datatypes:string, integer, number, boolean, date, or json 
 					//analysis of the first 50 elements or all if length<50
-					var arrOfRowValues = _.pluck(rowsSample,element);
-					var uniqueObj = extractUniqueFromArray(arrOfRowValues);//returns {empties:no_of empties,uniqueArr:uniqueArr}
-					//percent = (total diferent cases excluding empty)/(total non empty cases)
-					var columnPercent = ( uniqueObj.uniqueArr.length - ((uniqueObj.empties == 0) ? 0 : 1))/( numOfSampleRows - uniqueObj.empties );
-					if ( columnPercent < percent ) { //we have an enumerable
-						var arrOfAllRowValues = _.pluck(rows,element);
-						var fullUniqueObj = extractUniqueFromArray(arrOfAllRowValues);
-						obj[element.toLowerCase()] = {"fieldType":"string","fieldTypeUI":"combobox",enumerable:fullUniqueObj.uniqueArr, label:element};
-					}else{//not an enumerable
-						obj[element.toLowerCase()] = {"fieldType":"string","fieldTypeUI":"textbox",enumerable:null,label:element};
-						if( is_ColumnOfSubtype( "email",uniqueObj.uniqueArr ) )
-							obj[element.toLowerCase()]["fieldTypeUI"] = "email";
-						else if( is_ColumnOfSubtype( "url",uniqueObj.uniqueArr ) )
-							obj[element.toLowerCase()]["fieldTypeUI"] = "url";
-						else if( is_ColumnOfSubtype( "phone",uniqueObj.uniqueArr ) )
-							obj[element.toLowerCase()]["fieldTypeUI"] = "phone";
-					}
+				// var arrOfRowValues = _.pluck(rowsSample,element);
+					var arrOfSampleRowValues = _.pluck(rowsSample,element);
+					//the base javascript is of type "string" but it can be:
+					//    a date in string format
+					//    an enumerable
+					if ( FL.common.is_dateArrInStringFormat(arrOfSampleRowValues) ){//values are in string format but are they a deguised date column ?
+							obj[element.toLowerCase()] = {"fieldType":"date","fieldTypeUI":"datetextbox",enumerable:null, label:element};
+							//it is necessary to convert string to data
+					}else{
+						if( FL.common.is_enumerableArr(arrOfSampleRowValues,percent) ){//It is an enumerable we will prepare the enumerable content
+							var arrOfAllRowValues = _.pluck(rows,element);
+							var fullUniqueObj = FL.common.extractUniqueFromArray(arrOfAllRowValues);
+							obj[element.toLowerCase()] = {"fieldType":"string","fieldTypeUI":"combobox",enumerable:fullUniqueObj.uniqueArr, label:element};
+						}else{//not an enumerable
+							var uniqueObj = FL.common.extractUniqueFromArray(arrOfSampleRowValues);
+							obj[element.toLowerCase()] = {"fieldType":"string","fieldTypeUI":"textbox",enumerable:null,label:element};
+							if( is_ColumnOfSubtype( "email",uniqueObj.uniqueArr ) ) //checks that all sample objects are of subtype
+								obj[element.toLowerCase()]["fieldTypeUI"] = "email";
+							else if( is_ColumnOfSubtype( "url",uniqueObj.uniqueArr ) )
+								obj[element.toLowerCase()]["fieldTypeUI"] = "url";
+							else if( is_ColumnOfSubtype( "phone",uniqueObj.uniqueArr ) )
+								obj[element.toLowerCase()]["fieldTypeUI"] = "phone";
+						}
+						// console.log("dataRowAnalisys enumerable="+FL.common.is_enumerableArr(arrOfRowValues,percent));
+						// var uniqueObj = extractUniqueFromArray(arrOfRowValues);//returns {empties:no_of empties,uniqueArr:uniqueArr}
+						// //FL.common.is_enumerableArr(arrOfRowValues,uniqueObj,percent)
+						// //percent = (total diferent cases excluding empty)/(total non empty cases)
+						// //
+						// var columnPercent = ( uniqueObj.uniqueArr.length - ((uniqueObj.empties == 0) ? 0 : 1))/( numOfSampleRows - uniqueObj.empties );
+						// if ( columnPercent < percent ) { //we have an enumerable
+						// 	var arrOfAllRowValues = _.pluck(rows,element);
+						// 	var fullUniqueObj = extractUniqueFromArray(arrOfAllRowValues);
+						// 	obj[element.toLowerCase()] = {"fieldType":"string","fieldTypeUI":"combobox",enumerable:fullUniqueObj.uniqueArr, label:element};
+						// }else{//not an enumerable
+						// 	obj[element.toLowerCase()] = {"fieldType":"string","fieldTypeUI":"textbox",enumerable:null,label:element};
+						// 	if( is_ColumnOfSubtype( "email",uniqueObj.uniqueArr ) )
+						// 		obj[element.toLowerCase()]["fieldTypeUI"] = "email";
+						// 	else if( is_ColumnOfSubtype( "url",uniqueObj.uniqueArr ) )
+						// 		obj[element.toLowerCase()]["fieldTypeUI"] = "url";
+						// 	else if( is_ColumnOfSubtype( "phone",uniqueObj.uniqueArr ) )
+						// 		obj[element.toLowerCase()]["fieldTypeUI"] = "phone";
+						// }
+					}	
 				}else{
 					if (dataType == "number") {//possible datatypes:string, integer, number, boolean, date, or json 
 						obj[element.toLowerCase()] = {"fieldType":"number","fieldTypeUI":"numberbox",enumerable:null, label:element};
@@ -104,7 +134,7 @@
 			// returns an array with the same format as dd dictionary array of attributes. Each element has the following format:
 			//      ex: {name:"address",description:"address to send invoices",label:"Address",type:"string",enumerable:null,key:false});
 			var attributesArr = [];
-			var arrOfAttributes = dataRowAnalisys(rows, 0.5);
+			var arrOfAttributes = dataRowAnalisys(rows, 0.5);//returns an array of attributes (one element per column) ele ex:{"fieldType":"string","fieldTypeUI":"textbox",enumerable:null,label:element};
 			_.each(arrOfAttributes, function(element,index){
 				var attrName = _.keys(element)[0];
 				var fieldType =element[attrName].fieldType;
@@ -117,7 +147,7 @@
 				if(fieldType=="string" && fieldTypeUI == "combobox"){
 					enumerable = element[attrName].enumerable;
 				}
-				console.log(index+" - createAttributesArrFromCsvAnalisys "+attrName +" type="+fieldType+" label="+label + +" typeUI="+fieldTypeUI );
+				console.log(index+" - createAttributesArrFromCsvAnalisys "+attrName +" type="+fieldType+" label="+label +" typeUI="+fieldTypeUI );
 				attributesArr.push({name: attrName,description: "description of " + attrName,label: label,type: fieldType, typeUI: fieldTypeUI, enumerable: enumerable, key: false});
 
 				// FL.dd.addAttribute(entityName, attrName,entityName+"' "+attrName,label,fieldType,enumerable);//xEntity,xAttribute,xDescription,xLabel,xType,xEnumerable
@@ -406,7 +436,7 @@
 						// 			return;
 						// 			// $.Topic( 'createGridOption' ).publish( plural,entityNameToUseInMenu );//broadcast that will be received by FL.menu to add an option
 						// 		});
-						// 		saveTablePromise.fail(function(err){
+						// 		saveTadefaultNewGridRowblePromise.fail(function(err){
 						// 			alert("FL.grid.storeCurrentCSVToServerAndInsertMenu --> after successful synch->FAILURE in FL.API.saveTable err="+err);
 						// 			return;
 						// 		});							
