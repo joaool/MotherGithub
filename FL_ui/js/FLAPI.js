@@ -1268,7 +1268,10 @@
 				//begins by removeTable, then sync local dict  to server, then inserting lines
 				// var remove_synch = FL.API.removeTable(entityName).then(FL.API.syncLocalDictionaryToServer(entityName));
 				// var remove_synch = FL.API.removeTable(entityName).then(FL.API.syncLocalDictionaryToServer(entityName));
-				FL.API.removeTable(entityName).then(function(){return FL.API.syncLocalDictionaryToServer(entityName);})
+				FL.API.removeTable(entityName)
+				.then(function(){
+					return FL.API.syncLocalDictionaryToServer(entityName);
+				})
 				.then(function(){
 						ecn = FL.dd.getCEntity(entityName);
 						console.log(">>>>>saveTable --> remove and synch SUCCESS <<<<<");

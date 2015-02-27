@@ -463,12 +463,21 @@ FL["common"] = (function(){//name space FL.common
 			var retStr = null;
             if(str){
     			var pos = str.lastIndexOf(separator);
-    			var separatorLen = separator.length;
-    			if(pos>=0)
+     			if(pos>=0)
     				retStr = str.substring(0,pos);
             }    
 			return retStr;
 		},
+        stringBeforeFirst: function(str,separator) {//simply returns the content of str before the first separator character or string - no separator found  =>null
+            //ex. FL.common.stringBeforeFirst("this is (one) or (two) values","(") -->returns  "this is "
+            var retStr = null;
+            if(str){
+                var pos = str.indexOf(separator);
+                if(pos>=0)
+                    retStr = str.substring(0,pos);
+            }    
+            return retStr;
+        },        
 		getLastTagInString: function(str,separator,tagTerminator) {//returns the content after the last separator until end or terminal char
 			// str - string that will be processed
 			// separator - last ocurrence to be identified in string
@@ -586,6 +595,59 @@ FL["common"] = (function(){//name space FL.common
     	selectBox: function(options, onSelection) {
 			selectBox(options, onSelection);
 		},
+        is_ValidDate: function(dateString){
+            // returns true - if dateString has an acceptable format for a date
+            // refuse ->"Stage Paris 2014", "209999" 
+            if( isNaN( Date.parse(dateString) ) ){
+                return false;//if Date.parse does not return a number it is not a valid date for sure!!!
+            //but Date.parse will return a number for ..."Stage Paris 2014" or "209999" ->we must exclude these
+            }
+            var d = new Date(Date.parse(dateString));//always a valid date because it passed the previous test
+            var monthsArr = ["January", "February", "March", "April", "May","June", "July", "August", "September", "October", "November", "December"];
+            var monthsArr3 = ["Jan", "Feb", "Mar", "Apr", "May","Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+            var weekDaysArr = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday"];
+            var weekDaysArr3 = ["Sun","Mon","Tue","Wed","Thu","Fri"];
+            var testArr = [ monthsArr[d.getMonth()], monthsArr3[d.getMonth()], weekDaysArr[d.getDay()], weekDaysArr3[d.getDay()] ];//possible values for first string
+            var firstString = this.stringBeforeFirst(dateString," ");//for "Stage Paris 2014", first will be -->"Stage"
+            if(!firstString){ //examples: "Stage,Paris,2014" or "209999" 
+                firstString = this.stringBeforeFirst(dateString,",");//for "Stage,Paris,2014", first will be -->"Stage"
+                if(!firstString)
+                    firstString = dateString; //example "209999"
+            }
+            var is_date = false; //it will be false except if firstString matches any of testArr values
+            var foundMatch = _.find(testArr, function(element){return (element == firstString); } );
+            if( !_.isUndefined(foundMatch) ){
+                is_date = true;   
+            }else{//first string does not match any of test array element - now we check match with:
+                //mm-dd-yy "03-21-12" or "03/21/12"
+                //dd-mm-yy  "03/21/12 0:01"
+                //dd-mmm-yy "21-Mar-2012"
+                // var re = /^(0?[1-9]|[12][0-9]|3[01])[\/\-](0?[1-9]|1[012])[\/\-]\d{4}$/;//this regex validates for either DD/MM/YYYY or DD-MM-YYYY
+                // var re = /[0-9]{2}/[0-9]{2}/[0-9]{4}/;//99/99/1000. will pass
+                var re = /^(0[1-9]|1[012])([- /.])(0[1-9]|[12][0-9]|3[01])\2(19|20)\d\d$/;//Formats accepted mm/dd/yyyy or mm-dd-yyyy or mm.dd.yyyy format
+                //group 1 -  /^(0[1-9]|1[012]) - ^begins by  ()a group of 0 folowed by one of 1-9 =>01-09 or 1 followed by 0,1,o2 2 =>10, 11 or 12 =>02 or 11
+                //group 2 -  ([- /.]) - the char - or space or / or .
+                //group 3 -  (0[1-9]|[12][0-9]|3[01]) - the digits 01 until 09 or ( 1 or 2 followed by any of 0-9 ) or (3 followed by 0 or 1)
+                //group 4 -  \2 Backreference. It matches the contents of the n'th set of parentheses in the expression. repeats ([- /.])
+                //group 5 -  (19|20)\d\d$  19 or 20 followed by any d (digit) and d(another digit)  $ means look at the end of string while ^means look at the beginning
+                if( re.test(firstString) ){
+                    is_date = true;
+                }
+                var re = /^(0[1-9]|1[012])([- /.])(0[1-9]|[12][0-9]|3[01])\2\d\d$/;//Formats accepted mm/dd/yyyy or mm-dd-yyyy or mm.dd.yyyy format
+                if( re.test(firstString) ){
+                    is_date = true;
+                }
+                var re = /^(0[1-9]|[12][0-9]|3[01])([- /.])(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\2(19|20)\d\d$/;//Formats accepted dd/Mar/yyyy 
+                if( re.test(firstString) ){
+                    is_date = true;
+                }
+                var re = /^(0[1-9]|[12][0-9]|3[01])([- /.])(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\2\d\d$/;//Formats accepted dd/Mar/yy
+                if( re.test(firstString) ){
+                    is_date = true;
+                }                
+            }
+            return is_date;
+        },
         is_dateArrInStringFormat: function(arrOfRowValues){//returns true if all array elements are a valid string format
             //var d = Date.parse("March 21, 2012");//1332288000000
             //var d = Date.parse("03-21-12");//1332288000000
@@ -602,13 +664,22 @@ FL["common"] = (function(){//name space FL.common
             //var d = Date.parse("Friday MARCH21 2012");//1332288000000         
             var is_date = false;
             var dateCandidate = null;
+            var thiz = this;
+            var emptyCounter = 0;
             var failElement = _.find(arrOfRowValues, function(element){ //if failElement is undefined => all elements are a valid date format
                 if (element && element.trim().length>0){//skips null,"" and spaces - it enters test if it is a valid element
-                    return isNaN(Date.parse(element));//a non empty element that is not a date
+                    // return isNaN(Date.parse(element));//a non empty element that is not a date -
+                    return !thiz.is_ValidDate(element);//a non empty element that is not a date -
+                    //This returns a date for string "Stage Paris 2014" or "2013-02-31" or "209999"
+                    //return moment(element).isValid() // using moment() =>refuses "2013-02-31" but accepts "Stage Paris 2014" and accepts "209999"
+                }else{
+                    emptyCounter++;
                 }
                 return false;
             });
-            if( _.isUndefined(failElement) )
+            if( emptyCounter == arrOfRowValues.length ){ //all elements are empty
+                is_date = false;
+            }else if( _.isUndefined(failElement) )
                 is_date = true;
             return is_date;
         },
@@ -639,6 +710,131 @@ FL["common"] = (function(){//name space FL.common
             }
             var uniqueArr = _.map(arrGroups,function(element){return element[0];});
             return {empties:empties,uniqueArr:uniqueArr};
+        },
+        getLocalLanguage: function() {
+            var language = navigator.languages? navigator.languages[0] : (navigator.language || navigator.userLanguage);
+            if(_.isUndefined(language) )
+                language = window.navigator.userLanguage || window.navigator.language;
+            return language;
+        },
+        is_decimal_US: function(strNumber){
+            is_US = false;
+            var lastDotIndex = strNumber.lastIndexOf(".");
+            var firstDotIndex = strNumber.indexOf(".");
+            if(firstDotIndex >=0){//possible: (4.294,00) (4.294.123,00) (0.123) (4,294.00) (4,294,967.00)
+                    if(lastDotIndex ==  firstDotIndex)
+                        is_us= true; // (0.123) or (4,294.00) or (4,294,967.00)
+            }        
+        },
+        is_oneOfCharsInString: function(str,charList){
+            //ex FL.common.is_oneOfCharsInString("anc 1002,3","* ") =>true because space exists in string
+            var is = false;
+            var targetChar = null;
+            var pos = null;
+            for(var i=0;i<charList.length;i++){
+                targetChar = str.charAt(i);
+                pos = str.indexOf(targetChar);
+                if(pos>=0){
+                    is=true;
+                    break
+                }
+            }
+            return is;
+        },
+        isNumberSep: function(strNumber,sep){//sep is thousands sep - returns true if string is a valid number with that thousand separator
+            var isNumber = false;
+            if(sep==".") //.. we need to escape the . because it has the meaning of "an arbitrary character" in a regular expression.mystring.replace(/\./g,' ')
+                sep="\\.";
+            var regex = new RegExp(sep+"\\d", "g");//ex for sep="," all ocurrences of ,+digit will be deleted "123,,456,789.01" =>"123,456789.01"
+             // var noSep = strNumber.replace(/,/g, '');
+            var noSep = strNumber.replace(regex, '');//(',') 4,294,967,295.00 => 4294967295.00 ok 
+                                                     // ('.') 4.294.967.295,00 => 4294967295,00 ok
+            if( !isNaN( noSep) ){//4,294,295.00 becomes =>4294295.00
+                isNumber = true;
+            }else{//failled because it is 4294967295,00 or 124,14,534 or ascd
+                var lastCommaIndex = noSep.lastIndexOf(",");
+                if(lastCommaIndex >=0){//possible: 4294967295,000  or asdasdasd,000
+                    noSep=noSep.substr(0,lastCommaIndex) + "." + noSep.substr(lastCommaIndex+1);
+                }    
+                if( !isNaN( noSep) ){//4294295,00 becomes 4294295.00
+                    isNumber = true;
+                }    
+            }  
+            return isNumber;
+        },
+        getArrNumberFormat: function(arrOfRowValues){//given an array of strings returns id it is a numeber representation and if yes returns the format
+            //Possible formats : us,de,fr 
+            //returns {number:false, format:null} or {number:true, format:"us"} or (if all integers){number:true, format:null}
+            //4,294,967,295.00  US-English, Thai, 
+            //4 294 967 295,000  =>Dan, Fin, France, sweeden
+            //4.294.967.295,000  =>Italy, Norway, Spain, Portugal,Germany(de)
+            // returns lang ("us","de","fr","neutral") neutral means a number simply
+            var xRet = {"number":null,"format":null};
+            var is_de = null;
+            var is_fr = null;
+            var is_us = null;
+            var decimalPos = null;
+            var thiz = this;
+            var failElement = _.find(arrOfRowValues, function(element){ //if failElement is undefined => all elements are a valid number format
+                if (element && element.trim().length>0){//skips null,"" and spaces - it enters test if it is a valid element
+                    // return isNaN(Date.parse(element));//a non empty element that is not a date -
+                    if(!xRet.format){
+                        is_de = thiz.isNumberSep(element,".");//a non empty element that has a "de" format 4.294.967.295,000
+                        if(is_de){//is valid as a german format but may be ambiguous. If it has a comma is not ambiguous otherwise it is ambiguous
+                            xRet = {"number":true,"format":null};
+                            decimalPos = element.lastIndexOf(",");
+                            if(decimalPos>=0)
+                                xRet = {"number":true,"format":"de"};
+                        }else{
+                            is_fr = thiz.isNumberSep(element," ");//a non empty element that has "fr" format 4 294 967 295,000
+                            if(is_fr){
+                                xRet = {"number":true,"format":null};
+                                decimalPos = element.lastIndexOf(",");
+                                if(decimalPos>=0)
+                                    xRet = {"number":true,"format":"fr"};
+                            }else{
+                                is_us = thiz.isNumberSep(element,",");//a non empty element that has "us" format 4,294,967,295.000
+                                if(is_us){
+                                    xRet = {"number":true,"format":null};
+                                    decimalPos = element.lastIndexOf(".");
+                                    if(decimalPos>=0)
+                                       xRet = {"number":true,"format":"us"};
+                                }else{
+                                   xRet = {"number":false,"format":null};
+                                }
+                            }
+                        }
+                    }else if(xRet.format == "de"){
+                        is_de = thiz.isNumberSep(element,".");//a non empty element that has a "de" format 4.294.967.295,000
+                        if(is_de)
+                            return false;//goes to next element
+                        else{
+                            xRet = {"number":false,"format":null};//its is not a consistent number !!" previous was de but this one is not !"                  
+                            return true;
+                        }
+                    }else if(xRet.format == "fr"){
+                        is_fr = thiz.isNumberSep(element," ");//a non empty element that has a "de" format 4.294.967.295,000
+                        if(is_fr)
+                            return false;//goes to next element
+                        else{
+                            xRet = {"number":false,"format":null};//its is not a consistent number !!" previous was fr but this one is not !"                  
+                            return true;
+                        }
+                    }else if(xRet.format == "us"){
+                        is_us = thiz.isNumberSep(element,",");//a non empty element that has a "de" format 4.294.967.295,000
+                        if(is_us)
+                            return false;//goes to next element
+                        else{
+                            xRet = {"number":false,"format":null};//its is not a consistent number !!" previous was us but this one is not !"                  
+                            return true;
+                        }
+                    }
+                }
+                return false;//goes to next element
+            });
+            if( !_.isUndefined(failElement) )
+                xRet = {"number":false,"format":null};
+            return xRet;
         },
 		testFunc: function(x) {
 			alert("FL.common.test() -->"+x);

@@ -417,7 +417,7 @@
 				}else{
 					menuName = FL.dd.plural(entityName,"En");
 				}
-				FL.dd.createEntityAndFields(entityName,entityName+"' description",csvStore.attributesArr);
+				FL.dd.createEntityAndFields(entityName,entityName+" description",csvStore.attributesArr);
 
 				// $.Topic( 'createGridOptionByCN' ).publish( menuName,eCN );//broadcast that will be received by FL.menu to add an option
 				// alert("storeCurrentCSVToServerAndInsertMenu --> will create a new entity called:"+entityName+"/"+eCN + " in menu "+menuName+" synch="+FL.dd.isEntityInSync(entityName));//(entityName,entityDescription,fieldDefinitionArray)
@@ -548,10 +548,21 @@
 		            }
 		        });
 		    },
+			removeLastRowIfIncomplete: function (data){
+				//by some unknown reason papaparse may leave a last row incomplete....
+				//to prevent the existence of an incomplete last line. We will check if last line has the rigth number of columns if not we remove it
+				var lastRowIndex = data.data.length - 1;
+				var lastLineObj = data.data[lastRowIndex];
+				var totColsPerRow = data.meta.fields.length;
+				var lastLineCols = ( _.values(lastLineObj) ).length;
+				if (lastLineCols != totColsPerRow)
+					data.data.splice(lastRowIndex, 1);			
+			},
 	   		csvToGrid2: function(csvFile,delimiter,encoding,entityName){//input is a file object obtained from DOM	//http://papaparse.com/  
 						//csvFile - file to load file from local computer
 						//delimiter - eventual delimiter to use instead of auto delimiter. This is decided by onchange="FL.grid.validateCSV(this.files)"
 						// var spinner=FL.common.loaderAnimationON('spinnerDiv');
+						var thiz = this;
 						skipEmptyLines = true;
 						if(!delimiter){
 							delimiter = "";//this is the default =>autodetect
@@ -559,7 +570,9 @@
 						}	
 						Papa.parse(csvFile, {
 				        	header: true,
-							dynamicTyping: true,
+							dynamicTyping: true,//If true, numeric and boolean data will be converted to their type instead of remaining strings.
+												//Numeric data must conform to the definition of a decimal literal. (European-formatted numbers must have commas and dots swapped.)
+												//Papa parse don't know how to automatically detect if the number is American- or European-formatted. 
 							delimiter: delimiter,
 							skipEmptyLines: skipEmptyLines,
 							// encoding:"ISO-8859-1",// ISO-8859-1 is the good encoding for Portuguese chars  - "UTF-8" or "utf-8", "latin-1", "windows-1255"
@@ -588,6 +601,7 @@
 				                //     alert("Csv has a problem. Verify columns that have content but title is missing. Please suply a title or remove content.");
 				                //     return;
 				                // }
+								thiz.removeLastRowIfIncomplete(data);//to remove eventual incomplete last line
 				                var arrOfColumns =  createAttributesArrFromCsvAnalisys(data.data);//returns all coluns from CSV
 				                // returns an array with the same format as dd dictionary array of attributes. Each element has the following format:
 			        			//      ex: {name:"address",description:"address to send invoices",label:"Address",type:"string",enumerable:null,key:false});
@@ -596,7 +610,6 @@
 				                var columnsArr = utils.backGridColumnsFromArray(arrOfColumns);//extracts attributes from dictionary and prepares columns object for backgrid
 				                //exemple [{"name":"del","label":"Delete"},{"name":"id","editable":false,"label":"id"},{"name":"a","label":"a","cell":"number"},
 				                console.log("columns defined..."+JSON.stringify(columnsArr));
-
 				                csvStore.setAttributesArr(arrOfColumns);
 				                utils.csvToStore(data.data); //feeds the csvStore data store object. It inserts id element and converts keys to lowercase
 				                // utils.csvToStore(rowsArr2); //feeds the csvStore data store object. It inserts id element and converts keys to lowercase

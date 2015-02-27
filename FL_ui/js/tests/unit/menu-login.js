@@ -556,6 +556,80 @@ $(function () {
   });
   test("FL.common tests", function () {
     //typeOf
+
+    var xVar = "March 21, 2012";
+    var success = FL.common.is_ValidDate(xVar);
+    ok(success === true , "FL.common.is_ValidDate('March 21, 2012') -->'true'");//1
+
+    xVar = "March";
+    success = FL.common.is_ValidDate(xVar);
+    ok(success === false , "FL.common.is_ValidDate('March') -->'false'");//2
+
+    var xVar = "Mar 21, 2012";
+    var success = FL.common.is_ValidDate(xVar);
+    ok(success === true , "FL.common.is_ValidDate('Mar 21, 2012') -->'true'");//3
+
+    var xVar = "Wednesday Mar 21 2012";
+    var success = FL.common.is_ValidDate(xVar);
+    ok(success === true , "FL.common.is_ValidDate('Wednesday Mar 21 2012') -->'true'");//4
+
+    var xVar = "Thursday Mar 21 2012"; //this date is a Wednesday !!!!
+    var success = FL.common.is_ValidDate(xVar);
+    ok(success === false , "FL.common.is_ValidDate('Thursday Mar 21 2012') -->'false'");//5
+
+    var xVar = "Wed Mar 21 2012";
+    var success = FL.common.is_ValidDate(xVar);
+    ok(success === true , "FL.common.is_ValidDate('Wed Mar 21 2012') -->'true'");//6
+
+    var xVar = "Sun Mar 21 2012";//this date is a Wednesday !!!!
+    var success = FL.common.is_ValidDate(xVar);
+    ok(success === false , "FL.common.is_ValidDate('Sun Mar 21 2012') -->'false'");//7
+
+    var xVar = "Wed 21 2012";//no month
+    var success = FL.common.is_ValidDate(xVar);
+    ok(success === false , "FL.common.is_ValidDate('Wed 21 2012') -->'false'");//8
+
+    xVar = "03-21-12";
+    success = FL.common.is_ValidDate(xVar);
+    ok(success === true , "FL.common.is_ValidDate('03-21-12') -->'true'");//9
+
+    xVar = "03-21-2012";
+    success = FL.common.is_ValidDate(xVar);
+    ok(success === true , "FL.common.is_ValidDate('03-21-2012') -->'true'");//10
+    
+    xVar = "03-21-1812";
+    success = FL.common.is_ValidDate(xVar);
+    ok(success === false , "FL.common.is_ValidDate('03-21-1812') -->'false'");//11
+
+    xVar = "03/21/2012";
+    success = FL.common.is_ValidDate(xVar);
+    ok(success === true , "FL.common.is_ValidDate('03/21/2012') -->'true'");//12
+
+    xVar = "21/03/2012";//this is read has month/day/year
+    success = FL.common.is_ValidDate(xVar);
+    ok(success === false , "FL.common.is_ValidDate('21/03/2012') -->'false'");//13
+
+    xVar = "21-Mar-2012";
+    success = FL.common.is_ValidDate(xVar);
+    ok(success === true , "FL.common.is_ValidDate('21-Mar-2012') -->'true'");//14
+
+    xVar = "21/Mar/12";
+    success = FL.common.is_ValidDate(xVar);
+    ok(success === true , "FL.common.is_ValidDate('21/Mar/12') -->'true'");//15
+
+    xVar = "03 21 2012";
+    success = FL.common.is_ValidDate(xVar);
+    ok(success === false , "FL.common.is_ValidDate('03 21 2012') -->'false'");//16
+
+    xVar = "Stage Paris 2014";
+    success = FL.common.is_ValidDate(xVar);
+    ok(success === false , "FL.common.is_ValidDate('Stage Paris 2014') -->'false'");//17
+
+    xVar = "209999";
+    success = FL.common.is_ValidDate(xVar);
+    ok(success === false , "FL.common.is_ValidDate('209999') -->'false'");//18
+
+
     var arrOfRowValues = [
            "March 21, 2012",
            "03-21-12",
@@ -564,7 +638,7 @@ $(function () {
            "21-Mar-2012"
     ];
     var success = FL.common.is_dateArrInStringFormat(arrOfRowValues);
-    ok(success == true , "FL.common.is_dateArrInStringFormat('array of values with all valid') -->'true'" );//1
+    ok(success == true , "FL.common.is_dateArrInStringFormat('array of values with all valid') -->'true'" );//19
     arrOfRowValues = [
            "March 21, 2012",
            "03-21-12",
@@ -573,7 +647,108 @@ $(function () {
            "21-Mar-2012"
     ];    
     success = FL.common.is_dateArrInStringFormat(arrOfRowValues);
-    ok(success == false , "FL.common.is_dateArrInStringFormat('array of values with one invalid') -->'false'" );//2
+    ok(success == false , "FL.common.is_dateArrInStringFormat('array of values with one invalid') -->'false'" );//20
+    arrOfRowValues = [
+           " ",
+           "",
+           "",
+           " ",
+           " "
+    ];    
+    success = FL.common.is_dateArrInStringFormat(arrOfRowValues);
+    ok(success === false , "FL.common.is_dateArrInStringFormat('array of spaces and empty values') -->'false'" );//21
+
+    success = FL.common.isNumberSep('4,294,967,295.00',',');
+    ok(success === true , "FL.common.isNumberSep('4,294,967,295.00', ',') -->'true'" );//22
+    success = FL.common.isNumberSep('4.294.967.295,00','.');
+    ok(success === true , "FL.common.isNumberSep('4.294.967.295,00', '.') -->'true'" );//23
+    success = FL.common.isNumberSep('4 294 967 295,00',' ');
+    ok(success === true , "FL.common.isNumberSep('4 294 967 295,00', ' ') -->'true'" );//24
+    success = FL.common.isNumberSep('4,294,,967,295.00',',');
+    ok(success === false , "FL.common.isNumberSep('4,294,,967,295.00', ',') -->'false'" );//25
+    success = FL.common.isNumberSep('4,294 967,295.00',',');
+    ok(success === false , "FL.common.isNumberSep('4,294 967,295.00', ',') -->'false'" );//26
+    success = FL.common.isNumberSep('4 294  967 295,00',',');
+    ok(success === false , "FL.common.isNumberSep('4 294  967 295,00', ',') -->'false'" );//27
+    success = FL.common.isNumberSep('1234567', ',');
+    ok(success === true , "FL.common.isNumberSep('1234567', ',') -->'true'" );//28
+    success = FL.common.isNumberSep('1234567', '.');
+    ok(success === true , "FL.common.isNumberSep('1234567', '.') -->'true'" );//29
+    success = FL.common.isNumberSep('1234567', ' ');
+    ok(success === true , "FL.common.isNumberSep('1234567', ' ') -->'true'" );//30
+
+    success = FL.common.isNumberSep('1234567.12', ',');
+    ok(success === true , "FL.common.isNumberSep('1234567.12', ',') -->'true'" );//31
+    success = FL.common.isNumberSep('1234567.12', '.');//This is ambiguous =>interpret has US number without separators
+    ok(success === true , "FL.common.isNumberSep('1234567.12', '.') -->'true'" );//32
+    success = FL.common.isNumberSep('1234567', ' ');
+    ok(success === true , "FL.common.isNumberSep('1234567.12', ' ') -->'true'" );//33
+
+    success = FL.common.isNumberSep('1234567,12', ',');
+    ok(success === true , "FL.common.isNumberSep('1234567,12', ',') -->'true'" );//34
+    success = FL.common.isNumberSep('1234567,12', '.');//if sep="." =>decimal = "," =>TRUE 
+    ok(success === true , "FL.common.isNumberSep('1234567,12', '.') -->'true'" );//35
+    success = FL.common.isNumberSep('1234567,12', ' ');//if sep=" " =>France decimal = "," =>TRUE
+    ok(success === true , "FL.common.isNumberSep('1234567,12', ' ') -->'true'" );//36
+
+    success = FL.common.isNumberSep('1a4567,12', ',');
+    ok(success === false , "FL.common.isNumberSep('1a4567,12', ',') -->'false'" );//37
+    success = FL.common.isNumberSep('1a4567,12', '.');
+    ok(success === false , "FL.common.isNumberSep('1a4567,12', '.') -->'false'" );//38
+    success = FL.common.isNumberSep('1a4567,12', ' ');
+    ok(success === false , "FL.common.isNumberSep('1a4567,12', ' ') -->'false'" );//39
+
+    success = FL.common.isNumberSep('abc12', ',');
+    ok(success === false , "FL.common.isNumberSep('abc12', ',') -->'false'" );//40
+    success = FL.common.isNumberSep('abc12', '.');
+    ok(success === false , "FL.common.isNumberSep('abc12', '.') -->'false'" );//41
+    success = FL.common.isNumberSep('abc12', ' ');
+    ok(success === false , "FL.common.isNumberSep('abc,12', ' ') -->'false'" );//42
+
+    arrOfRowValues = [
+           "4.294.967.295,00",
+           "1000",
+           "1000,3",
+           "0,324",
+           "-27,2 "
+    ];
+    var xRet = FL.common.getArrNumberFormat(arrOfRowValues);
+    ok(xRet.number === true && xRet.format == "de" , "FL.common.getArrNumberFormat(arrOfRowValues) -->'number:true, format:'de'" );//43
+    arrOfRowValues = [
+           "4.294.967.295,00",
+           "1000",
+           "1000,3",
+           "0,,324",
+           "-27,2 "
+    ];
+    xRet = FL.common.getArrNumberFormat(arrOfRowValues);
+    ok(xRet.number === false && xRet.format === null , "FL.common.getArrNumberFormat(arrOfRowValues) -->'number:false, format:null " );//44
+    arrOfRowValues = [
+           "-4294",
+           "1000",
+           "1000,3",
+           "0,324",
+           "-27,2 "
+    ];
+    xRet = FL.common.getArrNumberFormat(arrOfRowValues);
+    ok(xRet.number === true && xRet.format == "de" , "FL.common.getArrNumberFormat(arrOfRowValues) -->'number:true, format:'de'" );//45
+    // arrOfRowValues = [
+    //        "-4294",
+    //        "1 000 102",
+    //        "1000,3",
+    //        "0,324",
+    //        "-27,2 "
+    // ];
+    // xRet = FL.common.getArrNumberFormat(arrOfRowValues);
+    // ok(xRet.number === true && xRet.format == "fr" , "FL.common.getArrNumberFormat(arrOfRowValues) -->'number:true, format:'fr'" );//45
+
+    success = FL.common.is_oneOfCharsInString('abc12', '*1');
+    ok(success === true , "is_oneOfCharsInString('abc12', '*1') -->'true'" );//40
+    success = FL.common.is_oneOfCharsInString('1 102 200', ', ');
+    ok(success === true , "is_oneOfCharsInString('1 102 200', ', ') -->'true'" );//40
+
+
+
   });
   test("client Dictionary tests", function () { //one test can have several assertions
     //client

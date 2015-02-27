@@ -54,53 +54,52 @@
     }    
 </style>
 <body>
-    <h1>Handlebars JS xExample 2.0</h1>
-    <script id="__text" type="text/x-handlebars-template">
+    <h1>Underscore Template JS Example 2.0</h1>
+    <script id="__text" type="text/template">
         <div class="input-group" style="padding:5px 300px 5px">
             <div class="input-group" style="line-height:0px;">
-                <span class="input-group-addon">{{leftLabel}}</span>
-                 <input id="{{id}}" type={{type}} class="form-control" placeholder={{placeholder}} value={{value}} data-parsley-trigger={{trigger}} data-toggle="tooltip" data-placement="top" title="{{tooltip}}">
-                <span class="input-group-addon"><span class="glyphicon {{icon}}"></span></span>
+                <span class="input-group-addon"><%= leftLabel %></span>
+                 <input id="<%= id %>" type=<%= type %> class="form-control" placeholder=<%= placeholder %> value=<%= value %> data-parsley-trigger=<%= trigger %> data-toggle="tooltip" data-placement="top" title="<%= tooltip %>">
+                <span class="input-group-addon"><span class="glyphicon <%= icon %>"></span></span>
             </div>
         </div>    
     </script>
-    <script id="__textLabel" type="text/x-handlebars-template">
+    <script id="__textLabel" type="text/template">
         <div class="input-group" style="padding:5px 300px 5px">
-            <legend>{{label}}</legend>
+            <legend><%= label %></legend>
             <div class="input-group" style="line-height:0px;">
-                <span class="input-group-addon">{{leftLabel}}</span>
-                <input id="{{id}}" type={{type}} class="form-control" id={{id}} placeholder={{placeholder}} value={{value}} data-parsley-trigger={{trigger}} data-toggle="tooltip" data-placement="top" title="{{tooltip}}">
-                <span class="input-group-addon"><span class="glyphicon {{icon}}"></span></span>
+                <span class="input-group-addon"><%= leftLabel %></span>
+                <input id="<%= id %>" type=<%= type %> class="form-control" placeholder=<%= placeholder %> value=<%= value %> data-parsley-trigger=<%= trigger %> data-toggle="tooltip" data-placement="top" title="<%= tooltip %>">
+                <span class="input-group-addon"><span class="glyphicon <%= icon %>"></span></span>
             </div>
         </div>
     </script>    
-    <script id="inTextareaLabel" type="text/x-handlebars-template"> 
+    <script id="inTextareaLabel" type="text/template"> 
         <label class="control-label" for="_dictEditEntityTemplate_entityDescription" id="_dictEditEntityTemplate_whatIsLabel" >What is a </label>
         <div class="input-group" style="line-height:0px;">
             <span class="input-group-addon">Description:</span>
             <textarea class="form-control" id="_dictEditEntityTemplate_entityDescription" name="entityDescription" onkeyup="FL.slidePanels.dictTemplateChangeDescription(this.form)" rows="2"><%= masterDetailItems.master.entityDescription %></textarea>
         </div>
     </script>
-    <script id="__button" type="text/x-handlebars-template"> 
+    <script id="__button" type="text/template"> 
         <div class="pull-right" style="padding:5px 300px 5px;" >
             <button type="button" class="btn btn-{{btnType1}} {{buttonHide1}}" onclick="{{onClick1}}" data-toggle="tooltip" data-placement="top" title="{{tooltip1}}" >{{label1}}</button>
             <button type="button" class="btn btn-{{btnType2}} {{buttonHide2}}" onclick="{{onClick2}}" data-toggle="tooltip" data-placement="top" title="{{tooltip2}}">{{label2}} </button>
             <button type="button" class="btn btn-{{btnType3}} {{buttonHide3}}" onclick="{{onClick3}}" data-toggle="tooltip" data-placement="top" title="{{tooltip3}}">{{label3}} </button>
             <button type="button" class="btn btn-{{btnType4}} {{buttonHide4}}" onclick="{{onClick4}}" data-toggle="tooltip" data-placement="top" title="{{tooltip4}}">{{label4}} </button>
             <button type="button" class="btn btn-{{btnType5}}  {{buttonHide5}}" onclick="{{onClick5}}" data-toggle="tooltip" data-placement="top" title="{{tooltip5}}" >{{label5}} </button>
-
         </div>
     </script>
-    <script id="__checkbox" type="text/x-handlebars-template"> 
-        <div id="{{id}}" class="input-group" style="padding:5px 300px 5px">
-            <label class="checkbox-inline {{chkHide1}}"><input type="checkbox" {{checked1}} value="1">{{label1}}</label>
-            <label class="checkbox-inline {{chkHide2}}"><input type="checkbox" {{checked2}} value="2">{{label2}}</label>
-            <label class="checkbox-inline {{chkHide3}}"><input type="checkbox" {{checked3}} value="3">{{label3}}</label>
-            <label class="checkbox-inline {{chkHide4}}"><input type="checkbox" {{checked4}} value="4">{{label4}}</label>
-            <label class="checkbox-inline {{chkHide5}}"><input type="checkbox" {{checked5}} value="5">{{label5}}</label>
+    <script id="__checkbox" type="text/template"> 
+        <div id="<%= id %>" class="input-group" style="padding:5px 300px 5px">
+            <label class="checkbox-inline <%= chkHide1 %>"><input type="checkbox" <%= checked1 %> value="1"><%= label1 %></label>
+            <label class="checkbox-inline <%= chkHide2 %>"><input type="checkbox" <%= checked2 %> value="2"><%= label2 %></label>
+            <label class="checkbox-inline <%= chkHide3 %>"><input type="checkbox" <%= checked3 %> value="3"><%= label3 %></label>
+            <label class="checkbox-inline <%= chkHide4 %>"><input type="checkbox" <%= checked4 %> value="4"><%= label4 %></label>
+            <label class="checkbox-inline <%= chkHide5 %>"><input type="checkbox" <%= checked5 %> value="5"><%= label5 %></label>
         </div>
     </script>
-    <script id="__radiobox" type="text/x-handlebars-template"> 
+    <script id="__radiobox" type="text/template"> 
         <div id="{{id}}" class="input-group" style="padding:5px 300px 5px">
             <label class="radio-inline {{radioHide1}}"><input type="radio" {{checked1}} name="optradio" value="1">{{label1}}</label>
             <label class="radio-inline {{radioHide2}}"><input type="radio" {{checked2}} name="optradio" value="2">{{label2}}</label>
@@ -109,7 +108,7 @@
             <label class="radio-inline {{radioHide5}}"><input type="radio" {{checked5}} name="optradio" value="5">{{label5}}</label>
         </div>
     </script>    
-    <script id="__combo" type="text/x-handlebars-template">    
+    <script id="__combo" type="text/template">    
         <div class="input-group" style="line-height:0px;padding:5px 300px 5px">
             <span class="input-group-addon">{{leftLabel}}</span>
             <div class="btn-group">
@@ -195,7 +194,7 @@
             </form>
         </div>
     </script>                         
-    <script id="some-template" type="text/x-handlebars-template"> 
+    <script id="some-template" type="text/template"> 
         <table>
             <thead> 
                 <th>Name</th> 
@@ -256,9 +255,9 @@
             } ]
         }; 
 
-        Handlebars.registerHelper('fullName', function(person) {
-          return person.firstName + " <----> " + person.lastName;
-        });
+        // Handlebars.registerHelper('fullName', function(person) {
+        //   return person.firstName + " <----> " + person.lastName;
+        // });
         //the function template receives the JSON data (an object with an array of users) and for each array element applies the compiled template source 
 
         data1 = {
@@ -453,7 +452,8 @@
                 console.log(index + " - " + element.element + "/" + element.type);
                 var lineId = "__line_" + index;
                 var source = $("#__"+element.element).html(); 
-                var template = Handlebars.compile(source);
+                // var template = Handlebars.compile(source);
+                var template = _.template(source);
                 if(element.element == "checkbox"){
                     elJson = checkboxSetup(lineId,element);
                      // $('body').append(template(elJson));                                                      
@@ -466,6 +466,7 @@
                     elJson = element;
                     elJson["id"] = lineId;
                 }
+                var bodyHTML = template(elJson);//for debug
                 $('body').append(template(elJson));
                 if(element.element == "combo"){
                     insertOptionsInCombo(lineId,element);//this is done after placing the combo in the DOM
