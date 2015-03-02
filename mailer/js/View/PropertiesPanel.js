@@ -1,6 +1,7 @@
 MailerTemplate.Views.PropertyPanel = Backbone.View.extend({
 	m_TitlePanel : null,
 	m_ImagePanel : null,
+	m_SocialLinkPanel : null,
 	m_activePanel : null,
 	m_Model : null,
 	
@@ -8,6 +9,7 @@ MailerTemplate.Views.PropertyPanel = Backbone.View.extend({
 	initialize : function(){
 		this.m_TitlePanel =  new MailerTemplate.Views.TitlePanel({el : "#propertyPanel"});
 		this.m_ImagePanel =  new MailerTemplate.Views.ImagePanel({el : "#propertyPanel"});
+		this.m_SocialLinkPanel =  new MailerTemplate.Views.SocialLinksPanel({el : "#propertyPanel"});
 		this.m_PropertyTab = $("#propertyTab");
 		this.m_activePanel = this.m_TitlePanel;
 		this.render();
@@ -43,6 +45,10 @@ MailerTemplate.Views.PropertyPanel = Backbone.View.extend({
 		else if (templateType == MailerTemplate.TemplateItems.IMAGE)
 		{
 			this.changeActivePanel(this.m_ImagePanel);
+		}
+		else if (templateType == MailerTemplate.TemplateItems.SOCIALLINKS)
+		{
+			this.changeActivePanel(this.m_SocialLinkPanel);
 		}
 		this.$el.show();
 		this.m_activePanel.renderModel(this.m_Model);

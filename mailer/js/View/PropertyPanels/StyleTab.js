@@ -14,6 +14,9 @@ MailerTemplate.Views.StyleTab = Backbone.View.extend({
 	m_backgroundColor : null,
 	m_headerTextColor : null,
 	m_ImageAlign : null,
+	m_BorderSize : null,
+	m_BorderType : null,
+	m_BorderColor : null,
 	
 	initialize : function(){
 		
@@ -31,10 +34,16 @@ MailerTemplate.Views.StyleTab = Backbone.View.extend({
 		this.m_headerTextColor = $("#headingTextColor");
 		this.m_ImageAlign = $("#imageAlignment");
 		this.m_ImageMargin = $("#imageMargin");
+		this.m_BorderStyle = $("borderStyle");
+		this.m_BorderSize = $("borderSize");
+		this.m_BorderColor = $("borderColor");
+		
 		this.m_StyleTypeHeader = $("#StyleTypeHeader");
 		this.m_StyleTypes = $("#styleType");
 		this.m_ImageSettingsHeader = $("#ImageSettingsHeader");
 		this.m_ImageSettings = $("#ImageSettings");
+		this.m_ContainerSettingsHeader = $("#ContainerTypeHeader");
+		this.m_ContainerSettings = $("#containerSettings");
 	},
 	attachEvents : function(){
 		var temp = this;
@@ -46,6 +55,10 @@ MailerTemplate.Views.StyleTab = Backbone.View.extend({
 		this.m_textAlign.bind("change.bfhselectbox",function(e){temp.OnTextAlignChanged(e)});
 		this.m_ImageAlign.bind("change.bfhselectbox",function(e){temp.OnImageAlignChanged(e)});
 		this.m_ImageMargin.bind("change",function(e){temp.OnImageMarginChanged(e)});
+		this.m_backgroundColor.bind("change.bfhcolorpicker",function(e){temp.OnBackgroundColorChanged(e)});
+		this.m_BorderStyle.bind("change.bfhselectbox",function(e){temp.OnBorderStyleChanged(e)});
+		this.m_BorderSize.bind("change",function(e){temp.OnBorderSizeChanged(e)});
+		this.m_BorderColor.bind("change.bfhcolorpicker",function(e){temp.OnBorderColorChanged(e)});
 	},
 	
 	OnFontColorChanged : function(e){
@@ -126,6 +139,34 @@ MailerTemplate.Views.StyleTab = Backbone.View.extend({
 		}
 		this.trigger(MailerTemplate.Views.StyleTab.STYLE_PROPERTY_CHANGED,data);
 	},
+	OnBackgroundColorChanged : function(e){
+		data = {
+			"property" : "backgroundColor",
+			"value" : $(e.target).val()
+		}
+		this.trigger(MailerTemplate.Views.StyleTab.STYLE_PROPERTY_CHANGED,data);
+	},
+	OnBorderSizeChanged : function(e){
+		data = {
+			"property" : "borderSize",
+			"value" : $(e.target).val()
+		}
+		this.trigger(MailerTemplate.Views.StyleTab.STYLE_PROPERTY_CHANGED,data);
+	},
+	OnBorderStyleChanged: function(e){
+		data = {
+			"property" : "borderStyle",
+			"value" : $(e.target).val()
+		}
+		this.trigger(MailerTemplate.Views.StyleTab.STYLE_PROPERTY_CHANGED,data);
+	},
+	OnBorderColorChanged : function(e){
+		data = {
+			"property" : "borderColor",
+			"value" : $(e.target).val()
+		}
+		this.trigger(MailerTemplate.Views.StyleTab.STYLE_PROPERTY_CHANGED,data);
+	},
 	
 	render : function(){
 		
@@ -150,6 +191,19 @@ MailerTemplate.Views.StyleTab = Backbone.View.extend({
 				$("#imageAlignment").show();
 				$("#imageMargin").show();
 				break;
+			case MailerTemplate.TemplateItems.SOCIALLINKS:
+				this.m_ContainerSettingsHeader.show();
+				this.m_ContainerSettings.show();
+				$("#borderParent").show();
+				this.m_StyleTypeHeader.show();
+				this.m_StyleTypes.show();
+				$("#backgroundColorParent").show();
+				$("#textColorParent").show();
+				$("#fontFamilyParent").show();
+				$("#fontSizeParent").show();
+				$("#fontWeightParent").show();
+				$("#lineHeightParent").show();
+				$("#textAlignParent").show();
 		}
 	},
 	hideAll : function(){
@@ -157,6 +211,8 @@ MailerTemplate.Views.StyleTab = Backbone.View.extend({
 		this.m_StyleTypes.hide();
 		this.m_ImageSettingsHeader.hide();
 		this.m_ImageSettings.hide();
+		this.m_ContainerSettingsHeader.hide();
+		this.m_ContainerSettings.hide();
 		$("#textColorParent").hide();
 		$("#backgroundColorParent").hide();
 		$("#headingTextColorParent").hide();
@@ -167,6 +223,7 @@ MailerTemplate.Views.StyleTab = Backbone.View.extend({
 		$("#textAlignParent").hide();
 		$("#imageAlignment").hide();
 		$("#imageMargin").hide();
+		$("#borderParent").hide();
 	},
 	showAll : function(){
 		this.m_StyleTypeHeader.show();
@@ -184,6 +241,7 @@ MailerTemplate.Views.StyleTab = Backbone.View.extend({
 		$("#textAlignParent").show();
 		$("#imageAlignment").show();
 		$("#imageMargin").show();
+		$("#borderParent").show();
 	},
 	getStyleProperty : function(){
 		
@@ -193,8 +251,7 @@ MailerTemplate.Views.StyleTab = Backbone.View.extend({
 		this.m_fontFamily.val(styleData.fontFamily);
 		this.m_fontSize.val(styleData.fontSize);
 		this.m_textAlign.val(styleData.textAlign);
-		switch(styleData.fontWeight)
-		{
+		switch(styleData.fontWeight){
 			case "initial":
 				this.m_fontWeight.val("1");
 			case "normal":
@@ -203,8 +260,7 @@ MailerTemplate.Views.StyleTab = Backbone.View.extend({
 			case "bold":
 				this.m_fontWeight.val("3");
 		}
-		switch(styleData.lineHeight)
-		{
+		switch(styleData.lineHeight){
 			case "initial":
 				this.m_lineHeight.val("1");
 				break;
@@ -222,10 +278,15 @@ MailerTemplate.Views.StyleTab = Backbone.View.extend({
 				break;
 		}
 		this.m_ImageAlign.val(styleData.ImageAlign);
-		if (styleData.ImageMargin != "")
-		{
+		if (styleData.ImageMargin != ""){
 			this.m_ImageMargin.attr("checked",true);
 		}
+		this.m_fontColor.val(styleData.fontColor);
+		this.m_fontFamily.val(styleData.fontFamily);
+		this.m_BorderColor.val(styleData.borderColor);
+		this.m_backgroundColor.val(styleData.backgroundColor);
+		this.m_BorderSize.val(styleData.borderSize);
+		this.m_BorderStyle.val(styleData.borderStyle);
 	}
 });
 MailerTemplate.Views.StyleTab.STYLE_PROPERTY_CHANGED = "stylePropchanged";

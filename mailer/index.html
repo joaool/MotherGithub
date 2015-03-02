@@ -20,30 +20,37 @@
 		<script src="js/lib/handlebars-v1.3.0.js"></script>
 		<script src="bootstrap/js/bootstrap.min.js"></script>
 		<script src="js/lib/formpicker/js/bootstrap-formhelpers.min.js"></script>
+		<script type="text/javascript" src="https://rawgithub.com/powmedia/backbone.bootstrap-modal/master/src/backbone.bootstrap-modal.js"></script>
+				
 		<script src="js/bussinesslogic/JsonGenerator.js"></script>
-		
 		<script src="js/Common.js"></script>
 		<script src="js/MailerTemplate.js"></script>
 		
 		<script src="js/Model/TitleModel.js"></script>
 		<script src="js/Model/ImageModel.js"></script>
+		<script src="js/Model/SocialLinksModel.js"></script>
 		
+		<script src="js/View/BackboneModal.js"></script>
 		<script src="js/View/MainView.js"></script>
 		<script src="js/View/PropertyPanels/StyleTab.js"></script>
 		<script src="js/View/PropertyPanels/TitlePanel.js"></script>
 		<script src="js/View/PropertyPanels/ImagePanel.js"></script>
+		<script src="js/View/PropertyPanels/SocialLinksPanel.js"></script>
 		<script src="js/View/PropertiesPanel.js"></script>
+		
 		<script src="js/View/DesignTemplateBody.js"></script>
 		<script src="js/View/DesignTemplateFooter.js"></script>
 		<script src="js/View/DesignTemplatePage.js"></script>
 		<script src="js/View/DesignTemplatePageHeader.js"></script>
+		
 		<script src="js/View/TemplateItems.js"></script>
 		<script src="js/View/TemplateElements/TitleElement.js"></script>
 		<script src="js/View/TemplateElements/ImageElement.js"></script>
+		<script src="js/View/TemplateElements/SocialLinksElement.js"></script>
+		
 		<script src="js/View/TemplateHolder.js"></script>
 		<script src="js/View/PropertyToolbar.js"></script>
 		<script src="js/DragNDrop.js"></script>
-		
 	</head>
 	<body>
 		<div id="templates"></div>
@@ -102,10 +109,8 @@
 						<div role="tabpanel" class="tab-pane active" id="propertyBody">
 						  	<div id="titleBody">
 								<textarea name="titleText" id="titleText"> </textarea>
-								
 							</div>
 							<div id="imageBody">
-								
 								<input id="imageUploadBtn" type="file" class="custom-file-input file-loading" id="imageUploadBtn">
 								<img id="imagePreview" class="imagePreview" src="">
 								<div class="">
@@ -118,13 +123,84 @@
 									</div>
 								</div>
 							</div>
-							
-					  	</div>
+							<div id="socialLinksBody">
+								<div id="facebookLinkDiv" class="shareLinkType">
+									<input type="checkbox" id="useFacebookLink" checked>Facebook Page URL
+									<p><input type="text" class="form-control" id="facebookPageUrl" value="http://www.facebook.com"></p>
+									<p>Link Text</p>
+									<p><input type="text" class="form-control" id="facebookLinkText" value="facebook"></p>
+									<hr/>
+								</div>
+								<div id="linkedInLinkDiv" class="shareLinkType">
+									<input type="checkbox" id="useLinkedInLink" checked>LinkedIn Profile URL
+									<p><input type="text" class="form-control" id="linkedInPageUrl" value="http://www.linkedIn.com"></p>
+									<p>Link Text</p>
+									<p><input type="text" class="form-control" id="linkedInLinkText" value="LinkedIn"></p>
+									<hr/>
+								</div>
+								<div id="googlePlusLinkDiv" class="shareLinkType">
+									<input type="checkbox" id="useGooglePlusLink" checked>Google Plus Profile URL
+									<p><input type="text" class="form-control" id="googlePlusPageUrl" value="http://plus.google.com/"></p>
+									<p>Link Text</p>
+									<p><input type="text" class="form-control" id="googlePlusLinkText" value="Google Plus"></p>
+									<hr/>
+								</div>
+								<div id="youTubeLinkDiv" class="shareLinkType">
+									<input type="checkbox" id="useYouTubeLink" checked>YouTube Channel URL
+									<p><input type="text" class="form-control" id="youTubePageUrl" value="http://www.youTube.com"></p>
+									<p>Link Text</p>
+									<p><input type="text" class="form-control" id="youTubeLinkText" value="YouTube"></p>
+									<hr/>
+								</div>
+								<div id="mailLinkDiv" class="shareLinkType">
+									<input type="checkbox" id="usEmailLink" checked>Email Address
+									<p><input type="email" class="form-control" id="mailPageUrl" value="your@email.com"></p>
+									<p>Link Text</p>
+									<p><input type="text" class="form-control" id="mailLinkText" value="Email"></p>
+									<hr/>
+								</div>
+							</div>
+						</div>
 						<div role="tabpanel" class="tab-pane" id="styletab">
+							<div class="styleHeader" id="ContainerTypeHeader">
+								Container
+							</div>
+							<div class="styleBody" id="containerSettings">
+								<div id="borderParent">
+									<div> Border </div>
+									<div style="width:100px;display: inline-block;">
+										<div class="bfh-selectbox" data-name="selectbox1" id="borderStyle">
+											<div data-value="none">
+												<span class="border-style none">None</span>
+											</div>
+											<div data-value="solid">
+												<span class="border-style solid">Solid</span>
+											</div>
+											<div data-value="dashed">
+												<span class="border-style dashed">Dashed</span>
+											</div>
+											<div data-value="dotted">
+												<span class="border-style dotted">Dotted</span>
+											</div>
+											<div data-value="double">
+												<span class="border-style double">Double</span>
+											</div>
+											<div data-value="groove">
+												<span class="border-style groove">Groove</span>
+											</div>
+											<div data-value="ridge">
+												<span class="border-style ridge">Dashed</span>
+											</div>
+										</div>
+									</div>
+									<div style="width:50px;display: inline-block;vertical-align: top;"><input type="text" class="form-control" id="borderSize" value="1px"></div>
+									<div class="bfh-colorpicker" data-name="colorpicker1" id="borderColor"></div>
+								</div>
+							</div>
 							<div class="styleHeader" id="StyleTypeHeader">
 								Type
 							</div>
-							<div id="styleType">
+							<div class="styleBody" id="styleType">
 								<div id="textColorParent">
 									<div> Text Color </div>
 									<div style="width:150px">

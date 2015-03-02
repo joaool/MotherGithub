@@ -73,3 +73,54 @@ width: 80px;
 div#move {
     cursor: move;
 }
+
+icon socialLink {
+	max-width: 48px;
+}
+
+img.icon.socialLink {
+    max-width: 32px;
+    vertical-align: middle;
+    margin: 5px;
+    /* border-radius: 34%; */
+}
+
+div#SocialLinks1 {
+    line-height: 50px;
+}
+
+div#socialLinksBody > div {
+    text-align: left;
+    margin-left: 10px;
+    margin-right: 10px;
+}
+
+.shareLinkType > input[type=checkbox] {
+    margin: 5px;
+    margin-top: 10px;
+    /* margin-bottom: 10px; */
+}
+
+#socialLinksBody > div > p {
+    margin-top: 6px;
+    margin-bottom: 0px;
+}
+
+bfh-selectbox-options Ãƒâ€šÃ‚Â border-style:after {
+    border-top: 6px solid #B7B7B7;  
+    top: 19px;
+    content: "";  position: absolute;  
+    /* top: 0; */  
+    left: 80px;  right: 0;  text-align: right;
+}
+
+.share {
+    width: 60px;
+    display: inline-block;
+    font-size: 11px;
+    vertical-align: middle;
+}
+
+input[type="button"] {
+    margin: 5px;
+}

@@ -1,7 +1,7 @@
 <script type="text/template" id="title">
 <li id="titleTemplateItem" class="draggable ui-state-default" type="title">
 	<a href="javascript:void(0)" class ="grow">
-		<img src="./mailer/images/img_Text.png" class="img-rounded" alt = ""/>
+		<img src="images/img_Text.png" class="img-rounded" alt = ""/>
 	</a>
 </li>
 </script>
@@ -9,50 +9,50 @@
 <script type="text/template" id="image">
 <li id="imageTemplateItem" class="draggable ui-state-default" type="image">
 	<a href="javascript:void(0)" class ="grow">
-			<img src="./mailer/images/img_Image.png" class="img-rounded" alt = ""/>
+			<img src="images/img_Image.png" class="img-rounded" alt = ""/>
 	</a>
 </li>
 </script>
 <script type="text/template" id="TextPlusImage">
 <li id="TextPlusImageTemplateItem" class="draggable ui-state-default" type="TextPlusImage">
 	<a href="javascript:void(0)" class ="grow" >
-			<img src="./mailer/images/img_TextPlusImage.png" class="img-rounded" alt = ""/>
+			<img src="images/img_TextPlusImage.png" class="img-rounded" alt = ""/>
 	</a>
 </li>
 </script><script type="text/template" id="ImageCard">
 <li id="ImageCardTemplateItem" class="draggable ui-state-default" type="ImageCard">
 	<a href="javascript:void(0)" class ="grow">
-			<img src="./mailer/images/img_ImageCard.png" class="img-rounded" alt = ""/>
+			<img src="images/img_ImageCard.png" class="img-rounded" alt = ""/>
 	</a>
 </li>
 </script><script type="text/template" id="Divider">
 <li id="DividerTemplateItem" class="draggable ui-state-default" type="Divider">
 	<a href="javascript:void(0)" class ="grow">
-			<img src="./mailer/images/img_Divider.png" class="img-rounded" alt = ""/>
+			<img src="images/img_Divider.png" class="img-rounded" alt = ""/>
 	</a>
 </li>
 </script><script type="text/template" id="Gallery">
 <li id="GalleryTemplateItem" class="draggable ui-state-default" type="Gallery">
 	<a href="javascript:void(0)" class ="grow">
-			<img src="./mailer/images/img_Gallery.png" class="img-rounded" alt = ""/>
+			<img src="images/img_Gallery.png" class="img-rounded" alt = ""/>
 	</a>
 </li>
 </script><script type="text/template" id="Button">
 <li id="ButtonTemplateItem" class="draggable ui-state-default" type="Button">
 	<a href="javascript:void(0)" class ="grow">
-			<img src="./mailer/images/img_Button.png" class="img-rounded" alt = ""/>
+			<img src="images/img_Button.png" class="img-rounded" alt = ""/>
 	</a>
 </li>
 </script><script type="text/template" id="Video">
 <li id="VideoTemplateItem" class="draggable ui-state-default" type="Video">
 	<a href="javascript:void(0)" class ="grow">
-			<img src="./mailer/images/img_Video.png" class="img-rounded" alt = ""/>
+			<img src="images/img_Video.png" class="img-rounded" alt = ""/>
 	</a>
 </li>
 </script><script type="text/template" id="SocialLinks">
 <li id="SocialLinksTemplateItem" class="draggable ui-state-default" type="SocialLinks">
 	<a href="javascript:void(0)" class ="grow">
-			<img src="./mailer/images/img_SocialLink.png" class="img-rounded" alt = ""/>
+			<img src="images/img_SocialLink.png" class="img-rounded" alt = ""/>
 	</a>
 </li>
 </script>
@@ -67,7 +67,7 @@
 	<div id="titleTemplateItem0" class="imageDroppedItem droppedObject ui-state-default" type="image"> 
 		<a id="imageLink" href="#" target="_blank">
 			<div> 
-				<img class="" src="./mailer/images/empty_image-72.png">
+				<img class="" src="images/empty_image-72.png">
 				<div id="previewBlock"><button type="button" class="btn btn-default">Browse an Image</button></div>
 			</div>
 		</a>
@@ -117,11 +117,27 @@
 
 <script type="text/template" id="SocialLinksDroppedItem">
 	<div id="SocialLinksTemplateItem0" class="SocialLinksDroppedItem droppedObject ui-state-default" type="SocialLinks"> 
-		<p > 
-			<a href="https://twitter.com/login"><img src='../MailerTemplate/images/Twitter.png' alt='Twitter' /> </a>
-			<img src='images/Twitter.png' alt='Twitter'/>  
-			<img src='images/Twitter.png' alt='Twitter'/>  
-			<img src='images/Twitter.png' alt='Twitter'/>  
+		<p> 
+			<div id="shareFacebook" class="share">
+				<img src='./images/facebook.png' alt='Facebook' class="icon socialLink"/>
+				<div id="facebookText">Facebook</div>
+			</div>
+			<div id="shareLinkedIn" class="share">
+				<img src='./images/linkedin.png' alt='LinkedIn' class="icon socialLink" style="max-width: 38px;"/>
+				<div id="linkedInText">LinkedIn</div>
+			</div>
+			<div id="shareGooglePlus" class="share">
+				<img src='./images/google+.png' alt='GooglePlus'class="icon socialLink"/>
+				<div id="googlePlusText">Google Plus </div>
+			</div>
+			<div id="shareYoutube" class="share">
+				<img src='./images/youtube.png' alt='YouTube'class="icon socialLink"/>
+				<div id="youTubeText">YouTube </div>
+			</div>
+			<div id="shareMail" class="share">
+				<img src='./images/gmail.png' alt='mail'class="icon socialLink"/>
+				<div id="mailLinkText">Mail </div>
+			</div>
 		</p> 
 	</div>
 </script>

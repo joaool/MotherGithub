@@ -12,8 +12,8 @@ window.MailerTemplate = {
 		DIVIDER : "Divider",
 		GALLERY : "Gallery",
 		BUTTON : "Button",
-		VIDEO : "Video",
-		SOCIALLINKS : "SocialLinks"*/
+		VIDEO : "Video",*/
+		SOCIALLINKS : "SocialLinks"
 	},
 	Templates : [ 
 			"title",
@@ -23,8 +23,8 @@ window.MailerTemplate = {
 			"Divider",
 			"Gallery",
 			"Button",
-			"Video",
-			"SocialLinks"*/
+			"Video",*/
+			"SocialLinks"
 		 ],
 	DesignTemplate : [
 		"background",
@@ -47,6 +47,10 @@ window.MailerTemplate = {
 		imageAlign : "center",
 		imageMargin : "0px",
 		imagePadding : "10px",
+		backgroundColor : "white",
+		borderSize : "1px",
+		borderStyle : "none",
+		borderColor : "transparent"
 	},
 	CssStyleConnector : {
 		fontColor : "color",
@@ -57,6 +61,17 @@ window.MailerTemplate = {
 		textAlign : "text-align",
 		imageAlign : "align",
 		imageMargin : "margin",
-		imagePadding : "padding"
+		imagePadding : "padding",
+		backgroundColor : "background-color",
+		borderSize : "border-size",
+		borderStyle : "border-top-style",
+		borderColor : "border-color"
+	},
+	SocialLinks : {
+		facebook : "facebook",
+		linkedIn : "linkedIn",
+		twitter : "twitter",
+		youTube : "youtube"
 	}
 }
+

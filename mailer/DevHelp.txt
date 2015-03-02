@@ -1,0 +1,11 @@
+To a new Element to Mailer Template
+	0. Add TemplateItem handle bar in HBTemplate.html
+	1. Add TemplateItemModel in js/Models/
+	2. Add TemplateItemElement in js/View/
+	3. Add TemplateItemPropertyPanel in js/View/PropertyPanel/
+	4. Include these files in index.html
+	5. Add propertyToolbar div in  <!--Tab panes -->
+	6. Create TemplateItemToolbar object in propertyPanel.js
+	7. Add TEmplateItemElement and TemplateITemModel case in Templateholder.js
+	6. Add Style Properties in html
+	7. Add objects in styleTab.js

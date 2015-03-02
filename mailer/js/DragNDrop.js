@@ -1,22 +1,14 @@
 DragNDrop = function(){
+	
+}
 
-};
-// window.onbeforeunload = function (e) {//works for close tab - and for close browser because:
-// 	e = e || window.event;
-// 	if (e) {
-// 		console.log("zzz disconnect here");
-// 		// FL.server.disconnect();
-// 		e.returnValue = 'test returnValue...';
-// 	}
-// 	return 'You are exiting FrameLink newsletterpage editor...';
-// };
 DragNDrop.getInstance = function(){
 	if (!this.oDragNDrop)
 	{
 		this.oDragNDrop = new DragNDrop();
 	}
 	return this.oDragNDrop;
-};
+}
 
 DragNDrop.prototype = {
 	draggableSelectors : [],

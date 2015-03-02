@@ -1,20 +1,16 @@
-MailerTemplate.Models.Image = Backbone.Model.extend({
-	m_ImageSource : null,
+MailerTemplate.Models.SocialLinks = Backbone.Model.extend({
+	m_lstSocialLinksUsed : [],
 	m_styleProperty : null,
-	m_Link : null,
+	m_lstLinkData : [],
 	
 	initialize : function(){
-		this.setSource("images/empty_image-72.png");
+		this.m_lstSocialLinks = [];
+		var temp =this;
+		$.each($(MailerTemplate.SocialLinks), function(i, item){
+			temp.m_lstSocialLinksUsed.push(item);
+		});
 		this.setDefaultStyleProperties();
-		this.set({type:MailerTemplate.TemplateItems.IMAGE});
-	},
-	setSource : function(source){
-		this.m_ImageSource = source;
-		this.set({source:this.m_ImageSource});
-		this.trigger(MailerTemplate.Models.Image.IMAGE_CHANGE,this.m_ImageSource);
-	},
-	getSource : function(){
-		return this.m_ImageSource;
+		this.set({type:MailerTemplate.TemplateItems.SOCIALLINKS});
 	},
 	setDefaultStyleProperties : function(){
 		this.m_styleProperty = {};
@@ -42,14 +38,6 @@ MailerTemplate.Models.Image = Backbone.Model.extend({
 		this.set({style:this.m_styleProperty});
 		this.trigger(MailerTemplate.Models.Image.STYLE_OBJ_CHANGE,this.m_styleProperty);
 	},
-	setLink : function(link){
-		this.m_Link = link;
-		this.set({link:this.m_Link});
-		this.trigger(MailerTemplate.Models.Image.LINK_CHANGE,this.m_Link);
-	},
-	getLink : function(){
-		return this.m_Link;
-	},
 	CloneModel : function(){
 		var newModel = new MailerTemplate.Models.Image();
 		newModel.setSource(this.m_ImageSource);
@@ -57,13 +45,28 @@ MailerTemplate.Models.Image = Backbone.Model.extend({
 		newModel.setLink(this.m_Link);
 		return newModel;
 	},
+	toJson : function(){
+		// TODO : generate JSON;
+	},
 	fromJson : function(json){
 		this.setSource(json.source);
 		this.setStyleObject(json.style);
 		this.setLink(json.link);
+	},
+	EnableLink : function(type){
+		this.m_lstSocialLinksUsed.push(type);
+		this.trigger(MailerTemplate.Models.Image.ENABLE_LINK,type);
+	},
+	DisableLink : function(type){
+		this.m_lstSocialLinksUsed.remove(type);
+		this.trigger(MailerTemplate.Models.Image.DISABLE_LINK,type);
+	},
+	setLinkUrl : function(type,url){
+		m_lstLinkData[type].url = url;
+	},
+	setLinkText : function(type,text){
+		m_lstLinkData[type].text = text;
 	}
 });
-MailerTemplate.Models.Image.IMAGE_CHANGE = "imageChange";
-MailerTemplate.Models.Image.PROPERTY_CHANGE = "propertychange";
-MailerTemplate.Models.Image.STYLE_OBJ_CHANGE = "styleObjchange";
-MailerTemplate.Models.Image.LINK_CHANGE = "imageLink";
+MailerTemplate.Models.Image.ENABLE_LINK = "enableLink";
+MailerTemplate.Models.Image.DISABLE_LINK = "disableLink";

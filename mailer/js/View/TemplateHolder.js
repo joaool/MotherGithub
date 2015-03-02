@@ -160,6 +160,9 @@ MailerTemplate.Views.TemplateHolder = Backbone.View.extend({
 			case MailerTemplate.TemplateItems.IMAGE:
 				return new MailerTemplate.Models.Image();
 				break;
+			case MailerTemplate.TemplateItems.SOCIALLINKS:
+				return new MailerTemplate.Models.SocialLinks();
+				break;
 		}
 	},
 	getTemplateObject : function(type,id){
@@ -171,6 +174,9 @@ MailerTemplate.Views.TemplateHolder = Backbone.View.extend({
 				break;
 			case MailerTemplate.TemplateItems.IMAGE:
 				return new MailerTemplate.Views.Image({el : "#"+id});
+				break;
+			case MailerTemplate.TemplateItems.SOCIALLINKS:
+				return new MailerTemplate.Views.SocialLinks({el : "#"+id});
 				break;
 		}
 	},
