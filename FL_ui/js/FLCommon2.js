@@ -91,15 +91,55 @@ FL["common"] = (function(){//name space FL.common
 		});
 		// $("#styleSet li a").click(function(){
 		$( "#" + options.boxId + " li a").click(function(){
+            var detailLine = -1; //assumes master
+            var detailLineStr = FL.common.stringAfterLast(options.boxId,"__f");//"_dictEditEntityTemplate__f4_userType_options"
+            if(detailLineStr){
+                detailLineStr = FL.common.stringBeforeFirst(detailLineStr,"_");//"4_userType_options" =>"4"
+                detailLine = parseInt(detailLineStr,10)-1;//to convert to base 0
+            }
 			var selText = $(this).text();
 			var list = $( "#" + options.boxId + " li a");
 			var index = list.index(this);
 			var elObj = options.boxArr[index];
 			$dropDownSelect.parents('.btn-group').find('.dropdown-toggle').html(selText+' <span class="caret"></span>');
 			// onSelection(selText);//runs the callback function
-			onSelection(elObj);//runs the callback function with the element object as argument
+			onSelection(elObj,detailLine);//runs the callback function with the element object as argument and the detail line (-1 =>master)
 		});
-	};	
+	};
+    var getDialogHTML = function(id,stackLevel,title,htmlIn,options){
+        var modalId = "__FLmodalId_"+id;
+        var zIndexContent = "";
+        if(stackLevel>1) zIndexContent = "z-Index:"+(1000*stackLevel);//place a modal inside a modal
+        var iconHTML = "";
+        if(options.icon) iconHTML = '<i class="glyphicon glyphicon-' + options.icon +'"></i>';
+        var button1HTML = "";
+        if(options.button1) button1HTML = '<a href="#" id="__FLDialog_button1" data-dismiss="modal" class="btn">' + options.button1 + '</a>';
+        var button2HTML = "";
+        if(options.button2) //this button has the parsley validate (like APPLE ->OK at right)
+            button2HTML = '<a href="#" id="__FLDialog_button2" class="btn btn-' + options.type + ' validate">' + options.button2 + '</a>';
+        var before = '<div class="modal fade" id="' +modalId+ '" style="' + zIndexContent + '">' +
+                        '<div class="modal-dialog">' +
+                            '<div class="modal-content">' +
+                                '<div class="modal-header modal-header-' + options.type + '">' +
+                                    '<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>'+
+                                    // '<h3 style="color:white;" class="modal-title">' + title + '</h3>' +
+                                    // '<h3 style="color:white;" class="modal-title"><i class="glyphicon glyphicon-thumbs-up"></i>' + title + '</h3>' +
+                                    '<h3 style="color:white;" class="modal-title">' + iconHTML + title + '</h3>' +
+                                '</div>' +
+                                '<div class="modal-body">';
+         var after =             '</div>' +
+                                    '<div class="modal-footer">' +
+                                        // '<a href="#button1" id="__FLDialog_button1" data-dismiss="modal" class="btn">Close</a>' +
+                                        button1HTML +
+                                         // '<a href="#button2" id="__FLDialog_button2" class="btn btn-primary">Save changes</a>' +
+                                        button2HTML +
+                                    '</div>' +
+                                '</div>' +
+                            '</div>' +
+                        '</div>' +
+                    '</div>';
+         return before + htmlIn + after;
+    };
 	return{
         editMasterDetail: function(id,title,templateName,masterDetailJson,options,editMasterDetailCB) {
 			// returns masterDetailJson with new values collected from modal dialog  with title and templateName - options like makeModa()
@@ -144,13 +184,13 @@ FL["common"] = (function(){//name space FL.common
 				}
 			},masterDetailJson);
         },
-        makeModalInfo: function(message,makeModalInfoCB) {
-            this.makeModal2("Information","<p>"+message+"</p>",{type:"primary",button1:"Ok",button2:null},makeModalInfoCB);//OK
+        makeModalInfo: function(message,makeModalInfoCB,stackLevel) {
+            this.makeModal2("Information","<p>"+message+"</p>",{type:"primary",button1:"Ok",button2:null},makeModalInfoCB,stackLevel);//OK
         },
-        makeModalConfirm: function(message,btn1,btn2,makeModalConfirmCB) {//button 2 is the default
-            this.makeModal2("Confirmation","<p>"+message+"</p>",{type:"primary",button1:btn1,button2:btn2},makeModalConfirmCB);//OK
+        makeModalConfirm: function(message,btn1,btn2,makeModalConfirmCB,stackLevel) {//button 2 is the default
+            this.makeModal2("Confirmation","<p>"+message+"</p>",{type:"primary",button1:btn1,button2:btn2},makeModalConfirmCB,stackLevel);//OK
         },
-		makeModal2: function(title,message,options,makeModalCB) {
+		makeModal2: function(title,message,options,makeModalCB,stackLevel) {
 			// version specific for makeModalInfo and makeModal confirm - does not use parsley
 			// CONDITIONS NECESSARY FOR makeModal() to work:
             //      1 - THE BODY MUST HAVE A DEDICATED SLOT: <div id="_modalDialog"+{id}></div>
@@ -176,42 +216,10 @@ FL["common"] = (function(){//name space FL.common
             // http://www.sitepoint.com/understanding-bootstrap-modals/
 			var $modalDialog = $("#_modalDialog");
 			options = _.extend( {icon:null,type:"success",button1:"Cancel",button2:"Ok"},options);
-            var modalId = "__FLmodalId";
-            var iconHTML = "";
-            if(options.icon){
-                iconHTML = '<i class="glyphicon glyphicon-' + options.icon +'"></i>';
-            }
-            var button1HTML = "";
-            if(options.button1){
-                button1HTML = '<a href="#" id="__FLDialog_button1" data-dismiss="modal" class="btn">' + options.button1 + '</a>';
-            }
-            var button2HTML = "";
-            if(options.button2){//this button has the parsley validate (like APPLE ->OK at right)
-                button2HTML = '<a href="#" id="__FLDialog_button2" class="btn btn-' + options.type + ' validate">' + options.button2 + '</a>';
-            }
-            // var before = '<div class="modal fade" id="myModal">' +
-            var before = '<div class="modal fade" id="' +modalId+ '">' +
-                            '<div class="modal-dialog">' +
-                                '<div class="modal-content">' +
-                                    '<div class="modal-header modal-header-' + options.type + '">' +
-                                        '<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>'+
-                                        // '<h3 style="color:white;" class="modal-title">' + title + '</h3>' +
-                                        // '<h3 style="color:white;" class="modal-title"><i class="glyphicon glyphicon-thumbs-up"></i>' + title + '</h3>' +
-                                        '<h3 style="color:white;" class="modal-title">' + iconHTML + title + '</h3>' +
-                                    '</div>' +
-                                    '<div class="modal-body">';
-            var after =             '</div>' +
-                                        '<div class="modal-footer">' +
-                                            // '<a href="#button1" id="__FLDialog_button1" data-dismiss="modal" class="btn">Close</a>' +
-                                            button1HTML +
-                                             // '<a href="#button2" id="__FLDialog_button2" class="btn btn-primary">Save changes</a>' +
-                                            button2HTML +
-                                        '</div>' +
-                                    '</div>' +
-                                '</div>' +
-                            '</div>' +
-                        '</div>';
-            var fullHTML = before + message + after;
+            if(!stackLevel)
+                stackLevel=0;
+            var modalId = "__FLmodalId_";
+            var fullHTML = getDialogHTML("",stackLevel,title,message,options);
             $modalDialog.empty().append(fullHTML);
             var $modal = $('#' + modalId );
             if(makeModalCB){
@@ -241,7 +249,9 @@ FL["common"] = (function(){//name space FL.common
             $modal.modal('show');//to launch it immediatly when calling makeModal	
 		},
 		makeModal: function(id,title,templateName,options,makeModalCB,dataStructureForSubstitution) {
-			// CONDITIONS NECESSARY FOR makeModal() to work:
+			//id = "A" or "B" followed by an optional number that indicates the stack level. If number=1 is ignored if number =2 z-index=2000
+            //  if number =3 =>z-index=3000   suporting a modal inside a modal
+            //CONDITIONS NECESSARY FOR makeModal() to work:
             //      1 - THE BODY MUST HAVE A DEDICATED SLOT: <div id="_modalDialog"+{id}></div>
             // title - Model window title
             // templateName - normally is a html template defined with  <script id="templateName" type="text/template"> 
@@ -270,7 +280,12 @@ FL["common"] = (function(){//name space FL.common
 			var masterDetailItems = null;
 			if(dataStructureForSubstitution)
 				window.masterDetailItems = dataStructureForSubstitution;//HACK for _.template()
-			var $modalDialog = $("#_modalDialog"+id);
+			var stackLevel = 0; //this is used  to define z-Index allowing to place modals inside modals 0 or 1 => first level          
+            if (id.length>1){
+                stackLevel = parseInt( id.substr(1,1),10 );//"A2" => 2
+                id = id.substr(0,1);
+            }    
+            var $modalDialog = $("#_modalDialog"+id);
 			if($modalDialog.length === 0) {//if it does not exist in DOM -THIS IS NO WORKING...WHY ??? -IT MUST EXIST ALREADY
 				// alert("the id="+ ("#_modalDialog"+id) + " does not exist in DOM !!");
 				//<div id='_modalDialogB'></div> -->
@@ -301,45 +316,8 @@ FL["common"] = (function(){//name space FL.common
 				// form.parsley().validate();
             }
 
-            var iconHTML = "";
-            if(options.icon){
-                iconHTML = '<i class="glyphicon glyphicon-' + options.icon +'"></i>';
-            }
-            var button1HTML = "";
-            if(options.button1){
-                button1HTML = '<a href="#" id="__FLDialog_button1" data-dismiss="modal" class="btn">' + options.button1 + '</a>';
-            }
-            var button2HTML = "";
-            if(options.button2){//this button has the parsley validate (like APPLE ->OK at right)
-                button2HTML = '<a href="#" id="__FLDialog_button2" class="btn btn-' + options.type + ' validate">' + options.button2 + '</a>';
-            }
-            // var before = '<div class="modal fade" id="myModal">' +
-            var before = '<div class="modal fade" id="' +modalId+ '">' +
-                            '<div class="modal-dialog">' +
-                                '<div class="modal-content">' +
-                                    '<div class="modal-header modal-header-' + options.type + '">' +
-                                        '<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>'+
-                                        // '<h3 style="color:white;" class="modal-title">' + title + '</h3>' +
-                                        // '<h3 style="color:white;" class="modal-title"><i class="glyphicon glyphicon-thumbs-up"></i>' + title + '</h3>' +
-                                        '<h3 style="color:white;" class="modal-title">' + iconHTML + title + '</h3>' +
-                                    '</div>' +
-                                    '<div class="modal-body">';
-            var after =             '</div>' +
-                                        '<div class="modal-footer">' +
-                                            // '<a href="#button1" id="__FLDialog_button1" data-dismiss="modal" class="btn">Close</a>' +
-                                            button1HTML +
-                                             // '<a href="#button2" id="__FLDialog_button2" class="btn btn-primary">Save changes</a>' +
-                                            button2HTML +
-                                        '</div>' +
-                                    '</div>' +
-                                '</div>' +
-                            '</div>' +
-                        '</div>';
-            var fullHTML = before + htmlIn + after;
-			// console.log("makeModal="+fullHTML);
-            // var $modalDialog = $("#_modalDialog"+id);
-            // $modalDialog.empty();// "#_modalDialog" is the DOM reserved slot for dialog boxes
-            // $modalDialog.html(fullHTML);           
+            var fullHTML = getDialogHTML(id,stackLevel,title,htmlIn,options);
+
             $modalDialog.empty().append(fullHTML);
             if(options.dropdown){//dropdown is an object with one key per drop down - the key is #id of dropdown on template
                  _.each(options.dropdown, function(value,key){
@@ -726,13 +704,13 @@ FL["common"] = (function(){//name space FL.common
                         is_us= true; // (0.123) or (4,294.00) or (4,294,967.00)
             }        
         },
-        is_oneOfCharsInString: function(str,charList){
+        is_oneOfCharsInString: function(str,charList){//returns true if any of the chars in par2 exists in par1.
             //ex FL.common.is_oneOfCharsInString("anc 1002,3","* ") =>true because space exists in string
             var is = false;
             var targetChar = null;
             var pos = null;
             for(var i=0;i<charList.length;i++){
-                targetChar = str.charAt(i);
+                targetChar = charList.charAt(i);
                 pos = str.indexOf(targetChar);
                 if(pos>=0){
                     is=true;
@@ -743,10 +721,33 @@ FL["common"] = (function(){//name space FL.common
         },
         isNumberSep: function(strNumber,sep){//sep is thousands sep - returns true if string is a valid number with that thousand separator
             var isNumber = false;
+            //case strNumber "1.000,3" with sep="," =>should return false. Without the "special if" it would return true =>1.0002 is valid
+            if(sep==","){ //"Special if for comma" will check if there is one last "," ocurrence, the first dot must comme after the ","
+                var commaPos = strNumber.lastIndexOf(",");
+                if(commaPos>=0){
+                    var dotPos = strNumber.indexOf(".");
+                    if(dotPos>=0){
+                        if(dotPos < commaPos)
+                            return isNumber;                       
+                    }
+                }
+            }
+            if(sep==" "){ //"Special if for space" -> "1 000,3" -> will check if there is one last " " ocurrence, the first dot must comme after the " "
+                var spacePos = strNumber.lastIndexOf(" ");
+                if(spacePos>=0){
+                    if( strNumber.indexOf(".") >= 0 )//if it exist a space the decimal point must be a "," : "1 000.3" => false
+                        return false;
+                    var commaPos = strNumber.indexOf(",");
+                    if(commaPos>=0){
+                        if(commaPos < spacePos) //"1,000 3"
+                            return isNumber;                       
+                    }
+                }
+            }            
             if(sep==".") //.. we need to escape the . because it has the meaning of "an arbitrary character" in a regular expression.mystring.replace(/\./g,' ')
                 sep="\\.";
             var regex = new RegExp(sep+"\\d", "g");//ex for sep="," all ocurrences of ,+digit will be deleted "123,,456,789.01" =>"123,456789.01"
-             // var noSep = strNumber.replace(/,/g, '');
+            // var noSep = strNumber.replace(/,/g, '');
             var noSep = strNumber.replace(regex, '');//(',') 4,294,967,295.00 => 4294967295.00 ok 
                                                      // ('.') 4.294.967.295,00 => 4294967295,00 ok
             if( !isNaN( noSep) ){//4,294,295.00 becomes =>4294295.00
@@ -762,7 +763,7 @@ FL["common"] = (function(){//name space FL.common
             }  
             return isNumber;
         },
-        getArrNumberFormat: function(arrOfRowValues){//given an array of strings returns id it is a numeber representation and if yes returns the format
+        getArrNumberFormat: function(arrOfRowValues){//given an array of strings returns id it is a number representation and if yes returns the format
             //Possible formats : us,de,fr 
             //returns {number:false, format:null} or {number:true, format:"us"} or (if all integers){number:true, format:null}
             //4,294,967,295.00  US-English, Thai, 
@@ -782,22 +783,21 @@ FL["common"] = (function(){//name space FL.common
                         is_de = thiz.isNumberSep(element,".");//a non empty element that has a "de" format 4.294.967.295,000
                         if(is_de){//is valid as a german format but may be ambiguous. If it has a comma is not ambiguous otherwise it is ambiguous
                             xRet = {"number":true,"format":null};
-                            decimalPos = element.lastIndexOf(",");
-                            if(decimalPos>=0)
+                            if( thiz.is_oneOfCharsInString( element,",.") )
                                 xRet = {"number":true,"format":"de"};
                         }else{
                             is_fr = thiz.isNumberSep(element," ");//a non empty element that has "fr" format 4 294 967 295,000
                             if(is_fr){
                                 xRet = {"number":true,"format":null};
-                                decimalPos = element.lastIndexOf(",");
-                                if(decimalPos>=0)
+                                if( thiz.is_oneOfCharsInString( element," ,") )
+                                // decimalPos = element.lastIndexOf(",");
+                                // if(decimalPos>=0)
                                     xRet = {"number":true,"format":"fr"};
                             }else{
                                 is_us = thiz.isNumberSep(element,",");//a non empty element that has "us" format 4,294,967,295.000
                                 if(is_us){
                                     xRet = {"number":true,"format":null};
-                                    decimalPos = element.lastIndexOf(".");
-                                    if(decimalPos>=0)
+                                    if( thiz.is_oneOfCharsInString( element,",.") )
                                        xRet = {"number":true,"format":"us"};
                                 }else{
                                    xRet = {"number":false,"format":null};
@@ -836,6 +836,40 @@ FL["common"] = (function(){//name space FL.common
                 xRet = {"number":false,"format":null};
             return xRet;
         },
+        localeStringToNumber: function(str,format){//returns number or 0 if is unable to convert
+            // str - str to convert to number
+            // format - us, de or fr -->all other formats return 0
+            //ex:FL.common.localeStringToNumber("1,002.3","us") =>1000.3
+            //ex:FL.common.localeStringToNumber("1.002,3","de") =>1000.3
+            //http://stackoverflow.com/questions/642650/how-to-convert-string-into-float-in-javascript
+            // we will use +(str) to cast str to number. We could use parseFloat("554,20") +540. The difference is that parse float ignores invalid chars after the number while cast returns NaN
+            if(!isNaN(str))
+                return +(str);//always does a cast because str may be a number or a string with a valid number format
+            var n=+(str);//tries a simple conversion
+            if(isNaN(n)){//simple conversion fails
+                var strNoSepThousands = null;
+                var strFinal = null;
+                if( format == "de" ){//european 1.002.003,4 format
+                   strNoSepThousands = str.replace(/\./g, '');
+                   strFinal = strNoSepThousands.replace(',', '.'); 
+                }else if( format == "fr" ){//french 1 002 003,4 format
+                   strNoSepThousands = str.replace(/ /g, '');
+                   strFinal = strNoSepThousands.replace(',', '.'); 
+                }else if( format == "us" ){//us 1,002,003.4 format
+                    strNoSepThousands = str.replace(/,/g, '');
+                    strFinal = strNoSepThousands;
+                }
+                n=+(strFinal);//retries a conversion
+                if(isNaN(n))
+                    n=0;
+            }
+            return n;
+        },
+        convertStringVectorToNumber: function(arr,format) {//given an array of strings and a format converts that string to a number to numeric according to string format
+            return _.map(arr,function(element){ 
+                return FL.common.localeStringToNumber(element,format); 
+            });
+        },      
 		testFunc: function(x) {
 			alert("FL.common.test() -->"+x);
 		}

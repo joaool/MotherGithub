@@ -994,16 +994,17 @@
 				return retArr;
 			},
 			userType: function(attributesElement){//an element of attributesArr produced by csvStore.getAttributesArrNoId() or FL.dd.getArrayOfFields(entityName);//we retrieve all except name="id
-				//given a pair type an typeUI of a local dictionary field, returns the corresponding userType
+				//given a pair type an typeUI of a local dictionary field, returns the corresponding userType - inversion of FL.dd.userType
 				//this method is a centralization of userType attributes. For the user an email is diferent form a textbox or a phone.
 				// for a pair type,typeUI returns a single userType
-				var type = null;
+				var userType = null;
 				if(attributesElement.type == "string"){//type is one of: string, integer, number, boolean, date, or json (Nico's field "M")
-					type = attributesElement.typeUI;
+					var typeUIConverterInsideString = {"textbox":"text","textarea":"textarea","emailbox":"email","email":"email","phonebox":"phone","combobox":"combo list"};
+					userType = typeUIConverterInsideString[attributesElement.typeUI];
 				}else{
-					type = attributesElement.type;
+					userType = attributesElement.type;
 				}
-				return type;
+				return userType;
 			},
 			emptyRow: function(xSingular){//returns an object with keys for every attribute and empty values for each attribute
 				//the name is emprtyRow because it was first used for grid new lines

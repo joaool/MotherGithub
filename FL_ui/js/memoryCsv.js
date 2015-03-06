@@ -60,13 +60,7 @@ window.csvStore = {
         return retArr;
     },
     store: function( arrToStore ) {//arrToStore is an array of objects [{},{},....{}] where id field is mandatory inside {}
-        // var arrOfIds = _.map(arrToStore,function(element){
-        //     return element.id;
-        // });
         // this.csvRows = _.object(arrOfIds,arrToStore); //becomes ->{1:arrToStore[1],2:arrToSAtore[2]....} 
-        // // this.csvRows = arrToStore;
-        // this.numberOfRows = arrOfIds.length;
- 
         this.csvRows = {};
         var arrOfDateAttributes = this.getAttributesOfType("date");
         _.each(arrToStore,function(element,index){//scans each row (an Object)
@@ -75,18 +69,36 @@ window.csvStore = {
             this.csvRows[id] = element;
             
             //code to convert dateInStringFormat (if any) to date in Javascript date format
-            if(arrOfDateAttributes){
+            // if(arrOfDateAttributes){
                 _.each(arrOfDateAttributes, function(elementCol){
                     if(typeof element[elementCol.name] != "date" ){
                         // element[elementCol.name] = new Date(Date.parse(element[elementCol.name]));//old content in string is converted to date
                         element[elementCol.name] = new Date( element[elementCol.name] );//old content in string is converted to date
-                    }    
+                    }
                 });
-            }
+            // }
             //-------------------
 
         },this);//this is necessary to refer to window.csvStore instead of window
         this.numberOfRows = arrToStore.length;
+    },
+    changeRowAttributes: function(changedAttributesArr){//updates the keys of all csvRows according to changedAttributesArr
+        //csvStore.changeAttributes()
+        var arrOfDateAttributes = this.getAttributesOfType("date");
+        var obj = null;
+        _.each(this.csvRows, function(rowObj,key){//scans each row (an Object) {1:{},2:{}...n:{}} - rowObj is the object
+            _.each(changedAttributesArr, function(element){
+                this.csvRows[key][element[1]] = this.csvRows[key][element[0]];//creates a new name key with the content of the old key
+                delete this.csvRows[key][element[0]];
+            },this);
+            var z=32;
+        },this);//this is necessary to refer to window.csvStore instead of window
+    },    
+    getRowsInArrFormat: function(){//retrieves csvRows object ({1:{},2:{}...n:{}}) in a array format [{},{}...{}]
+        var arr =_.map(this.csvRows,function(value,key){//scans each key inside csvRows object
+            return value;
+        });
+        return arr;   
     },
     addOneEmptyRow:function(){//adds one line to csvRrows with empty fields of this.entityName and _id="-1"
         var nextId = this.getNextId();

@@ -704,6 +704,16 @@ $(function () {
     ok(success === false , "FL.common.isNumberSep('abc12', '.') -->'false'" );//41
     success = FL.common.isNumberSep('abc12', ' ');
     ok(success === false , "FL.common.isNumberSep('abc,12', ' ') -->'false'" );//42
+    success = FL.common.isNumberSep('1.000,3', ',');
+    ok(success === false , "FL.common.isNumberSep('1.000,3', ',') -->'false'" );//43
+    success = FL.common.isNumberSep('1,000.3', ',');
+    ok(success === true , "FL.common.isNumberSep('1.000,3', ',') -->'true'" );//44
+    success = FL.common.isNumberSep('1 000.3', ' ');
+    ok(success === false , "FL.common.isNumberSep('1 000.3', ' ') -->'false'" );//45
+    success = FL.common.isNumberSep('1 000,3', ' ');
+    ok(success === true , "FL.common.isNumberSep('1 000,3', ' ') -->'true'" );//46
+    success = FL.common.isNumberSep('1,000 3', ' ');
+    ok(success === false , "FL.common.isNumberSep('1,000 3', ' ') -->'false'" );//47
 
     arrOfRowValues = [
            "4.294.967.295,00",
@@ -713,7 +723,7 @@ $(function () {
            "-27,2 "
     ];
     var xRet = FL.common.getArrNumberFormat(arrOfRowValues);
-    ok(xRet.number === true && xRet.format == "de" , "FL.common.getArrNumberFormat(arrOfRowValues) -->'number:true, format:'de'" );//43
+    ok(xRet.number === true && xRet.format == "de" , "FL.common.getArrNumberFormat(arrOfRowValues) -->'number:true, format:'de'" );//48
     arrOfRowValues = [
            "4.294.967.295,00",
            "1000",
@@ -722,7 +732,7 @@ $(function () {
            "-27,2 "
     ];
     xRet = FL.common.getArrNumberFormat(arrOfRowValues);
-    ok(xRet.number === false && xRet.format === null , "FL.common.getArrNumberFormat(arrOfRowValues) -->'number:false, format:null " );//44
+    ok(xRet.number === false && xRet.format === null , "FL.common.getArrNumberFormat(arrOfRowValues) -->'number:false, format:null " );//49
     arrOfRowValues = [
            "-4294",
            "1000",
@@ -731,21 +741,114 @@ $(function () {
            "-27,2 "
     ];
     xRet = FL.common.getArrNumberFormat(arrOfRowValues);
-    ok(xRet.number === true && xRet.format == "de" , "FL.common.getArrNumberFormat(arrOfRowValues) -->'number:true, format:'de'" );//45
-    // arrOfRowValues = [
-    //        "-4294",
-    //        "1 000 102",
-    //        "1000,3",
-    //        "0,324",
-    //        "-27,2 "
-    // ];
-    // xRet = FL.common.getArrNumberFormat(arrOfRowValues);
-    // ok(xRet.number === true && xRet.format == "fr" , "FL.common.getArrNumberFormat(arrOfRowValues) -->'number:true, format:'fr'" );//45
+    ok(xRet.number === true && xRet.format == "de" , "FL.common.getArrNumberFormat(arrOfRowValues) -->'number:true, format:'de'" );//50
+    arrOfRowValues = [
+           "-4294",
+           "1 000 102",
+           "1000,3",
+           "0,324",
+           "-27,2"
+    ];
+    xRet = FL.common.getArrNumberFormat(arrOfRowValues);
+    ok(xRet.number === true && xRet.format == "fr" , "FL.common.getArrNumberFormat(arrOfRowValues) -->'number:true, format:'fr'" );//51
+    arrOfRowValues = [
+           "-4294",
+           "1,000,102",
+           "1000,3",//this is Us format (comma is a separator)..it could also be "de" format
+           "0,324",
+           "-27,2"
+    ];
+    xRet = FL.common.getArrNumberFormat(arrOfRowValues);
+    ok(xRet.number === true && xRet.format === "us" , "FL.common.getArrNumberFormat(arrOfRowValues) -->'number:false, format:'us'" );//52
+    arrOfRowValues = [
+           "-4294",
+           "1,000,102",
+           "1000.3",//this is Us format (comma is a decimal )..it could also be "de" format
+           "0.324",
+           "-27"
+    ];
+    xRet = FL.common.getArrNumberFormat(arrOfRowValues);
+    ok(xRet.number === true && xRet.format == "us", "FL.common.getArrNumberFormat(arrOfRowValues) -->'number:true, format:'us'" );//53
+
+    arrOfRowValues = [
+           "-4294",
+           "1,000,102",//us
+           "1.000,3",
+           "0.324",
+           "-27"
+    ];
+    xRet = FL.common.getArrNumberFormat(arrOfRowValues);
+    ok(xRet.number === false && xRet.format === null, "FL.common.getArrNumberFormat(arrOfRowValues) -->'number:false, format:null" );//54
 
     success = FL.common.is_oneOfCharsInString('abc12', '*1');
-    ok(success === true , "is_oneOfCharsInString('abc12', '*1') -->'true'" );//40
+    ok(success === true , "is_oneOfCharsInString('abc12', '*1') -->'true'" );//55
     success = FL.common.is_oneOfCharsInString('1 102 200', ', ');
-    ok(success === true , "is_oneOfCharsInString('1 102 200', ', ') -->'true'" );//40
+    ok(success === true , "is_oneOfCharsInString('1 102 200', ', ') -->'true'" );//56
+    success = FL.common.is_oneOfCharsInString('1 102 200', '.,');
+    ok(success === false , "is_oneOfCharsInString('1 102 200', '.,') -->'false'" );//57
+
+    success = FL.common.localeStringToNumber('1,002,003.4', 'us');
+    ok(success === 1002003.4 , "localeStringToNumber('1,002,003.4', 'us') -->1002003.4" );//58
+    success = FL.common.localeStringToNumber('1.002.003,4', 'de');
+    ok(success === 1002003.4 , "localeStringToNumber('1.002.003,4', 'de') -->1002003.4" );//59    
+    success = FL.common.localeStringToNumber('1 002 003,4', 'fr');
+    ok(success === 1002003.4 , "localeStringToNumber('1 002 003 4', 'fr') -->1002003.4" );//60  
+    success = FL.common.localeStringToNumber('1.002.003', 'de');
+    ok(success === 1002003 , "localeStringToNumber('1.002.003', 'de') -->1002003" );//61  
+    success = FL.common.localeStringToNumber('1 002 003', 'fr');
+    ok(success === 1002003 , "localeStringToNumber('1 002 003', 'fr') -->1002003" );//62 
+    success = FL.common.localeStringToNumber('-1 002 003,4', 'fr');
+    ok(success === -1002003.4 , "localeStringToNumber('-1 002 003,4', 'fr') -->1002003.4" );//63
+    //extreme values
+    success = FL.common.localeStringToNumber(3.8, 'us');
+    ok(success === 3.8, "localeStringToNumber(3.8, 'us') -->3.8" );//64
+    success = FL.common.localeStringToNumber('3.8', 'xx');
+    ok(success === 3.8, "localeStringToNumber('3.8', 'xx') -->3.8" );//65
+    success = FL.common.localeStringToNumber('3,8', 'xx');
+    ok(success === 0, "localeStringToNumber('3,8', 'xx') -->0" );//66
+    success = FL.common.localeStringToNumber('3.8,23.3', 'us');
+    ok(success === 0, "localeStringToNumber('3.8,23.3', 'us')) -->0" );//67
+
+    arrOfRowValues = [
+           "-4294",
+           "1,000,102",//us
+           "1.000,3",
+           "0.324",//is already in a valid format
+           "-27"
+    ];
+    success = FL.common.convertStringVectorToNumber(arrOfRowValues, 'de');
+    var okResult = [-4294,0,1000.3,0.324,-27];
+    ok(JSON.stringify(success) === JSON.stringify(okResult), "convertStringVectorToNumber(arrOfRowValues, 'de') -->ok" );//68
+
+    arrOfRowValues = [
+           "-4294",
+           "1 000 102",
+           "1 000,3",
+           "0,324",
+           "-27"
+    ];
+    success = FL.common.convertStringVectorToNumber(arrOfRowValues, 'fr');
+    okResult = [-4294,1000102,1000.3,0.324,-27];
+    
+    ok(JSON.stringify(success) === JSON.stringify(okResult), "convertStringVectorToNumber(arrOfRowValues, 'fr') -->ok for format mismatch" );//69
+ 
+    success = FL.common.convertStringVectorToNumber(arrOfRowValues, 'de');
+    okResult = [-4294,0,0,0.324,-27];
+    ok(JSON.stringify(success) === JSON.stringify(okResult), "convertStringVectorToNumber(arrOfRowValues, 'de') -->ok for format mismatch" );//70
+
+    success = FL.common.convertStringVectorToNumber(arrOfRowValues, 'us');
+    okResult = [-4294,0,0,324,-27];
+    ok(JSON.stringify(success) === JSON.stringify(okResult), "convertStringVectorToNumber(arrOfRowValues, 'us') -->ok for format mismatch" );//71
+    arrOfRowValues = [
+           "-4294",
+           "1.a00.102",
+           "1.000,3",
+           "0,324",
+           "-27"
+    ];
+    success = FL.common.convertStringVectorToNumber(arrOfRowValues, 'de');
+    okResult = [-4294,0,1000.3,0.324,-27];
+    ok(JSON.stringify(success) === JSON.stringify(okResult), "convertStringVectorToNumber(arrOfRowValues, 'de') -->ok for 'a' among numbers" );//72
 
 
 
@@ -944,7 +1047,7 @@ $(function () {
       {shipped:false,product:"Super 3"},
       {shipped:true,product:"Super 4"}
     ];
-    utils.csvToStore(rowsArr);//id is injected here...
+    FL.grid.csvToStore(rowsArr);//id is injected here...
     console.log("---->csvStore.csvRows="+JSON.stringify(csvStore.csvRows));
 
     var obj = FL.server.preparePutRowFromCsvStoreById("order",1);
@@ -1017,7 +1120,7 @@ $(function () {
       {shipped:false,product:"Super 3"},
       {shipped:true,product:"Super 4"}
     ];
-    utils.csvToStore(rowsArr);// store in csvStore() after converting keys to lowercase and injecting ids
+    FL.grid.csvToStore(rowsArr);// store in csvStore() after converting keys to lowercase and injecting ids
     //--------------------------------------------------------------------------
     //Test 1 - Extract a single id from csvStore.csvRows and prepare it to be added to server
     // extract from format: {"1":{"shipped":true,"product":"Super 1","id":1},"2":{"shipped":false,"product":"Super 2"}}
