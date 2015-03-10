@@ -466,7 +466,7 @@ window.utils = {
                  });
                 column["label"] = element.label;
                 column["cell"] = MySelectCell;
-            }else if(element.type=="string" && element.typeUI=="email"){
+            }else if(element.type=="string" && (element.typeUI=="email" || element.typeUI=="emailbox") ){
                 column["label"] = element.label;
                 column["cell"] = EmailCell;
             }else{

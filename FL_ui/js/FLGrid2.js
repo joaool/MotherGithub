@@ -124,18 +124,6 @@
 			});
 			return attributesArr;
 		};
-		var translateColToAnalysisFormat = function(arrOfColumns){//translates arrOfAttributes format to dd format
-			// arrOfColumns  - array of objects in dd format [{name:"address",description:"address to send invoices",label:"Address",type:"string",typeUI:"textbox",enumerable:null,key:false},{}..];
-			// returns analysis format [attributeName1:{fieldType":"string","fieldTypeUI":"textbox","numberFormat":null, enumerable:null,label:element},attributeName2:{..}]
-			var analysisArr = [];
-			var attrName = null;
-			_.each(arrOfColumns, function(element,index){
-				var elObj={};
-				elObj[element.name] = {"fieldType": element.type, "fieldTypeUI": element.typeUI,"numberFormat": null,"enumerable": null, "label":  element.label};
-				analysisArr.push(elObj);
-			});
-			return analysisArr;
-		};		
 		// var createAttributesArrFromCsvAnalisys = function(rows){//creates the equivalent to a dd entry from a set of rows
 		var adjustRowsToAttributes = function(rows,arrOfAttributes){//creates the equivalent to a dd entry from a set of rows
 			// rows - an array of objects format [{"colum1Name":col11,"colum2Name":col12,..},{"colum1Name":col21,"colum2Name":col22,..}...{}]
@@ -258,9 +246,6 @@
 						alert("Create Grid canceled");
 					}
 				});
-			},
-			translateColToAnalysisFormat: function(arrOfColumns){//translates arrOfAttributes format to dd format
-				return translateColToAnalysisFormat(arrOfColumns);
 			},
 			adjustRowsToAttributes: function(rows,arrOfAttributes){
 				adjustRowsToAttributes(rows,arrOfAttributes);
