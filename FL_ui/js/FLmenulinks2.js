@@ -214,10 +214,13 @@
 			// FL.common.makeModalInfo("Edit " + entityName + " x To be implemented soon");
 			$("#_editGrid").empty();
 			$("#_modalDialogB").empty();
+
+
+
 			var singular  = entityName;
 			var description = FL.dd.getEntityBySingular(entityName).description;
 			var attributesArrNoId = csvStore.getAttributesArrNoId();//we retrieve all except name="id"
-			var detailItems = utils.buildMasterDetailStructureFromattributesArr(attributesArrNoId);
+			var detailItems = utils.buildMasterDetailStructureFromAttributesArr(attributesArrNoId);
 			var masterDetailItems = {
 				master:{entityName:singular,entityDescription:description},
 				detailHeader:["#","Attribute","what is it","Statement to validate"],
@@ -230,26 +233,87 @@
 				button1:"Cancel",
 				button2:"Confirm Table Dictionary",
 				detailDropdown:{
-					"type":{
+					"userType":{
 						arr:arrOfObj,//array of types
-						//default:"text", This is included in masterDetailItems.detail for mandatory key "default"
-						onSelect:function(objSelected){
-		            		selectedType = objSelected.text;
-		            		alert("The selection was "+selectedType);
-		            	}	
+						onSelect:function(objSelected,line){
+							var selectedType = objSelected.text;
+							//we need to get the current attribute name from the DOM because it could have been changed
+							var oldAttribute = masterDetailItems.detail[line].attribute;
+							var currentAttribute = $("#_dictEditEntityTemplate__f"+(line+1)+"_attribute").val();//"_dictEditEntityTemplate__f4_userType_options"
+							// var title = " Define possible values for "+masterDetailItems.detail[line].attribute;
+							var title = " Define possible values for "+currentAttribute;
+							var enumArr = csvStore.getEnumerableFromAttribute(oldAttribute);
+							var enumStr = "";
+							if(enumArr)
+								enumStr = enumArr.join(",");
+							var masterDetailListItems = { master:{list:enumStr} };
+							var enumOptions = {type:"primary", icon:"th-list", button1:"Cancel", button2:"Confirm select list"};
+							if(selectedType == "combo list"){
+								FL.common.editMasterDetail("A2",title,"_getComboList",masterDetailListItems,enumOptions,function(result){
+									if(result){
+										// alert("The list is ->"+masterDetailListItems.master.list);
+										var listOfValuesStr = masterDetailListItems.master.list;
+										csvStore.setEnumerableForAttribute(oldAttribute,listOfValuesStr.split(","));
+									}
+								});
+							}
+							// alert("The selection was "+selectedType);
+						}
 					}
-	          	}
+				}
 			};
 			FL.common.editMasterDetail("B"," Define Table Dictionary","_dictEditEntityTemplate",masterDetailItems,options,function(result){
 				if(result){
 					//We update name and description in csvStore.attributesArr and then use it to create dictionary fields. 
 					var attributesArrNoId = csvStore.getAttributesArrNoId();//we retrieve all except name="id"
-					_.each(attributesArrNoId, function(element,index){
-						element["name"] = masterDetailItems.detail[index].attribute;
-						element["description"] = masterDetailItems.detail[index].description;
-					});
-					var singular = masterDetailItems.master.entityName;
-					var description = masterDetailItems.master.entityDescription;
+					//   ex: {name:"address",description:"address to send invoices",label:"Address",type:"string",typeUI:"textbox",enumerable:null,key:false});		                
+					var changedAttributesArr = [];
+					var changedTypeArr = [];
+					var newAttributesArr = [];
+					_.each(attributesArrNoId, function(element,index){//to retrieve the lines content from the interface
+						var elObj = {};
+						elObj["name"] = masterDetailItems.detail[index].attribute.trim();
+						if(elObj["name"] != attributesArrNoId[index].name)
+							changedAttributesArr.push( [ attributesArrNoId[index].name, elObj["name"] ] );//oldName,newName
+						elObj["description"] = masterDetailItems.detail[index].description.trim();
+						elObj["label"] = masterDetailItems.detail[index].attribute.trim();
+						var userType = masterDetailItems.detail[index].userType.trim();//the item collected in the form combo
+						var userTypeObj = FL.dd.userTypes[userType];//returns type and typeUI corresponding to that serType
+						elObj["type"] = userTypeObj.type;
+						if(elObj["type"] != attributesArrNoId[index].type)
+							changedTypeArr.push( [ attributesArrNoId[index].name, attributesArrNoId[index].type, elObj["type"] ] );//oldName,oldType,newType
+						elObj["typeUI"] = userTypeObj.typeUI;
+						elObj["enumerable"] = csvStore.getEnumerableFromAttribute(attributesArrNoId[index].name);
+						elObj["key"] = false;
+						newAttributesArr.push(elObj);
+					},this);
+					var singular = masterDetailItems.master.entityName.trim();//to retrieve the header content from the interface
+					var description = masterDetailItems.master.entityDescription.trim();//to retrieve the header content from the interface
+					
+					
+				// FL.grid.adjustRowsToAttributes(rows,arrOfAttributes);//here we will adjust data.data according with the analisys feedback in newAttributesArr
+					
+					var loseInfo = csvStore.transformStoreTo(newAttributesArr,changedAttributesArr,changedTypeArr);
+					var columnsArrForGrid = utils.backGridColumnsFromArray(newAttributesArr);//uses dictionary format to prepare columns object for backgrid
+
+					FL.common.clearSpaceBelowMenus();
+					$("#addGrid").show();
+					$("#addGrid").html("Add Row");
+					$("#_editGrid").show();
+					$("#_editGrid").html(" Edit Grid");
+
+
+					utils.mountGridInCsvStore(columnsArrForGrid);//mount backbone views and operates grid - columnsArr must be prepared to backGrid
+					if(loseInfo){
+						FL.common.makeModalConfirm("You will lose some information. Do you want to continue ?","No, cancel changes","Yes Please",function(result){
+							if(result){
+								FL.common.makeModalInfo("Now we will save it to server....");
+							}else{
+								FL.common.makeModalInfo("Nothing was saved the original grid is going to be restored....");
+							}
+						});
+					}
+					var z=32;
 				}else{
 					FL.common.makeModalInfo("Nothing was saved.");
 				}
@@ -687,10 +751,10 @@
 					// FL.emailServices.sendEmail(null,mailHTML,imagesArr,toArr,senderObj,"test","test");//2 last param: FL.login.emailTemplateName,FL.login.token.dbName
 					FL.emailServices.sendEmail(mailHTML,imagesArr,toArr,senderObj,metadataObj);
 					// alert("Email test sent to "+senderObj.testEmail);
-					FL.common.makeModalInfo("Test Email sent to "+senderObj.testEmail);
+					FL.common.makeModalInfo("Test Email sent to "+senderObj.testEmail,null,2);
 				}else{
 					// alert("Email content is empty - choose a template and try again ");
-					FL.common.makeModalInfo("Email content is empty - choose a template and try again");
+					FL.common.makeModalInfo("Email content is empty - choose a template and try again",null,2);
 				}
 			}
 		};

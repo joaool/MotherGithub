@@ -237,22 +237,6 @@ window.utils = {
             return(element.toLowerCase());
         });
     },
-    csvToStore:function(rows){//rows is an array of JSON [{},{}...{}]; each JSON  has a key/value = attribute/content
-        //feeds the csvStore (memoryCsv.js)  with rows injecting id column and converting other column names to lower case
-        var csvrows = [];
-        _.each( rows, function( element, index ) {
-            // console.log((index+1)+" ---> "+element[data.fields[0]] + " --- " + element[data.fields[6]]);//shows column 0 and column 6
-            element["id"] = index+1;//to insert id in element...
-            //we need to be sure that each key is lowercase
-            var arrOfPairs = _.pairs(element);//returns an array w/ pairs [["one", 1], ["two", 2], ["three", 3]]
-            arrOfPairs =  _.map( arrOfPairs, function(value) {
-                return [ value[0].toLowerCase(), value[1] ];
-            });
-            var element2 = _.object(arrOfPairs);//reconstruct object from arrOf Pairs
-             csvrows.push(element2);
-        });
-        csvStore.store(csvrows);
-    },
     createEntityFromCsvAnalisys: function(rows){//creates a dd entry from a set of rows
         var entityName = "unNamed";
         //this new entity will be called "unNamed" + <num> - we need to evaluate how many unNamed<#> are already in dd.
@@ -482,7 +466,7 @@ window.utils = {
                  });
                 column["label"] = element.label;
                 column["cell"] = MySelectCell;
-            }else if(element.type=="string" && element.typeUI=="email"){
+            }else if(element.type=="string" && (element.typeUI=="email" || element.typeUI=="emailbox") ){
                 column["label"] = element.label;
                 column["cell"] = EmailCell;
             }else{
@@ -611,12 +595,17 @@ window.utils = {
         $("#paginator").append(paginator.render().$el);
         csvPageableCollection.fetch();
     },
-    buildMasterDetailStructureFromattributesArr: function(attributesArr){
+    buildMasterDetailStructureFromAttributesArr: function(attributesArr){
         var items = [];
         var detailLine = null;
         _.each(attributesArr, function(element,index){
             var userType = FL.dd.userType(element);
-            detailLine = {attribute:element.name, description:element.description, statement: "The " + element.name + " of entity is...",type:userType};
+            detailLine = {
+                attribute:element.name, 
+                description:element.description, 
+                statement: "The " + element.name + " of entity is...",
+                userType:userType
+            };
             items.push(detailLine);
         });
         return items;

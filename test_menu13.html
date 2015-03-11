@@ -482,8 +482,8 @@ mixpanel.init("19ada1cb259cc3272c67085eb1bf03fc");</script><!-- end Mixpanel -->
                                              </tr>
                                               	<td>
  													<div class="btn-group">
-											          <a class="btn btn-default dropdown-toggle" data-toggle="dropdown" style="font-size:14px;font-weight:bold;" id="<%= xId %>_type" href="#"> Type <span class="caret"></span></a>
-											          <ul id="<%= xId %>_type_options" class="dropdown-menu">
+											          <a class="btn btn-default dropdown-toggle" data-toggle="dropdown" style="font-size:14px;font-weight:bold;" id="<%= xId %>_userType" href="#"> Type <span class="caret"></span></a>
+											          <ul id="<%= xId %>_userType_options" class="dropdown-menu">
 															<li><a href="#">templ1</a></li>
 															<li><a href="#">templ2</a></li>
 											          </ul>
@@ -518,6 +518,20 @@ mixpanel.init("19ada1cb259cc3272c67085eb1bf03fc");</script><!-- end Mixpanel -->
 			</form>
 		</div>
 	</script>
+	<script id="_getComboList" type="text/template"> 
+		<div class="getComboList" style="margin-top:0px;">
+			<form id="form__getComboList" novalidate="novalidate">
+				<div class="row">
+					<div class="col-xs-12" >
+						<div class="input-group" style="line-height:0px;">
+							<input type="text" class="form-control" id="_getComboList_list" placeholder="List of values comma separated" value="<%= masterDetailItems.master.list %>" name="list" data-parsley-trigger="change" required >
+							<span class="input-group-addon"><span class="glyphicon glyphicon-th-list"></span></span>
+					    </div>
+				    </div>
+		    	</div>
+			</form>
+		</div>
+	</script>	
 	<script id="getStartedTemplate" type="text/template"> 
 		<div class="getStartedExample" style="margin-top:0px;">
 			<form id="form_getStartedTemplate" novalidate="novalidate">
