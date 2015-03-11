@@ -1,14 +1,18 @@
 MailerTemplate.Models.SocialLinks = Backbone.Model.extend({
 	m_lstSocialLinksUsed : [],
 	m_styleProperty : null,
-	m_lstLinkData : [],
+	m_lstLinkData : {},
 	
 	initialize : function(){
-		this.m_lstSocialLinks = [];
+		this.m_lstSocialLinksUsed = [];
+		this.m_lstLinkData = {};
 		var temp =this;
-		$.each($(MailerTemplate.SocialLinks), function(i, item){
-			temp.m_lstSocialLinksUsed.push(item);
+		$.each(MailerTemplate.SocialLinks, function(i, item){
+			temp.m_lstSocialLinksUsed.push(item.type);
+			var link = {url : item.defaultUrl, text : item.defaultText, enable : true};
+			temp.m_lstLinkData[item.type] = link;
 		});
+		this.setLinkData(this.m_lstLinkData);
 		this.setDefaultStyleProperties();
 		this.set({type:MailerTemplate.TemplateItems.SOCIALLINKS});
 	},
@@ -42,31 +46,70 @@ MailerTemplate.Models.SocialLinks = Backbone.Model.extend({
 		var newModel = new MailerTemplate.Models.Image();
 		newModel.setSource(this.m_ImageSource);
 		newModel.setStyleObject(this.m_styleProperty);
-		newModel.setLink(this.m_Link);
+		$.each(this.m_lstLinkData,function(i,link){
+			var type = link.type;
+			newModel.setLinkUrl(link.url);
+			newModel.setLinkText(link.text);
+			if (this.m_lstLinkData.enable)
+				newModel.EnableLink(type)
+		});
 		return newModel;
 	},
-	toJson : function(){
-		// TODO : generate JSON;
-	},
+	
 	fromJson : function(json){
-		this.setSource(json.source);
 		this.setStyleObject(json.style);
-		this.setLink(json.link);
+		this.setLinkData(json.linksData);
+	},
+	setLinkData : function(linkData){
+		this.m_lstLinkData = linkData;
+		this.set({linksData:this.m_lstLinkData})
+	},
+	getLinkData : function(){
+		return this.m_lstLinkData;	
+	},
+	updateLinkData : function(data){
+		var type = data.type;
+		switch (data.update)
+		{
+			case "enableLink":
+				this.EnableLink(type);
+				break;
+			case "disableLink":
+				this.DisableLink(type);
+				break;
+			case "linkUrl":
+				this.setLinkUrl(type,data.url);
+				break;
+			case "linkText":
+				this.setLinkText(type,data.text);
+				break;
+		}
 	},
 	EnableLink : function(type){
 		this.m_lstSocialLinksUsed.push(type);
-		this.trigger(MailerTemplate.Models.Image.ENABLE_LINK,type);
+		this.trigger(MailerTemplate.Models.SocialLinks.ENABLE_LINK,type);
+		var linkData = this.m_lstLinkData[type];
+		linkData.enable = true;
+		this.set({})
 	},
 	DisableLink : function(type){
 		this.m_lstSocialLinksUsed.remove(type);
-		this.trigger(MailerTemplate.Models.Image.DISABLE_LINK,type);
+		this.trigger(MailerTemplate.Models.SocialLinks.DISABLE_LINK,type);
+		var linkData = this.m_lstLinkData[type];
+		linkData.enable = false;
 	},
 	setLinkUrl : function(type,url){
-		m_lstLinkData[type].url = url;
+		this.m_lstLinkData[type].url = url;
+		this.trigger(MailerTemplate.Models.SocialLinks.UPDATE_URL,{type:type,url:url});
 	},
 	setLinkText : function(type,text){
-		m_lstLinkData[type].text = text;
+		this.m_lstLinkData[type].text = text;
+		this.trigger(MailerTemplate.Models.SocialLinks.UPDATE_TEXT,{type:type,text:text});
 	}
 });
-MailerTemplate.Models.Image.ENABLE_LINK = "enableLink";
-MailerTemplate.Models.Image.DISABLE_LINK = "disableLink";
+MailerTemplate.Models.SocialLinks.PROPERTY_CHANGE = "propertychange";
+MailerTemplate.Models.SocialLinks.STYLE_OBJ_CHANGE = "styleObjchange";
+MailerTemplate.Models.SocialLinks.ENABLE_LINK = "enableLink";
+MailerTemplate.Models.SocialLinks.DISABLE_LINK = "disableLink";
+MailerTemplate.Models.SocialLinks.UPDATE_TEXT = "updateText";
+MailerTemplate.Models.SocialLinks.UPDATE_URL = "updateUrl";

@@ -106,7 +106,7 @@ div#socialLinksBody > div {
     margin-bottom: 0px;
 }
 
-bfh-selectbox-options Ãƒâ€šÃ‚Â border-style:after {
+bfh-selectbox-options ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â border-style:after {
     border-top: 6px solid #B7B7B7;  
     top: 19px;
     content: "";  position: absolute;  
@@ -119,8 +119,13 @@ bfh-selectbox-options Ãƒâ€šÃ‚Â border-style:after {
     display: inline-block;
     font-size: 11px;
     vertical-align: middle;
+    word-break: break-all;
 }
 
 input[type="button"] {
     margin: 5px;
+}
+
+img {
+    /* max-width: 100%; */
 }

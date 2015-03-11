@@ -54,6 +54,9 @@ HtmlGenerator.prototype = {
 			case MailerTemplate.TemplateItems.IMAGE:
 				return new MailerTemplate.Views.Image({el : "#"+id});
 				break;
+			case MailerTemplate.TemplateItems.SOCIALLINKS:
+				return new MailerTemplate.Views.SocialLinks({el : "#"+id});
+				break;
 		}
 	},
 	getTemplateModel : function(type){
@@ -64,6 +67,9 @@ HtmlGenerator.prototype = {
 				break;
 			case MailerTemplate.TemplateItems.IMAGE:
 				return new MailerTemplate.Models.Image();
+				break;
+			case MailerTemplate.TemplateItems.SOCIALLINKS:
+				return new MailerTemplate.Models.SocialLinks();
 				break;
 		}
 	}

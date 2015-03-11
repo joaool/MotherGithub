@@ -7,6 +7,7 @@ html, body {
     height: 100%;
 }
 body * {
+    word-break: break-all;
 }
 
 body {
@@ -80,7 +81,7 @@ button{
 	height: 100%;
 	min-height: 100%;
 	max-height: 100%;
-	overflow-y: scroll;
+	overflow-y: auto;
 }
 
 .sidebar-nav > .sidebar-brand{

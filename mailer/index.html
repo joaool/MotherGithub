@@ -3,7 +3,7 @@
 	<head>
 		<title>Mail Template Editor </title>
 		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-		
+
 		<link rel="stylesheet" type="text/css" href="bootstrap/css/bootstrap.min.css"/>
 		<link rel="stylesheet" type="text/css" href="css/hover-min.css"/>
 		<!-- <link rel="stylesheet" type="text/css" href="bootstrap/css/bootstrap-theme.min.css"/> -->
@@ -11,7 +11,7 @@
 		<link rel="stylesheet" type="text/css" href="css/style.css"/>
 		<link rel="stylesheet" type="text/css" href="css/template-holder.css"/>
   		<link href="js/lib/formpicker/css/bootstrap-formhelpers.min.css" rel="stylesheet" media="screen">
-		
+
 		<script src="js/lib/ckeditor/ckeditor.js"></script>
 		<script src="js/lib/underscore.js"></script>
 		<script src="js/lib/jquery-1.11.0.js"></script>
@@ -21,15 +21,15 @@
 		<script src="bootstrap/js/bootstrap.min.js"></script>
 		<script src="js/lib/formpicker/js/bootstrap-formhelpers.min.js"></script>
 		<script type="text/javascript" src="https://rawgithub.com/powmedia/backbone.bootstrap-modal/master/src/backbone.bootstrap-modal.js"></script>
-				
+
 		<script src="js/bussinesslogic/JsonGenerator.js"></script>
 		<script src="js/Common.js"></script>
 		<script src="js/MailerTemplate.js"></script>
-		
+
 		<script src="js/Model/TitleModel.js"></script>
 		<script src="js/Model/ImageModel.js"></script>
 		<script src="js/Model/SocialLinksModel.js"></script>
-		
+
 		<script src="js/View/BackboneModal.js"></script>
 		<script src="js/View/MainView.js"></script>
 		<script src="js/View/PropertyPanels/StyleTab.js"></script>
@@ -37,17 +37,18 @@
 		<script src="js/View/PropertyPanels/ImagePanel.js"></script>
 		<script src="js/View/PropertyPanels/SocialLinksPanel.js"></script>
 		<script src="js/View/PropertiesPanel.js"></script>
-		
+
 		<script src="js/View/DesignTemplateBody.js"></script>
 		<script src="js/View/DesignTemplateFooter.js"></script>
 		<script src="js/View/DesignTemplatePage.js"></script>
 		<script src="js/View/DesignTemplatePageHeader.js"></script>
-		
+
 		<script src="js/View/TemplateItems.js"></script>
 		<script src="js/View/TemplateElements/TitleElement.js"></script>
 		<script src="js/View/TemplateElements/ImageElement.js"></script>
+		<script src="js/View/PropertyPanels/SocialLink.js"></script>
 		<script src="js/View/TemplateElements/SocialLinksElement.js"></script>
-		
+
 		<script src="js/View/TemplateHolder.js"></script>
 		<script src="js/View/PropertyToolbar.js"></script>
 		<script src="js/DragNDrop.js"></script>
@@ -55,7 +56,7 @@
 	<body>
 		<div id="templates"></div>
 		<div id="wrapper">
-		
+
         <!-- Sidebar -->
         <div id="sidebar-wrapper">
 			<ul  class="ButtonHolder">
@@ -73,7 +74,7 @@
                 <li class="sidebar-brand">
                     <div style="text-align: center;"><h3>Template Items</h3></div>
                 </li>
-                
+
             </ul>
 			<ul id="templateDesign">
 				<li class="sidebar-brand">
@@ -125,38 +126,38 @@
 							</div>
 							<div id="socialLinksBody">
 								<div id="facebookLinkDiv" class="shareLinkType">
-									<input type="checkbox" id="useFacebookLink" checked>Facebook Page URL
-									<p><input type="text" class="form-control" id="facebookPageUrl" value="http://www.facebook.com"></p>
+									<input type="checkbox" id="usefacebookLink" checked>Facebook Page URL
+									<p><input type="text" class="form-control" id="facebookPageUrl" value=""></p>
 									<p>Link Text</p>
-									<p><input type="text" class="form-control" id="facebookLinkText" value="facebook"></p>
+									<p><input type="text" class="form-control" id="facebookLinkText" value=""></p>
 									<hr/>
 								</div>
 								<div id="linkedInLinkDiv" class="shareLinkType">
-									<input type="checkbox" id="useLinkedInLink" checked>LinkedIn Profile URL
-									<p><input type="text" class="form-control" id="linkedInPageUrl" value="http://www.linkedIn.com"></p>
+									<input type="checkbox" id="uselinkedInLink" checked>LinkedIn Profile URL
+									<p><input type="text" class="form-control" id="linkedInPageUrl" value=""></p>
 									<p>Link Text</p>
-									<p><input type="text" class="form-control" id="linkedInLinkText" value="LinkedIn"></p>
+									<p><input type="text" class="form-control" id="linkedInLinkText" value=""></p>
 									<hr/>
 								</div>
 								<div id="googlePlusLinkDiv" class="shareLinkType">
-									<input type="checkbox" id="useGooglePlusLink" checked>Google Plus Profile URL
-									<p><input type="text" class="form-control" id="googlePlusPageUrl" value="http://plus.google.com/"></p>
+									<input type="checkbox" id="usegooglePlusLink" checked>Google Plus Profile URL
+									<p><input type="text" class="form-control" id="googlePlusPageUrl" value=""></p>
 									<p>Link Text</p>
-									<p><input type="text" class="form-control" id="googlePlusLinkText" value="Google Plus"></p>
+									<p><input type="text" class="form-control" id="googlePlusLinkText" value=""></p>
 									<hr/>
 								</div>
 								<div id="youTubeLinkDiv" class="shareLinkType">
-									<input type="checkbox" id="useYouTubeLink" checked>YouTube Channel URL
-									<p><input type="text" class="form-control" id="youTubePageUrl" value="http://www.youTube.com"></p>
+									<input type="checkbox" id="useyouTubeLink" checked>YouTube Channel URL
+									<p><input type="text" class="form-control" id="youTubePageUrl" value=""></p>
 									<p>Link Text</p>
-									<p><input type="text" class="form-control" id="youTubeLinkText" value="YouTube"></p>
+									<p><input type="text" class="form-control" id="youTubeLinkText" value=""></p>
 									<hr/>
 								</div>
 								<div id="mailLinkDiv" class="shareLinkType">
-									<input type="checkbox" id="usEmailLink" checked>Email Address
-									<p><input type="email" class="form-control" id="mailPageUrl" value="your@email.com"></p>
+									<input type="checkbox" id="usemailLink" checked>Email Address
+									<p><input type="email" class="form-control" id="mailPageUrl" value=""></p>
 									<p>Link Text</p>
-									<p><input type="text" class="form-control" id="mailLinkText" value="Email"></p>
+									<p><input type="text" class="form-control" id="mailLinkText" value=""></p>
 									<hr/>
 								</div>
 							</div>
@@ -209,7 +210,7 @@
 								</div>
 								<div id="backgroundColorParent">
 									<div> Background Color </div>
-									<div style="width:150px">	
+									<div style="width:150px">
 										<div class="bfh-colorpicker" data-name="colorpicker1" id="backgroundColor"></div>
 									</div>
 								</div>
@@ -288,9 +289,9 @@
 							</div>
 						</div>
 						<div role="tabpanel" class="tab-pane" id="settingsTab">settings</div>
-						<input type="button" class="btn btn-primary btn-success"  value="Save" id="saveProperties"/> 
+						<input type="button" class="btn btn-primary btn-success"  value="Save" id="saveProperties"/>
 					</div>
-						
+
 					</div>
 				</div>
 			</div>
@@ -304,10 +305,10 @@
                     <div class="col-lg-12">
 						<div>
                         <h1><center>Framelink Mail Editor</center></h1>
-							<div style="position:absolute;top:0px;right:0px">
+							<div style="position:absolute;top:10px;right:0px">
 								<a href="#" class="btn btn-success" id="saveTempalate">Generate Preview</a>
 							</div>
-							<div style="position:absolute;top:0px;left:10px">
+							<div style="position:absolute;top:10px;left:10px">
 								<a href="#" class="btn btn-primary" id="loadTemplate">Load Preview</a>
 							</div>
 						</div>
@@ -315,15 +316,15 @@
 							<div>
 								<div id="templateHolder" class="template_holder">
 									<div id="template_holder_header" class="header sortable droppable" >
-										
+
 									</div>
 									<br/><br/>
 									<div id="template_holder_body" class="template_holder_body sortable droppable">
-										
+
 									</div>
 									<br/><br/>
 									<div id="template_holder_footer" class="footer sortable droppable">
-										
+
 									</div>
 
 
@@ -335,7 +336,7 @@
 											<a id = "edit" href="#" class="btn btn-primary btn-default"><span class="glyphicon glyphicon-pencil"></span> </a>
 											<a id = "copy" href="#" class="btn btn-primary btn-default"><span class="glyphicon glyphicon-copy"></span> </a>
 											<a id="delete" href="#" class="btn btn-primary btn-default"><span class="glyphicon glyphicon-trash"></span> </a>
-										</div>							
+										</div>
 									</div>
 								</div>
 							</div>
@@ -343,11 +344,11 @@
                     </div>
                 </div>
 				<div id='test'>
-				
+
 				</div>
             </div>
         </div>
-		
+
         <!-- /#page-content-wrapper -->
     </div>
 	</body>

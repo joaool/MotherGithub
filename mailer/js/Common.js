@@ -47,7 +47,7 @@ window.MailerTemplate = {
 		imageAlign : "center",
 		imageMargin : "0px",
 		imagePadding : "10px",
-		backgroundColor : "white",
+		backgroundColor : "transparent",
 		borderSize : "1px",
 		borderStyle : "none",
 		borderColor : "transparent"
@@ -67,11 +67,37 @@ window.MailerTemplate = {
 		borderStyle : "border-top-style",
 		borderColor : "border-color"
 	},
-	SocialLinks : {
-		facebook : "facebook",
-		linkedIn : "linkedIn",
-		twitter : "twitter",
-		youTube : "youtube"
-	}
+	SocialLinks : [
+		{
+			type : "facebook",
+			defaultUrl : "http://www.facebook.com",
+			defaultText : "Facebook"
+		},
+		{
+			type : "linkedIn",
+			defaultUrl : "http://www.linkedIn.com",
+			defaultText : "LinkedIn"
+		},
+		{
+			type : "twitter",
+			defaultUrl : "http://www.twitter.com",
+			defaultText : "Twitter"
+		},
+		{	
+			type : "youTube",
+			defaultUrl : "http://www.youtube.com",
+			defaultText : "YouTube"
+		},
+	    {
+			type : "googlePlus",
+			defaultUrl : "http://plus.google.com",
+			defaultText : "Google Plus"
+		},
+	    {
+	    	type : "mail",
+			defaultUrl : "your@email.com",
+			defaultText : "Email"
+	    }
+	]
 }
 
