@@ -49,6 +49,8 @@ mixpanel.init("19ada1cb259cc3272c67085eb1bf03fc");</script><!-- end Mixpanel -->
 
      <link href="FL_ui/css/backgrid.css" rel="stylesheet">    
      <link href="FL_ui/css/backgrid-paginator.css" rel="stylesheet">    
+     <link href="FL_ui/css/backgrid-select-all.min.css" rel="stylesheet">    
+     <link href="FL_ui/css/backgrid-filter.min.css" rel="stylesheet">    
 
 	<!-- <script src="FL_ui/js/bootstrap-tour.min.js"></script> -->
 	<script src="FL_ui/js/bootstrap-tour.js"></script>
@@ -86,6 +88,9 @@ mixpanel.init("19ada1cb259cc3272c67085eb1bf03fc");</script><!-- end Mixpanel -->
 	<script src="FL_ui/js/backbone.paginator.js"></script>
 	<script src="FL_ui/js/backgrid.js"></script>
 	<script src="FL_ui/js/backgrid-paginator.js"></script>
+	<script src="FL_ui/js/backgrid-select-all.min.js"></script>
+	<script src="FL_ui/js/backgrid-filter.min.js"></script>
+
 	<script src="FL_ui/js/moment.js"></script>
 	<script src="FL_ui/js/backgrid-moment-cell.js"></script>
 	<!-- <link rel="stylesheet" href="//code.jquery.com/ui/1.11.3/themes/smoothness/jquery-ui.css"> -->
@@ -860,7 +865,10 @@ mixpanel.init("19ada1cb259cc3272c67085eb1bf03fc");</script><!-- end Mixpanel -->
 					<button id="_newsletter" class="edit btn btn-success glyphicon glyphicon-envelope"></button>
 					<button id="_newsletterMC" class="edit btn btn-success glyphicon glyphicon-envelope"></button>
 					<button id="_editGrid" class="edit btn btn-success glyphicon glyphicon-pencil"></button>
-					<div id="grid"></div>			
+					<button id="_select" class="edit btn btn-default glyphicon glyphicon-ok"></button>
+					<button id="_unSelect" class="edit btn btn-default glyphicon glyphicon-remove"></button>
+					<div id="grid">
+					</div>			
 					<div id="paginator"></div>				
 				</div>
 			</div>

@@ -287,6 +287,7 @@ window.utils = {
         //https://github.com/DJCrossman/backgrid-subgrid-cell
         //http://blog.joshsoftware.com/2011/09/28/filter-js-client-side-search-filtering-using-json-and-jquery/
         //http://techwuppet.com/backgrid_poc_demo/ - resize columns, search
+        //http://stackoverflow.com/questions/17940454/how-to-delete-select-all-and-select-row-in-backgrid-js
         var DeleteCell = Backgrid.Cell.extend({
             template: _.template($("#gridDelButton").html()),
             className: "backgridDelColumn",
@@ -306,7 +307,12 @@ window.utils = {
                 return this;
             }
         });
-        var columns = [{name: "del", label: "Delete", cell: DeleteCell }];
+        // var columns = [{name: "del", label: "Delete", cell: DeleteCell }];
+
+        // var SelectAllHeaderCell = Backgrid.HeaderCell.extend({
+        //     // Implement your "select all" logic here
+        // });
+        var columns = [{name: "del", label: "Delete", cell: DeleteCell },{name:"",cell:"select-row",headerCell: "select-all"}];
         //http://pastie.org/pastes/8312516
         var DialogButtonCell = Backgrid.Cell.extend({
             title: 'Title',
@@ -506,6 +512,15 @@ window.utils = {
         });
         return newRow;
     },
+    prepareColArrForClientSideFilter: function(backgridColumnsArr){
+        var filterFieldsArr = [];
+        _.each(backgridColumnsArr, function(element,index){
+            if(index>2){//skips del, select-all and id columns
+                filterFieldsArr.push(element.name);
+            }
+        });
+        return filterFieldsArr;
+    },
     mountGridInCsvStore: function(columnsArr) {//creates backbone classes and uses them
         // columnsArr is columns definition to mountGrid. 
         //      Format: [{label:"xx",name:fieldName,type:xtype,enumerable:xEnumerable},{col2}...{}]
@@ -560,6 +575,21 @@ window.utils = {
         });
         var csvPageableCollection = new CsvPageableCollection();
 
+        // ClientSideFilter performs a case-insensitive regular
+        // expression search on the client side by OR-ing the keywords in
+        // the search box together.
+        //https://gist.github.com/martindrapeau/9812237
+        var clientSideFilter = new Backgrid.Extension.ClientSideFilter({
+          collection: csvPageableCollection,
+          placeholder: "Search in any column",
+          // The model fields to search for matches
+          // fields: ['Name','birth date','email'],
+          fields: utils.prepareColArrForClientSideFilter(columnsArr),
+          // How long to wait after typing has stopped before searching can start
+          wait: 150,
+        });
+        // $("#client-side-filter-example-result").prepend(clientSideFilter.render().el);
+
         // var z=32;
         var grid = new Backgrid.Grid({
             // row:ClickableRow,
@@ -570,6 +600,10 @@ window.utils = {
         var paginator = new Backgrid.Extension.Paginator({
             // windowSize: 20, // Default is 10
             collection: csvPageableCollection // the collection subclass that supports pagination
+        });
+        csvPageableCollection.on('backgrid:selected', function(model, selected) {
+            console.log("model--->"+model);
+            // $(".backgrid").before("<p style='padding-top:30px;float:right;margin-right:800px'>abcde</p>");
         });
 
         $("#csvcontent").empty();
@@ -590,7 +624,26 @@ window.utils = {
 
             grid.insertRow(csvLine);
         });
+        $("#_select").click(function () {
+            //alert("selection !!!");
+            // var selectedModels = pageableGrid.getSelectedModels();
+            var selectedModels = grid.getSelectedModels();
+                _.each(selectedModels, function (model) {
+                model.destroy();
+            });
+        });    
+        $("#_unSelect").click(function () {
+            alert("Unselection !!!");
+            grid.clearSelectedModels();
+        });
+        // $(clientSideFilter.el).css({float: "right", margin: "20px"});
+        // $('<p style="padding-top:30px;float:right;margin-right:800px">abc</p>').insertBefore(".backgrid");
+        // $(".backgrid").before("<p style='padding-top:30px;float:right;margin-right:800px'>abcde</p>");
+        // $("#_select").insertBefore($(".backgrid"));
+
+        $("#grid").prepend(clientSideFilter.render().el);
         $("#grid").append(grid.render().$el);
+        $(".backgrid").before("<p style='padding-top:30px;float:right;margin-right:800px'>abcde</p>");
         // $("#csvcontent").append(grid.render().el);
         $("#paginator").append(paginator.render().$el);
         csvPageableCollection.fetch();
