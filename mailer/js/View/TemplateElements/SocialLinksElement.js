@@ -12,13 +12,14 @@ MailerTemplate.Views.SocialLinks = Backbone.View.extend({
 		$.each(MailerTemplate.SocialLinks, function(i, item){
 			var type = item.type;
 			var link = {
-				element : $("#share"+type),
-				textElement : $("#"+type+"Text"),
-				linkElement : $("#"+type+"Link")
+				element : temp.$el.find("#share"+type),
+				textElement : temp.$el.find("#"+type+"Text"),
+				linkElement : temp.$el.find("#"+type+"Link")
 			}
 			temp.m_lstSocialLinks[type] = link;
 		});
     },
+	
 	setModel : function(model){
 		this.m_Model = model;
 		

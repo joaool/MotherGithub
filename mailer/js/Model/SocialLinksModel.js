@@ -3,6 +3,7 @@ MailerTemplate.Models.SocialLinks = Backbone.Model.extend({
 	m_styleProperty : null,
 	m_lstLinkData : {},
 	
+	
 	initialize : function(){
 		this.m_lstSocialLinksUsed = [];
 		this.m_lstLinkData = {};
@@ -16,6 +17,7 @@ MailerTemplate.Models.SocialLinks = Backbone.Model.extend({
 		this.setDefaultStyleProperties();
 		this.set({type:MailerTemplate.TemplateItems.SOCIALLINKS});
 	},
+	
 	setDefaultStyleProperties : function(){
 		this.m_styleProperty = {};
 		var temp = this;
@@ -43,16 +45,20 @@ MailerTemplate.Models.SocialLinks = Backbone.Model.extend({
 		this.trigger(MailerTemplate.Models.Image.STYLE_OBJ_CHANGE,this.m_styleProperty);
 	},
 	CloneModel : function(){
-		var newModel = new MailerTemplate.Models.Image();
-		newModel.setSource(this.m_ImageSource);
-		newModel.setStyleObject(this.m_styleProperty);
+		var newModel = new MailerTemplate.Models.SocialLinks();
+		var json = JSON.stringify(this.toJSON());
+		var obj = JSON.parse(json);
+		newModel.fromJson(obj);
+		/*newModel.setStyleObject(this.m_styleProperty);
 		$.each(this.m_lstLinkData,function(i,link){
-			var type = link.type;
-			newModel.setLinkUrl(link.url);
-			newModel.setLinkText(link.text);
-			if (this.m_lstLinkData.enable)
-				newModel.EnableLink(type)
-		});
+			
+			newModel.setLinkUrl(i,link.url);
+			newModel.setLinkText(i,link.text);
+			if (link.enable)
+				newModel.EnableLink(i);
+			else
+				newModel.DisableLink(i);
+		});*/
 		return newModel;
 	},
 	
