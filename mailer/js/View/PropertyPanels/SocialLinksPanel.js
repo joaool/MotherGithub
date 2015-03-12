@@ -19,7 +19,7 @@ MailerTemplate.Views.SocialLinksPanel = Backbone.View.extend({
 		});
 		
 		this.m_styleTab = new MailerTemplate.Views.StyleTab({el : "#styletab"});
-		
+		this.hide();
 	},
 	
 	render : function(){
