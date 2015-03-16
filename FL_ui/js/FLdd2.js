@@ -621,15 +621,20 @@
 				}
 				return xRet;
 			},
-			updateEntityBySingular: function(xSingular,xOptions) {//updates an existing entity 
-				//Ex: updateEntityBySingular("client",{plural:"clients",description:"company that buys from us"});
+			updateEntityBySingular: function(xSingular,xOptions) {//updates an existing entity. It can uodate the entity key "singular"
+				//Ex: updateEntityBySingular("client",{singular:"client",plural:"clients",description:"company that buys from us"});
 				var oEntity=null;
 				var oEntityUpdate = null;
 				var xRet = false;
 				if(this.entities[xSingular]){//xSingular exists in dictionary
 					oEntity = this.entities[xSingular];
-					oEntityUpdate = _.extend(oEntity, xOptions); 
-					this.entities[xSingular] = oEntityUpdate;
+					oEntityUpdate = _.extend(oEntity, xOptions);
+					if(oEntityUpdate.singular!= xSingular){
+						delete this.entities[xSingular];//now that all relations are gone we can delete the entity
+						this.entities[oEntityUpdate.singular] = oEntityUpdate;
+					}else{
+						this.entities[xSingular] = oEntityUpdate;					
+					}
 					oEntity.sync = false;
 					xRet = true;
 				}else{//xSingular does not exists in dictionary
@@ -745,6 +750,48 @@
 					//Err.alert("dDictionary.addAttribute",(new Error)," you tried to add attribute "+xAttribute+" to a non existing entity "+xSingular);
 				}
 			},
+			getEntityAttribute: function(xSingular,xAttribute) {
+				// for entity xSingular and attribute with name=xAttribute returns:
+				//	  {name:xName,description:xDescription,label:xLabel,type:xType,typeUI:xTypeUI,enumerable:xEnumerable}
+				//returns null if entity or attribute does not exist
+				var oAttributes = null;
+				var oEntity = this.entities[xSingular];
+				if(oEntity){
+					var xIndex = attributeIndex(xSingular,xAttribute);
+					if(xIndex>=0){//if attribute exists
+						oAttributes = oEntity.attributes[xIndex];
+					}	
+				}	
+				return oAttributes;
+			},
+			updateAttribute: function(xSingular,xAttribute,changeObj){
+				//changeObj is an object with keys corresponding to xAttribute (old name - notice that the name itself can be changed).
+				// May have any key or key combination of:{name:xName,description:xDescription,label:xLabel,type:xType,typeUI:xTypeUI,enumerable:xEnumerable}
+				var def = $.Deferred();
+
+				var oEntity = this.entities[xSingular];
+				if(oEntity){
+					var xIndex = attributeIndex(xSingular,xAttribute);
+					if(xIndex>=0){//if attribute exists
+						var oAttributes = _.extend(oEntity.attributes[xIndex], changeObj);//notice that the attribute name may also belong to changeObj
+						if(oAttributes.name != xAttribute ){//attribute name was changed. It is necessary to update L2C and C2L
+							compressedAttr = oEntity.L2C[xAttribute];
+							oEntity.C2L[compressedAttr] = oAttributes.name;//Compressed to Logical is updated
+							delete oEntity.L2C[xAttribute];
+							oEntity.L2C[oAttributes.name] = compressedAttr;
+						}
+						oEntity.attributes[xIndex] = oAttributes;
+						//send to server
+
+						oEntity.sync = false;
+					}else{
+						alert("FL.dd.updateAttribute Error: impossible to update attribute "+xAttribute+". It does not exist in entity "+xSingular);
+					}
+				}else{
+					alert("FL.dd.updateAttribute Error: you tried to update attribute "+xAttribute+" to a non existing entity "+xSingular);
+				}
+				return def.promise();
+			},
 			addRelation: function(xSingular,withEntityName,verb,cardinality,side,storedHere,xLanguage) {//adds a new relation to the array of relations of entity xSingular
 				//xLanguage --> En, Fr, Nl, Pt
 				//NOTE: the rCN relation compressed name is retirned by the server when we try to create the relation.
@@ -842,14 +889,14 @@
 			peerTypeFor: function(typeOfPeer,entityName){//for type histoMail and entity ecn=55 forms "_histomail_55"
 				var eCN = this.getCEntity(entityName);
 				return histoName = "_" + typeOfPeer + "_" + eCN;
-			},			
+			},
 			isHistoMailPeer: function(entityName) {//returns true if _histoMail_<ecn(entityName)> exists in local dictionary
 				var exists = false;
 				if(this.isEntityInLocalDictionary( this.histoMailPeer( entityName ) ) ){
 					exists = true;
 				}
 				return exists;
-			},			
+			},
 			isEntityWithTypeUI: function(entityName,typeUI) {//returns true if entityName has an Email field 
 				var exists = false;
 				var oEntity = this.entities[entityName];
@@ -876,7 +923,7 @@
 					alert("FL.dd.isEntityInSync Error: "+entityName+" does not exist ! ");
 					return false;
 				}
-			},		
+			},
 			setSync: function(xSingular,bStatus) {//set sync = true for entity= xSingular - nothing is done if entity does not exist
 				var oEntity = this.entities[xSingular];
 				if(oEntity){
@@ -934,7 +981,7 @@
 						oEntity.L2C[fieldName] = fieldCN;//Logical to Compressed
 						oEntity.C2L[fieldCN] = fieldName;//Compressed to Logical					
 					}				
-				} 
+				}
 			},
 			getFieldCompressedName: function(xSingular,fieldName) {//for entity xSingular and attribute fieldName gets compressed name
 				var oEntity = this.entities[xSingular];
@@ -947,18 +994,18 @@
 			getArrayOfFields: function(xSingular) {//for entity xSingular return an array of JSON including statment
 				// The array has an object for each field with {attribute:xName, description:xDescription,statement:xStatement}
 				// Ex: returning items (excepting id)
-		        //  items = [
-		        //         {attribute:"name", description:"official designation",statement:"the name of the client is the official designation"},
-		        //         {attribute:"address", description:"place to send invoices",statement:"The address of the client is the place to send invoices"},
-		        //         {attribute:"city", description:"headquarters place", statement:"The city of the client is the headquarters place"},
-		        //         {attribute:"postal code", description:"postal reference for delivery",statement:"The postal code of the client is the postal reference for delivery"}
-		        //  	];
+				//  items = [
+				//         {attribute:"name", description:"official designation",statement:"the name of the client is the official designation"},
+				//         {attribute:"address", description:"place to send invoices",statement:"The address of the client is the place to send invoices"},
+				//         {attribute:"city", description:"headquarters place", statement:"The city of the client is the headquarters place"},
+				//         {attribute:"postal code", description:"postal reference for delivery",statement:"The postal code of the client is the postal reference for delivery"}
+				//		];
 				var oEntity = this.entities[xSingular];
 				var xRetArr = [];
 				var fieldCN = null;
 				if(oEntity){
 					_.each(oEntity.attributes, function(element, index){
-						if(element.name != "id"){						
+						if(element.name != "id"){
 							var el = {};
 							el["attribute"] = element.name;
 							el["description"] = element.description;
@@ -1021,7 +1068,7 @@
 				}
 				return newRow;////returns {attribute1:emptyValue1,attribute2:emptyValue2...etc} or null
 			},
-			emptyRowForArrOfTypes: function(columnsArr){//returns an object with keys for every attribute and empty values for each attrobute
+			emptyRowForArrOfTypes: function(columnsArr){//returns an object with keys for every attribute and empty values for each attribute
 				//columns array is an array of objects where each object must have the keys name and type
 				//      example: [{label:"xx",name:fieldName,type:xtype,enumerable:xEnumerable},{col2}...{}]
 				//returns {attribute1:emptyValue1,attribute2:emptyValue2...etc}

@@ -312,7 +312,8 @@ window.utils = {
         // var SelectAllHeaderCell = Backgrid.HeaderCell.extend({
         //     // Implement your "select all" logic here
         // });
-        var columns = [{name: "del", label: "Delete", cell: DeleteCell },{name:"",cell:"select-row",headerCell: "select-all"}];
+        // var columns = [{name: "del", label: "Delete", cell: DeleteCell },{name:"",cell:"select-row",headerCell: "select-all"}];
+        var columns = [{name:"",cell:"select-row",headerCell: "select-all"}];
         //http://pastie.org/pastes/8312516
         var DialogButtonCell = Backgrid.Cell.extend({
             title: 'Title',
@@ -515,7 +516,7 @@ window.utils = {
     prepareColArrForClientSideFilter: function(backgridColumnsArr){
         var filterFieldsArr = [];
         _.each(backgridColumnsArr, function(element,index){
-            if(index>2){//skips del, select-all and id columns
+            if(index>1){//skips select-all and id columns
                 filterFieldsArr.push(element.name);
             }
         });
@@ -605,7 +606,65 @@ window.utils = {
             console.log("model--->"+model);
             // $(".backgrid").before("<p style='padding-top:30px;float:right;margin-right:800px'>abcde</p>");
         });
+        $("#_belowMenus").show();
+        this.placeGridButtonsInDOM(csvSetCollection,csvPageableCollection,grid);
+                // $("#csvcontent").empty();
+                // $('#addGrid').off('click');
+                // $("#addGrid").click(function () {
+                //     csvStore.addOneEmptyRow();
+                //     var lastKeyInStore = csvStore.getNextId() - 1; //get the highest key in csvStore.csvRows
+                //     var CsvElementModel = Backbone.Model.extend({});
 
+                //     newRow = csvStore.csvRows[lastKeyInStore];
+                //     var csvLine = new CsvElementModel(newRow);
+
+                //     csvSetCollection.add(newRow);//grid without paginator - collection does not have a save method
+                //     csvPageableCollection.getLastPage();//we force lastKeyInStorePage display !!! - remove this line if no paginator
+                //     csvPageableCollection.add(newRow);//the new model was inserted in the collection <--- necessary for paginator - - remove this line if no paginator
+
+                //     csvLine.sync("create",newRow);
+
+                //     grid.insertRow(csvLine);
+                // });
+                // $('#_delete').off('click');
+                // $("#_delete").click(function () {
+                //      var selectedModels = grid.getSelectedModels();
+                //     if(selectedModels.length > 0 ){
+                //         var preStr = selectedModels.length + " row";
+                //         if (selectedModels.length > 1)
+                //             preStr +="s";
+                //         FL.common.makeModalConfirm(  preStr + " will be deleted. Do you confirm ?","No, cancel delete","Yes delete",function(result){
+                //             if(result){
+                //                 _.each(selectedModels, function (model) {
+                //                     model.destroy();
+                //                 });                       
+                //                 FL.common.makeModalInfo(  preStr + " were deleted....");
+                //             }else{
+                //                 FL.common.makeModalInfo("Nothing was deleted !!!");
+                //             }
+                //         });
+                //     }else{
+                //         FL.common.makeModalInfo("No selected rows. To delete one or more rows, click the left column checkbox.");
+                //     }
+
+                // });    
+                // // $("#_unSelect").click(function () {
+                // //     alert("Unselection !!!");
+                // //     // grid.clearSelectedModels();
+                // // });
+                // // $(clientSideFilter.el).css({float: "right", margin: "20px"});
+                // // $('<p style="padding-top:30px;float:right;margin-right:800px">abc</p>').insertBefore(".backgrid");
+                // // $(".backgrid").before("<p style='padding-top:30px;float:right;margin-right:800px'>abcde</p>");
+                // // $("#_select").insertBefore($(".backgrid"));
+
+        $("#grid").prepend(clientSideFilter.render().el);
+        $("#grid").append(grid.render().$el);
+        // $(".backgrid").before("<p style='padding-top:30px;float:right;margin-right:800px'>abcde</p>");
+        // $("#csvcontent").append(grid.render().el);
+        $("#paginator").append(paginator.render().$el);
+        csvPageableCollection.fetch();
+    },
+    placeGridButtonsInDOM: function(csvSetCollection,csvPageableCollection,grid){
         $("#csvcontent").empty();
         $('#addGrid').off('click');
         $("#addGrid").click(function () {
@@ -624,29 +683,50 @@ window.utils = {
 
             grid.insertRow(csvLine);
         });
-        $("#_select").click(function () {
-            //alert("selection !!!");
-            // var selectedModels = pageableGrid.getSelectedModels();
-            var selectedModels = grid.getSelectedModels();
-                _.each(selectedModels, function (model) {
-                model.destroy();
-            });
-        });    
-        $("#_unSelect").click(function () {
-            alert("Unselection !!!");
-            grid.clearSelectedModels();
+        $('#_delete').off('click');
+        $('#_delete').show();
+        $("#_delete").click(function () {
+             var selectedModels = grid.getSelectedModels();
+            if(selectedModels.length > 0 ){
+                var preStr = selectedModels.length + " row";
+                if (selectedModels.length > 1)
+                    preStr +="s";
+                FL.common.makeModalConfirm(  preStr + " will be deleted. Do you confirm ?","No, cancel delete","Yes delete",function(result){
+                    if(result){
+                        var arrOf_Ids = [];
+                        _.each(selectedModels, function (model) {
+                            arrOf_Ids.push(model.attributes._id);
+                            model.destroy();
+                        });
+                        var promise=FL.API.removeRecordFromTable(csvStore.getEntityName(),arrOf_Ids);
+                        promise.done(function(count){
+                            console.log(">>>>>util.placeGridButtonsInDOM destroy removeRecordFromTable SUCCESS <<<<<");
+                            if(count!=selectedModels.length)
+                                preStr = "Count="+count+" deleted instead of "+selectedModels.length+" --->";
+                            FL.common.makeModalInfo(  preStr + " were deleted....");
+                            return;
+                        });
+                        promise.fail(function(err){console.log(">>>>>util.placeGridButtonsInDOM destroy removeRecordFromTable FAILURE <<<<<"+err);
+                            FL.common.makeModalInfo( "Impossible to delete " + preStr + ". Error "+err);
+                            return;
+                        });
+                     
+                    }else{
+                        FL.common.makeModalInfo("Nothing was deleted !!!");
+                    }
+                });
+            }else{
+                FL.common.makeModalInfo("No selected rows. To delete one or more rows, click the left column checkbox.");
+            }
         });
+        // $("#_unSelect").click(function () {
+        //     alert("Unselection !!!");
+        //     // grid.clearSelectedModels();
+        // });
         // $(clientSideFilter.el).css({float: "right", margin: "20px"});
         // $('<p style="padding-top:30px;float:right;margin-right:800px">abc</p>').insertBefore(".backgrid");
         // $(".backgrid").before("<p style='padding-top:30px;float:right;margin-right:800px'>abcde</p>");
         // $("#_select").insertBefore($(".backgrid"));
-
-        $("#grid").prepend(clientSideFilter.render().el);
-        $("#grid").append(grid.render().$el);
-        $(".backgrid").before("<p style='padding-top:30px;float:right;margin-right:800px'>abcde</p>");
-        // $("#csvcontent").append(grid.render().el);
-        $("#paginator").append(paginator.render().$el);
-        csvPageableCollection.fetch();
     },
     buildMasterDetailStructureFromAttributesArr: function(attributesArr){
         var items = [];

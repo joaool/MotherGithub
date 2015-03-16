@@ -141,7 +141,7 @@ jQuery(document).ready(function($){
 			console.log("---------------------------------------------------------->logOutMenu");
 			var loginMenu = FL.menu.createMenu({jsonMenu:{"menu":[{"title":"","uri":"#"}]}});//FL.oMenu is a global defined  in FLMain.js
 			loginMenu.menuRefresh();
-			FL.clearSpaceBelowMenus();
+			FL.common.clearSpaceBelowMenus();
 			FL.domInject("_placeHolder",FL.login.defaultPageOnLogout );
 		};
 		var loginDefaultMenu_and_homePage = function(loginObject){//after user creation in server we need to display the menu and home page for logins of new users (defaults for menu and homepage)
@@ -158,7 +158,7 @@ jQuery(document).ready(function($){
 
 			localStorage.login = JSON.stringify(loginObject);
 			$('#trigger1').show();$('#trigger2').show();$('#trigger3').show();
-			FL.clearSpaceBelowMenus();
+			FL.common.clearSpaceBelowMenus();
 			FL.domInject("_placeHolder",homeHTML );
 			FL.domain = FL.login.token.appDescription;
 			displaySignInUser(loginObject.email);
@@ -175,7 +175,7 @@ jQuery(document).ready(function($){
 				// var loginMenu = FL.menu.createMenu({jsonMenu:menuData.oMenu});//FL.oMenu is a global defined  in FLMain.js
 				$.Topic( 'jsonMenuUpdate' ).publish( menuData.oMenu );//broadcast that will be received by FL.menu to update jsonMenu
 
-				FL.clearSpaceBelowMenus();
+				FL.common.clearSpaceBelowMenus();
 				// loginMenu.menuRefresh();
 				FL.domInject("_placeHolder",homeHTML );
 
@@ -667,7 +667,7 @@ jQuery(document).ready(function($){
 				loadAppPromise.done(function(menuData,homeHTML){
 					console.log("FL.login.home ---> homeHTML=" + homeHTML);
 					// console.log("FL.login.home --------------------------------------------->first menu=" + menuData.oMenu.menu[0].title);				
-					FL.clearSpaceBelowMenus();
+					FL.common.clearSpaceBelowMenus();
 					FL.domInject("_placeHolder",homeHTML );
 				});	
 				loadAppPromise.fail(function(err){

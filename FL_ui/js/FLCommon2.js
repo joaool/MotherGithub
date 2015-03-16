@@ -495,13 +495,16 @@ FL["common"] = (function(){//name space FL.common
             $("#csvcontent").empty();
             $("#grid").empty();
             $("#paginator").empty();
-            $("#addGrid").empty();
+
             $("#addGrid").hide();
-            $("#_newsletter").empty();
-            $("#_newsletter").hide();
-            $("#_editGrid").empty();
+            $("#_delete").hide();
             $("#_editGrid").hide();
-        },      
+            $("#_newsletterMC").hide();
+            $("#_newsletter").hide();
+
+            // $("#_belowMenus").hide();
+            $("#templateHolder").hide();
+         },      
         buildDiff: function(arrOfObjA,arrOfObjB,pivotKey) {
             //given two arrays of objects A and B, both containing key pivotKey, returns an array with all the elements 
             //  existing in A whose pivotKey exists in A and not in B.
@@ -960,23 +963,4 @@ FL["mix"] = function(mixEvent,propObj) {//if FL.mixPanelEnable = true, trigger  
 		alert("calls mixpanel.track for event="+mixEvent+" ->props="+JSON.stringify(propObj));
 		//mixpanel.track(mixEvent,propObj);
 	}
-};
-FL["clearSpaceBelowMenus"] = function() {
-	$("#_placeHolder").empty();
-	$("#personContent").empty();
-	$("#csvcontent").empty();
-	$("#grid").empty();
-	$("#paginator").empty();
-    $("#addGrid").empty();
-    $("#addGrid").hide();
-    $("#_newsletter").empty();
-    $("#_newsletter").hide();
-
-    $("#templateHolder").hide();
-    
-    $("#_newsletterMC").empty();
-    $("#_newsletterMC").hide();
-
-    $("#_editGrid").empty();
-    $("#_editGrid").hide();
 };

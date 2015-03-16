@@ -879,6 +879,14 @@ $(function () {
     ok(actual.description == "frequent buyer", "description was updated correctely");
     ok(actual.plural == "customers", "plural has changed to customers");
 
+    success = FL.dd.updateEntityBySingular("client",{singular:"customer", plural:"customers",description:"frequent buyer"});
+    actual = FL.dd.entities["customer"];
+    ok(success === true && actual.singular == "customer", "updateEntityBySingular SUCCESS changing entity singular FROM client TO customer" );//14
+
+    success = FL.dd.updateEntityBySingular("customer",{singular:"client", plural:"customers",description:"frequent buyer"});
+    actual = FL.dd.entities["client"];
+    ok(success === true && actual.singular == "client" , "updateEntityBySingular SUCCESS changing entity singular FROM customer TO client" );//15
+
     success = FL.dd.updateEntityByCName("2ls",{plural:"clients",description:"very frequent buyer"});
     ok(success === true , "updateEntityByCName operation successfull for client" );
     actual = FL.dd.entities["client"];
@@ -906,28 +914,52 @@ $(function () {
     actual = FL.dd.nextEntityBeginningBy("client");
     ok(actual === "client2", "nextEntityBeginningBy('client') is 'client2'");
     actual = FL.dd.nextEntityBeginningBy("patolinas");
-    ok(actual === "patolinas", "nextEntityBeginningBy('patolinas') is 'patolinas'");//25
+    ok(actual === "patolinas", "nextEntityBeginningBy('patolinas') is 'patolinas'");//27
     
     actual = FL.dd.getEntityBySingular("order").sync;
-    ok(actual === false, "order sync status is:'not synchronized'");//26
+    ok(actual === false, "order sync status is:'not synchronized'");//28
     FL.dd.setSync("order",true);
     actual = FL.dd.getEntityBySingular("order").sync;
-    ok(actual === true, "FL.dd.setSync-->order sync status is now:'synchronized'");//27
+    ok(actual === true, "FL.dd.setSync-->order sync status is now:'synchronized'");//29
     FL.dd.setSync("order",false);
     actual = FL.dd.getEntityBySingular("order").sync;
-    ok(actual === false, "FL.dd.setSync-->order sync status is again:'not synchronized'");//28
+    ok(actual === false, "FL.dd.setSync-->order sync status is again:'not synchronized'");//30
 
     actual = FL.dd.getFieldCompressedName("order","id");
-    ok(actual === "00", "FL.dd.getFieldCompressedName -->compressed name for id='00'");//29
+    ok(actual === "00", "FL.dd.getFieldCompressedName -->compressed name for id='00'");//31
     actual = FL.dd.getFieldCompressedName("order","shipped");
-    ok(actual === "01", "FL.dd.getFieldCompressedName -->compressed name for shipped='01'");//30
+    ok(actual === "01", "FL.dd.getFieldCompressedName -->compressed name for shipped='01'");//32
 
     FL.dd.addAttribute("order","product","unique order item","product","string","textbox",null);
     actual = FL.dd.getFieldCompressedName("order","product");
-    ok(actual === "02", "FL.dd.getFieldCompressedName -->compressed name is '02'");//31
+    ok(actual === "02", "FL.dd.getFieldCompressedName -->compressed name is '02'");//33
+
 
     console.log("%%%%%%%%%%%%%% begin %%%%%%%%%%%%%%%%%%%%%%%%");
     FL.dd.displayEntities();
+
+    FL.dd.updateAttribute('order','shipped',{type:'date',typeUI:'datebox'});//change type and typeUI for attribute "shipped" - previously type="boolean" typeUI="checkbox"
+    actual = FL.dd.getEntityAttribute("order","shipped");
+    ok(actual.type == "date" && actual.typeUI == "datebox", "FL.dd.updateAttribute('order','shipped',{type:'date',typeUI:'datebox'}) -->update done!");//34
+
+    FL.dd.updateAttribute('order','shipped',{type:'boolean',typeUI:'checkbox'});//change type and typeUI for attribute "shipped" - previously type="boolean" typeUI="checkbox"
+    actual = FL.dd.getEntityAttribute("order","shipped");
+    console.log(JSON.stringify(actual));
+    ok(actual.type == "boolean" && actual.typeUI == "checkbox", "FL.dd.updateAttribute('order','shipped',{type:'boolean',typeUI:'checkbox'}) -->update done!");//35
+
+    FL.dd.updateAttribute('order','shipped',{name:'sent',label:'Sent'});//change type and typeUI for attribute "shipped" - previously type="boolean" typeUI="checkbox"
+    actual = FL.dd.getEntityAttribute("order","sent");
+    console.log(JSON.stringify(actual));
+    ok(actual.name == "sent" && actual.label == "Sent", "FL.dd.updateAttribute('order','shipped',{name:'sent',label:'Sent'}) -->update done!");//36
+
+    FL.dd.updateAttribute('order','sent',{name:'shipped',label:'Shipped'});//change type and typeUI for attribute "shipped" - previously type="boolean" typeUI="checkbox"
+    actual = FL.dd.getEntityAttribute("order","shipped");
+    console.log(JSON.stringify(actual));
+    ok(actual.name == "shipped" && actual.label == "Shipped", "FL.dd.updateAttribute('order','sent',{name:'shipped',label:'Shipped'}) -->update done!");//37
+
+    FL.dd.displayEntities();
+
+
     //addRelation: function(xSingular,rCN,withEntityName,verb,cardinality,side,storedHere) {//adds a new relation to the array of relations of entity xSingular
     FL.dd.createEntity("sales_rep","employee responsable for sales");
     // FL.dd.addAttribute(xSingular,xAttribute,xDescription,xLabel,xType,xTypeUI,arrEnumerable);
@@ -943,14 +975,14 @@ $(function () {
     console.log("------- after ---------------");
     FL.dd.displayEntities();
     actual = FL.dd.relationsOf("sales_rep");
-    ok(actual[0].rCN === "02", "first relation from FL.dd.relationsOf('sales_rep') has rCN=='02'");//32
+    ok(actual[0].rCN === "02", "first relation from FL.dd.relationsOf('sales_rep') has rCN=='02'");//32+4
     ok(actual[0].semantic === "sales_rep manages many clients", "first relation from FL.dd.relationsOf('sales_rep') has semantic 'sales_rep manages many clients'");//33
     ok(actual[1].rCN === "03", "first relation from FL.dd.relationsOf('sales_rep') has rCN=='03'");//34
     ok(actual[1].semantic === "sales_rep is responsable by complaints of  many clients", "first relation from FL.dd.relationsOf('sales_rep') has semantic 'sales_rep is responsable by complaints of  many clients'");//35
     console.log("relations ="+JSON.stringify(actual));
 
     actual = FL.dd.relationsOf("client");
-    ok(actual[0].rCN === "01", "first relation from FL.dd.relationsOf('client') has rCN=='01'");//36
+    ok(actual[0].rCN === "01", "first relation from FL.dd.relationsOf('client') has rCN=='01'");//36+4
     ok(actual[0].semantic === "client has many orders", "first relation from FL.dd.relationsOf('client') has semantic 'client has many orders'");//37
     console.log("relations="+JSON.stringify(actual));
 
@@ -979,50 +1011,50 @@ $(function () {
     // console.log("*********************************after saveTable*******************************************");
 
     actual = FL.dd.isEntityInLocalDictionary("order");
-    ok(actual === true, "FL.dd.isEntityInLocalDictionary -->'order' exists in local dictionary.");//32
+    ok(actual === true, "FL.dd.isEntityInLocalDictionary -->'order' exists in local dictionary.");//45
     actual = FL.dd.isEntityInLocalDictionary("orderz");
-    ok(actual === false, "FL.dd.isEntityInLocalDictionary -->'orderz' does not exists in local dictionary.");//33
+    ok(actual === false, "FL.dd.isEntityInLocalDictionary -->'orderz' does not exists in local dictionary.");//47
     
     actual = FL.dd.getEntityByCName("2lS");
-    ok(actual == "order", "FL.dd.getEntityByCName --> returns 'order' for entity compressed name = '2lS'");//34
+    ok(actual == "order", "FL.dd.getEntityByCName --> returns 'order' for entity compressed name = '2lS'");//48
     actual = FL.dd.getEntityByCName("0A");
-    ok(actual === null, "FL.dd.getEntityByCName --> returns null for entity compressed name = '0A'");//35
+    ok(actual === null, "FL.dd.getEntityByCName --> returns null for entity compressed name = '0A'");//49
     // FL.dd.displayEntities();
     actual = FL.dd.getEntityByCName("2ls");
-    ok(actual === "client", "FL.dd.getEntityByCName --> returns 'client' for entity compressed name = '2ls'");//36
+    ok(actual === "client", "FL.dd.getEntityByCName --> returns 'client' for entity compressed name = '2ls'");//50
 
     //now testing relations functions
     actual = FL.dd.isRelation("client","01");
-    ok(actual === false, "FL.dd.isRelation --> relation compressed name '01' does not exist");//37
+    ok(actual === false, "FL.dd.isRelation --> relation compressed name '01' does not exist");//51
 
     //now testing is functions
     actual = FL.dd.isEntityInLocalDictionary("client");
-    ok(actual === true, "FL.dd.isEntityInLocalDictionary --> entity client exists in local dictionary");//37
+    ok(actual === true, "FL.dd.isEntityInLocalDictionary --> entity client exists in local dictionary");//52
     actual = FL.dd.isEntityInLocalDictionary("clientx");
-    ok(actual === false, "FL.dd.isEntityInLocalDictionary --> entity clientx does not exist in local dictionary");//37
+    ok(actual === false, "FL.dd.isEntityInLocalDictionary --> entity clientx does not exist in local dictionary");//53
     actual = FL.dd.isEntityWithTypeUI("sales_rep","emailbox");
-    ok(actual === true, "FL.dd.isEntityWithTypeUI --> in sales_rep exists an email field - typeUI='emailbox'");//37
+    ok(actual === true, "FL.dd.isEntityWithTypeUI --> in sales_rep exists an email field - typeUI='emailbox'");//54
     actual = FL.dd.isEntityWithTypeUI("client","emailbox");
-    ok(actual === false, "FL.dd.isEntityWithTypeUI --> in client does not exist an email field - typeUI='emailbox'");//37
+    ok(actual === false, "FL.dd.isEntityWithTypeUI --> in client does not exist an email field - typeUI='emailbox'");//55
     actual = FL.dd.isEntityWithTypeUI("sales_rep","phonebox");
-    ok(actual === false, "FL.dd.isEntityWithTypeUI --> in sales_rep does not exist a phone field - typeUI='phonebox'");//50
+    ok(actual === false, "FL.dd.isEntityWithTypeUI --> in sales_rep does not exist a phone field - typeUI='phonebox'");//56
     FL.dd.setFieldTypeUI("sales_rep","phone","phonebox");
     actual = FL.dd.isEntityWithTypeUI("sales_rep","phonebox");
-    ok(actual === true, "FL.dd.isEntityWithTypeUI --> Now after FL.dd.setFieldTypeUI sales_rep has a phone field - typeUI='phonebox'");//51
+    ok(actual === true, "FL.dd.isEntityWithTypeUI --> Now after FL.dd.setFieldTypeUI sales_rep has a phone field - typeUI='phonebox'");//57
     
     console.log("====================================================================================");
     console.log("histoMailPeer for sales_rep is "+FL.dd.histoMailPeer("histoMail","sales_rep"));
     console.log("====================================================================================");
     actual = FL.dd.isHistoMailPeer("sales_rep");
-    ok(actual === false, "FL.dd.isHistoMailPeer --> sales_rep has no " + FL.dd.histoMailPeer("sales_rep") + " =>'_histoMail_<eCN>' peer table");//52
+    ok(actual === false, "FL.dd.isHistoMailPeer --> sales_rep has no " + FL.dd.histoMailPeer("sales_rep") + " =>'_histoMail_<eCN>' peer table");//58
 
     FL.dd.createHistoMailPeer("sales_rep");
     actual = FL.dd.isHistoMailPeer("sales_rep");
-    ok(actual === true, "FL.dd.isHistoMailPeer -->after createHistoMailPeer, sales_rep has " + FL.dd.histoMailPeer("sales_rep") + " =>'_histoMail_<eCN>' peer table !");//53
+    ok(actual === true, "FL.dd.isHistoMailPeer -->after createHistoMailPeer, sales_rep has " + FL.dd.histoMailPeer("sales_rep") + " =>'_histoMail_<eCN>' peer table !");//59
 
     FL.dd.removeHistoMailPeer("sales_rep");
     actual = FL.dd.isHistoMailPeer("sales_rep");
-    ok(actual === false, "FL.dd.isHistoMailPeer -->after removeHistoMailPeer, sales_rep has no " + FL.dd.histoMailPeer("sales_rep") + " =>'_histoMail_<eCN>' peer table !");//53
+    ok(actual === false, "FL.dd.isHistoMailPeer -->after removeHistoMailPeer, sales_rep has no " + FL.dd.histoMailPeer("sales_rep") + " =>'_histoMail_<eCN>' peer table !");//60
 
     //creates peer
   
@@ -1052,10 +1084,10 @@ $(function () {
 
     var obj = FL.server.preparePutRowFromCsvStoreById("order",1);
     console.log("---->preparePutRowFromCsvStoreById="+JSON.stringify(obj));
-    deepEqual( obj, {d:{ "00":1,"01":true,"02":"Super 1" },r:[]}, "FL.server.preparePutRowFromCsvStoreById correct for id=1" );//39
+    deepEqual( obj, {d:{ "00":1,"01":true,"02":"Super 1" },r:[]}, "FL.server.preparePutRowFromCsvStoreById correct for id=1" );//61
     obj = FL.server.preparePutRowFromCsvStoreById("order",3);
     console.log("---->preparePutRowFromCsvStoreById="+JSON.stringify(obj));
-    deepEqual( obj, {d:{ "00":3,"01":false,"02":"Super 3" },r:[]}, "FL.server.getSavingObjFromCsvStoreById correct for id=3" );//40
+    deepEqual( obj, {d:{ "00":3,"01":false,"02":"Super 3" },r:[]}, "FL.server.getSavingObjFromCsvStoreById correct for id=3" );//62
     arrOfObj = FL.server.preparePutAllCsvStore("order");
     console.log("---->preparePutAllCsvStore="+JSON.stringify(arrOfObj));
     
