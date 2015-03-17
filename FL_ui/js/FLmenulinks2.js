@@ -21,7 +21,7 @@
 			var senderObj = {from_name:name,from_email:email,subject:subject,testEmail:testEmail};
 			return senderObj;
 		};
-		var getMailchimpHTML = function(cId) {
+		var XgetMailchimpHTML = function(cId) {
 			var def = $.Deferred();
 			var arr = null;
 			var fl = FL.login.token.fl;
@@ -40,7 +40,7 @@
 			}
 			return def.promise();
 		};
-		var convertsToArrOfObj = function(templateOptionsArr){
+		var XconvertsToArrOfObj = function(templateOptionsArr){
 			//receives [{"_id": "t 115",jsonTemplate:"dfdfdg"},{"_id": "t 116",jsonTemplate:"dfgd"}] and returns [{value:1,text: "t 115",template:"dfdfdg"},{value:2,text: "t 116",template:"dfgd"}]
 			return _.map(templateOptionsArr, function(el,index){ return {"value":index+1,"text":el._id,"template":el.jsonTemplate}; });
 		};
@@ -53,12 +53,12 @@
 		var tt = function(){
 			console.log("tt");
 		};
-		var addImageToMandrillImageArr = function(name,srcContent){//mandrillImagesArr is formed to FL.login.emailImagesArray
+		var XaddImageToMandrillImageArr = function(name,srcContent){//mandrillImagesArr is formed to FL.login.emailImagesArray
 			// var srcContent = imageFromJson.substring(23);//removes the beginning chars:"data:image/jpeg;base64,"
 			var imageArrElement = {name:name, type:"image/jpg", content:srcContent};
 			FL.login.emailImagesArray.push(imageArrElement);
 		};
-		var checkSocialblock = function(item){//HACK to introduce social links if text Item has "socialblock"
+		var XcheckSocialblock = function(item){//HACK to introduce social links if text Item has "socialblock"
 			var is_social = false;
 			if(item.type == "title"){//TEMPORARY to be a social element it must be type="title" and content = "socialblock"
 				var elementStr = item.title;
@@ -69,7 +69,7 @@
 			}
 			return is_social;
 		};
-		var appendTemplate = function(jsonObject, parentElement){
+		var XappendTemplate = function(jsonObject, parentElement){
 			// jsonObject - array jsons corresponding to a parentElement (ex.header, body or footer) 
 			// ex:[{"title":"<p>Mastruncio1</p>","style":{"fontColor":"#000","fontFamily":"Arial",...."imagePadding":"10px"},"type":"title"}]
 			$.each(jsonObject,function(i,item){//item is array element i
@@ -112,7 +112,7 @@
 				}	
 			});
 		};
-		var getHTMLContent = function(jsonTemplate){
+		var XgetHTMLContent = function(jsonTemplate){
 			// alert(jsonTemplate);
 			var jsonObj = JSON.parse(jsonTemplate);
 			var content = $("#templatePreview").html();
@@ -131,7 +131,7 @@
 			appendTemplate(jsonObj.templateItems.footer,footer);
 			return $("#templateHolder").html();
 		};
-		var newsletterEmissionUI = function(templateOptionsArr, entityName) {
+		var XnewsletterEmissionUI = function(templateOptionsArr, entityName) {
 			var def = $.Deferred();
 			FL.login.emailTemplateName = null;//cleans any previous template name
 			FL.login.emailContentTemplate = null;
@@ -181,7 +181,7 @@
 			});			
 			return def.promise();
 		};
-		var getMailchimpTemplates = function() {
+		var XgetMailchimpTemplates = function() {
 			var def = $.Deferred();
 			var arr = null;
 			var fl = FL.login.token.fl;
@@ -210,12 +210,10 @@
 			}
 			return def.promise();
 		};
-		var editGrid = function(entityName){
+		var XeditGrid = function(entityName){
 			// FL.common.makeModalInfo("Edit " + entityName + " x To be implemented soon");
 			$("#_editGrid").empty();
 			$("#_modalDialogB").empty();
-
-
 
 			var singular  = entityName;
 			var description = FL.dd.getEntityBySingular(entityName).description;
@@ -269,7 +267,7 @@
 					//   ex: {name:"address",description:"address to send invoices",label:"Address",type:"string",typeUI:"textbox",enumerable:null,key:false});		                
 					var changedAttributesArr = [];
 					var changedTypeArr = [];
-					var newAttributesArr = [];
+					var newAttributesArr = [{name:"id",description:"order of lines",label:"id",type:"number",typeUI:"numberbox",enumerable:null,key:true}];
 					_.each(attributesArrNoId, function(element,index){//to retrieve the lines content from the interface
 						var elObj = {};
 						elObj["name"] = masterDetailItems.detail[index].attribute.trim();
@@ -300,7 +298,7 @@
 					$("#addGrid").show();
 					$("#addGrid").html("Add Row");
 					$("#_editGrid").show();
-					$("#_editGrid").html(" Edit Grid");
+					$("#_editGrid").html(" Edit Grid in editGrid");
 
 
 					utils.mountGridInCsvStore(columnsArrForGrid);//mount backbone views and operates grid - columnsArr must be prepared to backGrid
@@ -310,8 +308,16 @@
 								FL.common.makeModalInfo("Now we will save it to server....");
 							}else{
 								FL.common.makeModalInfo("Nothing was saved the original grid is going to be restored....");
+								FL.grid.displayDefaultGrid(entityName);//loads from server and display
 							}
 						});
+					}else{//no info to be lost so we save in dict and reload
+						//save to dict
+					// FL.common.clearSpaceBelowMenus();
+					// $("#addGrid").show();
+					// $("#addGrid").html(" Add Row");
+					// $("#_editGrid").show();
+						FL.grid.displayDefaultGrid(entityName);//loads from server and display
 					}
 					var z=32;
 				}else{
@@ -385,7 +391,7 @@
 				alert("checkDuplicateEmission ->ERROR !!!");
 			});
 		};
-		var prepareNewsletterEmission = function(entityName){
+		var XprepareNewsletterEmission = function(entityName){
 			var getTemplatesPromise = FL.API.loadTableId("_templates","jsonTemplate");//("_templates","jsonTemplate");
 			var entityName = entityName;
 			getTemplatesPromise.done(function(data){
@@ -411,7 +417,7 @@
 				return;
 			});
 		};
-		var prepareNewsletterMCEmission = function(entityName){
+		var XprepareNewsletterMCEmission = function(entityName){
 			//collects all data to send a newsletter to the current grid. Including the template to use.
 			FL.login.emailTemplateName = null;//cleans any previous template name
 			var pos = FL.login.token.userName.indexOf("@");
@@ -471,7 +477,7 @@
 				console.log(">>>>>FLmenulinks2.js prepareNewsletterMCEmission  FAILURE <<<<<"+err);
 			});
 		};
-		var set3ButtonsAndGrid = function(entityName){//displays addGrid, newletter and editGrid buttons (with clicks prepared) and display grid
+		var set3ButtonsAndGrid = function(entityName){//displays addGrid, delete and editGrid buttons (with clicks prepared) and services to the right
 			$('#_editGrid').off('click');
 			$("#_editGrid").click(function(){
 				editGrid(entityName);
@@ -492,46 +498,36 @@
 			$("#_newsletterMC").click(function(){
 				prepareNewsletterMCEmission(entityName);
 			});			
-			FL.clearSpaceBelowMenus();
+			FL.common.clearSpaceBelowMenus();
 			$("#addGrid").show();
 			$("#addGrid").html(" Add Row");
+			$("#_delete").show();
+			$("#_editGrid").show();
 			$("#_newsletter").show();
 			$("#_newsletter").html(" Newsletter");
 			$("#_newsletterMC").show();
 			$("#_newsletterMC").html(" MC");
 
-			$("#_editGrid").show();
 			// $("#_editGrid").html(" Edit Grid");
 			FL.grid.displayDefaultGrid(entityName);
 		};
 		var DefaultGridWithNewsLetterAndEditButtons = function(entityName) {
 			//A)shows add button, newsletter and grid edit buttons if an email field exist in entityName
 			//  	checks if _histoMail_<ecn(entityName)> exists. If not creates it.
-			//B)shows add button and grid edit buttons if no email field exist in entityName
-					
-			// FL.dd.setFieldTypeUI(entityName,"email","phonebox");//only for test
-			// FL.dd.displayEntities();
-
-			if( FL.dd.isEntityWithTypeUI(entityName,"emailbox") || FL.dd.isEntityWithTypeUI(entityName,"email") ){//the newsletter option only appears to entities that have an email
-				if(FL.dd.isHistoMailPeer(entityName)){
-					set3ButtonsAndGrid(entityName);//displays addGrid, newletter and editGrid buttons (with clicks prepared) and displays grid
-				}else{
-					// alert("_histoMail for "+entityName+" does not exist! we need to create it");
-					promise = FL.API.createTableHistoMails_ifNotExisting(entityName)
-					.then(function(){
-						// this.setSync(FL.dd.histoMailPeer(entityName),true);
-						set3ButtonsAndGrid(entityName);
-						return;}
-						,function(err){alert("FL.links.DefaultGridWithNewsLetterAndEditButtons ERROR: cannot create histoMail peer for " + entityName + " - "+err); return;});
-					// set3ButtonsAndGrid(entityName);//displays addGrid, newletter and editGrid buttons (with clicks prepared) and displays grid
-				}
-			}else{//no newsletter button because entity has no email field
-				FL.clearSpaceBelowMenus();
-				$("#addGrid").show();
-				$("#addGrid").html(" Add Row");
-				$("#_editGrid").show();
-				// $("#_editGrid").html(" Edit Grid");
-				FL.grid.displayDefaultGrid(entityName);
+			//B)shows add button and grid edit buttons if no email field exist in entityName				
+			if(FL.dd.isHistoMailPeer(entityName)){
+				// set3ButtonsAndGrid(entityName);//displays addGrid, newletter and editGrid buttons (with clicks prepared) and displays grid
+				FL.grid.displayDefaultGrid(entityName);//loads from server and display buttons and Grid
+			}else{
+				// alert("_histoMail for "+entityName+" does not exist! we need to create it");
+				promise = FL.API.createTableHistoMails_ifNotExisting(entityName)
+				.then(function(){
+					// this.setSync(FL.dd.histoMailPeer(entityName),true);
+					// set3ButtonsAndGrid(entityName);
+					FL.grid.displayDefaultGrid(entityName);//loads from server and display buttons and Grid
+					return;}
+					,function(err){alert("FL.links.DefaultGridWithNewsLetterAndEditButtons ERROR: cannot create histoMail peer for " + entityName + " - "+err); return;});
+				// set3ButtonsAndGrid(entityName);//displays addGrid, newletter and editGrid buttons (with clicks prepared) and displays grid
 			}
 		};
 		return{
@@ -606,7 +602,7 @@
 			setDefaultGrid: function(entityName) {//called with menu key "uri": "javascript:FL.links.setDefaultGrid('JOJO')"
 				// alert("setDefaultGrid"+entityName);
 				entityName = entityName.replace(/_/g," ");//if entityName as a space like "test contacts" it will be saved in menu as "test_contact"
-				FL.API.debug = true;
+				// FL.API.debug = true;
 				if(FL.dd.isEntityInLocalDictionary(entityName)){
 					if(FL.dd.isEntityInSync(entityName) ){//entityName exists in local dictionary and is in sync
 						DefaultGridWithNewsLetterAndEditButtons(entityName);
@@ -683,7 +679,7 @@
 				promise.done(function(data){
 					console.log(">>>>> FL.links.getMandrillRejectListForSender() SUCCESS <<<<< list returned!");
 					// alert("getMandrillRejectListForSender:"+JSON.stringify(data));
-					FL.clearSpaceBelowMenus();
+					FL.common.clearSpaceBelowMenus();
 					$( "#_placeHolder" ).show();
 					$( "#_placeHolder" ).append( '<h2 style="margin-left: 30px">Rejected Email List for sender ' + senderEmail + ' </h2>' );
 					$( "#_placeHolder" ).append( '<dl style="margin-left: 30px"></dl>' );
@@ -710,7 +706,7 @@
 				promise.done(function(data){
 					console.log(">>>>> FL.links.displayStatistics() SUCCESS <<<<< list returned!");
 					// alert("FL.links.displayStatistics():"+JSON.stringify(data));
-					FL.clearSpaceBelowMenus();
+					FL.common.clearSpaceBelowMenus();
 					$( "#_placeHolder" ).show();
 					$( "#_placeHolder" ).append( '<h2 style="margin-left: 30px">email statistics per user ' + user + ' </h2>' );
 					$( "#_placeHolder" ).append( '<dl style="margin-left: 30px"></dl>' );

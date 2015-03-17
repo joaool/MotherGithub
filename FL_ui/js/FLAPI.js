@@ -446,17 +446,50 @@
 			});
 			return def.promise();
 		};
+		var _fieldUpdate = function(obj){//updates a field with _id=field_id defined inside object obj with all field definitions
+			//obj - {_id:field_id,name_3:x1,description_4:x2,label_K:x3,type_M:x4,typeUI_9:x5,enumerable_N:x6} - all keys must be supplied
+			var def = $.Deferred();
+			var fl = FL.login.token.fl; //new flMain();
+			// var fl = new flMain();
+			// var fa = FL.login.token.fa;//new fl.app();
+			var fField = new fl.field();
+			var field_id = obj._id;
+			fField.update({"query":{"_id":field_id},"update":{"3":obj.name_3,"4":obj.description_4,"K":obj.label_K,"M":obj.type_M,"9":obj.typeUI_9,"N":obj.enumerable_N,"O":obj.Nico_O }}, function (err, data){
+				console.log("............................._fieldUpdate....");
+				// err = "abc";
+				if(err){
+					// alert("ERROR ON _addWithFields err="+err);
+					console.log("======================>ERROR ON _fieldUpdate err="+err);
+					def.reject("ERROR: _fieldUpdate err="+err);
+				}else{
+					console.log("=====================================>_fieldUpdate: OK ");
+					def.resolve(data);
+				}
+			});
+			return def.promise();
+		};
+		var _fieldUpdateMultiple = function(arrOf_Obj){ //updates multiple fields
+			var def = $.Deferred();
+			var promise = FL.API.queueManager("_fieldUpdate","ignored",arrOf_Obj);
+			promise.done(function(result){
+				return def.resolve(arrOf_IdToRemove.length);
+			});
+			promise.fail(function(err){
+				return def.reject(err);
+			});
+			return def.promise();		
+		};
 		var _userCreate = function(userName,userPassWord,userType){//username is always an email
 	// fl.userCreate({"adminName": "nico@framelink.co", "adminPassWord": "coLas", "userName": "toto@gmail.com", "userPassWord": "dodo12345", 
-	// 			   "userType": 'user'}, function (err, data){
+	//		"userType": 'user'}, function (err, data){
 			var def = $.Deferred();
 			var fl = FL.login.token.fl; //new flMain();
 			if(!fl){
 				fl = new flMain();
-			}	
+			}
 			// fl.userChangePassWord({"adminName":"nico@framelink.co", "adminPassWord":"coLas",
-			// 		"userName":FL.login.token.userName, "userPassWord":password}, function(err, result){
-			fl.userCreate({"adminName": "nico@framelink.co", "adminPassWord": "coLas", "userName": userName, "userPassWord":userPassWord, 
+			//	"userName":FL.login.token.userName, "userPassWord":password}, function(err, result){
+			fl.userCreate({"adminName": "nico@framelink.co", "adminPassWord": "coLas", "userName": userName, "userPassWord":userPassWord,
 				"userType": userType}, function (err, data){//userType: user/clientAdmin/admin
 				console.log("............................._userCreate....TO "+password);
 				// err = "abc";
@@ -812,18 +845,135 @@
 			var def = $.Deferred();
 			var fl = FL.login.token.fl; //new flMain();
 			var fd = new fl.data();
-
-			fd.remove(ecn, {"query":{"_id":_id}}, function(err, result){
-				console.log("............................._remove....i_id="+_id);
+			fd.remove(ecn, {"query":{_id:_id}}, function(err, result){
+				// console.log("............................._remove....i_id="+_id);
 				if(err){
 					console.log("======================>ERROR ON _remove err="+err);
 					def.reject(err);
 				}else{
 					console.log("=====================================>_remove: OK ");
-					def.resolve();
+					def.resolve(result);
 				}
+            });
+			return def.promise();
+		};
+		var X_removeMultiple = function(ecn,arrOf_IdToRemove){ //remove  a single row within table ecn (entity compressed name)
+			var def = $.Deferred();
+			var numberOfEl = arrOf_IdToRemove.length;
+			var counter = 0;
+            _.each(arrOf_IdToRemove, function (element) {
+				var promise=_remove(ecn,element);
+				promise.done(function(result){
+					counter +=result;
+					if(numberOfEl--=== 0)
+						return def.resolve(counter);
+				});
+				promise.fail(function(err){
+					return def.reject(err);
+				});
+            });
+		};
+		var _removeMultiple = function(ecn,arrOf_IdToRemove){ //remove  a single row within table ecn (entity compressed name)
+			var def = $.Deferred();
+			var promise = FL.API.queueManager("_remove",ecn,arrOf_IdToRemove);
+			promise.done(function(result){
+				return def.resolve(arrOf_IdToRemove.length);
+			});
+			promise.fail(function(err){
+				return def.reject(err);
 			});
 			return def.promise();
+		};
+		var _dummy = function(ecn,_id){ //remove  a single row within table ecn (entity compressed name)
+			var def = $.Deferred();
+			setTimeout(function(){
+				console.log("***********************************************************************************************");
+				console.log("**************************  _dummy-------------------->execution="+_id);
+				console.log("***********************************************************************************************");
+				def.resolve(1);
+				// def.reject("dummy failure !");
+			},600);
+			return def.promise();
+		};
+		var queueManager = function(funcName,param1,arrToDispatch){ //call a function each 200 milisecondsremove  a single row within table ecn (entity compressed name)
+			// calls the same asynchronous function several times assuring that after the first call all subsequent calls are done after a successfull completion of the previous call.
+			//   funcName = name of the function to be called...it must be in the list: _dummy,_remove,_fieldUpdate
+			//	 param1 - a parameter constant between calls
+			//   arrToDispatch - array where each element is passed in each call (one at a time)
+			//		for "_remove" - a list of _ids to remove
+			//		for "_fieldUpdate" - a list of objects. Each object has {name_3:x1,description_4:x2,label_K:x3,type_M:x4,typeUI_9:x5,enumerable_N:x6}
+			//		for "updateAttribute" - runs FL.dd.updateAttribute() for multiple attributes. Each element of arrayToDispatch is an object
+			//			with {singular:xSingular,oldname:xOldname,name_3:x1,description_4:x2,label_K:x3,type_M:x4,typeUI_9:x5,enumerable_N:x6}
+			//			example: var promise = FL.API.queueManager("updateAttribute","dummy",bufferChangeObjs);
+			// returns a promise  valid if all calls were successfully done, or a promise fillure  if any of the calls failled
+			//    Parameters to adjust:
+			//			delay = time to wait between tries
+			//			maxRefused = just in case fuse.... a high number to prevent infinite loops
+			
+			// TESTING
+			// var promise = FL.API.queueManager("_dummy","abc",[230,231,232,233]);
+			// promise.done(function(result){
+			// 	alert("queueManager - PROMISE DONE!!!");
+			// });
+			// promise.fail(function(result){
+			// 	alert("queueManager - PROMISE FAIL!!!");
+			// });
+			var def = $.Deferred();
+
+			// var param1=param1;
+			
+			var numberOfEl = arrToDispatch.length;
+			var delay = 200;//time between tries to call promise
+			var counter = 0;//number of well succeded calls
+			var refusedCounter = 0;//number of refused calls
+			var maxRefused = 100;//limit of refused - more than this limit =>error
+			var next = true;
+			var intervalId = setInterval(function () {
+				if (next){
+					if(counter<numberOfEl){
+						next = false;
+						promise = null;
+						if (funcName == "_dummy")
+							promise=_dummy(param1,arrToDispatch[counter]);
+						else if(funcName == "_remove")
+							promise=_remove(param1,arrToDispatch[counter]);
+						else if(funcName == "_fieldUpdate")
+							promise=_fieldUpdate(arrToDispatch[counter]);//no constant parameter between calls
+						else if(funcName == "updateAttribute"){
+							var changeObj = arrToDispatch[counter];
+							promise=FL.dd.updateAttribute(changeObj.singular,changeObj.oldname,changeObj);
+						}else{
+							console.log("***************************  execution=rejected !!! ->Invalid funcName="+funcName);
+							clearInterval(intervalId);
+							return def.reject("function name ->"+funcName+" is INVALID.");
+						}
+						promise.done(function(result){
+							counter +=1;
+							if(counter == numberOfEl){
+								clearInterval(intervalId);
+								return def.resolve(counter);
+							}
+							next = true;
+						});
+						promise.fail(function(err){
+							console.log("***************************  execution=fail !!! ->"+funcName+" failure. Err="+err);
+							clearInterval(intervalId);
+							return def.reject("Error in "+funcName+" err="+err);
+						});
+					}
+				}else{
+					if(refusedCounter>maxRefused){
+						clearInterval(intervalId);
+						alert("queueManager ERROR more than " + maxRefused + " =>too many refusals.")
+						return def.reject("Refusals max exceeded !");		
+					}
+					console.log("***********************************************************************************************");
+					console.log("***************************  step execution=refused -> " + counter + " --->"+arrToDispatch[counter]);
+					console.log("***********************************************************************************************");
+					refusedCounter++;
+				}
+			}, delay);
+            return def.promise();
 		};		
 		var convertRecordsTo_arrToSend = function(entityName,recordsArray){//used by saveTable()
 			//Converts format: [{"name":cli1,"city":"Lx","country":"Pt"},{..},....] to 
@@ -900,6 +1050,9 @@
 			// },
 			clearServerToken: function(){
 				FL.login.token = tokenClear();
+			},
+			queueManager:function(funcName,param1,arrToDispatch){
+				return queueManager(funcName,param1,arrToDispatch);
 			},
 			convertArrC2LForEntity: function(entityName,serverArr){//serverArr =>[{"_id":123,d:{},r:[]},{"_id":124,d:{},r:[]},....{"_id":125,d:{},r:[]}]
 				//Use the dictionary for entityName to convert compressed field names in keys in serverArr to logical field names
@@ -1149,6 +1302,14 @@
 				addWithFields.fail(function(err){console.log(">>>>> syncLocalDictionaryToServer FAILURE <<<<< "+err);return def.reject();});
 				return def.promise();
 			},
+			updateDictionaryAttribute: function(fCN,oAttribute){//works with FL.dd.updateAttribute to update attribute to server
+				var def = $.Deferred();
+				var attrJSON = {"_id":fCN,"name_3":oAttribute.name, "description_4":oAttribute.description, 'label_K': oAttribute.label,'typeUI_9':oAttribute.typeUI, 'type_M': oAttribute.type, 'enumerable_N':oAttribute.enumerable, 'Nico_O':false };
+				var fieldUpdatePromise=_fieldUpdate(attrJSON);
+				fieldUpdatePromise.done(function(result){console.log(">>>>> updateDictionaryAttribute SUCCESS <<<<<");return def.resolve(result);});
+				fieldUpdatePromise.fail(function(err){console.log(">>>>> updateDictionaryAttribute FAILURE <<<<< "+err);return def.reject(err);});
+				return def.promise();
+			},
 			loadAppDataForSignInUser2: function() {//loads (local dict + menu + style + fontFamily) from server
 				console.log("....................................>beginning loadAppDataForSignInUser2....with token="+JSON.stringify(FL.login.token));
 				var def = $.Deferred();
@@ -1356,9 +1517,11 @@
 				}	
 				return def.promise();
 			},
-			removeRecordFromTable: function(entityName,record) {//removes a single record from a table
+			// removeRecordFromTable: function(entityName,record) {//removes a single record from a table
+			removeRecordFromTable: function(entityName,arrOf_Id) {//removes all _id in the array arrOf_Id
 				//assumes a login to an application exists and entitName exists in local and is in sync
 				//record is a JSON containing a _id key {"_id":12345,"id":1,"code":"abc"}
+				//arrOf_Id is an array containing _id keys [12345,12312343]
 				console.log("....................................>beginning removeRecordFromTable....with appToken="+JSON.stringify(FL.login.appToken));
 				var def = $.Deferred();
 				var ecn = FL.dd.getCEntity(entityName);
@@ -1372,18 +1535,21 @@
 						return def.reject("removeRecordFromTable table="+entityName+ " not in sync");//
 					}else{//table exists and is in sync
 						console.log("........FL.API.removeRecordFromTable() table="+entityName+ " is ok. We will remove!");
-						if(record._id){
-							console.log("remove ->"+record._id+" record="+JSON.stringify(record));
-							var removePromise = _remove(ecn,record._id);
-							removePromise.done(function(){
+						// if(record._id){
+						if(arrOf_Id.length>0){
+							// console.log("remove ->"+record._id+" record="+JSON.stringify(record));
+							console.log("remove -> _Ids in array "+JSON.stringify(arrOf_Id));
+							// var removePromise = _remove(ecn,record._id);
+							var removePromise = _removeMultiple(ecn,arrOf_Id);
+							removePromise.done(function(count){
 								console.log(">>>>> removePromise SUCCESS <<<<< record removed!");
-								def.resolve();
+								def.resolve(count);
 							});
 							removePromise.fail(function(err){console.log(">>>>> removePromise FAILURE <<<<<"+err);def.reject(err);});
 							// return def.resolve(data);
 						}else{
 							console.log("........FL.API.removeRecordFromTable() table="+entityName+ " is ok but _id is missing");
-							return def.reject("removeRecordFromTable table="+entityName+ " -->error: missing _id");//
+							return def.reject("removeRecordFromTable table="+entityName+ " -->error: array of _ids is empty");//
 						}	
 						// insertPromise.then(function(data){return def.resolve(data);},function(err){return def.reject(err);});
 					}

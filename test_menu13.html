@@ -851,25 +851,28 @@ mixpanel.init("19ada1cb259cc3272c67085eb1bf03fc");</script><!-- end Mixpanel -->
 						</ul>
 					</div>
 				</div>
-				<div id="_placeHolder"></div>
-				<!-- <form id="addPerson" action="">
-					<input type="text" placeholder="Person's name">
-					<input class="btn btn-primary" type="submit" value="Add Person">
-				</form> -->
-				<div id="personContent" class="col-sm-12"></div>
-				<div class="row">
-				    <div id="csvcontent" class="col-sm-12"></div>
-				</div>				
-				<div class="col-md-12 backgrid-container">
-					<button id="addGrid" class="edit btn btn-info glyphicon glyphicon-plus-sign"></button>
-					<button id="_newsletter" class="edit btn btn-success glyphicon glyphicon-envelope"></button>
-					<button id="_newsletterMC" class="edit btn btn-success glyphicon glyphicon-envelope"></button>
-					<button id="_editGrid" class="edit btn btn-success glyphicon glyphicon-pencil"></button>
-					<button id="_select" class="edit btn btn-default glyphicon glyphicon-ok"></button>
-					<button id="_unSelect" class="edit btn btn-default glyphicon glyphicon-remove"></button>
-					<div id="grid">
-					</div>			
-					<div id="paginator"></div>				
+				<div id="_belowMenus">
+					<div id="_placeHolder"></div>
+					<!-- <form id="addPerson" action="">
+						<input type="text" placeholder="Person's name">
+						<input class="btn btn-primary" type="submit" value="Add Person">
+					</form> -->
+					<div id="personContent" class="col-sm-12"></div>
+					<div class="row">
+					    <div id="csvcontent" class="col-sm-12"></div>
+					</div>				
+					<div class="col-md-12 backgrid-container">
+						<button id="addGrid" class="edit btn btn-info glyphicon glyphicon-plus-sign" title="add a new row to the bottom of the grid" style="float:left"></button>
+						<button id="_delete" class="edit btn btn-danger glyphicon glyphicon-remove" title="delete selected rows" style="float:left;margin-left:1px"></button>
+						<button id="_editGrid" class="edit btn btn-success glyphicon glyphicon-pencil" title="edit grid columns" style="float:left;margin-left:1px"></button>
+						<button id="_newsletter" class="edit btn btn-success glyphicon glyphicon-envelope" title ="send mail/newsletter to selected rows" style="float:right;margin-left:1px"></button>
+						<button id="_newsletterMC" class="edit btn btn-success glyphicon glyphicon-star" title="send mail/newsletter using mailChimp templates" style="float:right;margin-left:1px"></button>
+						<div style="clear:both;"></div>
+						<!-- <button id="_select" class="edit btn btn-default glyphicon glyphicon-ok" style="float:right"></button> -->
+						<div id="grid">
+						</div>			
+						<div id="paginator"></div>				
+					</div>
 				</div>
 			</div>
 		</div>	

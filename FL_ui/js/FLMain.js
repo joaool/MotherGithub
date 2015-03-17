@@ -18,7 +18,7 @@ var FL = FL || {};
 	var spinner=FL.common.loaderAnimationON('spinnerDiv');
 	setInterval(function(){spinner.stop();},1000);
 	$(document).ready(function() {
-		FL.API.debug = true;
+		FL.API.debug = false;
 		FL.oMenu = FL.login.defaultMenu; //why is this necessary ? it is !
 		FL.common.clearSpaceBelowMenus();
 
@@ -93,7 +93,14 @@ var FL = FL || {};
 			return;
 		});
 
-        
+		// //testing queueManager
+		// var promise = FL.API.queueManager("_dummy","abc",[230,231,232,233]);
+		// promise.done(function(result){
+		// 	alert("queueManager - PROMISE DONE!!!");
+		// });
+		// promise.fail(function(err){
+		// 	alert("queueManager - PROMISE FAIL!!! err="+err);
+		// });
 
 	});
 	// FL.login.token = {};
@@ -119,7 +126,7 @@ var FL = FL || {};
 			console.log("process 0 COMPLETE");
 			deferred.resolve();
 		}, 5000);
-		return deferred.promise();		
+		return deferred.promise();
 	};
 	var p1 = function(){
 		var def = $.Deferred();
@@ -137,14 +144,14 @@ var FL = FL || {};
 			console.log("process 1 COMPLETE");
 			def.resolve();
 		}, 2000);
-		return def.promise();		
+		return def.promise();
 	};
 	var p2 = function process2(){
 		var deferred = $.Deferred();
 		console.log("process 2 begins...");
 
 		console.log("process 2 COMPLETE");
-		return deferred.promise();		
+		return deferred.promise();
 	};
 	//only enters p1 after p0 is resolved
 	// p0().then(p1).then(p2);//OK !!!! DRY Dont Repeat Yourself and single Responsability Principle

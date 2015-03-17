@@ -168,6 +168,12 @@ window.csvStore = {
         var arrOfKeys = _.keys(this.csvRows);
         // arrOfKeys[3] = "101";// to test
         var last = _.max(arrOfKeys,function(element){ return  parseInt(element,10); });
+        if(arrOfKeys.length === 0 ){
+            last = 0;
+        }else{
+            if( isNaN( this.csvRows[last].id ) )
+                last = 0;
+        }
         return parseInt(last,10)+1;
     },
     getNumberOfLines: function(){//returns a number with the id of the last element + 1 
@@ -266,12 +272,12 @@ window.csvStore = {
 
     destroy: function (model) {
         console.log("memoryCsv.js - delete row "+JSON.stringify(model.attributes));
-        var promise=FL.API.removeRecordFromTable(this.entityName,model.attributes);
-        promise.done(function(){
-            console.log(">>>>>memoryCsv destroy removeRecordFromTable SUCCESS <<<<<");
-            return model;
-        });
-        promise.fail(function(err){console.log(">>>>>memoryCsv destroy removeRecordFromTable FAILURE <<<<<"+err);return model;});
+        // var promise=FL.API.removeRecordFromTable(this.entityName,model.attributes);
+        // promise.done(function(){
+        //     console.log(">>>>>memoryCsv destroy removeRecordFromTable SUCCESS <<<<<");
+        //     return model;
+        // });
+        // promise.fail(function(err){console.log(">>>>>memoryCsv destroy removeRecordFromTable FAILURE <<<<<"+err);return model;});
         delete this.csvRows[model.id];//it is used !!!
         return model;
     },
