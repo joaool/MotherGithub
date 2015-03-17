@@ -18,6 +18,7 @@ CKEDITOR.editorConfig = function( config ) {
 		{name : 'textStyles', items : ['TextColor', 'BGColor']},
 		{name : 'link', items : ['Link']},
 		{ name: 'paragraph', items: [ 'JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock' ] },
+		
 //		{ name: 'textStyles', items: ['TextColor', 'BGColor', '-', 'Link' ] },
 //		{ name: 'insert', items: [ 'Image', 'Flash', 'Table', 'HorizontalRule', 'Smiley', 'SpecialChar', 'PageBreak', 'Iframe' ] },
 //		'/',
@@ -26,6 +27,7 @@ CKEDITOR.editorConfig = function( config ) {
 //		{ name: 'tools', items: [ 'Maximize', 'ShowBlocks' ] },
 //		{ name: 'others', items: [ '-' ] },
 //		{ name: 'about', items: [ 'About' ] }
+		{ name: 'insert', items: [ 'unsubscribe' ] },
 	];
 
 	// Toolbar groups configuration.
@@ -38,7 +40,7 @@ CKEDITOR.editorConfig = function( config ) {
 		{ name: 'basicstyles', groups: [ 'basicstyles', 'cleanup'] },
 //		{ name: 'paragraph', groups: [ 'list', 'indent', 'blocks', 'align', 'bidi' ] },
 //		{ name: 'textStyles', groups: ['textStyles'] },
-//		{ name: 'insert' },
+		{ name: 'insert' },
 //		'/',
 //		{ name: 'styles' },
 //		{ name: 'colors' },
@@ -46,4 +48,5 @@ CKEDITOR.editorConfig = function( config ) {
 //		{ name: 'others' },
 //		{ name: 'about' }
 	];
+	config.extraPlugins = 'unsubscribe';
 };

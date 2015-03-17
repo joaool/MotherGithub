@@ -1,5 +1,6 @@
 
 window.MailerTemplate = {
+	UNSUBSCRIBELINK : "http://62.210.97.101/#unsubscribe",
 	Models : {},
 	Collections : {},
 	Views : {},
