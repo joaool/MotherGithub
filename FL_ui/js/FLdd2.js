@@ -768,7 +768,7 @@
 				//changeObj is an object with keys corresponding to xAttribute (old name - notice that the name itself can be changed).
 				// May have any key or key combination of:{name:xName,description:xDescription,label:xLabel,type:xType,typeUI:xTypeUI,enumerable:xEnumerable}
 				var def = $.Deferred();
-
+				var err = null;
 				var oEntity = this.entities[xSingular];
 				if(oEntity){
 					var xIndex = attributeIndex(xSingular,xAttribute);
@@ -781,14 +781,24 @@
 							oEntity.L2C[oAttributes.name] = compressedAttr;
 						}
 						oEntity.attributes[xIndex] = oAttributes;
+						var fCN = oEntity.L2C[oAttributes.name];
 						//send to server
-
-						oEntity.sync = false;
+						var promise = FL.API.updateDictionaryAttribute(fCN,oAttributes);
+						promise.done(function(result){
+							oEntity.sync = true;
+							return def.resolve(result);
+						});
+						promise.fail(function(err){
+							oEntity.sync = false;
+							return def.reject(err);
+						});
 					}else{
-						alert("FL.dd.updateAttribute Error: impossible to update attribute "+xAttribute+". It does not exist in entity "+xSingular);
+						err = "FL.dd.updateAttribute Error: impossible to update attribute "+xAttribute+". It does not exist in entity "+xSingular;
+						return def.reject(err);
 					}
 				}else{
-					alert("FL.dd.updateAttribute Error: you tried to update attribute "+xAttribute+" to a non existing entity "+xSingular);
+					err = "FL.dd.updateAttribute Error: you tried to update attribute "+xAttribute+" to a non existing entity "+xSingular;
+					return def.reject(err);
 				}
 				return def.promise();
 			},

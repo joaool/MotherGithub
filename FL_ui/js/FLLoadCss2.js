@@ -357,7 +357,7 @@ jQuery(document).ready(function($){
 		var newUserAccess = function(loginObject){//when login email is valid and other data acceptable - {email:email,userName:userName,password:password};
 			// loginObject = {email:email,userName:userName,password:password};
 			var def = $.Deferred();
-			FL.API.debug = true;
+			// FL.API.debug = true;
 			var loginPromise = null;
 			// check if the user exists - if it does not exist => creates it.
 			console.log("loginAccess not a guest -------------------------------------------------------> checks if user exists");

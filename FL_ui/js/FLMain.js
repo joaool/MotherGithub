@@ -18,7 +18,7 @@ var FL = FL || {};
 	var spinner=FL.common.loaderAnimationON('spinnerDiv');
 	setInterval(function(){spinner.stop();},1000);
 	$(document).ready(function() {
-		FL.API.debug = true;
+		FL.API.debug = false;
 		FL.oMenu = FL.login.defaultMenu; //why is this necessary ? it is !
 		FL.common.clearSpaceBelowMenus();
 

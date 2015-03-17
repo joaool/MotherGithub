@@ -267,7 +267,7 @@
 						elObj["key"] = false;
 						newAttributesArr.push(elObj);
 					},this);
-					var oldSingular = singular;
+					var oldSingular = entityName;
 					var singular = masterDetailItems.master.entityName.trim();//to retrieve the header content from the interface
 					var description = masterDetailItems.master.entityDescription.trim();//to retrieve the header content from the interface
 					
@@ -305,25 +305,22 @@
 								var changeObj = {name:element.name,description:element.description,label:element.label,type:element.type,typeUI:element.typeUI,enumerable:element.enumerable};
 								changeObj["singular"]=singular;
 								changeObj["oldname"]=element.oldName;
-
 								bufferChangeObjs.push(changeObj);
 							}
 						},this);
-						var promise = FL.API.queueManager("_updateAttribute","ignore",bufferChangeObjs);
+						var promise = FL.API.queueManager("updateAttribute","dummy",bufferChangeObjs);
 						promise.done(function(result){
+							FL.grid.displayDefaultGrid(entityName,false);//loads from server and displaywithout newsl
 							return def.resolve(bufferChangeObjs.length);
 						});
 						promise.fail(function(err){
+							alert("editGrid FAIL");
 							return def.reject(err);
 						});
-
-
-	
 					// FL.common.clearSpaceBelowMenus();
 					// $("#addGrid").show();
 					// $("#addGrid").html(" Add Row");
 					// $("#_editGrid").show();
-						FL.grid.displayDefaultGrid(entityName,false);//loads from server and displaywithout newsl
 					}
 					var z=32;
 				}else{

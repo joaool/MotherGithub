@@ -454,14 +454,14 @@
 			// var fa = FL.login.token.fa;//new fl.app();
 			var fField = new fl.field();
 			var field_id = obj._id;
-			fField.update({"query":{"_id":field_id},"update":{"3":obj.name_3,"4":obj.description_4,"K":obj.label_K,"M":obj.type_M,"9":obj.typeUI_9,"N":obj.enumerable_N}}, function (err, data){
+			fField.update({"query":{"_id":field_id},"update":{"3":obj.name_3,"4":obj.description_4,"K":obj.label_K,"M":obj.type_M,"9":obj.typeUI_9,"N":obj.enumerable_N,"O":obj.Nico_O }}, function (err, data){
 				console.log("............................._fieldUpdate....");
 				// err = "abc";
 				if(err){
 					// alert("ERROR ON _addWithFields err="+err);
 					console.log("======================>ERROR ON _fieldUpdate err="+err);
 					def.reject("ERROR: _fieldUpdate err="+err);
-				}else{				
+				}else{
 					console.log("=====================================>_fieldUpdate: OK ");
 					def.resolve(data);
 				}
@@ -900,8 +900,11 @@
 			//   funcName = name of the function to be called...it must be in the list: _dummy,_remove,_fieldUpdate
 			//	 param1 - a parameter constant between calls
 			//   arrToDispatch - array where each element is passed in each call (one at a time)
-			//		for _remove - a list of _ids to remove
-			//		for _fieldUpdate - a list of objects. Each object has {name_3:x1,description_4:x2,label_K:x3,type_M:x4,typeUI_9:x5,enumerable_N:x6}
+			//		for "_remove" - a list of _ids to remove
+			//		for "_fieldUpdate" - a list of objects. Each object has {name_3:x1,description_4:x2,label_K:x3,type_M:x4,typeUI_9:x5,enumerable_N:x6}
+			//		for "updateAttribute" - runs FL.dd.updateAttribute() for multiple attributes. Each element of arrayToDispatch is an object
+			//			with {singular:xSingular,oldname:xOldname,name_3:x1,description_4:x2,label_K:x3,type_M:x4,typeUI_9:x5,enumerable_N:x6}
+			//			example: var promise = FL.API.queueManager("updateAttribute","dummy",bufferChangeObjs);
 			// returns a promise  valid if all calls were successfully done, or a promise fillure  if any of the calls failled
 			//    Parameters to adjust:
 			//			delay = time to wait between tries
@@ -938,7 +941,7 @@
 							promise=_fieldUpdate(arrToDispatch[counter]);//no constant parameter between calls
 						else if(funcName == "updateAttribute"){
 							var changeObj = arrToDispatch[counter];
-							promise=FL.dd.updateAttribute(changeObj.singular,changeObj.oldName,changeObj);
+							promise=FL.dd.updateAttribute(changeObj.singular,changeObj.oldname,changeObj);
 						}else{
 							console.log("***************************  execution=rejected !!! ->Invalid funcName="+funcName);
 							clearInterval(intervalId);
@@ -1297,6 +1300,14 @@
 				var addWithFields=_addWithFields(entityJSON);
 				addWithFields.done(function(){console.log(">>>>> syncLocalDictionaryToServer SUCCESS <<<<<");return def.resolve();});
 				addWithFields.fail(function(err){console.log(">>>>> syncLocalDictionaryToServer FAILURE <<<<< "+err);return def.reject();});
+				return def.promise();
+			},
+			updateDictionaryAttribute: function(fCN,oAttribute){//works with FL.dd.updateAttribute to update attribute to server
+				var def = $.Deferred();
+				var attrJSON = {"_id":fCN,"name_3":oAttribute.name, "description_4":oAttribute.description, 'label_K': oAttribute.label,'typeUI_9':oAttribute.typeUI, 'type_M': oAttribute.type, 'enumerable_N':oAttribute.enumerable, 'Nico_O':false };
+				var fieldUpdatePromise=_fieldUpdate(attrJSON);
+				fieldUpdatePromise.done(function(result){console.log(">>>>> updateDictionaryAttribute SUCCESS <<<<<");return def.resolve(result);});
+				fieldUpdatePromise.fail(function(err){console.log(">>>>> updateDictionaryAttribute FAILURE <<<<< "+err);return def.reject(err);});
 				return def.promise();
 			},
 			loadAppDataForSignInUser2: function() {//loads (local dict + menu + style + fontFamily) from server

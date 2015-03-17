@@ -602,7 +602,7 @@
 			setDefaultGrid: function(entityName) {//called with menu key "uri": "javascript:FL.links.setDefaultGrid('JOJO')"
 				// alert("setDefaultGrid"+entityName);
 				entityName = entityName.replace(/_/g," ");//if entityName as a space like "test contacts" it will be saved in menu as "test_contact"
-				FL.API.debug = true;
+				// FL.API.debug = true;
 				if(FL.dd.isEntityInLocalDictionary(entityName)){
 					if(FL.dd.isEntityInSync(entityName) ){//entityName exists in local dictionary and is in sync
 						DefaultGridWithNewsLetterAndEditButtons(entityName);
