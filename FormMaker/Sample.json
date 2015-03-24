@@ -1,0 +1,117 @@
+{
+	"elements": [
+		{
+			"element": "Text",
+			"type": "email",
+			"leftLabel": "Your Name:",
+			"placeholder": "Please introduce your name",
+			"value": "Antonio",
+			"icon": "glyphicon-envelope",
+			"trigger": "change",
+			"icon": "glyphicon-envelope",
+			"tooltip": "This is a nice email"
+		},
+		{
+			"element": "TextLabel",
+			"type": "password",
+			"leftLabel": "Password:",
+			"placeholder": "Password",
+			"value": "Antonio123",
+			"icon": "glyphicon-lock",
+			"trigger": "change",
+			"label": "Please introduce your password:",
+			"tooltip": "This is a nice password"
+		},
+		{
+			"element": "Checkbox",
+			"chkArr": [
+				{
+					"label": "first checkbox",
+					"checked": true,
+					"onChange": null
+				},
+				{
+					"label": "checkbox two",
+					"checked": false,
+					"onChange": null
+				},
+				{
+					"label": "Like FrameLink",
+					"checked": true,
+					"onChange": null
+				}
+			]
+		 },
+		{
+			"element": "Checkbox",
+			"chkArr": [
+				{
+					"label": "Are you ready ?",
+					"checked": false,
+					"onChange": null
+				}
+			 ]
+		 },
+		{
+			"element": "Radio",
+			"radioArr": [
+				{
+					"label": "Poor",
+					"onChange": null
+				},
+				{
+					"label": "Good",
+					"checked": true,
+					"onChange": null
+				},
+				{
+					"label": "Excellent",
+					"onChange": null
+				},
+				{
+					"label": "No idea",
+					"onChange": null
+				}
+			 ]
+		},
+		{
+			"element": "Combo",
+			"leftLabel": "Please choose a template:",
+			"tooltip": "Hi zz, please select  your template here",
+			"comboLabel": "Select One Template",
+			"onClick": "clickTest('combo')",
+			"comboArr": ["first choice", "second one", "option 3"],
+			"caption": "Test",
+			"btnType": "default" 
+		},
+		{
+			"element": "Button",
+			"buttonArr": [
+				{
+					"btnType": "info",
+					"label": "Press 1",
+					"onClick": "clickTest('btn1')",
+					"tooltip": "please press1"
+				},
+				{
+					"btnType": "success",
+					"label": "Joakim Almeida",
+					"onClick": "clickTest('btn2')",
+					"tooltip": "please press2"
+				},
+				{
+					"btnType": "danger",
+					"label": "Press 3",
+					"onClick": "clickTest('btn3')",
+					"tooltip": "please press3"
+				},
+				{
+					"btnType": "primary",
+					"label": "Special",
+					"onClick": "clickTest('Special')",
+					"tooltip": "please press special"
+				}
+			]
+		}
+	]
+}
