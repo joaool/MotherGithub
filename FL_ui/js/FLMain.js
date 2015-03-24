@@ -1,17 +1,28 @@
 var FL = FL || {};
 (function() {//hijack any JavaScript funct <----------- OK !!!
-//http://stackoverflow.com/questions/9216441/intercept-calls-to-console-log-in-chrome
+	//http://stackoverflow.com/questions/9216441/intercept-calls-to-console-log-in-chrome
+	//Use:
+	//   to inhibit all console.log do FL.API.debug = false
+	//   to show all console.log with line numbers link do FL.API.debug = true (this assumes FL.API.debugStyle= 0)
+	//	 to show console.log without line numbers link do: FL.API.debug = true; FL.API.debugStyle= 1;
   var Oldlog = console.log;
   // console.log = function(){};//activate this instead of next - to "remove" all console.logs
   console.log = function() {
-    var nRepeat =  90 - arguments[0].length;
-      var args = [].slice.apply(arguments).concat([FL.common.repeat("-",nRepeat),(new Error()).stack.split(/\n/)[2].trim()]);
-      if(FL.API.debug){
+    // var nRepeat = 1; //90 - arguments[0].length;
+    // var args = [].slice.apply(arguments).concat([FL.common.repeat("-",nRepeat),(new Error()).stack.split(/\n/)[2].trim()]);
+    if(FL.API.debug){
         FL.API.fl.setTraceClient(2);
-        Oldlog.apply(this, args);
-      }else{
+		if (FL.API.debugStyle == 1){
+			Oldlog.apply(this, arguments);
+		}else{
+			var nRepeat = 90 - arguments[0].length;
+			var args = [].slice.apply(arguments).concat([FL.common.repeat("-",nRepeat),(new Error()).stack.split(/\n/)[2].trim()]);
+			Oldlog.apply(this, args);
+		}
+        // Oldlog.apply(this, args);
+    }else{
         FL.API.fl.setTraceClient(0);
-      }
+    }
   };
 })();
 (function() { //App is a name space.
@@ -68,7 +79,7 @@ var FL = FL || {};
 	// var myMenu = FL.menu.createMenu({jsonMenu:FL.clone(oMenu),initialMenu:"_home",editable:true});
 		// var myMenu = FL.menu.createMenu({jsonMenu:FL.clone(oMenu),initialMenu:"_mission",editable:true});
 		// var myMenu = FL.menu.createMenu({jsonMenu:FL.clone(oMenu)});
-		FL.setTourOn(true);
+		// FL.setTourOn(true);
 		FL.mixPanelEnable = false;
 		FL.server.offline = false;
 		localStorage.connection = '';

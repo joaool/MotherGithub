@@ -504,6 +504,7 @@
 				//		{name:"address",description:"address to send invoices",label:"Address",type:"string",enumerable:null,key:false});
 				//			NOTE: enumerable is null for all type except "enumerable" - in this case enumerable is an array of strings
 				// 
+				FL.API.debug = true;FL.API.debugStyle = 1;
 				console.log("********************************** FL.dd.displayEntities ********************************");
 				console.log("********************************************** BEGIN ******************************************");
 
@@ -564,6 +565,7 @@
 					}
 				}
 				console.log("********************************************** END of displayEntities *****************************************");
+				FL.API.debug = false; FL.API.debugStyle = 0;
 			},
 			countEntitiesBeginningBy: function(singularPrefix) {//return the number of entities whose singular name begins by singularPrefix
 				//example   var count = FL.dd.countsEntitiesBeginningBy("_unNamed");=>count = 0
@@ -613,7 +615,7 @@
 					xPlural = plural(xSingular,"En");  //+"s";
 					oEntity = {singular:xSingular,csingular:xCSingular,plural:xPlural,description:xDescription,sync:false,lastId:0,L2C:{},C2L:{},attributes:[],relations:[]};
 					this.entities[xSingular] = oEntity;
-					this.addAttribute(xSingular,"id",xSingular+"'s id","id","string");//we need to set key=true !!!
+					this.addAttribute(xSingular,"id",xSingular+"'s id","#","string");//we need to set key=true !!!
 					this.entities[xSingular].attributes[0].key=true;
 					xRet = true;
 				}else{//xSingular already exists in dictionary

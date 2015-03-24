@@ -270,57 +270,53 @@
 					var oldSingular = entityName;
 					var singular = masterDetailItems.master.entityName.trim();//to retrieve the header content from the interface
 					var description = masterDetailItems.master.entityDescription.trim();//to retrieve the header content from the interface
-					
-					
-				// FL.grid.adjustRowsToAttributes(rows,arrOfAttributes);//here we will adjust data.data according with the analisys feedback in newAttributesArr
+
+					var xPlural = FL.dd.plural(singular,"En");  //+"s";
+					FL.dd.updateEntityBySingular(oldSingular,{singular:singular,plural:xPlural,description:description});
 					
 					var loseInfo = csvStore.transformStoreTo(newAttributesArr,changedAttributesArr,changedTypeArr);
-					var columnsArrForGrid = utils.backGridColumnsFromArray(newAttributesArr);//uses dictionary format to prepare columns object for backgrid
-
-					FL.common.clearSpaceBelowMenus();
-					$("#addGrid").show();
-					$("#addGrid").html("Add Row");
-					$("#_editGrid").show();
-					$("#_editGrid").html(" Edit Grid in editGrid");
-
-
-					utils.mountGridInCsvStore(columnsArrForGrid);//mount backbone views and operates grid - columnsArr must be prepared to backGrid
 					if(loseInfo){
 						FL.common.makeModalConfirm("You will lose some information. Do you want to continue ?","No, cancel changes","Yes Please",function(result){
 							if(result){
-								FL.common.makeModalInfo("Now we will save it to server....");
+								// FL.common.makeModalInfo("Now we will save it to server....");
+								// FL.common.clearSpaceBelowMenus();
+								var spinner=FL.common.loaderAnimationON('spinnerDiv');
+								var updateDictionaryAllAttributesPromise = FL.API.updateDictionaryAllAttributes(entityName,singular,description,newAttributesArr);
+								updateDictionaryAllAttributesPromise.done(function(){
+									FL.API.debug = true; FL.API.debugStyle= 0;
+									var updatePromise = FL.grid.updateCurrentCSVToServer(entityName);
+									updatePromise.done(function(){
+										spinner.stop();
+										FL.API.debug = false; FL.API.debugStyle= 0;
+										FL.grid.displayDefaultGrid(entityName);//loads from server and display
+									});
+									updatePromise.fail(function(err){
+										spinner.stop();
+										FL.API.debug = false; FL.API.debugStyle= 0;
+										alert("editGrid updateDictionaryAllAttributes Failure err="+err);//loads from server and displaywithout newsl
+									});
+								});
+								updateDictionaryAllAttributesPromise.fail(function(err){
+									spinner.stop();
+									alert("editGrid updateDictionaryAllAttributes Failure err="+err);//loads from server and displaywithout newsl
+								});
+
 							}else{
 								FL.common.makeModalInfo("Nothing was saved the original grid is going to be restored....");
 								FL.grid.displayDefaultGrid(entityName);//loads from server and display
 							}
 						});
 					}else{//no info to be lost so we save in dict and reload 
-						//save to dict
-						var xPlural = FL.dd.plural(singular,"En");  //+"s";
-						FL.dd.updateEntityBySingular(oldSingular,{singular:singular,plural:xPlural,description:description});
-						//now the attributes...
-						var bufferChangeObjs = [];
-						_.each(newAttributesArr, function(element){//change type based on old attributes
-							if(element.name!="id"){
-								var changeObj = {name:element.name,description:element.description,label:element.label,type:element.type,typeUI:element.typeUI,enumerable:element.enumerable};
-								changeObj["singular"]=singular;
-								changeObj["oldname"]=element.oldName;
-								bufferChangeObjs.push(changeObj);
-							}
-						},this);
-						var promise = FL.API.queueManager("updateAttribute","dummy",bufferChangeObjs);
-						promise.done(function(result){
-							FL.grid.displayDefaultGrid(entityName,false);//loads from server and displaywithout newsl
-							return def.resolve(bufferChangeObjs.length);
+						var spinner=FL.common.loaderAnimationON('spinnerDiv');
+						var updateDictionaryAllAttributesPromise = FL.API.updateDictionaryAllAttributes(entityName,singular,description,newAttributesArr);
+						updateDictionaryAllAttributesPromise.done(function(result){
+							spinner.stop();
+							FL.grid.displayDefaultGrid(entityName);//loads from server and displaywithout newsl
 						});
-						promise.fail(function(err){
-							alert("editGrid FAIL");
-							return def.reject(err);
+						updateDictionaryAllAttributesPromise.fail(function(err){
+							spinner.stop();
+							alert("editGrid updateDictionaryAllAttributes Failure err="+err);//loads from server and displaywithout newsl
 						});
-					// FL.common.clearSpaceBelowMenus();
-					// $("#addGrid").show();
-					// $("#addGrid").html(" Add Row");
-					// $("#_editGrid").show();
 					}
 					var z=32;
 				}else{
@@ -624,26 +620,21 @@
 						var headerString = $("#_createGrid_header").val();
 						// alert("Title:"+entityName+"-->"+headerString);
 						if(entityName === "" || headerString === "")
-							alert("Empty sample or headerString => nothing to do");
+							FL.common.makeModalInfo("Empty sample or headerString => nothing to do");
 						else{
-							//FL.ddcreateEntity()
 							var arrOfColumns =prepareAttributesArr(headerString);
-							injectId("id",arrOfColumns); //now the first column is an "id" column 
-							// alert("--->"+JSON.stringify(arrOfColumns));
-							var columnsArr = utils.backGridColumnsFromArray(arrOfColumns);//extracts attributes from dictionary and prepares columns object for backgrid
-							csvStore.setAttributesArr(arrOfColumns);//saves arrOfColumns on csvStore -  [{label:"xx",name:fieldName,description:xDescription,type:xtype,enumerable:xEnumerable},{col2}...{}]
-
-							var emptyRowArr = prepareOneEmptyRowArray(arrOfColumns)
-
-							FL.grid.csvToStore(emptyRowArr); //feeds the csvStore data store object. It inserts id element and converts keys to lowercase
-
-							FL.common.clearSpaceBelowMenus();
-							$("#addGrid").show();
-							$("#addGrid").html("Add Row");
-							$("#_editGrid").show();
-							$("#_editGrid").html(" Edit Grid");
-							
-							utils.mountGridInCsvStore(columnsArr);//mount backbone views and operates grid - columnsArr must be prepared to backGrid
+							injectId("id",arrOfColumns); //now the first column is an "id" column
+							if(FL.dd.createEntityAndFields(entityName,"description of "+entityName,arrOfColumns)){
+								var columnsArr = utils.backGridColumnsFromArray(arrOfColumns);//extracts attributes from dictionary and prepares columns object for backgrid
+								csvStore.setAttributesArr(arrOfColumns);//saves arrOfColumns on csvStore -  [{label:"xx",name:fieldName,description:xDescription,type:xtype,enumerable:xEnumerable},{col2}...{}]
+								var emptyRowArr = prepareOneEmptyRowArray(arrOfColumns);
+								FL.grid.csvToStore(emptyRowArr); //feeds the csvStore data store object. It inserts id element and converts keys to lowercase
+								FL.common.clearSpaceBelowMenus();
+								utils.mountGridInCsvStore(columnsArr);//mount backbone views and operates grid - columnsArr must be prepared to backGrid
+								FL.grid.storeCurrentCSVToServerAndInsertMenu(entityName);//the 
+							}else{
+								FL.common.makeModalInfo("The entity name '" + entityName + "' already exist. Please choose another name.");
+							}
 						}
 					}else{
 						alert("Create Grid canceled");
@@ -783,11 +774,7 @@
 							if(!FL.grid.csvFile){
 								FL.common.makeModalInfo('There is a problem with ' + fileName + ' - Nothing was done');
 							}else{
-	 							FL.common.clearSpaceBelowMenus();
-								$("#addGrid").show();
-								$("#addGrid").html("Add Row");
-				 				$("#_editGrid").show();
-								$("#_editGrid").html(" Edit Grid");
+								FL.common.clearSpaceBelowMenus();
 								
 								var csvFile = FL.grid.csvFile;//set by FL.grid.validateCSV(this.files) --- was val = $('input[type=file]');
 								var delimiter = FL.grid.csvFileDelimiter;
@@ -817,16 +804,12 @@
 				});
 				csvStore.store(csvrows);
 			},
-			extractFromCsvStore: function(){
-				//Ex: from csvStore.csvRows = {"1":{"id":1,"shipped":true,"product":"Prod 1"},"2":{"id":2,"shipped":false,"product":"Prod 2"}}
-				var retArr=_.map(csvStore.csvRows, function(value,key){return value;});
-				return retArr;
-			},
 			insertDefaultGridMenu: function(singular,plural) {// Adds a menu with title <plural> and content displayDefaultGrid(<singular>)
 				// cursor over menu position <plural> will show: javascript:FL.links.setDefaultGrid('<singular>')
 				// if singular has spaces, they will be changed by "_"
 				var singularToUseInMenu = singular.replace(/ /g,"_");
-				var arrToSend = FL.grid.extractFromCsvStore(singular);
+				// var arrToSend = FL.grid.extractFromCsvStore(singular);
+				var arrToSend = csvStore.extractFromCsvStore(singular);
 				// console.log("FLGrid2.js --> insertDefaultGridMenu show arrToSend="+JSON.stringify(arrToSend));
 				// format for arraTosend must be-->[{"name":"Jojox","phone":"123"},{"name":"Anton","phone":"456"}];
 				var saveTablePromise = FL.API.saveTable(singular,arrToSend);
@@ -839,26 +822,33 @@
 					alert("FLGrid2.js --> insertDefaultGridMenu FAILURE !!! err="+err);
 				});
 			},
-			storeCurrentCSVToServerAndInsertMenu: function(entityName){ //(entityName,plural) Adds a menu with title <plural> and content displayDefaultGrid(<singular>)
+			storeCurrentCSVToServerAndInsertMenu: function(entityName,insertMenu){ //(entityName,plural) Adds a menu with title <plural> and content displayDefaultGrid(<singular>)
+				// entityName- Name of entity that will be stored
+				// insertMenu - true=> create new menu false=>no menu will be created
 				// cursor over menu position <plural> will show: javascript:FL.links.setDefaultGridByCN('<eCN>')
 				// if entityName has spaces, they will be changed by "_"
 				var spinner=FL.common.loaderAnimationON('spinnerDiv');
+				if(_.isUndefined(insertMenu) || insertMenu === null )
+					insertMenu = true;
 				var menuName = null;
 				if(!entityName){
 					entityName = FL.dd.nextEntityBeginningBy("unNamed");
-					menuName = "New Grid";			
+					menuName = "New Grid";
 				}else{
 					menuName = FL.dd.plural(entityName,"En");
 				}
 				FL.dd.createEntityAndFields(entityName,entityName+" description",csvStore.attributesArr);
 								
-				var arrToSend = FL.grid.extractFromCsvStore();
+				// var arrToSend = FL.grid.extractFromCsvStore();
+				var arrToSend = csvStore.extractFromCsvStore();
 				var saveTablePromise = FL.API.saveTable(entityName,arrToSend);
 				saveTablePromise.done(function(data){
 					console.log("FL.grid.storeCurrentCSVToServerAndInsertMenu --> dict synch and saveTable sucessfull ->"+JSON.stringify(data));
-					var eCN = FL.dd.getCEntity(entityName);
-					FL.login.permissionToAddMenu = true;//forces true...tis flag is set to false in FL.menu.topicCreateGridByCN to prevent 2 calls
-					$.Topic( 'createGridOptionByCN' ).publish( menuName,eCN );//broadcast that will be received by FL.menu to add an option
+					if(insertMenu){
+						var eCN = FL.dd.getCEntity(entityName);
+						FL.login.permissionToAddMenu = true;//forces true...tis flag is set to false in FL.menu.topicCreateGridByCN to prevent 2 calls
+						$.Topic( 'createGridOptionByCN' ).publish( menuName,eCN );//broadcast that will be received by FL.menu to add an option
+					}
 					FL.common.clearSpaceBelowMenus();
 					spinner.stop();
 					return;
@@ -873,6 +863,80 @@
 				//--------------------- old code
 				var singularToUseInMenu = entityName.replace(/ /g,"_");
 			},			
+			XupdateCurrentCSVToServer: function(entityName){ //update all records of entityName Table existing in dictionary
+				// entityName- Name of entity that will be stored
+				// if entityName has spaces, they will be changed by "_"
+				if(FL.dd.isEntityInLocalDictionary(entityName)){
+					var spinner=FL.common.loaderAnimationON('spinnerDiv');
+					var removeTablePromise = FL.API.removeTable(entityName);
+					removeTablePromise.done(function(data){					
+						// var arrToSend = FL.grid.extractFromCsvStore();
+						var arrToSend = csvStore.extractFromCsvStore();
+						var saveTablePromise = FL.API.saveTable(entityName,arrToSend);
+						saveTablePromise.done(function(data){
+							console.log("FL.grid.updateCurrentCSVToServer --> dict synch and saveTable sucessfull ->"+JSON.stringify(data));
+							spinner.stop();
+							return;
+						});
+						saveTablePromise.fail(function(err){
+							spinner.stop();
+							alert("FL.grid.updateCurrentCSVToServer --> after successful remove ->FAILURE in FL.API.saveTable err="+err);
+							return;
+						});
+
+					});
+					removeTablePromise.fail(function(err){
+						spinner.stop();
+						alert("FL.grid.updateCurrentCSVToServer --> FAILURE to remove table err="+err);
+						return;
+					});
+				}else{
+					alert("FL.grid.updateCurrentCSVToServer --> " + entityName + " does not exist in Local Dictionary");
+				}
+				//--------------------- old code
+				//var singularToUseInMenu = entityName.replace(/ /g,"_");
+			},
+			updateCurrentCSVToServer: function(entityName){ //update all records of entityName Table existing in dictionary
+				// entityName- Name of entity that will be stored
+				// if entityName has spaces, they will be changed by "_"
+				// we will delete all records of entity name, and then insert all with the same _ids. 
+				//		fd.remove("50", {query:{}, single:{single:false}}, function(er, dr){
+				//		fd.insert("50",[{_id:x1,d:{"51":"cliente 1","52":"Lisboa","53":"Portugal"}}, {_id:x2,d:{"51":"cliente 2","52":"Porto","53":"Portugal"}}])
+				var def = $.Deferred();
+				if(FL.dd.isEntityInLocalDictionary(entityName)){
+					var spinner=FL.common.loaderAnimationON('spinnerDiv');
+					var eCN = FL.dd.getCEntity(entityName);
+					var removeAllPromise = FL.API.removeAllRecords(eCN);
+					removeAllPromise.done(function(data){
+						console.log("FL.grid.updateCurrentCSVToServer --> removeAll sucessfull !!! ->"+JSON.stringify(data));
+						//FL.API  var convertOneRecordTo_arrToSend
+						// var arrToSend = csvStore.extractFromCsvStoreWith_Id();  //convertRecordsTo_arrToSend in FLAPI
+						var arrToSend = csvStore.extractFromCsvStore();
+						if(arrToSend.length!=data.count)
+							alert("ça c'est pas bon --->arrToSend.length="+arrToSend.length+ " vs data.count="+ data.count );			
+						// var insertAllPromise = FL.API._insert(eCN);
+						//we NEED TO INTRODUCE _id at d:{} level and remove-it from 
+						var insertAllPromise = FL.API.addRecordsToTable(entityName,arrToSend,true);//last parameter is withId to force the same Ids
+						insertAllPromise.done(function(data){
+							spinner.stop();
+							return def.resolve(data);
+						});
+						insertAllPromise.fail(function(err){
+							spinner.stop();
+							console.log("FL.grid.updateCurrentCSVToServer --> after successful remove ->FAILURE in insertAllPromise err="+err);
+							return def.reject(err);
+						});
+					});
+					removeAllPromise.fail(function(err){
+						spinner.stop();
+						console.log("FL.grid.updateCurrentCSVToServer --> after successful remove ->FAILURE in FL.API.saveTable err="+err);
+						return def.reject(err);
+					});
+				}else{
+					return def.reject("FL.grid.updateCurrentCSVToServer --> " + entityName + " does not exist in Local Dictionary !");
+				}
+				return def.promise();
+			},				
 		   	csvToGrid: function(csvFile){//input is a JQuery object (a file representation). Ex var csvFile = $('input[type=file]');
 		        csvFile.parse({//http://papaparse.com/  
 		            config: {
@@ -1007,7 +1071,8 @@
 				                // returns an array with the same format as dd dictionary array of attributes. Each element has the following format:
 			        			//   ex: {name:"address",description:"address to send invoices",label:"Address",type:"string",enumerable:null,key:false});		                
 
-				                injectId("id",arrOfColumns); //now the first column is an "id" column 
+				                // injectId("id",arrOfColumns); //now the first column is an "id" column 
+				                injectId("#",arrOfColumns); //now the first column is an "id" column 
 
 				                csvStore.setAttributesArr(arrOfColumns);
 				                FL.grid.csvToStore(data.data); //feeds the csvStore data store object. It inserts id element and converts keys to lowercase

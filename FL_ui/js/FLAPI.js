@@ -803,12 +803,22 @@
 			return def.promise();
 		};
 		var _insert = function(eCN,arrToSend){ //entity compressed name, arr with records to store
-			//format of arrToSend ->[{"d":{"51":"cli1","52":"Lx","53":"Pt"}},{"d":{"51":"cli2","52":"Sintra","53":"Pt"}}]
+			//format of arrToSend ->["_id":"1234",{"d":{"51":"cli1","52":"Lx","53":"Pt"}},{"d":{"51":"cli2","52":"Sintra","53":"Pt"}}]
 			var def = $.Deferred();
 			var fl = FL.login.token.fl; //new flMain();
 			var fd = new fl.data();
 			// var fl = new flMain();
 			// var fa = FL.login.token.fa;//new fl.app();
+			var testJSON = {};
+			_.each(arrToSend,function(element){
+				if(!_.isUndefined(element["_id"])){
+					if( !_.isUndefined(testJSON[element["_id"]] )){
+						alert("FL.API _insert -> Repeated _id - protection to prevent server blockage activated !!!!");
+						return def.reject("Duplicate _id -protection to prevent server blockage");
+					}
+					testJSON[element["_id"]] = "1";
+				}
+			});
 			fd.insert(eCN,arrToSend,function(err, data){
 				console.log("............................._insert...");
 				// err = "abc";
@@ -857,6 +867,21 @@
             });
 			return def.promise();
 		};
+		var _removeAll = function(ecn){ //remove  all rows of table ecn 
+			var def = $.Deferred();
+			var fl = FL.login.token.fl; //new flMain();
+			var fd = new fl.data();
+			fd.remove(ecn, {"query":{},options:{single:false}}, function(err, result){
+				if(err){
+					console.log("======================>ERROR ON _removeAll err="+err);
+					return def.reject(err);
+				}else{
+					console.log("=====================================>_removeAll: OK ");
+					return def.resolve(result);
+				}
+            });
+			return def.promise();
+		};		
 		var X_removeMultiple = function(ecn,arrOf_IdToRemove){ //remove  a single row within table ecn (entity compressed name)
 			var def = $.Deferred();
 			var numberOfEl = arrOf_IdToRemove.length;
@@ -926,7 +951,7 @@
 			var delay = 200;//time between tries to call promise
 			var counter = 0;//number of well succeded calls
 			var refusedCounter = 0;//number of refused calls
-			var maxRefused = 100;//limit of refused - more than this limit =>error
+			var maxRefused = 200;//limit of refused - more than this limit =>error
 			var next = true;
 			var intervalId = setInterval(function () {
 				if (next){
@@ -974,25 +999,35 @@
 				}
 			}, delay);
             return def.promise();
-		};		
-		var convertRecordsTo_arrToSend = function(entityName,recordsArray){//used by saveTable()
+		};
+		var convertRecordsTo_arrToSend = function(entityName,recordsArray,withId){//used by saveTable()
+			//withId flag (default = false) if true all _id will be forced in the add.
 			//Converts format: [{"name":cli1,"city":"Lx","country":"Pt"},{..},....] to 
 			//	format of arrToSend ->[{"d":{"51":"cli1","52":"Lx","53":"Pt"}},{"d":{"51":"cli2","52":"Sintra","53":"Pt"}}]	
+			// or (if withId=true) Converts format: [{"_id":"3f1",name":cli1,"city":"Lx","country":"Pt"},{..},....] to 
+			//	format of arrToSend ->[{"_id":"3f1","d":{"51":"cli1","52":"Lx","53":"Pt"}},{"_id":"3f2","d":{"51":"cli2","52":"Sintra","53":"Pt"}}]	
+
 			var retArr = _.map(recordsArray, function(element){
-				return convertOneRecordTo_arrToSend(entityName,element);
+				return convertOneRecordTo_arrToSend(entityName,element,withId);
 			});
 			return retArr;
 		};
-		var convertOneRecordTo_arrToSend = function(entityName,recordEl){
-			//Converts format: {"name":cli1,"city":"Lx","country":"Pt"} to {"d":{"51":"cli1","52":"Lx","53":"Pt"}} 
+		var convertOneRecordTo_arrToSend = function(entityName,recordEl,withId){
+			//withId flag (default = false) if true all _id will be forced in the add.
+			//Converts format: {"name":cli1,"city":"Lx","country":"Pt"} to {"d":{"51":"cli1","52":"Lx","53":"Pt"}}  OR
+			//				{"_id":"3f1",name":cli1,"city":"Lx","country":"Pt"} to {"_id":"3f1","d":{"51":"cli1","52":"Lx","53":"Pt"} if withId=true
 			var retObj = {};
 			var fCN = null;
 			var oEntity =  FL.dd.getEntityBySingular(entityName);
-			recordEl = _.omit(recordEl, "_id"); 
+			if(withId)
+				var _id = recordEl._id;
+			recordEl = _.omit(recordEl, "_id");
 			_.each(recordEl, function(value,key){
 				fCN = oEntity.L2C[key];//with key ( a logical name) we get the compressed name
 				retObj[fCN] = value;
 			});
+			if(withId)
+				return {"_id":_id,d:retObj,r:[]};
 			return {d:retObj,r:[]};
 		};
 		var _mandrillRejectListForSender = function(senderEmail){ //update a single row within table ecn entity compressed name, _idValue and jsonToSend (a single record)
@@ -1043,13 +1078,18 @@
 			data:{},
 			offline:true,
 			trace:true,//to be removed
-			debug:true,
+			debug:true,//if it is false  no console log will be shown
+			debugStyle: 0,// 0=>means shows numbers to jump to, 1=> no line Numbers to jump to (this only works if debug=true)
+
 			// getPageNo: function(pagName){ //to be used by savePage and restorePage
 			//	var pageNoObj = {"home":1,"about":2};
 			//	return  pageNoObj[pagName];
 			// },
 			clearServerToken: function(){
 				FL.login.token = tokenClear();
+			},
+			convertOneRecordTo_arrToSend: function(entityName,recordEl){
+				return convertOneRecordTo_arrToSend(entityName,recordEl);
 			},
 			queueManager:function(funcName,param1,arrToDispatch){
 				return queueManager(funcName,param1,arrToDispatch);
@@ -1310,6 +1350,41 @@
 				fieldUpdatePromise.fail(function(err){console.log(">>>>> updateDictionaryAttribute FAILURE <<<<< "+err);return def.reject(err);});
 				return def.promise();
 			},
+			updateDictionaryAllAttributes: function(entityName,singular,description,newAttributesArr){//updates the dict with all content related to table
+				// entityName - original entity name to be updated
+				// singular - new entity  name (eventually the same as entityName )
+				// description - new entity description
+				// newAttributesArr - new array of objects each element corresponding to a diferent attribute - and extra key: oldName must be included with the old attribute Name
+				//		ex: {name:"address",description:"address to send invoices",label:"Address",type:"string",typeUI:"textbox",enumerable:null,key:false,oldName:"Address"}
+				// if it fails the dictionary  is rolled back
+				var def = $.Deferred();
+				if(FL.dd.isEntityInLocalDictionary(entityName)){
+					var dictBackup = FL.dd.entities[entityName];//to roll back in case of failure
+					var xPlural = FL.dd.plural(singular,"En");  //+"s";
+					FL.dd.updateEntityBySingular(entityName,{singular:singular,plural:xPlural,description:description});
+					var bufferChangeObjs = [];
+					_.each(newAttributesArr, function(element){//change type based on old attributes
+						if(element.name!="id"){
+							var changeObj = {name:element.name,description:element.description,label:element.label,type:element.type,typeUI:element.typeUI,enumerable:element.enumerable};
+							changeObj["singular"]=singular;
+							changeObj["oldname"]=element.oldName;
+							bufferChangeObjs.push(changeObj);
+						}
+					},this);
+					var promise = FL.API.queueManager("updateAttribute","dummy",bufferChangeObjs);
+					promise.done(function(result){
+						FL.dd.setSync(entityName,true)
+						return def.resolve(result);
+					});
+					promise.fail(function(err){
+						FL.dd.entities[entityName] = dictBackup;
+						return def.reject(err);
+					});
+				}else{
+					return def.reject("FL.API.updateDictionaryAllAttributes --> " + entityName + " does not exist in Local Dictionary !");
+				}
+				return def.promise();
+			},
 			loadAppDataForSignInUser2: function() {//loads (local dict + menu + style + fontFamily) from server
 				console.log("....................................>beginning loadAppDataForSignInUser2....with token="+JSON.stringify(FL.login.token));
 				var def = $.Deferred();
@@ -1459,11 +1534,14 @@
 			//		where recordsArray has the format [{"number":12,"code":"abc"},....]
 			// Methods getRecordsFromTable,updateRecordsToTable and removeRecordsFromTable - has parameters  (entityName,recordsId,withTS)
 			//		where recordsId has the format [{"_id":1,timeStamp:"A"},{"_id":4},....]
-			addRecordsToTable: function(entityName,recordsArray) {//add one or several records to existing table
+			addRecordsToTable: function(entityName,recordsArray,withId) {//add one or several records to existing table
 				//assumes a login to an application exists and entitName exists in local and is in sync
 				//recordsArray [{"number":12,"code":"abc"},....]
+				//withId flag (default = false) if true all _id will be forced in the add.
 				console.log("....................................>beginning addRecordsToTable....with appToken="+JSON.stringify(FL.login.appToken));
 				var def = $.Deferred();
+				if(_.isUndefined(withId) )
+					var withId = false;
 				var ecn = FL.dd.getCEntity(entityName);
 				if(ecn === null){
 					console.log("........FL.API.addRecordsToTable() table="+entityName+ " not in local dict !");
@@ -1475,7 +1553,7 @@
 						return def.reject("addRecordsToTable <table="+entityName+ "> not in sync !");//
 					}else{//table exists and is in sync
 						console.log("........FL.API.addRecordsToTable() table="+entityName+ " is ok. We will insert!");
-						var arrToSend = convertRecordsTo_arrToSend(entityName,recordsArray);		
+						var arrToSend = convertRecordsTo_arrToSend(entityName,recordsArray,withId);		
 						insertPromise = _insert(ecn,arrToSend);
 						insertPromise.then(function(data){return def.resolve(data);},function(err){return def.reject(err);});
 					}
@@ -1555,7 +1633,17 @@
 					}
 				}	
 				return def.promise();
-			},							
+			},
+			removeAllRecords: function(eCN){//remove all records from eCN
+				var def = $.Deferred();
+				var removeAllPromise=_removeAll(eCN);
+				removeAllPromise.done(function(count){
+					console.log(">>>>> removeAllPromise SUCCESS <<<<< ");
+					return def.resolve(count);
+				});
+				removeAllPromise.fail(function(err){console.log(">>>>> removeAllPromise FAILURE <<<<<"+err); return def.reject(err);});
+				return def.promise();				
+			},								
 			loadTable: function(entityName) {//returns the full content of a table from server
 				//assumes a login to an application exists
 				console.log("....................................>beginning loadTable....with appToken="+JSON.stringify(FL.login.appToken));

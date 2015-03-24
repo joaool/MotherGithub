@@ -352,139 +352,7 @@ $(function () {
     // alert("is_menuHide="+myMenu1.is_menuHide+" is_contextOn="+myMenu1.is_contextOn);
     */
   });
-  test("FL.tour primitives", function () {
-    // stepsChangeEvents: [ //these are the events that may change the 'natural' sequence
-    //   {onEvent: "signInDone",onEventValue: false,suspend: false,tourMap:[1,1,0,0,0,0]},//if logout, tour only can be in brand or in login
-    //   {onEvent: "signInDone",onEventValue: true,suspend: false,  tourMap:[1,0,1,1,1,1]},//if logout, tour can be everywhere e except login
-    //   {onEvent: "sidePanelOpened",onEventValue: true,suspend: false,  tourMap:[1,0,1,0,1,1]},
-    //   {onEvent: "sidePanelOpened",onEventValue: false,suspend: false,  tourMap:[1,1,1,1,0,0]},
-    //   {onEvent: "inLogOnProcess",onEventValue: true,suspend: true},
-    //   {onEvent: "inMenuEdition",onEventValue: false,suspend: true}
-    // ],    
-    var actual = FL.findTourMapFor("signInDone",true);
-    var expected =[1,0,1,1,1,1,1,1,1,1,1,1];
-    deepEqual( actual, expected,"FL.findTourMapFor found FL.tourSettings.stepsChangeEvents[1] !!!" );//1
-    actual = FL.findTourMapFor("sidePanelOpened",false);
-    expected =    [1,1,1,1,0,0,0,0,0,0,0,0];
-    deepEqual( actual, expected,"FL.findTourMapFor found FL.tourSettings.stepsChangeEvents[3] !!!" );//2
-    actual = FL.findTourMapFor("inMenuEdition",false);
-    if(!actual)
-      actual = "null";
-    // alert(actual);
-    expected = "null";
-    deepEqual( actual, expected,"FL.findTourMapFor returned null in FL.tourSettings.stepsChangeEvents[5] !!!" );//3
-
-    FL.eventRegister = [{eventName:"signInDone",status:true},{eventName:"sidePanelOpened",status:false},{eventName:"inLogOnProcess",status:null},{eventName:"inMenuEdition",status:null}];
-    // FL.currentTourMap = [true,true,true,true,true,true,true,true,true,true,true,true];
-    FL.mixinTourMap(FL.currentTourMap);
-    expected = [true,false,true,true,false,false,false,false,false,false,false,false];
-    deepEqual( FL.currentTourMap, expected,"FL.mixinTourMap for signin and sidePanelClosed OK" );//4
-
-    FL.eventRegister = [{eventName:"signInDone",status:true},{eventName:"sidePanelOpened",status:true},{eventName:"inLogOnProcess",status:null},{eventName:"inMenuEdition",status:null}];
-    // FL.currentTourMap = [true,true,true,true,true,true,true,true,true,true,true,true];
-    FL.mixinTourMap(FL.currentTourMap);
-    expected = [true,false,true,false,true,true,true,true,true,true,true,true];//the actual navigation area
-    deepEqual( FL.currentTourMap, expected,"FL.mixinTourMap for signIn and sidePanelOpened OK" );//5
-
-    FL.eventRegister = [{eventName:"signInDone",status:false},{eventName:"sidePanelOpened",status:false},{eventName:"inLogOnProcess",status:null},{eventName:"inMenuEdition",status:null}];
-    // FL.currentTourMap = [true,true,true,true,true,true,true,true,true,true,true,true];
-    FL.mixinTourMap(FL.currentTourMap);
-    expected = [true,true,false,false,false,false,false,false,false,false,false,false];//the actual navigation area
-    deepEqual( FL.currentTourMap, expected,"FL.mixinTourMap for signOut and sidePanelClosed OK" );//6
-
-    FL.eventRegister = [{eventName:"signInDone",status:null},{eventName:"sidePanelOpened",status:null},{eventName:"inLogOnProcess",status:null},{eventName:"inMenuEdition",status:null}];
-    FL.updatesEventRegister("signInDone",true);
-    ok( FL.eventRegister[0].status === true,"FL.updatesEventRegister updated signInDone correctely !!!" );
-    FL.updatesEventRegister("sidePanelOpened",true);
-    ok( FL.eventRegister[1].status === true,"FL.updatesEventRegister updated sidePanelOpened correctely !!!" );
-    FL.updatesEventRegister("signInDone",false);
-    ok( FL.eventRegister[0].status === false,"FL.updatesEventRegister updated again signInDone correctely !!!" );
-
-    FL.currentTourMap = [true,false,true,false,false,true];//the potential navigation area 
-    actual = FL.nextOnTourMap(1);
-    equal( actual,2,"FL.nextOnTourMap found position 2 correctely !!!" );//10
-
-    actual = FL.nextOnTourMap(2);
-    equal( actual,5,"FL.nextOnTourMap found position 5 correctely !!!" );//11
-
-    actual = FL.nextOnTourMap(5);
-    equal( actual,null,"FL.nextOnTourMap found position null correctely !!!" );//12
-
-    actual = FL.nextOnTourMap(6);
-    equal( actual,null,"FL.nextOnTourMap found position null correctely !!!" );//13
-
-    actual = FL.nextOnTourMap(0);
-    equal( actual,2,"FL.nextOnTourMap found position null correctely !!!" );//14
-
-    actual = FL.prevOnTourMap(2);
-    equal( actual,0,"FL.prevOnTourMap found position 1 correctely !!!" );//15
-
-    actual = FL.prevOnTourMap(4);
-    equal( actual, 2,"FL.prevOnTourMap found position 2 correctely !!!" );//16
-
-    actual = FL.prevOnTourMap(0);
-    equal( actual, null,"FL.prevOnTourMap found position null correctely !!!" );//17
-
-    actual = FL.prevOnTourMap(6);
-    equal( actual, 5,"FL.prevOnTourMap found position null correctely !!!" );//18
-
-    actual = FL.prevOnTourMap(7);
-    equal( actual, 5,"FL.prevOnTourMap found position null correctely !!!" );//19
-
-    //------testing FL.setNextPrevOfCurrentStep()
-
-    FL.currentTourMap = [true,false,true,true,false,false];//the potential navigation area 
-    FL.setTourOn(true);//createsFL.tour object
-    var currentStep = 2;
-    FL.tour.setCurrentStep(currentStep);//in Tour forces 2 to be current
-    // alert("current step is "+FL.tour.getCurrentStep());
-    currentStep=FL.setNextPrevOfCurrentStep();//the tested method. adjust 2.next and 2.prev according to FL.currentTourMap
-    actual = FL.tourSettings.steps[currentStep].next;
-    equal( actual, 3,"FL.setNextPrevOfCurrentStep() updated next of step 2 to 3 correctely !!!" );//20
-    actual = FL.tourSettings.steps[currentStep].prev;
-    equal( actual, 0,"FL.setNextPrevOfCurrentStep() updated prev of step 2 to 0 correctely !!!" );//21
-   
-    currentStep = 3;
-    FL.tour.setCurrentStep(currentStep);//in Tour forces 3 to be current
-    // alert("current step is "+FL.tour.getCurrentStep());
-    currentStep=FL.setNextPrevOfCurrentStep();//the tested method. adjust 3.next and 3.prev according to FL.currentTourMap
-    actual = FL.tourSettings.steps[currentStep].next;
-    equal( actual, 3,"FL.setNextPrevOfCurrentStep() updated next of step 3 to 3 correctely !!!" );//22
-    actual = FL.tourSettings.steps[currentStep].prev;
-    equal( actual, 2,"FL.setNextPrevOfCurrentStep() updated prev of step 3 to 2 correctely !!!" );//23
-
-    // currentStep = 5;//a "false" position on FL.currentTourMap
-    // FL.tour.setCurrentStep(currentStep);//in Tour forces 5 to be current
-    // // alert("current step is "+FL.tour.getCurrentStep());
-    // currentStep = FL.setNextPrevOfCurrentStep();//the tested method. adjust 5.next and 5.prev according to FL.currentTourMap
-    // actual = FL.tourSettings.steps[currentStep].next;
-    // equal( actual, 3,"FL.setNextPrevOfCurrentStep() updated next of step 5 to 3 correctely !!!" );//24 it is strange but correct when current position is false and no  next true is available
-    // actual = FL.tourSettings.steps[currentStep].prev;
-    // equal( actual, 2,"FL.setNextPrevOfCurrentStep() updated prev of step 5 to 3 correctely !!!" );//25
-
-    currentStep = 0;
-    FL.tour.setCurrentStep(currentStep);//in Tour forces 0 to be current
-    // alert("current step is "+FL.tour.getCurrentStep());
-    currentStep=FL.setNextPrevOfCurrentStep();//the tested method. adjust 0.next and 0.prev according to FL.currentTourMap
-    actual = FL.tourSettings.steps[currentStep].next;
-    equal( actual, 2,"FL.setNextPrevOfCurrentStep() updated next of step 0 to 2 correctely !!!" );//26
-    actual = FL.tourSettings.steps[currentStep].prev;
-    equal( actual, 0,"FL.setNextPrevOfCurrentStep() updated prev of step 0 to 0 correctely !!!" );//27
-
-    // currentStep = 1;//a "false" position on FL.currentTourMap
-    // FL.tour.setCurrentStep(currentStep);//in Tour forces 0 to be current
-    // // alert("current step is "+FL.tour.getCurrentStep());
-    // currentStep=FL.setNextPrevOfCurrentStep();//the tested method. adjust 0.next and 0.prev according to FL.currentTourMap
-    // actual = FL.tourSettings.steps[currentStep].next;
-    // equal( actual, 3,"FL.setNextPrevOfCurrentStep() updated next of step 1 to 3 correctely !!!" );//28
-    
-    // actual = FL.tourSettings.steps[currentStep].prev;
-    // equal( actual, 0,"FL.setNextPrevOfCurrentStep() updated prev of step 1 to 0 correctely !!!" );//29   
-
-    // ok( actual == expected,"found FL.tourSettings.stepsChangeEvents[1] !!!" ); //bolean expression
-    // equal(actual,expected,"...are equal");//non strict assertion
-    // strictEqual(1,1,"they are strictly equal");//non strict assertion
-  });
+ 
   // ensure all the required form elements are in place
   // //http://blog.newrelic.com/2013/05/15/new-simple-javascript-testing-with-qunit/
   // test( "All required form elements exist", 7, function() {
@@ -938,26 +806,26 @@ $(function () {
     console.log("%%%%%%%%%%%%%% begin %%%%%%%%%%%%%%%%%%%%%%%%");
     FL.dd.displayEntities();
 
-    FL.dd.updateAttribute('order','shipped',{type:'date',typeUI:'datebox'});//change type and typeUI for attribute "shipped" - previously type="boolean" typeUI="checkbox"
-    actual = FL.dd.getEntityAttribute("order","shipped");
-    ok(actual.type == "date" && actual.typeUI == "datebox", "FL.dd.updateAttribute('order','shipped',{type:'date',typeUI:'datebox'}) -->update done!");//34
+    // FL.dd.updateAttribute('order','shipped',{type:'date',typeUI:'datebox'});//change type and typeUI for attribute "shipped" - previously type="boolean" typeUI="checkbox"
+    // actual = FL.dd.getEntityAttribute("order","shipped");
+    // ok(actual.type == "date" && actual.typeUI == "datebox", "FL.dd.updateAttribute('order','shipped',{type:'date',typeUI:'datebox'}) -->update done!");//34
 
-    FL.dd.updateAttribute('order','shipped',{type:'boolean',typeUI:'checkbox'});//change type and typeUI for attribute "shipped" - previously type="boolean" typeUI="checkbox"
-    actual = FL.dd.getEntityAttribute("order","shipped");
-    console.log(JSON.stringify(actual));
-    ok(actual.type == "boolean" && actual.typeUI == "checkbox", "FL.dd.updateAttribute('order','shipped',{type:'boolean',typeUI:'checkbox'}) -->update done!");//35
+    // FL.dd.updateAttribute('order','shipped',{type:'boolean',typeUI:'checkbox'});//change type and typeUI for attribute "shipped" - previously type="boolean" typeUI="checkbox"
+    // actual = FL.dd.getEntityAttribute("order","shipped");
+    // console.log(JSON.stringify(actual));
+    // ok(actual.type == "boolean" && actual.typeUI == "checkbox", "FL.dd.updateAttribute('order','shipped',{type:'boolean',typeUI:'checkbox'}) -->update done!");//35
 
-    FL.dd.updateAttribute('order','shipped',{name:'sent',label:'Sent'});//change type and typeUI for attribute "shipped" - previously type="boolean" typeUI="checkbox"
-    actual = FL.dd.getEntityAttribute("order","sent");
-    console.log(JSON.stringify(actual));
-    ok(actual.name == "sent" && actual.label == "Sent", "FL.dd.updateAttribute('order','shipped',{name:'sent',label:'Sent'}) -->update done!");//36
+    // FL.dd.updateAttribute('order','shipped',{name:'sent',label:'Sent'});//change type and typeUI for attribute "shipped" - previously type="boolean" typeUI="checkbox"
+    // actual = FL.dd.getEntityAttribute("order","sent");
+    // console.log(JSON.stringify(actual));
+    // ok(actual.name == "sent" && actual.label == "Sent", "FL.dd.updateAttribute('order','shipped',{name:'sent',label:'Sent'}) -->update done!");//36
 
-    FL.dd.updateAttribute('order','sent',{name:'shipped',label:'Shipped'});//change type and typeUI for attribute "shipped" - previously type="boolean" typeUI="checkbox"
-    actual = FL.dd.getEntityAttribute("order","shipped");
-    console.log(JSON.stringify(actual));
-    ok(actual.name == "shipped" && actual.label == "Shipped", "FL.dd.updateAttribute('order','sent',{name:'shipped',label:'Shipped'}) -->update done!");//37
+    // FL.dd.updateAttribute('order','sent',{name:'shipped',label:'Shipped'});//change type and typeUI for attribute "shipped" - previously type="boolean" typeUI="checkbox"
+    // actual = FL.dd.getEntityAttribute("order","shipped");
+    // console.log(JSON.stringify(actual));
+    // ok(actual.name == "shipped" && actual.label == "Shipped", "FL.dd.updateAttribute('order','sent',{name:'shipped',label:'Shipped'}) -->update done!");//37
 
-    FL.dd.displayEntities();
+    // FL.dd.displayEntities();
 
 
     //addRelation: function(xSingular,rCN,withEntityName,verb,cardinality,side,storedHere) {//adds a new relation to the array of relations of entity xSingular

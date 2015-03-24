@@ -321,7 +321,7 @@ FL["common"] = (function(){//name space FL.common
             $modalDialog.empty().append(fullHTML);
             if(options.dropdown){//dropdown is an object with one key per drop down - the key is #id of dropdown on template
                  _.each(options.dropdown, function(value,key){
-                    if(value.default && value.arr && value.onSelect ){                      
+                    if(value.default && value.arr && value.onSelect ){
                         // var arrOfObjs =_.map(value.arr,function(element,index){ //converted to format {value:0,text:arr[0]},{value:1,text:arr[1]}...etc
                         //     return {value:index,text:element};
                         // });
@@ -780,59 +780,60 @@ FL["common"] = (function(){//name space FL.common
             var decimalPos = null;
             var thiz = this;
             var failElement = _.find(arrOfRowValues, function(element){ //if failElement is undefined => all elements are a valid number format
-                if (element && element.trim().length>0){//skips null,"" and spaces - it enters test if it is a valid element
-                    // return isNaN(Date.parse(element));//a non empty element that is not a date -
-                    if(!xRet.format){
-                        is_de = thiz.isNumberSep(element,".");//a non empty element that has a "de" format 4.294.967.295,000
-                        if(is_de){//is valid as a german format but may be ambiguous. If it has a comma is not ambiguous otherwise it is ambiguous
-                            xRet = {"number":true,"format":null};
-                            if( thiz.is_oneOfCharsInString( element,",.") )
-                                xRet = {"number":true,"format":"de"};
-                        }else{
-                            is_fr = thiz.isNumberSep(element," ");//a non empty element that has "fr" format 4 294 967 295,000
-                            if(is_fr){
+                if( !_.isNumber(element) ){//skips numbers
+                    if (element && element.trim().length>0){//skips null,"" and spaces - it enters test if it is a valid element
+                        if(!xRet.format){
+                            is_de = thiz.isNumberSep(element,".");//a non empty element that has a "de" format 4.294.967.295,000
+                            if(is_de){//is valid as a german format but may be ambiguous. If it has a comma is not ambiguous otherwise it is ambiguous
                                 xRet = {"number":true,"format":null};
-                                if( thiz.is_oneOfCharsInString( element," ,") )
-                                // decimalPos = element.lastIndexOf(",");
-                                // if(decimalPos>=0)
-                                    xRet = {"number":true,"format":"fr"};
+                                if( thiz.is_oneOfCharsInString( element,",.") )
+                                    xRet = {"number":true,"format":"de"};
                             }else{
-                                is_us = thiz.isNumberSep(element,",");//a non empty element that has "us" format 4,294,967,295.000
-                                if(is_us){
+                                is_fr = thiz.isNumberSep(element," ");//a non empty element that has "fr" format 4 294 967 295,000
+                                if(is_fr){
                                     xRet = {"number":true,"format":null};
-                                    if( thiz.is_oneOfCharsInString( element,",.") )
-                                       xRet = {"number":true,"format":"us"};
+                                    if( thiz.is_oneOfCharsInString( element," ,") )
+                                    // decimalPos = element.lastIndexOf(",");
+                                    // if(decimalPos>=0)
+                                        xRet = {"number":true,"format":"fr"};
                                 }else{
-                                   xRet = {"number":false,"format":null};
+                                    is_us = thiz.isNumberSep(element,",");//a non empty element that has "us" format 4,294,967,295.000
+                                    if(is_us){
+                                        xRet = {"number":true,"format":null};
+                                        if( thiz.is_oneOfCharsInString( element,",.") )
+                                           xRet = {"number":true,"format":"us"};
+                                    }else{
+                                       xRet = {"number":false,"format":null};
+                                    }
                                 }
                             }
-                        }
-                    }else if(xRet.format == "de"){
-                        is_de = thiz.isNumberSep(element,".");//a non empty element that has a "de" format 4.294.967.295,000
-                        if(is_de)
-                            return false;//goes to next element
-                        else{
-                            xRet = {"number":false,"format":null};//its is not a consistent number !!" previous was de but this one is not !"                  
-                            return true;
-                        }
-                    }else if(xRet.format == "fr"){
-                        is_fr = thiz.isNumberSep(element," ");//a non empty element that has a "de" format 4.294.967.295,000
-                        if(is_fr)
-                            return false;//goes to next element
-                        else{
-                            xRet = {"number":false,"format":null};//its is not a consistent number !!" previous was fr but this one is not !"                  
-                            return true;
-                        }
-                    }else if(xRet.format == "us"){
-                        is_us = thiz.isNumberSep(element,",");//a non empty element that has a "de" format 4.294.967.295,000
-                        if(is_us)
-                            return false;//goes to next element
-                        else{
-                            xRet = {"number":false,"format":null};//its is not a consistent number !!" previous was us but this one is not !"                  
-                            return true;
+                        }else if(xRet.format == "de"){
+                            is_de = thiz.isNumberSep(element,".");//a non empty element that has a "de" format 4.294.967.295,000
+                            if(is_de)
+                                return false;//goes to next element
+                            else{
+                                xRet = {"number":false,"format":null};//its is not a consistent number !!" previous was de but this one is not !"                  
+                                return true;
+                            }
+                        }else if(xRet.format == "fr"){
+                            is_fr = thiz.isNumberSep(element," ");//a non empty element that has a "de" format 4.294.967.295,000
+                            if(is_fr)
+                                return false;//goes to next element
+                            else{
+                                xRet = {"number":false,"format":null};//its is not a consistent number !!" previous was fr but this one is not !"                  
+                                return true;
+                            }
+                        }else if(xRet.format == "us"){
+                            is_us = thiz.isNumberSep(element,",");//a non empty element that has a "de" format 4.294.967.295,000
+                            if(is_us)
+                                return false;//goes to next element
+                            else{
+                                xRet = {"number":false,"format":null};//its is not a consistent number !!" previous was us but this one is not !"                  
+                                return true;
+                            }
                         }
                     }
-                }
+                }    
                 return false;//goes to next element
             });
             if( !_.isUndefined(failElement) )

@@ -72,6 +72,22 @@ window.csvStore = {
             retArr = null;
         return retArr;
     },
+    extractFromCsvStore: function(){
+        //Ex: from csvStore.csvRows = {"1":{"id":1,"shipped":true,"product":"Prod 1",_id:"55d3.."},"2":{"id":2,"shipped":false,"product":"Prod 2",_id:"55d3.."}}
+        var retArr=_.map(csvStore.csvRows, function(value,key){return value;});
+        return retArr;
+    },
+    extractFromCsvStoreWith_Id: function(){
+        //Ex: from csvStore.csvRows = {"1":{"id":1,"shipped":true,"product":"Prod 1",_id:"55d3.."},"2":{"id":2,"shipped":false,"product":"Prod 2",_id:"55d3.."}}
+        var entityName = this.getEntityName();
+        var retArr=_.map(csvStore.csvRows, function(value,key){
+            var _id = value["_id"];
+            var recordEl = FL.API.convertOneRecordTo_arrToSend(entityName,value);////Converts format: {"name":cli1,"city":"Lx","country":"Pt"} to {"d":{"51":"cli1","52":"Lx","53":"Pt"}} 
+            recordEl["_id"] = _id;
+            return recordEl;//returns {_id:x1,d:{"51":"cliente 1","52":"Lisboa","53":"Portugal"}
+        },this);
+        return retArr;
+    },
     transformStoreTo: function(newAttributesArr,changedNamesArr,changedTypeArr){//transform the store content according to newAttributesArr and changedNamesArr and  changedTypeArr
         //newAttributesArr - new format of attributes in csvStore.
         //       must have keys attr1..7 = name,description,label,type,typeUI,enumerable and key
