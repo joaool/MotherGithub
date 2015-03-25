@@ -881,22 +881,6 @@
 				}
             });
 			return def.promise();
-		};		
-		var X_removeMultiple = function(ecn,arrOf_IdToRemove){ //remove  a single row within table ecn (entity compressed name)
-			var def = $.Deferred();
-			var numberOfEl = arrOf_IdToRemove.length;
-			var counter = 0;
-            _.each(arrOf_IdToRemove, function (element) {
-				var promise=_remove(ecn,element);
-				promise.done(function(result){
-					counter +=result;
-					if(numberOfEl--=== 0)
-						return def.resolve(counter);
-				});
-				promise.fail(function(err){
-					return def.reject(err);
-				});
-            });
 		};
 		var _removeMultiple = function(ecn,arrOf_IdToRemove){ //remove  a single row within table ecn (entity compressed name)
 			var def = $.Deferred();
@@ -1000,6 +984,30 @@
 			}, delay);
             return def.promise();
 		};
+		var _checkServerCallBlocked = function(){//waits until FL.API.serverCallBlocked is true or a limit is exceeded
+			var def = $.Deferred();
+			if( FL.API.serverCallBlocked ){
+				var delay = 100;//time between tries to check if FL.API.serverCallBlocked was set to false
+				var counter = 0;//number of check attempts
+				var maxRefused = 50;//limit of refused - more than this limit =>error
+				var intervalId = setInterval(function () {
+					counter++;
+					console.log("_checkServerCallBlocked counter=" + counter + "/" + maxRefused );
+					if( counter >= maxRefused ){
+						clearInterval(intervalId);
+						FL.API.serverCallBlocked = false;					
+						return def.reject("_checkServerCallBlocked limit of tries exceeded ->counter="+counter);
+					}
+					if( !FL.API.serverCallBlocked ){
+						clearInterval(intervalId);						
+						return def.resolve(counter);
+					}	
+				}, delay);	
+			}else{
+				return def.resolve();
+			}
+            return def.promise();
+		};
 		var convertRecordsTo_arrToSend = function(entityName,recordsArray,withId){//used by saveTable()
 			//withId flag (default = false) if true all _id will be forced in the add.
 			//Converts format: [{"name":cli1,"city":"Lx","country":"Pt"},{..},....] to 
@@ -1085,6 +1093,7 @@
 			//	var pageNoObj = {"home":1,"about":2};
 			//	return  pageNoObj[pagName];
 			// },
+			serverCallBlocked: false, //HACK to prevent server call (menu calling a grid) before last call is dispatched (ex:cell update) - a promise must be resolved to unblock
 			clearServerToken: function(){
 				FL.login.token = tokenClear();
 			},
@@ -1093,6 +1102,9 @@
 			},
 			queueManager:function(funcName,param1,arrToDispatch){
 				return queueManager(funcName,param1,arrToDispatch);
+			},
+			checkServerCallBlocked:function(){
+				return _checkServerCallBlocked();
 			},
 			convertArrC2LForEntity: function(entityName,serverArr){//serverArr =>[{"_id":123,d:{},r:[]},{"_id":124,d:{},r:[]},....{"_id":125,d:{},r:[]}]
 				//Use the dictionary for entityName to convert compressed field names in keys in serverArr to logical field names

@@ -514,8 +514,33 @@
 		var DefaultGridWithNewsLetterAndEditButtons = function(entityName) {
 			//A)shows add button, newsletter and grid edit buttons if an email field exist in entityName
 			//  	checks if _histoMail_<ecn(entityName)> exists. If not creates it.
-			//B)shows add button and grid edit buttons if no email field exist in entityName				
+			//B)shows add button and grid edit buttons if no email field exist in entityName	
+			FL.API.debug = true; FL.API.debugStyle= 0;			
 			if(FL.dd.isHistoMailPeer(entityName)){
+				var promiseUnblock = FL.API.checkServerCallBlocked()
+				.then(function(){
+					FL.grid.displayDefaultGrid(entityName);//loads from server and display buttons and Grid
+					FL.API.debug = false; FL.API.debugStyle= 0;
+					return;
+				}, function(err){ alert("FL.links.DefaultGridWithNewsLetterAndEditButtons ERROR: Please try again " + err); } );
+			}else{
+				// alert("_histoMail for "+entityName+" does not exist! we need to create it");
+				promise = FL.API.createTableHistoMails_ifNotExisting(entityName)
+				.then(function(){
+					// this.setSync(FL.dd.histoMailPeer(entityName),true);
+					// set3ButtonsAndGrid(entityName);
+					FL.grid.displayDefaultGrid(entityName);//loads from server and display buttons and Grid
+					return;}
+					,function(err){alert("FL.links.DefaultGridWithNewsLetterAndEditButtons ERROR: cannot create histoMail peer for " + entityName + " - "+err); return;});
+				// set3ButtonsAndGrid(entityName);//displays addGrid, newletter and editGrid buttons (with clicks prepared) and displays grid
+			}
+		};
+		var DefaultGridWithNewsLetterAndEditButtonsByCN = function(eCN) {//TO BE COMPLETED
+			//A)shows add button, newsletter and grid edit buttons if an email field exist in entityName
+			//  	checks if _histoMail_<ecn(entityName)> exists. If not creates it.
+			//B)shows add button and grid edit buttons if no email field exist in entityName
+			var entityName = FL.dd.getEntityByCName(eCN);//to be removed	<----------------------------------- REMOVE LATER ON		
+			if(FL.dd.isHistoMailPeerByCN(eCN)){
 				// set3ButtonsAndGrid(entityName);//displays addGrid, newletter and editGrid buttons (with clicks prepared) and displays grid
 				FL.grid.displayDefaultGrid(entityName);//loads from server and display buttons and Grid
 			}else{
@@ -529,7 +554,7 @@
 					,function(err){alert("FL.links.DefaultGridWithNewsLetterAndEditButtons ERROR: cannot create histoMail peer for " + entityName + " - "+err); return;});
 				// set3ButtonsAndGrid(entityName);//displays addGrid, newletter and editGrid buttons (with clicks prepared) and displays grid
 			}
-		};
+		};		
 		return{
 			abc: "abc",
 			test: function(x) {//call with menu key "uri": "javascript:FL.links.test('JOJO')"
@@ -599,6 +624,25 @@
 					alert("FL.links.setDefaultGridByCN ERROR: EntityCompressedName=" + eCN + " does not exist !!!");
 				}
 			},
+			setDefaultGridByCN2: function(eCN) {//called with menu key "uri": "javascript:FL.links.setDefaultGridByCN('55')"
+				if(FL.dd.isEntityInLocalDictionaryByCN(eCN)){
+					if(FL.dd.isEntityByCNInSync(eCN) ){//eCN exists in local dictionary and is in sync
+						DefaultGridWithNewsLetterAndEditButtons(entityName);
+					}else{//entityName exists but is not in sync - we force synchronization
+						alert("FL.links.setDefaultGrid - " + entityName + " not in sync we will syncronize local to backend.");
+						FL.API.syncLocalDictionaryToServer(entityName)
+							.then(function(){DefaultGridWithNewsLetterAndEditButtons(entityName);return;}
+								,function(err){alert("FL.links.setDefaultGrid ERROR: cannot sync " + entityName + " to server!"); return;});
+					}
+				}else{//entity is not in local dictionary =>we force an update of local dictionary with server dictionary data
+					// FL.API.syncLocalDictionary()
+					// 	.then(function(){DefaultGridWithNewsLetterAndEditButtons(entityName);return;}
+					// 		,function(err){alert("FL.links.setDefaultGrid ERROR: cannot read back end Dictionary !"); return;});
+
+					alert("FL.links.setDefaultGrid - cannot display grid. Entity -->" + entityName + "<-- does not exist in Local Data Dictionary.");
+					return;
+				}
+			},			
 			setDefaultGrid: function(entityName) {//called with menu key "uri": "javascript:FL.links.setDefaultGrid('JOJO')"
 				// alert("setDefaultGrid"+entityName);
 				// entityName = entityName.replace(/_/g," ");//if entityName as a space like "test contacts" it will be saved in menu as "test_contact"

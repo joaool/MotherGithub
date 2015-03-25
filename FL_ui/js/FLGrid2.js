@@ -1142,7 +1142,55 @@
 					spinner.stop();
 					alert("DefaultGridWithNewsLetterAndEditButtons Error="+err);
 				});				
-			},	    
+			},
+			displayDefaultGrid2: function(entityName) { //loads entity from server and display the grid with add,del,edit grid buttons at left and newsletter if a email field exist
+				var def = $.Deferred();
+				entityName = entityName.replace(/_/g," ");
+				// FL.common.spin(true);
+
+				var spinner=FL.common.loaderAnimationON('spinnerDiv');
+				var promiseUnblock = FL.API.checkServerCallBlocked()
+				.then(function(){//this only occurs when checkServerCallBlocked is resolved
+					var promise=FL.API.loadTable(entityName);
+					promise.done(function(data){
+						csvStore.setEntityName(entityName);//stores <entityName> in csvStore object 
+						csvStore.store(data);//data is an array of objects [{},{},....{}] where id field is mandatory inside {}
+						console.log("FL.grid.displayDefaultGrid2 -->loadTable is done");console.log("show csvStore="+JSON.stringify(csvStore.csvRows));
+						var columnsArr = utils.backGridColumnsExtractedFromDictionary(entityName);//extracts attributes from dictionary and prepares columns object for backgrid
+						console.log("FL.grid.displayDefaultGrid2 &&&&&&&& entity="+entityName);console.log("show columnsArr="+JSON.stringify(columnsArr));
+						FL.common.clearSpaceBelowMenus();
+						$("#addGrid").show();$("#addGrid").html(" Add Row");$('#_editGrid').off('click');$("#_editGrid").click(function(){ editGrid(entityName);});
+						$("#_editGrid").show();
+						if( FL.dd.isEntityWithTypeUI(entityName,"emailbox") || FL.dd.isEntityWithTypeUI(entityName,"email") ){//the newsletter option only appears to entities that have an email
+							$('#_newsletter').off('click');
+							$("#_newsletter").click(function(){
+								var templatePromise=FL.API.createTemplates_ifNotExisting();
+								templatePromise.done(function(){
+									prepareNewsletterEmission(entityName);
+									return;
+								});
+								templatePromise.fail(function(err){
+									alert("FL.grid.displayDefaultGrid2 ->FAILURE with createTemplates_ifNotExisting err="+err);
+									return;
+								});
+							});
+							$('#_newsletter').show();$('#_newsletterMC').off('click');$("#_newsletterMC").click(function(){prepareNewsletterMCEmission(entityName);});							
+							$('#_newsletterMC').show();$("#_newsletterMC").html(" MC");
+						}	
+						utils.mountGridInCsvStore(columnsArr);//mount backbone views and operates grid -	
+						spinner.stop();
+						return def.resolve();
+					});
+					promise.fail(function(err){
+						spinner.stop();
+						return def.reject("FL.grid.displayDefaultGrid2 failure on loadTable "+err);
+					});
+				}, function(err){
+					spinner.stop();
+					return def.reject("FL.grid.displayDefaultGrid2 failure on checkServerCallBlocked() "+err);
+				});
+            	return def.promise();
+			},			  
 			testFunc: function(x) {
 				alert("FL.grid.test() -->"+x);
 			}

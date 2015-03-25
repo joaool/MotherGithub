@@ -271,13 +271,15 @@ window.csvStore = {
             });
             promise.fail(function(err){console.log(">>>>>memoryCsv update addRecordsToTable FAILURE <<<<<"+err);return def.reject(err);});
         }else if(model.attributes._id){//this is an update over an existing line =>update in db
+            FL.API.serverCallBlocked = true;//HACK to prevent server call (menu calling a grid) before this promise is resolved
             promise = FL.API.updateRecordToTable(this.entityName,model.attributes);
             promise.done(function(data){
                 console.log(">>>>>memoryCsv update updateRecordToTable  SUCCESS <<<<< -->"+JSON.stringify(data));
                 thiz.csvRows[model.id] = model.attributes;
+                FL.API.serverCallBlocked = false;
                 return def.resolve(model);
             });
-            promise.fail(function(err){console.log(">>>>>memoryCsv update updateRecordToTable FAILURE <<<<<"+err);return def.reject(err);});
+            promise.fail(function(err){console.log(">>>>>memoryCsv update updateRecordToTable FAILURE <<<<<"+err); FL.API.serverCallBlocked = false; return def.reject(err);});
         }else{
             console.log(">>>>>memoryCsv update updateRecordToTable  NOP Nothing was done !!!! <<<<< -->model.attributes._id="+model.attributes._id);
             return def.reject("memoryCsv update error - missing attribute _id in model");

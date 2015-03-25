@@ -894,6 +894,12 @@
 					exists = true;
 				return exists;
 			},
+			isEntityInLocalDictionaryByCN: function(eCN) {//returns true if compressed entity name (eCN) exists in local dictionary
+				var exists = false;
+				if(this.getEntityByCName(eCN))
+					exists = true;
+				return exists;
+			},
 			histoMailPeer: function(entityName){
 				var eCN = this.getCEntity(entityName);
 				return histoName = "_histoMail_" + eCN;
@@ -909,6 +915,13 @@
 				}
 				return exists;
 			},
+			isHistoMailPeerByCN: function(ecN) {//returns true if _histoMail_<ecn> exists in local dictionary
+				var exists = false;
+				if(this.isEntityInLocalDictionary( "_histoMail_"+eCN ) ){
+					exists = true;
+				}
+				return exists;
+			},			
 			isEntityWithTypeUI: function(entityName,typeUI) {//returns true if entityName has an Email field 
 				var exists = false;
 				var oEntity = this.entities[entityName];
@@ -935,6 +948,19 @@
 					alert("FL.dd.isEntityInSync Error: "+entityName+" does not exist ! ");
 					return false;
 				}
+			},
+			isEntityByCNInSync: function(eCN) {//returns true if eCN has in sync status = true - if eCN does not exist returns false
+				var entityName = this.getEntityByCName(eCN);
+				if(entityName){
+					var oEntity = this.entities[entityName];
+					if(oEntity){
+						return oEntity.sync;
+					}else{
+						alert("FL.dd.isEntityByCNInSync Error: Entity compressed name =" + eCN + " exists, but associated entityName=" + entityName + " does not exist ! ");
+						return false;
+					}
+				}
+				return false;
 			},
 			setSync: function(xSingular,bStatus) {//set sync = true for entity= xSingular - nothing is done if entity does not exist
 				var oEntity = this.entities[xSingular];

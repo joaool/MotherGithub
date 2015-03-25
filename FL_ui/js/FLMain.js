@@ -5,6 +5,7 @@ var FL = FL || {};
 	//   to inhibit all console.log do FL.API.debug = false
 	//   to show all console.log with line numbers link do FL.API.debug = true (this assumes FL.API.debugStyle= 0)
 	//	 to show console.log without line numbers link do: FL.API.debug = true; FL.API.debugStyle= 1;
+	//example FL.API.debug = true; FL.API.debugStyle= 0;
   var Oldlog = console.log;
   // console.log = function(){};//activate this instead of next - to "remove" all console.logs
   console.log = function() {
@@ -29,7 +30,7 @@ var FL = FL || {};
 	var spinner=FL.common.loaderAnimationON('spinnerDiv');
 	setInterval(function(){spinner.stop();},1000);
 	$(document).ready(function() {
-		FL.API.debug = false;
+		FL.API.debug = true;
 		FL.oMenu = FL.login.defaultMenu; //why is this necessary ? it is !
 		FL.common.clearSpaceBelowMenus();
 

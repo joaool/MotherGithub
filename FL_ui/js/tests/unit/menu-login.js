@@ -981,6 +981,29 @@ $(function () {
     FL.server.offline = false;
     var oEntity =  FL.dd.getEntityBySingular("order");
     oEntity.csingular = "61";//we force entity compressed name for test
+    FL.dd.displayEntities();
+
+    actual = FL.dd.isEntityInLocalDictionaryByCN('2lu');
+    ok(actual === true, "FL.dd.isEntityInLocalDictionaryByCN('2lu') =>true (exists!)" );//59
+
+    actual = FL.dd.isEntityInLocalDictionaryByCN('2lx');
+    ok(actual === false, "FL.dd.isEntityInLocalDictionaryByCN('2lx') =>false (does not exists!)" );//60
+
+    actual = FL.dd.isEntityByCNInSync('2lu');
+    ok(actual === false, "FL.dd.isEntityByCNInSync('2lu') =>false (it is not in sync)" );//61
+
+    actual = FL.dd.isEntityByCNInSync('2lu');
+    ok(actual === false, "FL.dd.isEntityByCNInSync('2lu') =>false (it is not in sync)" );//61
+
+    var entityName = FL.dd.getEntityByCName('2lu');
+    FL.dd.setSync(entityName,true);//forces sync
+    actual = FL.dd.isEntityByCNInSync('2lu');
+    ok(actual === true, "FL.dd.isEntityByCNInSync('2lu') =>true (it is in sync)" );//62
+    
+    actual = FL.dd.isEntityByCNInSync('2lx');
+    ok(actual === false, "FL.dd.isEntityByCNInSync('2lx') =>false (ask if a non existing entity is in sync returns false)" );//63
+
+
 
     //we need to force field compressed names for test
 
