@@ -13,6 +13,7 @@ FormMaker = Backbone.View.extend({
 			if (FormMaker[item.element])
 			{
 				var obj = new FormMaker[item.element]();
+				obj.loadData(item);
 				arrObjs.push(obj);
 			}
 			else
@@ -20,6 +21,9 @@ FormMaker = Backbone.View.extend({
 				console.log("Class not found for :" +item.element);
 			}
 		}).bind(this));
+		$.each(arrObjs,function(i,item){
+			item.render();
+		});
 	}
 });
 
