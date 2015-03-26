@@ -27,6 +27,7 @@ CKEDITOR.editorConfig = function( config ) {
 //		{ name: 'tools', items: [ 'Maximize', 'ShowBlocks' ] },
 //		{ name: 'others', items: [ '-' ] },
 //		{ name: 'about', items: [ 'About' ] }
+		{ name: 'insert2', items: [ 'Smiley' ] },
 		{ name: 'insert', items: [ 'unsubscribe' ] },
 	];
 
