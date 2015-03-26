@@ -1,6 +1,6 @@
 DragNDrop = function(){
-	
-}
+	// alert("Drag & drop");
+};
 
 DragNDrop.getInstance = function(){
 	if (!this.oDragNDrop)
@@ -8,7 +8,7 @@ DragNDrop.getInstance = function(){
 		this.oDragNDrop = new DragNDrop();
 	}
 	return this.oDragNDrop;
-}
+};
 
 DragNDrop.prototype = {
 	draggableSelectors : [],
