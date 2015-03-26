@@ -178,6 +178,7 @@ MailerTemplate.Views.StyleTab = Backbone.View.extend({
 			case MailerTemplate.TemplateItems.TITLE:
 				this.m_StyleTypeHeader.show();
 				this.m_StyleTypes.show();
+				$("#backgroundColorParent").show();
 				$("#textColorParent").show();
 				$("#fontFamilyParent").show();
 				$("#fontSizeParent").show();
