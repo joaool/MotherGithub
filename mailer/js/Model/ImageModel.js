@@ -4,7 +4,8 @@ MailerTemplate.Models.Image = Backbone.Model.extend({
 	m_Link : null,
 	
 	initialize : function(){
-		this.setSource("images/empty_image-72.png");
+		// this.setSource("images/empty_image-72.png");
+		this.setSource("./mailer/images/empty_image-72.png");
 		this.setDefaultStyleProperties();
 		this.set({type:MailerTemplate.TemplateItems.IMAGE});
 	},

@@ -7,20 +7,8 @@ $(document).ready(function(){
 
 function OnTemplatesLoaded()
 {
-	// $("#sidebar-wrapper,#page-content-wrapper").css({"height":window.innerHeight});
-	// mainView = new MailerTemplate.Views.MainView({el : "#wrapper"});
-	// $('#sidebar-wrapper ul:first li label').click(function(){
-	// 	if($(this).text().trim() === "Content"){
-	// 		$('#templateDesign').css("display","none");
-	// 		$('#templateItems').css("display","block");
-	// 	}else{
-	// 		$('#templateItems').css("display","none");
-	// 		$('#templateDesign').css("display","block");
-	// 	}
-	// });
-	// $('#templateDesign').css("display","none");
 	// --------------------code to connect to Framelink Database --------------------
-	alert("MailerTemplate.js ->begins connection with FrameLink");
+	// alert("MailerTemplate.js ->begins connection with FrameLink");
 	var promise=FL.API.getFLContextFromBrowserLocationBar();
 	promise.done(function(data){
 		console.log("MailerTemplate.js OnTemplatesLoaded ->getFLContextFromBrowserLocationBar SUCCESS <<<<< ");
@@ -30,7 +18,7 @@ function OnTemplatesLoaded()
 			console.log("appSetup ---> menudata=" + JSON.stringify(menuData));
 			var templatePromise=FL.API.createTemplates_ifNotExisting();
 			templatePromise.done(function(){
-				instantiateMainView();
+				instantiateMainView();//Kartik code originally the only code in OnTemplatesLoaded()
 				return;
 			});
 			templatePromise.fail(function(err){
