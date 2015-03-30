@@ -26,30 +26,23 @@
 </script>
 <script id="__button" type="text/x-handlebars-template"> 
 	<div class="pull-right" style="padding:5px 300px 5px;" >
-		<button type="button" class="btn btn-{{btnType1}} {{buttonHide1}}" onclick="{{onClick1}}" data-toggle="tooltip" data-placement="top" title="{{tooltip1}}" >{{label1}}</button>
-		<button type="button" class="btn btn-{{btnType2}} {{buttonHide2}}" onclick="{{onClick2}}" data-toggle="tooltip" data-placement="top" title="{{tooltip2}}">{{label2}} </button>
-		<button type="button" class="btn btn-{{btnType3}} {{buttonHide3}}" onclick="{{onClick3}}" data-toggle="tooltip" data-placement="top" title="{{tooltip3}}">{{label3}} </button>
-		<button type="button" class="btn btn-{{btnType4}} {{buttonHide4}}" onclick="{{onClick4}}" data-toggle="tooltip" data-placement="top" title="{{tooltip4}}">{{label4}} </button>
-		<button type="button" class="btn btn-{{btnType5}}  {{buttonHide5}}" onclick="{{onClick5}}" data-toggle="tooltip" data-placement="top" title="{{tooltip5}}" >{{label5}} </button>
-
+		{{#each buttonArr}}
+			<button type="button" class="btn btn-{{btnType}} {{buttonHide}}" onclick="{{onClick}}" data-toggle="tooltip" data-placement="top" title="{{tooltip}}" >{{label}}</button>
+		 {{/each}}
 	</div>
 </script>
 <script id="__checkbox" type="text/x-handlebars-template"> 
 	<div id="{{id}}" class="input-group" style="padding:5px 300px 5px">
-		<label class="checkbox-inline {{chkHide1}}"><input type="checkbox" {{checked1}} value="1">{{label1}}</label>
-		<label class="checkbox-inline {{chkHide2}}"><input type="checkbox" {{checked2}} value="2">{{label2}}</label>
-		<label class="checkbox-inline {{chkHide3}}"><input type="checkbox" {{checked3}} value="3">{{label3}}</label>
-		<label class="checkbox-inline {{chkHide4}}"><input type="checkbox" {{checked4}} value="4">{{label4}}</label>
-		<label class="checkbox-inline {{chkHide5}}"><input type="checkbox" {{checked5}} value="5">{{label5}}</label>
+		{{#each chkArr}}
+		<label class="checkbox-inline {{chkHide}}"><input type="checkbox" {{checked}} value="1">{{label}}</label>
+		{{/each}}
 	</div>
 </script>
 <script id="__radiobox" type="text/x-handlebars-template"> 
 	<div id="{{id}}" class="input-group" style="padding:5px 300px 5px">
-		<label class="radio-inline {{radioHide1}}"><input type="radio" {{checked1}} name="optradio" value="1">{{label1}}</label>
-		<label class="radio-inline {{radioHide2}}"><input type="radio" {{checked2}} name="optradio" value="2">{{label2}}</label>
-		<label class="radio-inline {{radioHide3}}"><input type="radio" {{checked3}} name="optradio" value="3">{{label3}}</label>
-		<label class="radio-inline {{radioHide4}}"><input type="radio" {{checked4}} name="optradio" value="4">{{label4}}</label>
-		<label class="radio-inline {{radioHide5}}"><input type="radio" {{checked5}} name="optradio" value="5">{{label5}}</label>
+		{{#each radioArr}}
+		<label class="radio-inline {{radioHide}}"><input type="radio" {{checked}} name="optradio" value="1">{{label}}</label>
+		{{/each}}
 	</div>
 </script>    
 <script id="__combo" type="text/x-handlebars-template">    
@@ -60,8 +53,9 @@
 				<span id="{{id}}" data-bind="label" data-toggle="tooltip" data-placement="top" title="{{tooltip}}" >{{comboLabel}}</span>&nbsp;<span class="caret"></span>
 			</button> 
 			<ul id="{{id}}Items" class="dropdown-menu">
-				<li><a href="#">templ1</a></li>
-				<li><a href="#">templ2</a></li>
+				{{#each comboArr}}
+					<li><a href="#">{{label}}</a></li>
+				 {{/each}}
 			</ul>
 		</div>
 	</div>    

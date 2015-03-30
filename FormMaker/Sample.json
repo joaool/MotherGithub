@@ -80,7 +80,20 @@
 			"tooltip": "Hi zz, please select  your template here",
 			"comboLabel": "Select One Template",
 			"onClick": "clickTest('combo')",
-			"comboArr": ["first choice", "second one", "option 3"],
+			"comboArr": [
+				{
+					"label" : "first choice",
+					"value" : "firstChoice"
+				},
+				{
+					"label" : "second one",
+					"value" : "secondOne"
+				},
+				{
+					"label" : "option 3",
+					"value" : "option3"
+				}
+			],
 			"caption": "Test",
 			"btnType": "default" 
 		},
