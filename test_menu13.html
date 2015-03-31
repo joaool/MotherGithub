@@ -646,7 +646,7 @@ mixpanel.init("19ada1cb259cc3272c67085eb1bf03fc");</script><!-- end Mixpanel -->
 					        <input type="email" class="form-control" id="_sendNewsletter_testEmail" placeholder="full email sender ex:jessica.costa@weadvice.pt" value="<%= masterDetailItems.master.testEmail %>" >
 							<span class="input-group-addon"><span class="glyphicon glyphicon-envelope"></span></span>
 					    </div>					    
-                        <button type="submit" class="btn btn-default" onclick="FL.links.sendEmailTest()">Send test email</button>
+                        <button type="submit" class="btn btn-default" onclick="FL.grid.sendEmailTest()">Send test email</button>
 
 				    </div>
 		    	</div>
@@ -710,13 +710,14 @@ mixpanel.init("19ada1cb259cc3272c67085eb1bf03fc");</script><!-- end Mixpanel -->
 		</div>
 	</div>      
 </script>
+
 <script type="text/template" id="titleDroppedItem">
-	<div class="titleDroppedItem droppedObject ui-state-default" id="titleTemplateItem0" type="title"> 
+	<div id="titleTemplateItem0" class="titleDroppedItem droppedObject ui-state-default" type="title"> 
 		Put your Text Here 
 	</div>
 </script>
 <script type="text/template" id="imageDroppedItem">
-	<div id="titleTemplateItem0" class="imageDroppedItem droppedObject ui-state-default" type="image"> 
+	<div id="imageTemplateItem0" class="imageDroppedItem droppedObject ui-state-default" type="image"> 
 		<a id="imageLink" href="#" target="_blank">
 			<div> 
 				<img class="" src="./mailer/images/empty_image-72.png" />
@@ -724,7 +725,6 @@ mixpanel.init("19ada1cb259cc3272c67085eb1bf03fc");</script><!-- end Mixpanel -->
 		</a>
 	</div>
 </script>
-
 <script type="text/template" id="socialblockDroppedItem" align="center">
 	<div style="text-align: center">
 		<a href="https://www.facebook.com/Weadvice.living.web"><img id="facebook" title="Facebook" src="images/social/Facebook.png" alt="Facebook" width="48" height="48"></a>
@@ -734,6 +734,36 @@ mixpanel.init("19ada1cb259cc3272c67085eb1bf03fc");</script><!-- end Mixpanel -->
 	</div>
 </script>
 
+
+<script type="text/template" id="emailTemplateHolder">
+	<div id="templateHolder" class="template_holder">
+		<table align="center" border="1" cellpadding="0" cellspacing="0" width="<%= totWidth %>px">
+		<tbody>
+ 			<tr bgcolor="<%= headerBgcolor %>">
+  				<td  style="padding-top: 10px; padding-right: <%= lateralMargin %>px; padding-bottom: 8px; padding-left: <%= lateralMargin %>px;">
+					<div id="template_holder_header" class="header sortable droppable" >		
+
+					</div>
+  				</td>
+ 			</tr>
+			<tr bgcolor="<%= bodyBgcolor %>">
+ 				<td  style="padding-top: 10px; padding-right: <%= lateralMargin %>px; padding-bottom: 8px; padding-left: <%= lateralMargin %>px;">
+					<div id="template_holder_body" class="template_holder_body sortable droppable">
+						
+					</div>
+				</td>
+			</tr> 			
+			<tr bgcolor="<%= footerBgcolor %>">
+ 				<td  style="padding-top: 10px; padding-right: <%= lateralMargin %>px; padding-bottom: 8px; padding-left: <%= lateralMargin %>px;">
+					<div id="template_holder_footer" class="footer sortable droppable">
+						
+					</div>
+				</td>
+			</tr>
+		</tbody>
+		</table>	
+	</div>
+</script>
 
 <body style="padding-top:10px;">
 	<div id="_modalDialog"></div>
@@ -872,11 +902,11 @@ mixpanel.init("19ada1cb259cc3272c67085eb1bf03fc");</script><!-- end Mixpanel -->
 		</div>	
 	</div><!-- masthead -->
 
-	<div id="templateHolder" class="template_holder">
+	<div id="XtemplateHolder" class="template_holder">
 		<table align="center" border="1" cellpadding="0" cellspacing="0" width="600px">
  			<tr>
   				<td bgcolor="#dedbd7" style="padding-top: 10px; padding-right: 15px; padding-bottom: 8px; padding-left: 15px;">
-					<div id="template_holder_header" class="header sortable droppable" >		
+					<div id="Xtemplate_holder_header" class="header sortable droppable" >		
 
 					</div>
 					<br/><br/>
@@ -884,7 +914,7 @@ mixpanel.init("19ada1cb259cc3272c67085eb1bf03fc");</script><!-- end Mixpanel -->
  			</tr>
 			<tr>
  				<td bgcolor="#dedbd7" style="padding-top: 10px; padding-right: 15px; padding-bottom: 8px; padding-left: 15px;">
-					<div id="template_holder_body" class="template_holder_body sortable droppable">
+					<div id="Xtemplate_holder_body" class="template_holder_body sortable droppable">
 						
 					</div>
 					<br/><br/>
@@ -892,7 +922,7 @@ mixpanel.init("19ada1cb259cc3272c67085eb1bf03fc");</script><!-- end Mixpanel -->
 			</tr> 			
 			<tr>
  				<td bgcolor="#dedbd7" style="padding-top: 10px; padding-right: 15px; padding-bottom: 8px; padding-left: 15px;">
-					<div id="template_holder_footer" class="footer sortable droppable">
+					<div id="Xtemplate_holder_footer" class="footer sortable droppable">
 						
 					</div>
 				</td>
