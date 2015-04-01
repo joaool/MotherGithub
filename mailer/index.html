@@ -37,12 +37,8 @@
 		<script src="js/View/PropertyPanels/ImagePanel.js"></script>
 		<script src="js/View/PropertyPanels/SocialLinksPanel.js"></script>
 		<script src="js/View/PropertiesPanel.js"></script>
-
-		<script src="js/View/DesignTemplateBody.js"></script>
-		<script src="js/View/DesignTemplateFooter.js"></script>
-		<script src="js/View/DesignTemplatePage.js"></script>
-		<script src="js/View/DesignTemplatePageHeader.js"></script>
-
+		<script src="js/View/PageDesign.js"></script>
+		
 		<script src="js/View/TemplateItems.js"></script>
 		<script src="js/View/TemplateElements/TitleElement.js"></script>
 		<script src="js/View/TemplateElements/ImageElement.js"></script>
@@ -76,16 +72,57 @@
                 </li>
 
             </ul>
-			<ul id="templateDesign">
-				<li class="sidebar-brand">
-                    <div style="text-align: center;color:white;"><h3>Design</h3></div>
-                </li>
-				<li><a href="javascript:void(0)">Page</a></li>
-				<li><a href="javascript:void(0)">PreHeader</a></li>
-				<li><a href="javascript:void(0)">Header</a></li>
-				<li><a href="javascript:void(0)">Columns</a></li>
-				<li><a href="javascript:void(0)">Footer</a></li>
-			</ul>
+			<div id="templateDesign">
+				<div class="styleHeader">
+					Page Settings
+				</div>
+				<div id="newsLetterWidthParent" class="styleItem">
+					<div> Newsletter width </div>
+					<div style="width:70px;display: inline;">
+						<input type="number" style="width:70px;" id="newsletterWidth"/><span> px</span>
+					</div>
+				</div>
+				<div id="headerBgColorParent" class="styleItem">
+					<div> Header Background Color </div>
+					<div style="width:150px">
+						<div class="bfh-colorpicker" data-name="colorpicker1" id="headerBgColor"></div>
+					</div>
+				</div>
+				<div id="bodyBgColorParent" class="styleItem">
+					<div> Body Background Color </div>
+					<div style="width:150px">
+						<div class="bfh-colorpicker" data-name="colorpicker1" id="bodyBgColor"></div>
+					</div>
+				</div>
+				<div id="footerBgColorParent" class="styleItem">
+					<div> Footer Background Color </div>
+					<div style="width:150px">
+						<div class="bfh-colorpicker" data-name="colorpicker1" id="footerBgColor"></div>
+					</div>
+				</div>
+				<div id="newsLetterWidthParent" class="styleItem">
+					<div> Header Padding </div>
+					<div style="width:70px;display: inline;">
+						Left :<input type="number" style="width:70px;" id="headerPaddingLeft"/><span> px</span>
+						Right :<input type="number" style="width:70px;" id="headerPaddingRight"/><span> px</span>
+					</div>
+				</div>
+				<div id="newsLetterWidthParent" class="styleItem">
+					<div> Body Padding </div>
+					<div style="width:70px;display: inline;">
+						Left :<input type="number" style="width:70px;" id="bodyPaddingLeft"/><span> px</span>
+						Right :<input type="number" style="width:70px;" id="bodyPaddingRight"/><span> px</span>
+					</div>
+				</div>
+				<div id="newsLetterWidthParent" class="styleItem">
+					<div> Footer Padding </div>
+					<div style="width:70px;display: inline;">
+						Left :<input type="number" style="width:70px;" id="footerPaddingLeft"/><span> px</span>
+						Right :<input type="number" style="width:70px;" id="footerPaddingRight"/><span> px</span>
+					</div>
+				</div>
+				
+			</div>
 			<div id="propertyPanel" class="PropertyPanel">
 				<div id="propertyParent">
 					<div id="propteryHeader" class="page-header"></div>
@@ -99,10 +136,7 @@
 							  <input type="radio" name="options" id="contentTabButton" autocomplete="off" checked>
 							  Style
 						 </div>
-						 <div href="#settingsTab" class="btn btn-default propertyTabBtn" role="tab" aria-controls="settingsTab" data-toggle="tab">
-							  <input type="radio" name="options" id="contentTabButton" autocomplete="off" checked>
-							  Settings
-						 </div>
+						 
 					</div>
 
 					  <!-- Tab panes -->
@@ -167,7 +201,7 @@
 								Container
 							</div>
 							<div class="styleBody" id="containerSettings">
-								<div id="borderParent">
+								<div id="borderParent" class="styleItem">
 									<div> Border </div>
 									<div style="width:100px;display: inline-block;">
 										<div class="bfh-selectbox" data-name="selectbox1" id="borderStyle">
@@ -201,32 +235,32 @@
 							<div class="styleHeader" id="StyleTypeHeader">
 								Type
 							</div>
-							<div class="styleBody" id="styleType">
-								<div id="textColorParent">
+							<div class="styleBody" id="styleType" class="styleItems">
+								<div id="textColorParent" class="styleItem">
 									<div> Text Color </div>
 									<div style="width:150px">
 										<div class="bfh-colorpicker" data-name="colorpicker1" id="fontColor"></div>
 									</div>
 								</div>
-								<div id="backgroundColorParent">
+								<div id="backgroundColorParent" class="styleItem">
 									<div> Background Color </div>
 									<div style="width:150px">
 										<div class="bfh-colorpicker" data-name="colorpicker1" id="backgroundColor"></div>
 									</div>
 								</div>
-								<div id="headingTextColorParent">
+								<div id="headingTextColorParent" class="styleItem">
 									<div>Heading Text Color</div>
 									<div class="bfh-colorpicker" data-name="colorpicker1" id="headingTextColor"></div>
 								</div>
-								<div id="fontFamilyParent">
+								<div id="fontFamilyParent" class="styleItem">
 									<div>Font Family</div>
 									<div class="bfh-selectbox bfh-fonts" data-font="Lato" id="fontFamily" data-blank=false></div>
 								</div>
-								<div id="fontSizeParent">
+								<div id="fontSizeParent" class="styleItem">
 									<div>Font Size</div>
 									<div class="bfh-selectbox bfh-fontsizes" data-fontsize="12" id="fontSize" data-blank=false></div>
 								</div>
-								<div id="fontWeightParent">
+								<div id="fontWeightParent" class="styleItem">
 									<div>Font Weight</div>
 									<div class="bfh-selectbox" data-name="selectbox1" id="fontWeight">
 										<div data-value="1">Not Specified</div>
@@ -234,7 +268,7 @@
 										<div data-value="3">Bold</div>
 									</div>
 								</div>
-								<div id="lineHeightParent">
+								<div id="lineHeightParent" class="styleItem">
 									<div>Line Height</div>
 									<div class="bfh-selectbox" data-name="selectbox1" id="lineHeight">
 										<div data-value="1">Not Specified</div>
@@ -244,7 +278,7 @@
 										<div data-value="5">Double Space</div>
 									</div>
 								</div>
-								<div id="textAlignParent">
+								<div id="textAlignParent" class="styleItem">
 									<div> Text Align</div>
 									<div class="btn-group" data-toggle="buttons" id="textAlign">
 										<label class="btn btn-default active">

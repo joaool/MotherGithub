@@ -78,14 +78,14 @@ button{
 #page-content-wrapper
 {
 	padding-top: 0px;
-	height: 100%;
+	height: auto;
 	min-height: 100%;
 	max-height: 100%;
 	overflow-y: auto;
 }
 
 .sidebar-nav > .sidebar-brand{
-	color:  #fff;
+	color: #000;
 }
 
 .sidebar-nav li a
@@ -160,6 +160,7 @@ div#propteryHeader {
 div#sidebar-wrapper {
     overflow: hidden;
     height: 100%;
+    border-left: 1px solid #CACACA;
 }
 
 div#propertyTab {
@@ -187,7 +188,8 @@ div#propertyParent {
 
 
 .styleHeader {
-    height: 40px;
+    height: 35px;
+    line-height: 35px;
     text-align: left;
     font-size: 20px;
     background-color: #EAEAEA;
@@ -200,15 +202,15 @@ div#propertyParent {
     padding-bottom: 10px;
 }
 
-#styletab > div >div
+.styleItem
 {
 	padding-left: 10px;
 	padding-right: 10px;
 	text-align: left;
 }
-#styletab > div >div > div:first-child {
-    line-height: 17px;
-    margin-top: 8px;
+.styleItem > div:first-child {
+    line-height: 20px;
+    margin-top: 12px;
 }
 
 
@@ -277,3 +279,30 @@ input[type=file] {
     height: 30px;  margin: 0 auto 10px;    height : 35px;    overflow:hidden;    line-height:23px;
 }
 
+
+
+.propertyTabBtn {
+    width: 120px;
+}
+
+.bfh-colorpicker-popover {
+    /* right: -155px; */
+    /* left: -120px!important; */
+    padding: 0px!important;
+}
+
+div#templateDesign {
+    /* height: 100%; */
+    background-color: white;
+}
+
+ul#templateDesign {
+    list-style: none;
+}
+
+#templateDesign li {
+    padding-left: 10px;    padding-right: 10px;    text-align: left;
+}
+
+.bfh-colorpicker-popover>canvas {
+}

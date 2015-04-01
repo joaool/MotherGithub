@@ -22,10 +22,12 @@ HtmlGenerator.prototype = {
 		var body = templateItems.body;
 		var footer = templateItems.footer;
 		
-
 		this.AppendTemplate(header,this.m_Header);
 		this.AppendTemplate(body,this.m_Body);
 		this.AppendTemplate(footer,this.m_Footer);
+		
+		var pageStyle = this.m_jsonData.pageStyles;
+		this.setAllPageValues(pageStyle);
 	},
 	AppendTemplate : function(jsonObject, parentElement){
 		var temp = this;
@@ -72,6 +74,20 @@ HtmlGenerator.prototype = {
 				return new MailerTemplate.Models.SocialLinks();
 				break;
 		}
+	},
+	setAllPageValues: function(data){
+		this.m_Body.width(data.pageWidth+"px");
+		this.m_Header.width(data.pageWidth+"px");
+		this.m_Footer.width(data.pageWidth+"px");
+		this.m_Header.css("background-color",data.headerBgColor);
+		this.m_Body.css("background-color",data.bodyBgColor);
+		this.m_Footer.css("background-color",data.footerBgColor);
+		this.m_Header.css("padding-left",data.headerPaddingLeft+"px");
+		this.m_Header.css("padding-right",data.headerPaddingRight+"px");
+		this.m_Body.css("padding-left",data.bodyPaddingLeft+"px");
+		this.m_Body.css("padding-right",data.bodyPaddingRight+"px");
+		this.m_Footer.css("padding-left",data.footerPaddingLeft+"px");
+		this.m_Footer.css("padding-right",data.footerPaddingRight+"px");
 	}
 }
 

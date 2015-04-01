@@ -89,5 +89,16 @@
 			"type": "SocialLinks"
 		}]
 	},
-	"pageStyles": null
+	"pageStyles": {
+		"pageWidth": "566",
+		"headerBgColor": "#ff2dfa",
+		"bodyBgColor": "#4bcfff",
+		"footerBgColor": "#aeff69",
+		"headerPaddingLeft": "0",
+		"headerPaddingRight": "0",
+		"bodyPaddingLeft": "0",
+		"bodyPaddingRight": "0",
+		"footerPaddingLeft": "0",
+		"footerPaddingRight": "0"
+	}
 }

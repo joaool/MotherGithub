@@ -11,7 +11,17 @@ MailerTemplate.Views.TemplateHolder = Backbone.View.extend({
 	m_CurrentTemplateViewObject : null,
 	m_lstModel : [],
 	dragNDropHandler : null,
-	
+	pageWidth : "500px",
+	headerBgColor: "white",
+	bodyBgColor : "white",
+	footerBgColor : "white",
+	headerPaddingLeft : "0px",
+	headerPaddingRight : "0px",
+	bodyPaddingLeft : "0px",
+	bodyPaddingRight : "0px",
+	footerPaddingLeft : "0px",
+	footerPaddingRight : "0px",
+
 	initialize : function(){
 		
 		this.m_objCnt=0;
@@ -180,14 +190,28 @@ MailerTemplate.Views.TemplateHolder = Backbone.View.extend({
 				break;
 		}
 	},
-	generatePlainHtml : function(){
+	getModelData : function(){
 		var headerItemIds = $.map($( "#template_holder_header > .droppedObject" ),function(item){return $(item).attr("id"); } );
 		var bodyItemIds = $.map($( "#template_holder_body > .droppedObject" ),function(item){return $(item).attr("id"); } );
 		var footerItemIds = $.map($( "#template_holder_footer > .droppedObject" ),function(item){return $(item).attr("id"); } );
 		
 		var ids = {"header" : headerItemIds, "body" : bodyItemIds, "footer":footerItemIds};
-		return { "ids" : ids,
-				 "models" : this.m_lstModel};
+		return {
+				"ids" : ids,
+				"models" : this.m_lstModel,
+				"pageStyles" : {
+					"pageWidth" 	: this.pageWidth,
+					"headerBgColor" 	: this.headerBgColor,
+					"bodyBgColor" 		: this.bodyBgColor,
+					"footerBgColor" 	: this.footerBgColor,
+					"headerPaddingLeft" : this.headerPaddingLeft,
+					"headerPaddingRight" : this.headerPaddingRight,
+					"bodyPaddingLeft" : this.bodyPaddingLeft,
+					"bodyPaddingRight" : this.bodyPaddingRight,
+					"footerPaddingLeft" : this.footerPaddingLeft,
+					"footerPaddingRight" : this.footerPaddingRight
+				}	
+			};
 	},
 	ClearEditor : function(){
 		this.m_Index= 0;
@@ -222,6 +246,75 @@ MailerTemplate.Views.TemplateHolder = Backbone.View.extend({
 			temp.m_lstModel[$(element).attr("id")] = model;
 		});
 	},
+	setProperty : function(data){
+		if (data.property == "width"){
+			this.m_TemplateHoderBody.width(data.value+"px");
+			this.m_TemplateHoderHeader.width(data.value+"px");
+			this.m_TemplateHoderFooter.width(data.value+"px");
+			this.pageWidth = data.value;
+		}
+		else if (data.property == "headerBgColor"){
+			this.m_TemplateHoderHeader.css("background-color",data.value);
+			this.headerBgColor = data.value;
+		}
+		else if (data.property == "bodyBgColor"){
+			this.m_TemplateHoderBody.css("background-color",data.value);
+			this.bodyBgColor = data.value;
+		}
+		else if (data.property == "footerBgColor"){
+			this.m_TemplateHoderFooter.css("background-color",data.value);
+			this.footerBgColor = data.value;
+		}
+		else if (data.property == "headerPaddingLeft"){
+			this.m_TemplateHoderHeader.css("padding-left",data.value+"px");
+			this.headerBgColor = data.value;
+		}
+		else if (data.property == "headerPaddingRight"){
+			this.m_TemplateHoderHeader.css("padding-right",data.value+"px");
+			this.bodyBgColor = data.value;
+		}
+		else if (data.property == "bodyPaddingLeft"){
+			this.m_TemplateHoderBody.css("padding-left",data.value+"px");
+			this.footerBgColor = data.value;
+		}
+		else if (data.property == "bodyPaddingRight"){
+			this.m_TemplateHoderBody.css("padding-right",data.value+"px");
+			this.headerBgColor = data.value;
+		}
+		else if (data.property == "footerPaddingLeft"){
+			this.m_TemplateHoderFooter.css("padding-left",data.value+"px");
+			this.bodyBgColor = data.value;
+		}
+		else if (data.property == "footerPaddingRight"){
+			this.m_TemplateHoderFooter.css("padding-right",data.value+"px");
+			this.footerBgColor = data.value;
+		}
+	},
+	setAllPageValues: function(data){
+		this.pageWidth = data.pageWidth;
+		this.headerBgColor = data.headerBgColor;
+		this.bodyBgColor = data.bodyBgColor;
+		this.footerBgColor = data.footerBgColor;
+		this.headerPaddingLeft = data.headerPaddingLeft;
+		this.headerPaddingRight = data.headerPaddingRight;
+		this.bodyPaddingLeft = data.bodyPaddingLeft;
+		this.bodyPaddingRight = data.bodyPaddingRight;
+		this.footerPaddingLeft = data.footerPaddingLeft;
+		this.footerPaddingRight = data.footerPaddingRight;
+		
+		this.m_TemplateHoderBody.width(data.pageWidth+"px");
+		this.m_TemplateHoderHeader.width(data.pageWidth+"px");
+		this.m_TemplateHoderFooter.width(data.pageWidth+"px");
+		this.m_TemplateHoderHeader.css("background-color",data.headerBgColor);
+		this.m_TemplateHoderBody.css("background-color",data.bodyBgColor);
+		this.m_TemplateHoderFooter.css("background-color",data.footerBgColor);
+		this.m_TemplateHoderHeader.css("padding-left",data.headerPaddingLeft+"px");
+		this.m_TemplateHoderHeader.css("padding-right",data.headerPaddingRight+"px");
+		this.m_TemplateHoderBody.css("padding-left",data.bodyPaddingLeft+"px");
+		this.m_TemplateHoderBody.css("padding-right",data.bodyPaddingRight+"px");
+		this.m_TemplateHoderFooter.css("padding-left",data.footerPaddingLeft+"px");
+		this.m_TemplateHoderFooter.css("padding-right",data.footerPaddingRight+"px");
+	}
 });
 MailerTemplate.Views.TemplateHolder.DISPLAY_PROPERTYPANEL = "displayPropertyPanel";
 MailerTemplate.Views.TemplateHolder.BINDMODEL = "bindModel";

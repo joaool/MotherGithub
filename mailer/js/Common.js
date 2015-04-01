@@ -99,6 +99,18 @@ window.MailerTemplate = {
 			defaultUrl : "your@email.com",
 			defaultText : "Email"
 	    }
-	]
+	],
+	pageStyle : {
+		pageWidth : "500",
+		headerBgColor : "white",
+		bodyBgColor : 'white',
+		footerBgColor: "white",
+		headerPaddingLeft : "0",
+		headerPaddingRight : "0",
+		bodyPaddingLeft : "0",
+		bodyPaddingRight : "0",
+		footerPaddingLeft : "0",
+		footerPaddingRight : "0",
+	}
 }
 
