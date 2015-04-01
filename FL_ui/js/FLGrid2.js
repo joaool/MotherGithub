@@ -331,13 +331,16 @@
 		};
 		var checkSocialblock = function(item){//HACK to introduce social links if text Item has "socialblock"
 			var is_social = false;
-			if(item.type == "title"){//TEMPORARY to be a social element it must be type="title" and content = "socialblock"
-				var elementStr = item.title;
-				var element = $.parseHTML(elementStr);
-				var titleText = $(element).text();
-				if(titleText == "socialblock")
-					is_social = true
-			}
+			// if(item.type == "title"){//TEMPORARY to be a social element it must be type="title" and content = "socialblock"
+			// 	var elementStr = item.title;
+			// 	var element = $.parseHTML(elementStr);
+			// 	var titleText = $(element).text();
+			// 	if(titleText == "socialblock")
+			// 		is_social = true
+			// }
+			if(item.type == "SocialLinks"){
+				is_social = true
+			}			
 			return is_social;
 		};		
 		var appendTemplate = function(jsonObject, parentElement){
@@ -364,9 +367,9 @@
 				}else{
 					var elementId = item.type + "DroppedItem";
 					element = $("#"+elementId).html();
-					element = $(element).filter("div");			
+					// element = $(element).filter("div");			
+					element = $(element).prop("id","template"+ window.templateCounter);
 					$(parentElement).append(element);
-					$(element).prop("id","template"+ window.templateCounter);
 					if( item.type == "title" ) {
 						$(element).css(item.style);
 						$(element).html(item.title);
@@ -377,6 +380,12 @@
 							$(elementAnchor).attr('href',item.link);	
 						addImageToMandrillImageArr("template"+ window.templateCounter,item.source.substring(23));//name,imageFromJson - removes the beginning chars:"data:image/jpeg;base64,"
 						$(elementImg).attr('src','cid:template'+ window.templateCounter);
+						
+						//test
+						if(window.templateCounter == 1){
+							item.style["width"] = "52px";						
+						}
+						
 						$(elementImg).css(item.style);
 					}
 					window.templateCounter++;
@@ -386,6 +395,16 @@
 		var getHTMLContent = function(jsonTemplate){
 			// alert(jsonTemplate);
 			var jsonObj = JSON.parse(jsonTemplate);
+
+			//FORCING BACKGROUND TO BLACK
+			// jsonObj.templateItems.header[0].style.backgroundColor = "#ffffff";
+			// jsonObj.templateItems.footer[0].style.backgroundColor = "#ffffff";
+			var rawEmailTemplate = $("#emailTemplateHolder").html();
+			var templateFunc =  _.template(rawEmailTemplate);
+			var emailTemplate = templateFunc({headerBgcolor:"#005000",bodyBgcolor:"#ff0000",footerBgcolor:"#0000ff",totWidth:"400",lateralMargin:"80"});
+			$("#templateHolder").empty();
+			$(emailTemplate).appendTo('body');//place emailTemplate HTML in DOM
+			
 			var content = $("#templatePreview").html();
 			// var template = _.template($("#templatePreview").html());
 			var header = $("#template_holder_header");
@@ -397,16 +416,30 @@
 			FL.login.emailImagesArray = [];
 			// mountTemplate(jsonObj,header,body,footer);
 			window.templateCounter = 0;
-			appendTemplate(jsonObj.templateItems.header,header);
-			appendTemplate(jsonObj.templateItems.body,body);
-			appendTemplate(jsonObj.templateItems.footer,footer);
-			return $("#templateHolder").html();
+			appendTemplate(jsonObj.templateItems.header,header);//fills header template with header content extracted from jsonObj
+			appendTemplate(jsonObj.templateItems.body,body);//fills body template with body content extracted from jsonObj
+			appendTemplate(jsonObj.templateItems.footer,footer);//fills footer template with footer content extracted from jsonObj
+			
+			var emailJQ = $(emailTemplate);
+			emailJQ.find("#template_holder_header").append(header.contents());
+			emailJQ.find("#template_holder_body").append(body.contents());
+			emailJQ.find("#template_holder_footer").append(footer.contents());
+			// return $("#templateHolder").html();
+			return $(emailJQ).html();
 		};		
 		var convertsToArrOfObj = function(templateOptionsArr){
 			//receives [{"_id": "t 115",jsonTemplate:"dfdfdg"},{"_id": "t 116",jsonTemplate:"dfgd"}] and returns [{value:1,text: "t 115",template:"dfdfdg"},{value:2,text: "t 116",template:"dfgd"}]
 			return _.map(templateOptionsArr, function(el,index){ return {"value":index+1,"text":el._id,"template":el.jsonTemplate}; });
-		};		
-		var newsletterEmissionUI = function(templateOptionsArr, entityName) {
+		};
+		var extractSenderObjFromModal = function() { //extracts senderObj from _sendNewsletterTemplate
+			var name = $("#_sendNewsletter_name").val();
+			var email = $("#_sendNewsletter_email").val();
+			var subject = $("#_sendNewsletter_subject").val();
+			var testEmail =  $("#_sendNewsletter_testEmail").val();
+			var senderObj = {from_name:name,from_email:email,subject:subject,testEmail:testEmail};
+			return senderObj;
+		};			
+		var newsletterEmissionUI = function(templateOptionsArr, entityName, grid, emailAttributeName) {//grid is the backgrid object necessary for select
 			var def = $.Deferred();
 			FL.login.emailTemplateName = null;//cleans any previous template name
 			FL.login.emailContentTemplate = null;
@@ -440,12 +473,17 @@
 			};
 			FL.common.editMasterDetail("B"," Send email/Newsletter","_sendNewsletterTemplate",masterDetailItems,options,function(result){
 				if(result){//user choosed button2 ==>Send Newsletter button
-					if(FL.login.emailTemplateName !== null){
-						var senderObj = extractSenderObjFromModal();//var senderObj = {from_name:name,from_email:email,subject:subject,testEmail:testEmail};
-						var toArr = csvStore.extractEmailArray();//to arr becomes: [{"email":"e1@live.com"},{"email":"email2@gmail.com"}..]
-						var mailHTML = FL.login.emailContentTemplate;// we also have FL.login.emailTemplateName
-						// alert("FLmenulinks2 newsletterEmissionUI Ready to send after checking duplicates.....template=" + mailHTML);
-						checkDuplicateEmission(entityName,FL.login.emailTemplateName,toArr,senderObj);
+					if(FL.login.emailTemplateName !== null){					
+						// var toArr = csvStore.extractEmailArray();//to arr becomes: [{"email":"e1@live.com"},{"email":"email2@gmail.com"}..]
+						var toArr = getSelectedEmailArray(grid,emailAttributeName);//to arr becomes: [{"email":"e1@live.com"},{"email":"email2@gmail.com"}..]
+						if( toArr.length == 0 ){
+							FL.common.makeModalInfo("No email to send. To send one or more emails, click the left column checkbox.");
+						}else{
+							var senderObj = extractSenderObjFromModal();//var senderObj = {from_name:name,from_email:email,subject:subject,testEmail:testEmail};
+							var mailHTML = FL.login.emailContentTemplate;// we also have FL.login.emailTemplateName
+							// alert("FLmenulinks2 newsletterEmissionUI Ready to send after checking duplicates.....template=" + mailHTML);
+							checkDuplicateEmission(entityName,FL.login.emailTemplateName,toArr,senderObj);						
+						}
 					}else{
 						FL.common.makeModalInfo("Canceled !!! No template selected.");
 					}	
@@ -455,8 +493,19 @@
 				return def.resolve();
 			});			
 			return def.promise();
-		};		
-		var prepareNewsletterEmission = function(entityName){
+		};	
+		var getSelectedEmailArray = function(grid,emailAttributeName){//TEM DE RECEBER A GRID !!!!
+            var emailsArr = [];
+            var selectedModels = grid.getSelectedModels();
+            if(selectedModels.length > 0 ){
+            	// alert("FLGrid2 selectedModels="+selectedModels);
+            	_.each(selectedModels,function(element,index){
+            		emailsArr.push( element.attributes[emailAttributeName] );
+            	});
+            }
+            return emailsArr;	
+		};
+		var prepareNewsletterEmission = function(entityName,grid,emailAttributeName){
 			var getTemplatesPromise = FL.API.loadTableId("_templates","jsonTemplate");//("_templates","jsonTemplate");
 			var entityName = entityName;
 			getTemplatesPromise.done(function(data){
@@ -465,7 +514,7 @@
 					FL.common.makeModalInfo('No templates available. You must have at least one template saved.');
 				}else{
 					// aGrid2nulinks2.js prepareNewsletterEmission =>\n" + JSON.stringify(data));//data array of objects
-					var emissionPromise = newsletterEmissionUI(data,entityName);
+					var emissionPromise = newsletterEmissionUI(data,entityName,grid,emailAttributeName);
 					emissionPromise.done(function(data){
 						console.log("FLmenulinks2 prepareNewsletterEmission emission done !");
 						return;// def.resolve(data);					
@@ -576,7 +625,7 @@
 						var mailHTML = FL.login.emailContentTemplate;
 						// alert("before calling checkDuplicate ->"+FL.login.emailTemplateName);
 						if(FL.login.emailTemplateName !== null)
-							checkDuplicateEmission(entityName,FL.login.emailTemplateName,toArr,senderObj);
+							checkDuplicateEmission(entityName,FL.login.emailTemplateName,toArr,senderObj);//CURRENTLY var IN FLmenulinks2.js 
 						else
 							FL.common.makeModalInfo("Canceled !!! No template selected.");
 					}else{
@@ -589,7 +638,75 @@
 			getTemplatesPromise.fail(function(err){
 				console.log(">>>>>FLGrid2.js prepareNewsletterMCEmission  FAILURE <<<<<"+err);
 			});
-		};			
+		};
+		var checkDuplicateEmission = function(entityName,NName,toSend,senderObj){
+			// Assumes that NNAme is not null
+			// This method manages the users dialogs for the following cases:
+			//		First time emission - the newsletter was not sent before ->sends  to missingEmails = the whole list (recipientsArr)
+			//		Remission to all recipients - The same newsletter was sent previously - DANGEROUS !!!!
+			//         missing are null in this case ->
+			//		Emission to new recipients that were introduced in the base table, after the last emission - sends to the missingEmails			var promise = FL.API.mailRecipientsOfTemplate(entityName,NName);
+			var promise = FL.API.mailRecipientsOfTemplate(entityName,NName);
+			promise.done(function(sent){
+				// var toSend =  _.pluck(recipientsArr, "email");
+				FL.API.debug = true; FL.API.debugStyle= 0;
+				console.log("==========================================");
+				console.log("toSend->"+JSON.stringify(toSend));
+				var missingEmails = _.difference(toSend, sent); //if sent = null =>missing = toSend
+
+				// missingEmails = [];//TEST CASE 2 - REEMISSION
+				// missingEmails.splice(0,2);//TEST CASE 3 - NEW ADDITIONS - remove position 0 and 1
+	
+				console.log("Emails to sent->"+JSON.stringify(missingEmails));
+				// alert("missingEmails->"+JSON.stringify(missingEmails));
+				var confirmQuestion = null;
+				var button2 = null;
+				if(missingEmails.length == toSend.length){
+					confirmQuestion = "Do you confirm the emission of " + toSend.length + " emails, using template '" + NName + "' ?";
+					button2 = "OK execute first emission";
+				}else{
+					var missingHTML = "";
+					_.each(missingEmails,function(element){
+						missingHTML += "<li>" + element + "</li>";
+					});
+					confirmQuestion = NName + " was sent previously, but " + missingEmails.length + " new recipient(s) were added to the send list.<br>Do you want to send only to the new recipient(s) ?<br>"+missingHTML;
+					button2 = "OK send to " + missingEmails.length + " new email(s)";
+					if(missingEmails.length ==0){
+						confirmQuestion = "This emission of " + NName + " was done previously to the same recipients !!! Do you really want to repeat it ?";
+						button2 = "OK resend these emails";
+					}
+				}
+				FL.common.makeModalConfirm(confirmQuestion,"No, cancel the emission",button2, function(result){
+					if(result){
+						var mailHTML = FL.login.emailContentTemplate;
+						var imagesArr = FL.login.emailImagesArray;
+						// mailHTML = null; //to TEST ONLY
+						var msg = "Newsletter " + FL.login.emailTemplateName + " was not sent !!!. No content to send.";
+						if(mailHTML!== null){
+							if(  button2 == "OK resend these emails") {
+								missingEmails = toSend; //missingEmails now refers to toSend
+								// alert("Resend the emission ->"+JSON.stringify(missingEmails));
+							}
+							// var sentCount = FL.links.sendEmail(entityName,mailHTML,imagesArr,missingEmails,senderObj,FL.login.emailTemplateName);
+							var eCN = FL.dd.getCEntity(FL.dd.histoMailPeer(entityName));
+							var fCN = FL.dd.getFieldCompressedName(FL.dd.histoMailPeer(entityName),"msg");
+							var metadataObj={newsletterName:FL.login.emailTemplateName,dbName:FL.login.token.dbName,eCN:eCN,fCN:fCN}
+							// var sentCount = FL.emailServices.sendEmail(entityName,mailHTML,imagesArr,missingEmails,senderObj,metadataObj);
+							var sentCount = FL.emailServices.sendEmail(mailHTML,imagesArr,missingEmails,senderObj,metadataObj);
+							// var sentCount = missingEmails.length;
+							msg = "Newsletter " + FL.login.emailTemplateName + " sent  to " + sentCount + " recipients !!!<br> - total rows checked = "+toSend.length;
+						}	
+						FL.common.makeModalInfo(msg);
+					}else{
+						FL.common.makeModalInfo("Canceled !!! you can always send these emails later...");
+					}
+				});
+				FL.API.debug = false; FL.API.debugStyle= 0;
+			});
+			promise.fail(function(){
+				alert("checkDuplicateEmission ->ERROR !!!");
+			});
+		};				
 		var internalTest = function(x) {//
 			alert("grid internalTest() -->"+x);
 		};
@@ -1016,7 +1133,7 @@
 		                utils.mountGridInCsvStore(columnsArr);//mount backbone views and operates grid - columnsArr must be prepared to backGrid
 		                // to prepare columnArr to backGrid use utils.backGridColumnsExtractedFromDictionary() or backGridColumnsFromArray()
 		                // utils.mountGridInCsvStore(columnsArr2);//mount backbone views and operates grid - columnsArr must be prepared to backGrid
-		            }
+					}
 		        });
 		    },
 			removeLastRowIfIncomplete: function (data){
@@ -1115,12 +1232,16 @@
 						editGrid(entityName);
 					});				
 					$("#_editGrid").show();
-					if( FL.dd.isEntityWithTypeUI(entityName,"emailbox") || FL.dd.isEntityWithTypeUI(entityName,"email") ){//the newsletter option only appears to entities that have an email
+					var eCN = FL.dd.getCEntity(entityName);//to remove later when we change entityName by eCN
+					var emailAttributeName = FL.dd.firstEmailAttribute(eCN);
+					if(emailAttributeName) {
+					// if( FL.dd.isEntityWithTypeUI(entityName,"emailbox") || FL.dd.isEntityWithTypeUI(entityName,"email") ){//the newsletter option only appears to entities that have an email
 						$('#_newsletter').off('click');
 						$("#_newsletter").click(function(){
 							var templatePromise=FL.API.createTemplates_ifNotExisting();
 							templatePromise.done(function(){
-								prepareNewsletterEmission(entityName);
+								// alert("FLGrid2 l1143 grid = "+grid);
+								prepareNewsletterEmission(entityName,grid,emailAttributeName);
 								return;
 							});
 							templatePromise.fail(function(err){
@@ -1136,7 +1257,7 @@
 						$('#_newsletterMC').show();
 						$("#_newsletterMC").html(" MC");
 					}	
-					utils.mountGridInCsvStore(columnsArr);//mount backbone views and operates grid -	
+					var grid = utils.mountGridInCsvStore(columnsArr);//mount backbone views and operates grid -	
 				});
 				promise.fail(function(err){
 					spinner.stop();
@@ -1163,10 +1284,10 @@
 						$("#_editGrid").show();
 						if( FL.dd.isEntityWithTypeUI(entityName,"emailbox") || FL.dd.isEntityWithTypeUI(entityName,"email") ){//the newsletter option only appears to entities that have an email
 							$('#_newsletter').off('click');
-							$("#_newsletter").click(function(){
+							$("#_newsletter").click(function(grid){
 								var templatePromise=FL.API.createTemplates_ifNotExisting();
 								templatePromise.done(function(){
-									prepareNewsletterEmission(entityName);
+									prepareNewsletterEmission(entityName,grid);
 									return;
 								});
 								templatePromise.fail(function(err){
@@ -1190,7 +1311,31 @@
 					return def.reject("FL.grid.displayDefaultGrid2 failure on checkServerCallBlocked() "+err);
 				});
             	return def.promise();
-			},			  
+			},
+			sendEmailTest: function() {//sends a sample email with eMail/newsletter
+				if(FL.login.emailContentTemplate){
+					// var mailHTML = '<p>Thank you for selecting <a href="http://www.framelink.co"><strong>FrameLink version 8</strong></a> to build your backend site !</p>';			
+					var mailHTML = FL.login.emailContentTemplate;
+					var imagesArr = FL.login.emailImagesArray;
+					var senderObj = extractSenderObjFromModal();
+					// var toArr = [{"email":testEmail}];
+					var toArr = [senderObj.testEmail];
+					var metadataObj={newsletterName:"test",dbName:"test",eCN:null,fCN:null}
+
+					console.log("Sends test email to from_name:"+senderObj.from_name+" email:"+senderObj.from_email+" subject:"+senderObj.subject);
+					console.log("Sends to -->"+JSON.stringify(toArr));
+					console.log("Sends HTML -->"+mailHTML);
+					console.log("----------------------------------------------------------------------");
+					// FL.links.sendEmail(null,mailHTML,imagesArr,toArr,senderObj,"test");
+					// FL.emailServices.sendEmail(null,mailHTML,imagesArr,toArr,senderObj,"test","test");//2 last param: FL.login.emailTemplateName,FL.login.token.dbName
+					FL.emailServices.sendEmail(mailHTML,imagesArr,toArr,senderObj,metadataObj);
+					// alert("Email test sent to "+senderObj.testEmail);
+					FL.common.makeModalInfo("Test Email sent to "+senderObj.testEmail,null,2);
+				}else{
+					// alert("Email content is empty - choose a template and try again ");
+					FL.common.makeModalInfo("Email content is empty - choose a template and try again",null,2);
+				}
+			},			
 			testFunc: function(x) {
 				alert("FL.grid.test() -->"+x);
 			}

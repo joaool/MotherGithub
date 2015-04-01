@@ -663,6 +663,7 @@ window.utils = {
         // $("#csvcontent").append(grid.render().el);
         $("#paginator").append(paginator.render().$el);
         csvPageableCollection.fetch();
+        return grid;
     },
     placeGridButtonsInDOM: function(csvSetCollection,csvPageableCollection,grid){
         $("#csvcontent").empty();
@@ -686,7 +687,7 @@ window.utils = {
         $('#_delete').off('click');
         $('#_delete').show();
         $("#_delete").click(function () {
-             var selectedModels = grid.getSelectedModels();
+            var selectedModels = grid.getSelectedModels();
             if(selectedModels.length > 0 ){
                 var preStr = selectedModels.length + " row";
                 if (selectedModels.length > 1)

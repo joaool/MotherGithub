@@ -939,6 +939,19 @@
 					return false;
 				}
 			},
+			firstEmailAttribute: function(eCN){
+				var emailAttr = null;
+				var entityName = this.getEntityByCName(eCN);
+				var oEntity = this.entities[entityName];
+				var el = _.find(oEntity.attributes, function(element){
+					return ( element.typeUI == "emailbox" || element.typeUI == "email");
+					// if ( element.typeUI == "emailbox" || element.typeUI == "email")
+					// 	return element.name;
+				});
+				if( !_.isUndefined(el) )
+					emailAttr = el.name;
+				return emailAttr;
+			},
 			isEntityInSync: function(entityName) {//returns true if entityName has in sync status = true
 				var exists = false;
 				var oEntity = this.entities[entityName];
