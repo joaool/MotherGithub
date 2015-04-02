@@ -72,7 +72,7 @@ window.csvStore = {
             retArr = null;
         return retArr;
     },
-    extractFromCsvStore: function(){
+    extractFromCsvStore: function(){//get arr of objects
         //Ex: from csvStore.csvRows = {"1":{"id":1,"shipped":true,"product":"Prod 1",_id:"55d3.."},"2":{"id":2,"shipped":false,"product":"Prod 2",_id:"55d3.."}}
         var retArr=_.map(csvStore.csvRows, function(value,key){return value;});
         return retArr;
@@ -127,6 +127,25 @@ window.csvStore = {
             var z=32;
         },this);//this is necessary to refer to window.csvStore instead of window
         this.setAttributesArr(newAttributesArr);
+        return loseInfo;
+    },
+    is_dictionaryUpdateLoseInformation: function(changedTypeArr){//transform the store content according to newAttributesArr and changedNamesArr and  changedTypeArr
+        //similar to transformStoreTo but nothing is changed ->Returns true if dictionary change will impact entity loosing info. False otherwise
+        var loseInfo = false;
+            _.each(changedTypeArr, function(element){
+                var name = element[0];
+                var oldType = element[1];
+                var newType = element[2];
+                if(oldType == "string" && newType == "number"){
+                    loseInfo = true;
+                }else if(newType == "date"){//covers string->date, number->date
+                    loseInfo = true;
+                }else if(oldType == "date" && newType == "number"){
+                    loseInfo = true;
+                }else if(oldType == "number" && newType == "string"){
+                     //information will be in the string format
+                }
+            },this);
         return loseInfo;
     },
     store: function( arrToStore ) {//arrToStore is an array of objects [{},{},....{}] where id field is mandatory inside {}

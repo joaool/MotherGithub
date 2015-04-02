@@ -802,6 +802,19 @@
 			});
 			return def.promise();
 		};
+		var nicoTestDuplicateIds = function(arrToTest){//checks if any of the  _id's value is repeated
+			var is_Duplicated = false;
+			var testJSON = {};
+			_.each(arrToTest,function(element){
+				if(!_.isUndefined(element["_id"])){
+					if( !_.isUndefined(testJSON[element["_id"]] )){
+						is_Duplicated = true;
+					}
+					testJSON[element["_id"]] = "1";//_ide is placed as key....
+				}
+			});
+			return is_Duplicated;
+		};
 		var _insert = function(eCN,arrToSend){ //entity compressed name, arr with records to store
 			//format of arrToSend ->["_id":"1234",{"d":{"51":"cli1","52":"Lx","53":"Pt"}},{"d":{"51":"cli2","52":"Sintra","53":"Pt"}}]
 			var def = $.Deferred();
@@ -809,16 +822,20 @@
 			var fd = new fl.data();
 			// var fl = new flMain();
 			// var fa = FL.login.token.fa;//new fl.app();
-			var testJSON = {};
-			_.each(arrToSend,function(element){
-				if(!_.isUndefined(element["_id"])){
-					if( !_.isUndefined(testJSON[element["_id"]] )){
-						alert("FL.API _insert -> Repeated _id - protection to prevent server blockage activated !!!!");
-						return def.reject("Duplicate _id -protection to prevent server blockage");
-					}
-					testJSON[element["_id"]] = "1";
-				}
-			});
+			// var testJSON = {};
+			// _.each(arrToSend,function(element){
+			// 	if(!_.isUndefined(element["_id"])){
+			// 		if( !_.isUndefined( testJSON[ element["_id" ] ] ) ){
+			// 			alert("FL.API _insert -> Repeated _id - protection to prevent server blockage activated !!!!");
+			// 			return def.reject("Duplicate _id -protection to prevent server blockage");
+			// 		}
+			// 		testJSON[element["_id"]] = "1";
+			// 	}
+			// });
+			if( nicoTestDuplicateIds(arrToSend) ){
+				alert("FL.API _insert -> Repeated _id - protection to prevent server blockage activated !!!!");
+				return def.reject("Duplicate _id -protection to prevent server blockage");
+			}
 			fd.insert(eCN,arrToSend,function(err, data){
 				console.log("............................._insert...");
 				// err = "abc";
@@ -1994,6 +2011,9 @@
 					}
 				}
 				return def.promise();
+			},
+			nicoTestDuplicateIds: function(arrToTest) {
+				return nicoTestDuplicateIds(arrToTest);
 			},			
 			testFunc: function(x) {
 				alert("FL.server.test() -->"+x);

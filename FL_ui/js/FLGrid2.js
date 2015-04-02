@@ -267,63 +267,68 @@
 						elObj["key"] = false;
 						newAttributesArr.push(elObj);
 					},this);
-					var oldSingular = entityName;
 					var singular = masterDetailItems.master.entityName.trim();//to retrieve the header content from the interface
 					var description = masterDetailItems.master.entityDescription.trim();//to retrieve the header content from the interface
-
-					var xPlural = FL.dd.plural(singular,"En");  //+"s";
-					FL.dd.updateEntityBySingular(oldSingular,{singular:singular,plural:xPlural,description:description});
-					
-					var loseInfo = csvStore.transformStoreTo(newAttributesArr,changedAttributesArr,changedTypeArr);
-					if(loseInfo){
+					if( csvStore.is_dictionaryUpdateLoseInformation() ){
 						FL.common.makeModalConfirm("You will lose some information. Do you want to continue ?","No, cancel changes","Yes Please",function(result){
 							if(result){
-								// FL.common.makeModalInfo("Now we will save it to server....");
-								// FL.common.clearSpaceBelowMenus();
-								var spinner=FL.common.loaderAnimationON('spinnerDiv');
-								var updateDictionaryAllAttributesPromise = FL.API.updateDictionaryAllAttributes(entityName,singular,description,newAttributesArr);
-								updateDictionaryAllAttributesPromise.done(function(){
-									FL.API.debug = true; FL.API.debugStyle= 0;
-									var updatePromise = FL.grid.updateCurrentCSVToServer(entityName);
-									updatePromise.done(function(){
-										spinner.stop();
-										FL.API.debug = false; FL.API.debugStyle= 0;
-										FL.grid.displayDefaultGrid(entityName);//loads from server and display
-									});
-									updatePromise.fail(function(err){
-										spinner.stop();
-										FL.API.debug = false; FL.API.debugStyle= 0;
-										alert("editGrid updateDictionaryAllAttributes Failure err="+err);//loads from server and displaywithout newsl
-									});
-								});
-								updateDictionaryAllAttributesPromise.fail(function(err){
-									spinner.stop();
-									alert("editGrid updateDictionaryAllAttributes Failure err="+err);//loads from server and displaywithout newsl
-								});
-
+								updateDictionaryAndTypesInServer(entityName,singular,description,newAttributesArr,changedAttributesArr,changedTypeArr);
 							}else{
-								FL.common.makeModalInfo("Nothing was saved the original grid is going to be restored....");
+								FL.common.makeModalInfo("Nothing was saved. The original grid is going to be restored....");
 								FL.grid.displayDefaultGrid(entityName);//loads from server and display
-							}
+							}	
 						});
-					}else{//no info to be lost so we save in dict and reload 
-						var spinner=FL.common.loaderAnimationON('spinnerDiv');
-						var updateDictionaryAllAttributesPromise = FL.API.updateDictionaryAllAttributes(entityName,singular,description,newAttributesArr);
-						updateDictionaryAllAttributesPromise.done(function(result){
-							spinner.stop();
-							FL.grid.displayDefaultGrid(entityName);//loads from server and displaywithout newsl
-						});
-						updateDictionaryAllAttributesPromise.fail(function(err){
-							spinner.stop();
-							alert("editGrid updateDictionaryAllAttributes Failure err="+err);//loads from server and displaywithout newsl
-						});
+					}else{
+						updateDictionaryAndTypesInServer(entityName,singular,description,newAttributesArr,changedAttributesArr,changedTypeArr);
 					}
-					var z=32;
 				}else{
 					FL.common.makeModalInfo("Nothing was saved.");
 				}
-			});//OK				
+			});//OK
 		};
+		var updateDictionaryAndTypesInServer = function(entityName,newSingularName,description,newAttributesArr,changedAttributesArr,changedTypeArr){
+			//Update Dictionary and Entity data in server - silently uses csvStore.csvRows and local dictionary
+			//updateTypesInServer must synchronize: local dictionary, server dictionary, csvStore and entity on server
+			// if data dictionary update fails on server it rools back the local dictionary change
+			//    tests:force dictionary fail
+			// if data dictionary update succeds but entity update on server fails 
+			var storedArr= csvStore.extractFromCsvStore();
+			if( FL.API.nicoTestDuplicateIds(storedArr) ){//only works if no duplicate _id exist in csvStore
+				alert("FLGrid2 updateTypesInServer - csvStore.csvRows _id duplicate DETECTED !!!. Nothing was done");
+				return;	
+			}
+			// var z = msg.abc; //to force error
+			var localDictEntityBackup = FL.dd.getEntityBySingular(entityName);
+			var xPlural = FL.dd.plural(newSingularName,"En");  //+"s";
+			FL.dd.updateEntityBySingular(entityName,{singular:newSingularName,plural:xPlural,description:description});
+
+			var spinner=FL.common.loaderAnimationON('spinnerDiv');
+			var updateDictionaryAllAttributesPromise = FL.API.updateDictionaryAllAttributes(entityName,newSingularName,description,newAttributesArr);
+			updateDictionaryAllAttributesPromise.done(function(){
+				if(changedTypeArr.length>0){//there is type change(s)
+						FL.API.debug = true; FL.API.debugStyle= 0;
+					csvStore.transformStoreTo(newAttributesArr,changedAttributesArr,changedTypeArr);//does changes in csvStore
+					var updatePromise = FL.grid.updateCurrentCSVToServer(entityName);
+					updatePromise.done(function(){
+						spinner.stop();
+						FL.API.debug = false; FL.API.debugStyle= 0;
+						FL.grid.displayDefaultGrid(entityName);//loads from server and display
+					});
+					updatePromise.fail(function(err){
+						spinner.stop();
+						FL.dd.entities[newSingularName] = localDictEntityBackup;//rools back local dictionary update
+						FL.dd.setSync(entityName,false); //warns that local dict is not in sync with server dictionary
+						FL.API.debug = false; FL.API.debugStyle= 0;
+						alert("editGrid updateCurrentCSVToServer Failure err="+err);//loads from server and displaywithout newsl
+					});
+				}	
+			});
+			updateDictionaryAllAttributesPromise.fail(function(err){
+				spinner.stop();
+				FL.dd.entities[newSingularName] = localDictEntityBackup;//rools back local dictionary update
+				alert("editGrid updateTypesInServer updateDictionaryAllAttributes Failure err="+err);//loads from server and displaywithout newsl
+			});
+		};		
 		var addImageToMandrillImageArr = function(name,srcContent){//mandrillImagesArr is formed to FL.login.emailImagesArray
 			// var srcContent = imageFromJson.substring(23);//removes the beginning chars:"data:image/jpeg;base64,"
 			var imageArrElement = {name:name, type:"image/jpg", content:srcContent};
@@ -382,9 +387,9 @@
 						$(elementImg).attr('src','cid:template'+ window.templateCounter);
 						
 						//test
-						if(window.templateCounter == 1){
-							item.style["width"] = "52px";						
-						}
+						// if(window.templateCounter == 1){
+						// 	item.style["width"] = "52px";						
+						// }
 						
 						$(elementImg).css(item.style);
 					}
@@ -401,7 +406,19 @@
 			// jsonObj.templateItems.footer[0].style.backgroundColor = "#ffffff";
 			var rawEmailTemplate = $("#emailTemplateHolder").html();
 			var templateFunc =  _.template(rawEmailTemplate);
-			var emailTemplate = templateFunc({headerBgcolor:"#005000",bodyBgcolor:"#ff0000",footerBgcolor:"#0000ff",totWidth:"400",lateralMargin:"80"});
+			var emailTemplate = templateFunc({
+				headerBgcolor:jsonObj.pageStyles.headerBgColor,
+				headerPaddingLeft:jsonObj.pageStyles.headerPaddingLeft,
+				headerPaddingRight:jsonObj.pageStyles.headerPaddingRight,
+				bodyBgcolor:jsonObj.pageStyles.bodyBgColor,
+				bodyPaddingLeft:jsonObj.pageStyles.bodyPaddingLeft,
+				bodyPaddingRight:jsonObj.pageStyles.bodyPaddingRight,
+				footerBgcolor:jsonObj.pageStyles.footerBgColor,
+				footerPaddingLeft:jsonObj.pageStyles.footerPaddingLeft,
+				footerPaddingRight:jsonObj.pageStyles.footerPaddingRight,				
+				totWidth:jsonObj.pageStyles.pageWidth,
+				lateralMargin:"80"
+			});
 			$("#templateHolder").empty();
 			$(emailTemplate).appendTo('body');//place emailTemplate HTML in DOM
 			
