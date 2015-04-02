@@ -11,16 +11,16 @@ MailerTemplate.Views.TemplateHolder = Backbone.View.extend({
 	m_CurrentTemplateViewObject : null,
 	m_lstModel : [],
 	dragNDropHandler : null,
-	pageWidth : "500px",
+	pageWidth : 500,
 	headerBgColor: "white",
 	bodyBgColor : "white",
 	footerBgColor : "white",
-	headerPaddingLeft : "0px",
-	headerPaddingRight : "0px",
-	bodyPaddingLeft : "0px",
-	bodyPaddingRight : "0px",
-	footerPaddingLeft : "0px",
-	footerPaddingRight : "0px",
+	headerPaddingLeft : 0,
+	headerPaddingRight : 0,
+	bodyPaddingLeft : 0,
+	bodyPaddingRight : 0,
+	footerPaddingLeft : 0,
+	footerPaddingRight : 0,
 
 	initialize : function(){
 		
@@ -267,27 +267,27 @@ MailerTemplate.Views.TemplateHolder = Backbone.View.extend({
 		}
 		else if (data.property == "headerPaddingLeft"){
 			this.m_TemplateHoderHeader.css("padding-left",data.value+"px");
-			this.headerBgColor = data.value;
+			this.headerPaddingLeft = data.value;
 		}
 		else if (data.property == "headerPaddingRight"){
 			this.m_TemplateHoderHeader.css("padding-right",data.value+"px");
-			this.bodyBgColor = data.value;
+			this.headerPaddingRight = data.value;
 		}
 		else if (data.property == "bodyPaddingLeft"){
 			this.m_TemplateHoderBody.css("padding-left",data.value+"px");
-			this.footerBgColor = data.value;
+			this.bodyPaddingLeft = data.value;
 		}
 		else if (data.property == "bodyPaddingRight"){
 			this.m_TemplateHoderBody.css("padding-right",data.value+"px");
-			this.headerBgColor = data.value;
+			this.bodyPaddingRight = data.value;
 		}
 		else if (data.property == "footerPaddingLeft"){
 			this.m_TemplateHoderFooter.css("padding-left",data.value+"px");
-			this.bodyBgColor = data.value;
+			this.footerPaddingLeft = data.value;
 		}
 		else if (data.property == "footerPaddingRight"){
 			this.m_TemplateHoderFooter.css("padding-right",data.value+"px");
-			this.footerBgColor = data.value;
+			this.footerPaddingRight = data.value;
 		}
 	},
 	setAllPageValues: function(data){
