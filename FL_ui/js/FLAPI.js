@@ -1385,10 +1385,10 @@
 				// description - new entity description
 				// newAttributesArr - new array of objects each element corresponding to a diferent attribute - and extra key: oldName must be included with the old attribute Name
 				//		ex: {name:"address",description:"address to send invoices",label:"Address",type:"string",typeUI:"textbox",enumerable:null,key:false,oldName:"Address"}
-				// if it fails the dictionary  is rolled back
+				// if it fails the dictionary  it is not rolled back - the roll back task must be done above this code (ex.FLGrid2 updateDictionaryAndTypesInServer)
 				var def = $.Deferred();
 				if(FL.dd.isEntityInLocalDictionary(entityName)){
-					var dictBackup = FL.dd.entities[entityName];//to roll back in case of failure
+					// return def.reject();//force failure to test above code
 					var xPlural = FL.dd.plural(singular,"En");  //+"s";
 					FL.dd.updateEntityBySingular(entityName,{singular:singular,plural:xPlural,description:description});
 					var bufferChangeObjs = [];
@@ -1406,7 +1406,6 @@
 						return def.resolve(result);
 					});
 					promise.fail(function(err){
-						FL.dd.entities[entityName] = dictBackup;
 						return def.reject(err);
 					});
 				}else{

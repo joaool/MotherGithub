@@ -269,7 +269,7 @@
 					},this);
 					var singular = masterDetailItems.master.entityName.trim();//to retrieve the header content from the interface
 					var description = masterDetailItems.master.entityDescription.trim();//to retrieve the header content from the interface
-					if( csvStore.is_dictionaryUpdateLoseInformation() ){
+					if( csvStore.is_dictionaryUpdateLoseInformation( changedTypeArr) ){
 						FL.common.makeModalConfirm("You will lose some information. Do you want to continue ?","No, cancel changes","Yes Please",function(result){
 							if(result){
 								updateDictionaryAndTypesInServer(entityName,singular,description,newAttributesArr,changedAttributesArr,changedTypeArr);
@@ -298,15 +298,17 @@
 				return;	
 			}
 			// var z = msg.abc; //to force error
-			var localDictEntityBackup = FL.dd.getEntityBySingular(entityName);
+			var localDictEntityBackup = FL.dd.getDictEntityBackup(entityName);
 			var xPlural = FL.dd.plural(newSingularName,"En");  //+"s";
 			FL.dd.updateEntityBySingular(entityName,{singular:newSingularName,plural:xPlural,description:description});
+			// FL.dd.setEntityFieldsBySingular(entityName,newAttributesArr,changedAttributesArr);
 
 			var spinner=FL.common.loaderAnimationON('spinnerDiv');
+			//FL.API.updateDictionaryAllAttributes also updates local dictionary
 			var updateDictionaryAllAttributesPromise = FL.API.updateDictionaryAllAttributes(entityName,newSingularName,description,newAttributesArr);
-			updateDictionaryAllAttributesPromise.done(function(){
+			updateDictionaryAllAttributesPromise.done(function(){//this update local and server dictionary
 				if(changedTypeArr.length>0){//there is type change(s)
-						FL.API.debug = true; FL.API.debugStyle= 0;
+					FL.API.debug = true; FL.API.debugStyle= 0;
 					csvStore.transformStoreTo(newAttributesArr,changedAttributesArr,changedTypeArr);//does changes in csvStore
 					var updatePromise = FL.grid.updateCurrentCSVToServer(entityName);
 					updatePromise.done(function(){
@@ -321,11 +323,15 @@
 						FL.API.debug = false; FL.API.debugStyle= 0;
 						alert("editGrid updateCurrentCSVToServer Failure err="+err);//loads from server and displaywithout newsl
 					});
+				}else{
+					spinner.stop();
+					FL.API.debug = false; FL.API.debugStyle= 0;
+					FL.grid.displayDefaultGrid(entityName);//loads from server and display
 				}	
 			});
 			updateDictionaryAllAttributesPromise.fail(function(err){
 				spinner.stop();
-				FL.dd.entities[newSingularName] = localDictEntityBackup;//rools back local dictionary update
+				FL.dd.entities[newSingularName] = localDictEntityBackup;//rools back local dictionary update - TESTED OK
 				alert("editGrid updateTypesInServer updateDictionaryAllAttributes Failure err="+err);//loads from server and displaywithout newsl
 			});
 		};		
@@ -1047,7 +1053,7 @@
 						// var arrToSend = csvStore.extractFromCsvStoreWith_Id();  //convertRecordsTo_arrToSend in FLAPI
 						var arrToSend = csvStore.extractFromCsvStore();
 						if(arrToSend.length!=data.count)
-							alert("ça c'est pas bon --->arrToSend.length="+arrToSend.length+ " vs data.count="+ data.count );			
+							alert("FL.grid.updateCurrentCSVToServer - ça c'est pas bon --->arrToSend.length="+arrToSend.length+ " vs data.count="+ data.count );			
 						// var insertAllPromise = FL.API._insert(eCN);
 						//we NEED TO INTRODUCE _id at d:{} level and remove-it from 
 						var insertAllPromise = FL.API.addRecordsToTable(entityName,arrToSend,true);//last parameter is withId to force the same Ids

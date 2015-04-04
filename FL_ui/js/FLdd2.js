@@ -476,6 +476,15 @@
 			relation["withEntityCN"] = null;//this is an auxiliary field to support FL.server.syncLocalDictionary()
 			return relation;
 		};
+		var getDictAttributesBackup = function(attrArr){//returns a copy of an attributes Array (to be used by getDictEntityBackup)
+			var backupArr = _.map(attrArr, function(element){
+				var eNumBackup = _.clone(element.enumerable);
+				var elBackup = _.clone(element);
+				elBackup.enumerable = eNumBackup;
+				return(elBackup);
+			});
+			return backupArr;
+		};
 		return{
 			entities: {__Last:9999,__LastRelation:0},
 			test:"FL.dd.test return !!!",
@@ -775,14 +784,17 @@
 				if(oEntity){
 					var xIndex = attributeIndex(xSingular,xAttribute);
 					if(xIndex>=0){//if attribute exists
-						var oAttributes = _.extend(oEntity.attributes[xIndex], changeObj);//notice that the attribute name may also belong to changeObj
+						var attributesCopy = getDictAttributesBackup(oEntity.attributes);//it is an overkill- we only need one attribute
+						var attrCopy = attributesCopy[xIndex];
+						// var oAttributes = _.extend(oEntity.attributes[xIndex], changeObj);//notice that the attribute name may also belong to changeObj
+						var oAttributes = _.extend(attrCopy, changeObj);//notice that the attribute name may also belong to changeObj
 						if(oAttributes.name != xAttribute ){//attribute name was changed. It is necessary to update L2C and C2L
-							compressedAttr = oEntity.L2C[xAttribute];
+							var compressedAttr = oEntity.L2C[xAttribute];
 							oEntity.C2L[compressedAttr] = oAttributes.name;//Compressed to Logical is updated
 							delete oEntity.L2C[xAttribute];
 							oEntity.L2C[oAttributes.name] = compressedAttr;
 						}
-						oEntity.attributes[xIndex] = oAttributes;
+						oEntity.attributes[xIndex] = _.omit(oAttributes,"oldname","singular");
 						var fCN = oEntity.L2C[oAttributes.name];
 						//send to server
 						var promise = FL.API.updateDictionaryAttribute(fCN,oAttributes);
@@ -1074,6 +1086,23 @@
 				}
 				return xRetArr;
 			},
+			setEntityFieldsBySingular: function(xSingular,fieldsArr,changedAttributesArr) {//sets all fields of entity xSingular.If xSingular does not exist nothing is done.
+				// fieldsArr - an Array of objects, each one with the format:
+				//     {name:"address",description:"address to send invoices",label:"Address",type:"string",typeUI:"textbox",enumerable:eNumArr,key:false});
+				//changedAttributesArr - an array of arrays. Each array element is an array with 2 elements [oldName,newName]
+				if( !_.isUndefined(this.entities[xSingular]) ){
+					var oEntity = this.entities[xSingular];
+					_.each(changedAttributesArr, function(element){
+						var oldName = element[0];
+						var newName = element[1];
+						var compressedAttr = oEntity.L2C[oldName];
+						oEntity.C2L[compressedAttr] = newName;
+						delete oEntity.L2C[oldName];
+						oEntity.L2C[newName] = compressedAttr;
+					});
+					this.entities[xSingular].attributes = fieldsArr;
+				}	
+			},
 			userTypes: {///the opposite of userType() -->for a single userType returns type and typeUI. Ex FL.dd.userTypes.email =>{type:"string",typeUI:"emailbox"}
 				"number":{type:"number",typeUI:"numberbox"},
 				"text"  :{type:"string",typeUI:"textbox"},//"textbox" is hard coded in FLgrid2.js --> dataRowAnalisys(rows,percent) for most basic type
@@ -1232,6 +1261,23 @@
 				}else{
 					alert("dDictionary.removeEntity Error:Trying to remove a non existing entity:"+xSingular);
 				}
+			},
+			getDictEntityBackup: function(entityName){//returns a copy of an whole entity (with all its internal objects) 
+				var entityBackup = null;
+				if( !_.isUndefined(this.entities[entityName]) ){
+					var oEntity = FL.dd.getEntityBySingular(entityName);
+					entityBackup = _.clone(oEntity);
+					var C2LBackup = _.clone(oEntity.C2L);
+					var L2CBackup = _.clone(oEntity.L2C);
+					var attributesBackup = getDictAttributesBackup(oEntity.attributes);
+					var relationsBackup = _.clone(oEntity.relations);
+
+					entityBackup.C2L = C2LBackup;
+					entityBackup.L2C = L2CBackup;
+					entityBackup.attributes = attributesBackup;
+					entityBackup.relations = relationsBackup;
+				}
+				return entityBackup;
 			}
 		};
 	})();

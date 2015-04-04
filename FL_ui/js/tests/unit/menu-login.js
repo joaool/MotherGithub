@@ -1003,6 +1003,18 @@ $(function () {
     actual = FL.dd.isEntityByCNInSync('2lx');
     ok(actual === false, "FL.dd.isEntityByCNInSync('2lx') =>false (ask if a non existing entity is in sync returns false)" );//63
 
+    var oEntity = FL.dd.entities["order"];
+    var oAttribute = FL.dd.getEntityAttribute("order","shipped");//to introduce enumerable in order.shipped
+    oAttribute.enumerable = ["on hold","ready","shipped","arrived"];
+    var backup = FL.dd.getDictEntityBackup("order");
+    // assert.deepEqual( oEntity, backup, "The backup is a perfect copy of 'order' entity" );
+    ok( oEntity.attributes[1].enumerable[0] === backup.attributes[1].enumerable[0], "The backup is a perfect copy of 'order' entity" );
+    // now he change the enumerable of one of the attributes of "order"
+    oAttribute.enumerable[0] = "xxx";
+    // assert.notDeepEqual( oEntity, backup, "after changing the dictionary the backup is not changed" );
+    ok( oEntity.attributes[1].enumerable[0] != backup.attributes[1].enumerable[0],  "after changing the dictionary the backup is not changed" );
+    FL.dd.displayEntities();
+
 
 
     //we need to force field compressed names for test
