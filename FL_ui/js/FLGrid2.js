@@ -743,6 +743,12 @@
 			csvEncoding: null,
 			createGrid: function() {//call with menu key "uri": "javascript:FL.grid.createGrid()"
 				// FL.common.makeModalInfo("Create Grid to be implemented soon");
+				// var isIE = /*@cc_on!@*/false || !!document.documentMode;
+				// var isFirefox = typeof InstallTrigger !== 'undefined';   // Firefox 1.0+
+				// if(isIE)
+				// 	// alert("createGrid - you are using Internet Explorer");
+				// if(isFirefox)
+				// 	// alert("createGrid - you are using Firefox");
 				var masterDetailItems = {
 					master:{entityName:"sample",headerString:""},
 					detail:{} //format is array with {attribute:<attribute name>,description:<attr description>,statement;<phrase>}
@@ -777,7 +783,8 @@
 							}
 						}
 					}else{
-						alert("Create Grid canceled");
+						// alert("Create Grid canceled");
+						FL.common.makeModalInfo("Create Grid canceled");
 					}
 				});
 			},
@@ -1003,39 +1010,6 @@
 				//--------------------- old code
 				var singularToUseInMenu = entityName.replace(/ /g,"_");
 			},			
-			XupdateCurrentCSVToServer: function(entityName){ //update all records of entityName Table existing in dictionary
-				// entityName- Name of entity that will be stored
-				// if entityName has spaces, they will be changed by "_"
-				if(FL.dd.isEntityInLocalDictionary(entityName)){
-					var spinner=FL.common.loaderAnimationON('spinnerDiv');
-					var removeTablePromise = FL.API.removeTable(entityName);
-					removeTablePromise.done(function(data){					
-						// var arrToSend = FL.grid.extractFromCsvStore();
-						var arrToSend = csvStore.extractFromCsvStore();
-						var saveTablePromise = FL.API.saveTable(entityName,arrToSend);
-						saveTablePromise.done(function(data){
-							console.log("FL.grid.updateCurrentCSVToServer --> dict synch and saveTable sucessfull ->"+JSON.stringify(data));
-							spinner.stop();
-							return;
-						});
-						saveTablePromise.fail(function(err){
-							spinner.stop();
-							alert("FL.grid.updateCurrentCSVToServer --> after successful remove ->FAILURE in FL.API.saveTable err="+err);
-							return;
-						});
-
-					});
-					removeTablePromise.fail(function(err){
-						spinner.stop();
-						alert("FL.grid.updateCurrentCSVToServer --> FAILURE to remove table err="+err);
-						return;
-					});
-				}else{
-					alert("FL.grid.updateCurrentCSVToServer --> " + entityName + " does not exist in Local Dictionary");
-				}
-				//--------------------- old code
-				//var singularToUseInMenu = entityName.replace(/ /g,"_");
-			},
 			updateCurrentCSVToServer: function(entityName){ //update all records of entityName Table existing in dictionary
 				// entityName- Name of entity that will be stored
 				// if entityName has spaces, they will be changed by "_"

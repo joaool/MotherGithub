@@ -107,16 +107,28 @@ FL["common"] = (function(){//name space FL.common
 		});
 	};
     var getDialogHTML = function(id,stackLevel,title,htmlIn,options){
+        //to work in IE and Firefox always enclose button inside a tag. not a tag inside button tag. - http://stackoverflow.com/questions/12856851/jquery-modal-window-only-working-on-chrome-but-not-ff-ie9
+        // CORRECT - Button inside a ref
+        //  <div class="btn-group" style="margin: 0 5px 0 0;">
+        //     <a href="#?w=385" rel="login_popup" class="poplight" style="text-decoration:none;"><button type="button">Login</button></a>
+        //  </div><!-- /btn-group --> 
+        // INCORRECT - ref inside a button tag
+        //  <div class="btn-group" style="margin: 0 5px 0 0;">
+        //      <button class="btn btn-small btn-info" type="button"><a href="#?w=385" rel="login_popup" class="poplight" style="text-decoration:none;">Login</a></button>
+        //  </div><!-- /btn-group --> 
         var modalId = "__FLmodalId_"+id;
         var zIndexContent = "";
         if(stackLevel>1) zIndexContent = "z-Index:"+(1000*stackLevel);//place a modal inside a modal
         var iconHTML = "";
         if(options.icon) iconHTML = '<i class="glyphicon glyphicon-' + options.icon +'"></i>';
         var button1HTML = "";
-        if(options.button1) button1HTML = '<a href="#" id="__FLDialog_button1" data-dismiss="modal" class="btn">' + options.button1 + '</a>';
+        if(options.button1){
+            button1HTML = '<a href="#" id="__FLDialog_button1" data-dismiss="modal" class="btn">' + options.button1 + '</a>';
+        }
         var button2HTML = "";
-        if(options.button2) //this button has the parsley validate (like APPLE ->OK at right)
-            button2HTML = '<a href="#" id="__FLDialog_button2" class="btn btn-' + options.type + ' validate">' + options.button2 + '</a>';
+        if(options.button2){ //this button has the parsley validate (like APPLE ->OK at right)
+            button2HTML = '<a href="#" id="__FLDialog_button2" class="btn btn-' + options.type + ' validate">' + options.button2 + '</a>';   
+        }
         var before = '<div class="modal fade" id="' +modalId+ '" style="' + zIndexContent + '">' +
                         '<div class="modal-dialog">' +
                             '<div class="modal-content">' +

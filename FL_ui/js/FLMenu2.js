@@ -774,6 +774,7 @@ FL["menu"] = (function(){//name space FL.menu
 				return false;
 			}
 		});
+		$( "#main-menu" ).off('click');
 		$( "#main-menu" ).on( "click", refHandler);//a click inside main-menu will call refHandler 
 	};//menu.prototype.menuRefresh
 	menu.prototype.setEditable = function(status) {

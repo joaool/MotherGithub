@@ -901,11 +901,14 @@
 		};
 		var _removeMultiple = function(ecn,arrOf_IdToRemove){ //remove  a single row within table ecn (entity compressed name)
 			var def = $.Deferred();
+			var spinner=FL.common.loaderAnimationON('spinnerDiv');
 			var promise = FL.API.queueManager("_remove",ecn,arrOf_IdToRemove);
 			promise.done(function(result){
+				spinner.stop();
 				return def.resolve(arrOf_IdToRemove.length);
 			});
 			promise.fail(function(err){
+				spinner.stop();
 				return def.reject(err);
 			});
 			return def.promise();
@@ -1565,6 +1568,7 @@
 			addRecordsToTable: function(entityName,recordsArray,withId) {//add one or several records to existing table
 				//assumes a login to an application exists and entitName exists in local and is in sync
 				//recordsArray [{"number":12,"code":"abc"},....]
+
 				//withId flag (default = false) if true all _id will be forced in the add.
 				console.log("....................................>beginning addRecordsToTable....with appToken="+JSON.stringify(FL.login.appToken));
 				var def = $.Deferred();

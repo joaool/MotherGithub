@@ -43,21 +43,17 @@ mixpanel.init("19ada1cb259cc3272c67085eb1bf03fc");</script><!-- end Mixpanel -->
     <script type="text/javascript" src="FL_ui/js/tests/vendor/jquery.smartmenus.bootstrap.js"></script>
     <link href="FL_ui/css/bootstrap-dialog.css" rel="stylesheet" type="text/css" />
     <script src="FL_ui/js/bootstrap-dialog.js"></script>
-    <!-- <script src="FL_ui/js/FLBig-slide.js"></script> -->
-    <!-- <link href="FL_ui/css/bootstrap-tour.min.css" rel="stylesheet"> -->
-    <link href="FL_ui/css/bootstrap-tour.css" rel="stylesheet">
 
-     <link href="FL_ui/css/backgrid.css" rel="stylesheet">    
-     <link href="FL_ui/css/backgrid-paginator.css" rel="stylesheet">    
+	<link href="FL_ui/css/backgrid.css" rel="stylesheet">    
+	<link href="FL_ui/css/backgrid-paginator.css" rel="stylesheet">    
+	<link href="FL_ui/css/backgrid-select-all.min.css" rel="stylesheet">    
+	<link href="FL_ui/css/backgrid-filter.min.css" rel="stylesheet">    
 
-	<!-- <script src="FL_ui/js/bootstrap-tour.min.js"></script> -->
-	<script src="FL_ui/js/bootstrap-tour.js"></script>
 	<script src="FL_ui/js/spin.min.js"></script>
 	<script src="FL_ui/js/FLMenu2.js"></script>
 	<script src="FL_ui/js/FLLoadCss2.js"></script>
 	<script src="FL_ui/js/FLCommon2.js"></script>
 	<script src="FL_ui/js/FLGrid2.js"></script>
-	<script src="FL_ui/js/FLTour2.js"></script>
 	<script src="FL_ui/js/FLServices2.js"></script>
 
    	<!-- <link href="FL_ui/css/FLcosmos.css" rel="stylesheet"> -->
@@ -79,12 +75,21 @@ mixpanel.init("19ada1cb259cc3272c67085eb1bf03fc");</script><!-- end Mixpanel -->
 	<!-- <script src="FL_ui/js/underscore-min.js"></script> -->
 	<script src="FL_ui/js/underscore.js"></script>
 	<!-- <script src="js/jquery-1.11.1.min.js"></script> -->
-	<script src="FL_ui/js/backbone-min.js"></script>
+	<!-- <script src="FL_ui/js/backbone-min.js"></script> -->
+	<script src="FL_ui/js/backbone.js"></script>
 	<!-- <script src="js/bootstrap.min.js"></script> -->
 	<!-- necessary for backgrid  -->
 	<script src="FL_ui/js/backbone.paginator.js"></script>
 	<script src="FL_ui/js/backgrid.js"></script>
 	<script src="FL_ui/js/backgrid-paginator.js"></script>
+	<script src="FL_ui/js/backgrid-select-all.min.js"></script>
+	<script src="FL_ui/js/backgrid-filter.min.js"></script>
+
+	<script src="FL_ui/js/moment.js"></script>
+	<script src="FL_ui/js/backgrid-moment-cell.js"></script>
+	<!-- <link rel="stylesheet" href="//code.jquery.com/ui/1.11.3/themes/smoothness/jquery-ui.css"> -->
+
+
 
 	<script src="FL_ui/js/jquery.parse.min.js"></script> <!-- to load csv reader http://papaparse.com/  -->
 	<script src="FL_ui/js/papaparse.min.js"></script> <!-- to load csv reader http://papaparse.com/  -->
@@ -104,6 +109,7 @@ mixpanel.init("19ada1cb259cc3272c67085eb1bf03fc");</script><!-- end Mixpanel -->
 	<script src="FL_ui/js/phoneparser.js"></script>
 
 	<script src="FL_ui/js/FLAPI.js"></script>
+	<!-- <script src="FL_ui/js/objectid.js"></script> -->
 
     <script type="text/javascript" src="https://js.stripe.com/v2/"></script>  
 	<!-- <script src="js/main3.js"></script> -->
@@ -388,6 +394,48 @@ mixpanel.init("19ada1cb259cc3272c67085eb1bf03fc");</script><!-- end Mixpanel -->
       top: 50%;
       left: 50%;
     }
+    /*
+	.datepicker thead {  
+	    background-color: #f7f7f7;  
+	    background-image: -moz-linear-gradient(top,  #f7f7f7 0%, #f1f1f1 100%);  
+	    background-image: -webkit-gradient(linear, left top, left bottombottom, color-stop(0%,#f7f7f7), color-stop(100%,#f1f1f1));  
+	    background-image: -webkit-linear-gradient(top,  #f7f7f7 0%,#f1f1f1 100%);  
+	    background-image: -o-linear-gradient(top,  #f7f7f7 0%,#f1f1f1 100%);  
+	    background-image: -ms-linear-gradient(top,  #f7f7f7 0%,#f1f1f1 100%);  
+	    background-image: linear-gradient(top,  #f7f7f7 0%,#f1f1f1 100%);  
+	    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#f7f7f7', endColorstr='#f1f1f1',GradientType=0 );  
+	    border-bottom: 1px solid #bbb;  
+	}
+	.datepicker th {  
+	    text-transform: uppercase;  
+	    font-size: 6pt;  
+	    padding: 5px 0;  
+	    color: #666666;  
+	    text-shadow: 1px 0px 0px #fff;  
+	    filter: dropshadow(color=#fff, offx=1, offy=0);  
+	}
+	*/
+	/* 	 	
+	.datepicker prev, .datepicker next {  
+	    display: inline-block;  
+	    width: 30px;  
+	    height: 30px;  
+	    text-align: center;  
+	    cursor: pointer;  
+	    background-image: url('../img/arrow.png');  
+	    background-repeat: no-repeat;  
+	    line-height: 600%;  
+	    overflow: hidden;  
+	}
+	.datepicker prev {  
+	    float: left;  
+	    background-position: center -30px;  
+	}  
+	.datepicker next {  
+	    float: rightright;  
+	    background-position: center 0px;  
+	}  
+	*/	 		 
 /*	.backgrid .backgridId {
 	  background-color: green;
 	  width:300px;
@@ -427,11 +475,20 @@ mixpanel.init("19ada1cb259cc3272c67085eb1bf03fc");</script><!-- end Mixpanel -->
                                              <% var xId = "_dictEditEntityTemplate__f"+(index+1) %><!-- create more variables -->
                                             <tr>
                                                 <!-- use variables -->
-                                                <td><%= index+1 %></td>
+                                                <td rowspan="2"><%= index+1 %></td>
                         <td><input type="text" class="form-control" id="<%= xId %>_attribute" name="attr<%= index+1 %>" value="<%= item.attribute %>" onkeyup="FL.slidePanels.dictTemplateAttributeValidation(this.form,<%= index+1 %>)"></td>
-                        <td><textarea rows="2" id="<%= xId %>_description" onkeyup="FL.slidePanels.dictTemplateAttributeValidation(this.form,<%= index+1 %>)"><%= item.description %></textarea></td>
-                                                 <td id="<%= xId %>_statement" ><%= item.statement %></td>
-                                            </tr>
+                        <td rowspan="2"><textarea rows="4" id="<%= xId %>_description" onkeyup="FL.slidePanels.dictTemplateAttributeValidation(this.form,<%= index+1 %>)"><%= item.description %></textarea></td>
+                                                <td rowspan="2" id="<%= xId %>_statement" ><%= item.statement %></td>
+                                             </tr>
+                                              	<td>
+ 													<div class="btn-group">
+											          <a class="btn btn-default dropdown-toggle" data-toggle="dropdown" style="font-size:14px;font-weight:bold;" id="<%= xId %>_userType" href="#"> Type <span class="caret"></span></a>
+											          <ul id="<%= xId %>_userType_options" class="dropdown-menu">
+															<li><a href="#">templ1</a></li>
+															<li><a href="#">templ2</a></li>
+											          </ul>
+													</div>
+                                              	</td>
                                         <% }); %>
                                      </tbody>    
                                 </table>
@@ -461,6 +518,20 @@ mixpanel.init("19ada1cb259cc3272c67085eb1bf03fc");</script><!-- end Mixpanel -->
 			</form>
 		</div>
 	</script>
+	<script id="_getComboList" type="text/template"> 
+		<div class="getComboList" style="margin-top:0px;">
+			<form id="form__getComboList" novalidate="novalidate">
+				<div class="row">
+					<div class="col-xs-12" >
+						<div class="input-group" style="line-height:0px;">
+							<input type="text" class="form-control" id="_getComboList_list" placeholder="List of values comma separated" value="<%= masterDetailItems.master.list %>" name="list" data-parsley-trigger="change" required >
+							<span class="input-group-addon"><span class="glyphicon glyphicon-th-list"></span></span>
+					    </div>
+				    </div>
+		    	</div>
+			</form>
+		</div>
+	</script>	
 	<script id="getStartedTemplate" type="text/template"> 
 		<div class="getStartedExample" style="margin-top:0px;">
 			<form id="form_getStartedTemplate" novalidate="novalidate">
@@ -576,7 +647,7 @@ mixpanel.init("19ada1cb259cc3272c67085eb1bf03fc");</script><!-- end Mixpanel -->
 					        <input type="email" class="form-control" id="_sendNewsletter_testEmail" placeholder="full email sender ex:jessica.costa@weadvice.pt" value="<%= masterDetailItems.master.testEmail %>" >
 							<span class="input-group-addon"><span class="glyphicon glyphicon-envelope"></span></span>
 					    </div>					    
-                        <button type="submit" class="btn btn-default" onclick="FL.links.sendEmailTest()">Send test email</button>
+                        <button type="submit" class="btn btn-default" onclick="FL.grid.sendEmailTest()">Send test email</button>
 
 				    </div>
 		    	</div>
@@ -640,13 +711,14 @@ mixpanel.init("19ada1cb259cc3272c67085eb1bf03fc");</script><!-- end Mixpanel -->
 		</div>
 	</div>      
 </script>
+
 <script type="text/template" id="titleDroppedItem">
-	<div class="titleDroppedItem droppedObject ui-state-default" id="titleTemplateItem0" type="title"> 
+	<div id="titleTemplateItem0" class="titleDroppedItem droppedObject ui-state-default" type="title"> 
 		Put your Text Here 
 	</div>
 </script>
 <script type="text/template" id="imageDroppedItem">
-	<div id="titleTemplateItem0" class="imageDroppedItem droppedObject ui-state-default" type="image"> 
+	<div id="imageTemplateItem0" class="imageDroppedItem droppedObject ui-state-default" type="image"> 
 		<a id="imageLink" href="#" target="_blank">
 			<div> 
 				<img class="" src="./mailer/images/empty_image-72.png" />
@@ -654,7 +726,6 @@ mixpanel.init("19ada1cb259cc3272c67085eb1bf03fc");</script><!-- end Mixpanel -->
 		</a>
 	</div>
 </script>
-
 <script type="text/template" id="socialblockDroppedItem" align="center">
 	<div style="text-align: center">
 		<a href="https://www.facebook.com/Weadvice.living.web"><img id="facebook" title="Facebook" src="images/social/Facebook.png" alt="Facebook" width="48" height="48"></a>
@@ -664,6 +735,36 @@ mixpanel.init("19ada1cb259cc3272c67085eb1bf03fc");</script><!-- end Mixpanel -->
 	</div>
 </script>
 
+
+<script type="text/template" id="emailTemplateHolder">
+	<div id="templateHolder" class="template_holder">
+		<table align="center" border="1" cellpadding="0" cellspacing="0" width="<%= totWidth %>px">
+		<tbody>
+ 			<tr bgcolor="<%= headerBgcolor %>">
+  				<td  style="padding-top: 10px; padding-right: <%= headerPaddingRight %>px; padding-bottom: 8px; padding-left: <%= headerPaddingLeft %>px;">
+					<div id="template_holder_header" class="header sortable droppable" >		
+
+					</div>
+  				</td>
+ 			</tr>
+			<tr bgcolor="<%= bodyBgcolor %>">
+ 				<td  style="padding-top: 10px; padding-right: <%= bodyPaddingRight %>px; padding-bottom: 8px; padding-left: <%= bodyPaddingLeft %>px;">
+					<div id="template_holder_body" class="template_holder_body sortable droppable">
+						
+					</div>
+				</td>
+			</tr> 			
+			<tr bgcolor="<%= footerBgcolor %>">
+ 				<td  style="padding-top: 10px; padding-right: <%= footerPaddingRight %>px; padding-bottom: 8px; padding-left: <%= footerPaddingLeft %>px;">
+					<div id="template_holder_footer" class="footer sortable droppable">
+						
+					</div>
+				</td>
+			</tr>
+		</tbody>
+		</table>	
+	</div>
+</script>
 
 <body style="padding-top:10px;">
 	<div id="_modalDialog"></div>
@@ -775,54 +876,33 @@ mixpanel.init("19ada1cb259cc3272c67085eb1bf03fc");</script><!-- end Mixpanel -->
 						</ul>
 					</div>
 				</div>
-				<div id="_placeHolder"></div>
-				<!-- <form id="addPerson" action="">
-					<input type="text" placeholder="Person's name">
-					<input class="btn btn-primary" type="submit" value="Add Person">
-				</form> -->
-				<div id="personContent" class="col-sm-12"></div>
-				<div class="row">
-				    <div id="csvcontent" class="col-sm-12"></div>
-				</div>				
-				<div class="col-md-12 backgrid-container">
-					<button id="addGrid" class="edit btn btn-info glyphicon glyphicon-plus-sign"></button>
-					<button id="_newsletter" class="edit btn btn-success glyphicon glyphicon-envelope"></button>
-					<button id="_newsletterMC" class="edit btn btn-success glyphicon glyphicon-envelope"></button>
-					<button id="_editGrid" class="edit btn btn-success glyphicon glyphicon-pencil"></button>
-					<div id="grid"></div>			
-					<div id="paginator"></div>				
+				<div id="_belowMenus">
+					<div id="_placeHolder"></div>
+					<!-- <form id="addPerson" action="">
+						<input type="text" placeholder="Person's name">
+						<input class="btn btn-primary" type="submit" value="Add Person">
+					</form> -->
+					<div id="personContent" class="col-sm-12"></div>
+					<div class="row">
+					    <div id="csvcontent" class="col-sm-12"></div>
+					</div>				
+					<div class="col-md-12 backgrid-container">
+						<button id="addGrid" class="edit btn btn-info glyphicon glyphicon-plus-sign" title="add a new row to the bottom of the grid" style="float:left"></button>
+						<button id="_delete" class="edit btn btn-danger glyphicon glyphicon-remove" title="delete selected rows" style="float:left;margin-left:1px"></button>
+						<button id="_editGrid" class="edit btn btn-success glyphicon glyphicon-pencil" title="edit grid columns" style="float:left;margin-left:1px"></button>
+						<button id="_newsletter" class="edit btn btn-success glyphicon glyphicon-envelope" title ="send mail/newsletter to selected rows" style="float:right;margin-left:1px"></button>
+						<button id="_newsletterMC" class="edit btn btn-success glyphicon glyphicon-star" title="send mail/newsletter using mailChimp templates" style="float:right;margin-left:1px"></button>
+						<div style="clear:both;"></div>
+						<!-- <button id="_select" class="edit btn btn-default glyphicon glyphicon-ok" style="float:right"></button> -->
+						<div id="grid">
+						</div>			
+						<div id="paginator"></div>				
+					</div>
 				</div>
 			</div>
 		</div>	
 	</div><!-- masthead -->
 
-	<div id="templateHolder" class="template_holder">
-		<table align="center" border="1" cellpadding="0" cellspacing="0" width="600px">
- 			<tr>
-  				<td bgcolor="#dedbd7" style="padding-top: 10px; padding-right: 15px; padding-bottom: 8px; padding-left: 15px;">
-					<div id="template_holder_header" class="header sortable droppable" >		
-
-					</div>
-					<br/><br/>
-  				</td>
- 			</tr>
-			<tr>
- 				<td bgcolor="#dedbd7" style="padding-top: 10px; padding-right: 15px; padding-bottom: 8px; padding-left: 15px;">
-					<div id="template_holder_body" class="template_holder_body sortable droppable">
-						
-					</div>
-					<br/><br/>
-				</td>
-			</tr> 			
-			<tr>
- 				<td bgcolor="#dedbd7" style="padding-top: 10px; padding-right: 15px; padding-bottom: 8px; padding-left: 15px;">
-					<div id="template_holder_footer" class="footer sortable droppable">
-						
-					</div>
-				</td>
-			</tr>
-		</table>	
-	</div>
 
 	<footer class="footer">
 		<div class="container">

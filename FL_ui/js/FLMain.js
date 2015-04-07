@@ -17,7 +17,10 @@ var FL = FL || {};
 			Oldlog.apply(this, arguments);
 		}else{
 			var nRepeat = 90 - arguments[0].length;
-			var args = [].slice.apply(arguments).concat([FL.common.repeat("-",nRepeat),(new Error()).stack.split(/\n/)[2].trim()]);
+			var isIE = /*@cc_on!@*/false || !!document.documentMode;   // At least IE6 - http://stackoverflow.com/questions/9847580/how-to-detect-safari-chrome-ie-firefox-and-opera-browser
+			var args = arguments;
+			if(!isIE)
+				args = [].slice.apply(arguments).concat([FL.common.repeat("-",nRepeat),(new Error()).stack.split(/\n/)[2].trim()]);
 			Oldlog.apply(this, args);
 		}
         // Oldlog.apply(this, args);
@@ -88,6 +91,8 @@ var FL = FL || {};
 		//checkSignIn2 ->recover last saved loginObject and:
 		//	if user/password exists ->logs in ->updates upper right corner
 		//	if not keeps user in logout mode. ->updates upper right corner
+
+
 		var myMenu = FL.menu.createMenu({jsonMenu:FL.clone(FL.oMenu)});
 
 		var loginPromise = FL.login.checkSignIn2();
