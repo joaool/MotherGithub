@@ -138,7 +138,7 @@ jQuery(document).ready(function($){
 			FL.domInject("_login",htmlToInject );
 		};
 		var logOutMenu = function(){//displays the menu and home page for logout status
-			console.log("---------------------------------------------------------->logOutMenu");
+			FL.common.printToConsole("---------------------------------------------------------->logOutMenu");
 			var loginMenu = FL.menu.createMenu({jsonMenu:{"menu":[{"title":"","uri":"#"}]}});//FL.oMenu is a global defined  in FLMain.js
 			loginMenu.menuRefresh();
 			FL.common.clearSpaceBelowMenus();
@@ -168,9 +168,9 @@ jQuery(document).ready(function($){
 			var def = $.Deferred();
 			var loadAppPromise=FL.API.loadAppDataForSignInUser2();//gets data dictionary + main menu + style + fontFamily + home page
 			loadAppPromise.done(function(menuData,homeHTML){
-				console.log("appSetup ---> homeHTML=" + homeHTML);
-				console.log("appSetup ---> menudata=" + JSON.stringify(menuData));
-				// console.log("appSetup --------------------------------------------->first menu=" + menuData.oMenu.menu[0].title);
+				FL.common.printToConsole("appSetup ---> homeHTML=" + homeHTML);
+				FL.common.printToConsole("appSetup ---> menudata=" + JSON.stringify(menuData));
+				// FL.common.printToConsole("appSetup --------------------------------------------->first menu=" + menuData.oMenu.menu[0].title);
 
 				// var loginMenu = FL.menu.createMenu({jsonMenu:menuData.oMenu});//FL.oMenu is a global defined  in FLMain.js
 				$.Topic( 'jsonMenuUpdate' ).publish( menuData.oMenu );//broadcast that will be received by FL.menu to update jsonMenu
@@ -208,7 +208,7 @@ jQuery(document).ready(function($){
 			};
 			// FL.common.makeModal("B"," FrameLink Login","loginTemplate",{icon:"user",button1:"Logout",button2:"Login"},function(result){// "Cancel and "Ok" will be assumed with result = true for "Ok"
 			var btn1Caption = "Cancel";//if it enters in logout mode the first button is "Cancel"
-			if(FL.login.token.fl)
+			if(FL.fl)
 				btn1Caption = "Logout";//if it enters in loggedin mode the first button is "Logout"
 			FL.common.editMasterDetail("B"," Sign in to FrameLink","loginTemplate",masterDetailItems,{type:"primary", icon:"user",button1:btn1Caption,button2:"Sign in"},function(result){
 				if(result){//user choosed login
@@ -217,13 +217,13 @@ jQuery(document).ready(function($){
 					var loginPromise = loginAccess({email:email,password:password,domain:null});
 					// loginPromise.then(function(okToContinue,loginObject){
 					loginPromise.then(function(userExists,loginObject){
-						console.log("loginAccess well done! email="+loginObject.email+" userExists="+userExists);
+						FL.common.printToConsole("loginAccess well done! email="+loginObject.email+" userExists="+userExists);
 						if(!userExists){
 							FL.common.makeModalInfo(
 								"Invalid Email/password.<br> - If you are an existing user please correct your EMail/password.<br>" +
 								" - If you are a <strong>new user</strong> please press <strong>'Logout'</strong> and then " +
 								"<strong>'Get started'</strong> button.<br>", function(){
-								console.log("makeModalInfo --->pressed 'Ok' after Invalid Email/password email="+loginObject.email);
+								FL.common.printToConsole("makeModalInfo --->pressed 'Ok' after Invalid Email/password email="+loginObject.email);
 								return def.resolve(false,loginObject);//true ==>continue false=>repeat						
 							});
 						}else{
@@ -234,7 +234,7 @@ jQuery(document).ready(function($){
 					},function(err){
 						if(err.indexOf("Access denied")>=0){
 							FL.common.makeModalInfo("Wrong password. Please correct it and retry.",function(){
-								console.log("makeModalInfo --->pressed 'Ok' after wrong password warning");
+								FL.common.printToConsole("makeModalInfo --->pressed 'Ok' after wrong password warning");
 								return def.resolve(false,loginObject);//true ==>continue false=>repeat						
 							});
 						}else{
@@ -243,7 +243,7 @@ jQuery(document).ready(function($){
 					});
 				}else{//the user choosed Cancel or Logout (it is the same button)
 					var z = $('#__FLDialog_button2').attr("class");
-					console.log("()()()()()()()->z="+z);
+					FL.common.printToConsole("()()()()()()()->z="+z);
 
 					// logOutMenu();//displays menu and homepage for logout status
 					// FL.login.signOut();
@@ -276,27 +276,27 @@ jQuery(document).ready(function($){
 					loginObject  = {eMail:email,password:password};
 					if(email.length>0 && password.length === 0){
 						FL.common.makeModalInfo('You must introduce a password to sign up !',function(){
-							console.log("getStartedDialogs-->missing password for email="+email+" !!!");
+							FL.common.printToConsole("getStartedDialogs-->missing password for email="+email+" !!!");
 							def.resolve(false,loginObject);//true ==>continue false=>repeat	
 						});
 					}else if(email.length === 0 && password.length === 0){
-						console.log("getStartedDialogs-->sign up for trial");
+						FL.common.printToConsole("getStartedDialogs-->sign up for trial");
 						// TO BE DONE
 						// loginPromise = FL.API.prepareTrialApp().then(function(){return appSetup(loginObject);})
 							// .then(function(){return def.resolve();},function(err){return def.reject(err);});
 
 						def.resolve(true);//true ==>continue false=>repeat	
 					}else if(email.length >0  && password.length > 0){//a potencial new user
-						console.log("getStartedDialogs-->sign up for email="+email+"/"+password);
+						FL.common.printToConsole("getStartedDialogs-->sign up for email="+email+"/"+password);
 						loginObject = {email:email,userName:"",password:password}
 						var newUserPromise=newUserAccess( loginObject );
 						newUserPromise.done(function(userWasCreated){
 							if(userWasCreated){
-								console.log("getStartedDialogs ->newUserAccess-> new user " + email +" successfully created!");
+								FL.common.printToConsole("getStartedDialogs ->newUserAccess-> new user " + email +" successfully created!");
 								loginDefaultMenu_and_homePage(loginObject);//default for new users
 								def.resolve(true);//true ==>continue false=>repeat	
 							}else{
-								console.log("getStartedDialogs ->newUserAccess-> user " + email + " alread exists !!!");
+								FL.common.printToConsole("getStartedDialogs ->newUserAccess-> user " + email + " alread exists !!!");
 								def.resolve(false,loginObject);//true ==>continue false=>repeat	
 							}
 						});
@@ -306,7 +306,7 @@ jQuery(document).ready(function($){
 						def.resolve(true);//true ==>continue false=>repeat	
 					}
 				}else{//the user choosed logout
-					console.log("getStartedDialogs-->cancel");
+					FL.common.printToConsole("getStartedDialogs-->cancel");
 					return def.resolve(true);////true ==>continue false=>repeat		
 				}
 			});//OK	
@@ -323,22 +323,22 @@ jQuery(document).ready(function($){
 					.then(function(){return def.resolve();},function(err){return def.reject(err);});
 			}else{//use an existing account or a new account
 				// check if the user exists - if it exists => connect if not create new user.
-				console.log("loginAccess not a guest -------------------------------------------------------> checks if user exists");
+				FL.common.printToConsole("loginAccess not a guest -------------------------------------------------------> checks if user exists");
 				var existingUserPromise=FL.API.isUserExist(loginObject.email);
 				existingUserPromise.done(function(exist){
-					console.log("existingUserPromise.done------------------------------------------------------------>next will text exist !!!");
+					FL.common.printToConsole("existingUserPromise.done------------------------------------------------------------>next will text exist !!!");
 					if(exist){//the user exists
 						var spinner=FL.common.loaderAnimationON('spinnerDiv');
 						// setInterval(function(){spinner.stop();},3000);
-						console.log("existingUserPromise.done------------------------------------------------------------> user exists !!!");
+						FL.common.printToConsole("existingUserPromise.done------------------------------------------------------------> user exists !!!");
 						var setupExistingUserPromise = FL.API.connectUserToDefaultApp(loginObject.email,loginObject.password)
 							.then(function(){return appSetup(loginObject);})
 							.then(function(){
-								console.log("FLLoadCss2 -> success connecting to default app and doing app setup!");
+								FL.common.printToConsole("FLLoadCss2 -> success connecting to default app and doing app setup!");
 								spinner.stop();
 								return def.resolve(true,loginObject);//true =>user exists
 								},function(err){
-									console.log("loginAccess ===>fail ->err="+err);
+									FL.common.printToConsole("loginAccess ===>fail ->err="+err);
 									spinner.stop();
 									return def.reject(err);
 								});//true ==>continue false=>repeat	
@@ -357,26 +357,25 @@ jQuery(document).ready(function($){
 		var newUserAccess = function(loginObject){//when login email is valid and other data acceptable - {email:email,userName:userName,password:password};
 			// loginObject = {email:email,userName:userName,password:password};
 			var def = $.Deferred();
-			// FL.API.debug = true;
 			var loginPromise = null;
 			// check if the user exists - if it does not exist => creates it.
-			console.log("loginAccess not a guest -------------------------------------------------------> checks if user exists");
+			FL.common.printToConsole("loginAccess not a guest -------------------------------------------------------> checks if user exists");
 			var existingUserPromise=FL.API.isUserExist(loginObject.email);
 			existingUserPromise.done(function(exist){
-				console.log("newUserAccess existingUserPromise.done-------------------------------->next will text exist !!!");
+				FL.common.printToConsole("newUserAccess existingUserPromise.done-------------------------------->next will text exist !!!");
 				if(!exist){//the user does not exist we can create-it
-					console.log("newUserAccess existingUserPromise.done----------------------------> unexisting user!. We can create it");
+					FL.common.printToConsole("newUserAccess existingUserPromise.done----------------------------> unexisting user!. We can create it");
 					var userName = FL.common.stringBeforeLast(loginObject.email,"@");
 					createUserPromise = FL.API.createUserAndDefaultApp(loginObject.email,loginObject.password, "First app of " + userName)
 						.then(function(){
-							console.log("FLLoadCss2 ->newUserAccess-> success creating a new user! ->now we create _histoMail");
+							FL.common.printToConsole("FLLoadCss2 ->newUserAccess-> success creating a new user! ->now we create _histoMail");
 							
 							var histoPromise=FL.API.createHistoMails_ifNotExisting();
 							histoPromise.done(function(){
 								// FL.login.checkSignIn();
 								// displaySignInUser(loginObject.email);
 								// return loginAccessCB(null,loginObject);
-								console.log("FLLoadCss2.js newUserAccess _histoMail SUCESSFULLY created for new user");
+								FL.common.printToConsole("FLLoadCss2.js newUserAccess _histoMail SUCESSFULLY created for new user");
 								return def.resolve(true);//true ==>user was created
 							});
 							histoPromise.fail(function(err){
@@ -385,10 +384,10 @@ jQuery(document).ready(function($){
 								return def.reject("FLLoadCss2.js newUserAccess _histoMail FAILURE creating _histoMail err="+err);
 							});
 							// return def.resolve(true);//true ==>user was created
-							},function(err){console.log("FLLoadCss2 ->newUserAccess->fail");return def.reject(err);});
+							},function(err){FL.common.printToConsole("FLLoadCss2 ->newUserAccess->fail");return def.reject(err);});
 				}else{//user exist !!!
 					FL.common.makeModalInfo("Cannot sign up because " + loginObject.email + " is already registered.<br> - If " + loginObject.email + " is your Email, please choose <strong>'Sign In'</strong> to enter as an existing user.",function(){
-						console.log("FLLoadCss2 ->newUserAccess->makeModalInfo --->pressed 'Ok' after existing email message for email="+loginObject.email);
+						FL.common.printToConsole("FLLoadCss2 ->newUserAccess->makeModalInfo --->pressed 'Ok' after existing email message for email="+loginObject.email);
 						return def.resolve(false);//false ==>user not created because it already exists						
 					});
 				}
@@ -534,7 +533,8 @@ jQuery(document).ready(function($){
 										"<a href='#' class='btn btn-primary btn-large' onclick='FL.login.getStarted();'>Get started with a FREE beta account</a>" +
 									"</p>" +
 								"</div>",					
-			fl: new flMain(),//FL.login.fl
+			// fl: new flMain(),//FL.login.fl
+			fl: null,//FL.login.fl
 			fa: null,
 			emailContentTemplate:null, //used on FLmenulinks - if not null it is ready to send newsletter
 			emailTemplateName:null,
@@ -581,7 +581,7 @@ jQuery(document).ready(function($){
 						var loginPromise = loginAccess(lastLoginObj);
 
 						loginPromise.then(function(userExists,loginObject){
-							console.log("loginAccess well done! email="+loginObject.email+" userExists="+userExists);
+							FL.common.printToConsole("loginAccess well done! email="+loginObject.email+" userExists="+userExists);
 							if(!userExists){
 								FL.login.signOut();//saves logout in local storage ->hide slide panels  ->updates upper right corner display
 								logOutMenu();//displays menu and homepage for logout status
@@ -614,7 +614,7 @@ jQuery(document).ready(function($){
 				// signIn calls loginDialogs ->calls loginAccess and disconnect
 				// Use cases:
 				// 		New user
-				console.log("enter signIn");
+				FL.common.printToConsole("enter signIn");
 				$.Topic( 'inLogOnProcess' ).publish( true );//broadcast that will be received by FL.menu to update .editable to false
 				if(FL.is_sidePanelOpen){
 					FL.common.makeModalInfo("Please close FrameLink side panel before changing your Sign In/Sign Out status");
@@ -629,7 +629,7 @@ jQuery(document).ready(function($){
 						}
 						var loginOkPromise = loginDialogs(loginObject);
 						loginOkPromise.done(function(loginOk,loginObject){
-							console.log("signIn --------------->loginOk="+loginOk+" Email="+loginObject.email);//loginOk ==>go false=>repeat
+							FL.common.printToConsole("signIn --------------->loginOk="+loginOk+" Email="+loginObject.email);//loginOk ==>go false=>repeat
 							if(!loginOk){
 								if(loginObject.email.length>0){
 									localStorage.login = JSON.stringify(loginObject);
@@ -652,7 +652,7 @@ jQuery(document).ready(function($){
 					loginObject  = {eMail:"",password:""};
 				var getStartedPromise = getStartedDialogs(loginObject);
 				getStartedPromise.done(function(continueOk,loginObject){
-					console.log("getStarted --------------->continueOk=" + continueOk);//continueOk ==>go false=>repeat
+					FL.common.printToConsole("getStarted --------------->continueOk=" + continueOk);//continueOk ==>go false=>repeat
 					if(!continueOk){
 						FL.login.getStarted(loginObject);
 					}
@@ -665,8 +665,8 @@ jQuery(document).ready(function($){
 				// alert("the brand !!!");
 				var loadAppPromise=FL.API.loadAppDataForSignInUser2();//gets data dictionary + main menu + style + fontFamily + home page
 				loadAppPromise.done(function(menuData,homeHTML){
-					console.log("FL.login.home ---> homeHTML=" + homeHTML);
-					// console.log("FL.login.home --------------------------------------------->first menu=" + menuData.oMenu.menu[0].title);				
+					FL.common.printToConsole("FL.login.home ---> homeHTML=" + homeHTML);
+					// FL.common.printToConsole("FL.login.home --------------------------------------------->first menu=" + menuData.oMenu.menu[0].title);				
 					FL.common.clearSpaceBelowMenus();
 					FL.domInject("_placeHolder",homeHTML );
 				});	

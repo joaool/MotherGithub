@@ -43,10 +43,10 @@ $(function () {
     actual =  FL.common.getLastTagInString('the brown(fox) and the white(rabbit) jumped the fence','(',')'); //(str,separator,tagTerminator)
     ok( actual == "rabbit"," FL.common.getLastTagInString('the brown(fox) and the white(rabbit) jumped the fence','(',')') -> 'rabbit'");//16
 
-    // console.log("<--------------test------------>");
+    // FL.common.printToConsole("<--------------test------------>");
     actual =  FL.common.getLastTagInString('the brown*fox* is there','(',')'); //(str,separator,tagTerminator)
     ok( actual === null," FL.common.getLastTagInString('the brown*fox* is there','(',')') -> null");//17
-    // console.log("------------------------------->"+actual);
+    // FL.common.printToConsole("------------------------------->"+actual);
 
 
 
@@ -97,10 +97,10 @@ $(function () {
     ok( actual == expected,"Validated !!!" ); //1
     var car1 = FL.menu.createCar("Fiat","1990");
     ok( car1.model == "Fiat","car is Fiat Validated !!!" );//2
-    console.log(car1.phrase());
+    FL.common.printToConsole(car1.phrase());
     ok( car1.phrase() == "Fiat of 1990","phrase function Validated !!!" );//3
     var myMenu1 = FL.menu.createMenu({jsonMenu:oMenu,initialMenu:"_home",editable:false});
-    console.log(myMenu1.toString());
+    FL.common.printToConsole(myMenu1.toString());
     ok( myMenu1.jsonMenu.menu[1].title == "MenuB/T1","Getting menu title 'MenuB/T1' (at root)" );//4
     ok( myMenu1.jsonMenu.menu[1].menu[1].title == "MenuB/T2-II","Getting menu title 'MenuB/T2-II' at second level" );//5
     myMenu1.jsonMenu.menu[1].menu[1].title = "Joachim";
@@ -324,12 +324,12 @@ $(function () {
     $('<div id="menuContainer"><ul id="main-menu"></ul></div>').appendTo('#qunit-fixture');
     var myMenu1 = FL.menu.createMenu({jsonMenu:oMenu,initialMenu:"_home",editable:true});
     var $itemClicked = $( "#toolbar" );
-    console.log("before click myMenu1.is_menuHide="+myMenu1.is_menuHide);
-    console.log("before click myMenu1.is_contextOn="+myMenu1.is_contextOn);
+    FL.common.printToConsole("before click myMenu1.is_menuHide="+myMenu1.is_menuHide);
+    FL.common.printToConsole("before click myMenu1.is_contextOn="+myMenu1.is_contextOn);
 
     $itemClicked.trigger( {type:"mousedown",which:3} );//the same as pressing the right mouse on toolbar OK !!!
-    console.log("after click myMenu1.is_menuHide="+myMenu1.is_menuHide);
-    console.log("after click myMenu1.is_contextOn="+myMenu1.is_contextOn);
+    FL.common.printToConsole("after click myMenu1.is_menuHide="+myMenu1.is_menuHide);
+    FL.common.printToConsole("after click myMenu1.is_contextOn="+myMenu1.is_contextOn);
     equal(true, myMenu1.is_menuHide, "right click in toolbar => myMenu1.is_menuHide=true ");
     equal(false, myMenu1.is_contextOn, "right click in toolbar => myMenu1.is_contextOn=false ");
     $itemClicked.trigger( {type:"mousedown",which:2} );//the same as pressing the right mouse on toolbar OK !!!
@@ -803,7 +803,7 @@ $(function () {
     ok(actual === "02", "FL.dd.getFieldCompressedName -->compressed name is '02'");//33
 
 
-    console.log("%%%%%%%%%%%%%% begin %%%%%%%%%%%%%%%%%%%%%%%%");
+    FL.common.printToConsole("%%%%%%%%%%%%%% begin %%%%%%%%%%%%%%%%%%%%%%%%");
     FL.dd.displayEntities();
 
     // FL.dd.updateAttribute('order','shipped',{type:'date',typeUI:'datebox'});//change type and typeUI for attribute "shipped" - previously type="boolean" typeUI="checkbox"
@@ -812,17 +812,17 @@ $(function () {
 
     // FL.dd.updateAttribute('order','shipped',{type:'boolean',typeUI:'checkbox'});//change type and typeUI for attribute "shipped" - previously type="boolean" typeUI="checkbox"
     // actual = FL.dd.getEntityAttribute("order","shipped");
-    // console.log(JSON.stringify(actual));
+    // FL.common.printToConsole(JSON.stringify(actual));
     // ok(actual.type == "boolean" && actual.typeUI == "checkbox", "FL.dd.updateAttribute('order','shipped',{type:'boolean',typeUI:'checkbox'}) -->update done!");//35
 
     // FL.dd.updateAttribute('order','shipped',{name:'sent',label:'Sent'});//change type and typeUI for attribute "shipped" - previously type="boolean" typeUI="checkbox"
     // actual = FL.dd.getEntityAttribute("order","sent");
-    // console.log(JSON.stringify(actual));
+    // FL.common.printToConsole(JSON.stringify(actual));
     // ok(actual.name == "sent" && actual.label == "Sent", "FL.dd.updateAttribute('order','shipped',{name:'sent',label:'Sent'}) -->update done!");//36
 
     // FL.dd.updateAttribute('order','sent',{name:'shipped',label:'Shipped'});//change type and typeUI for attribute "shipped" - previously type="boolean" typeUI="checkbox"
     // actual = FL.dd.getEntityAttribute("order","shipped");
-    // console.log(JSON.stringify(actual));
+    // FL.common.printToConsole(JSON.stringify(actual));
     // ok(actual.name == "shipped" && actual.label == "Shipped", "FL.dd.updateAttribute('order','sent',{name:'shipped',label:'Shipped'}) -->update done!");//37
 
     // FL.dd.displayEntities();
@@ -840,43 +840,43 @@ $(function () {
     FL.dd.addRelation("sales_rep","client","is responsable by complaints of ","N",0,true,"En");
 
 
-    console.log("------- after ---------------");
+    FL.common.printToConsole("------- after ---------------");
     FL.dd.displayEntities();
     actual = FL.dd.relationsOf("sales_rep");
     ok(actual[0].rCN === "02", "first relation from FL.dd.relationsOf('sales_rep') has rCN=='02'");//32+4
     ok(actual[0].semantic === "sales_rep manages many clients", "first relation from FL.dd.relationsOf('sales_rep') has semantic 'sales_rep manages many clients'");//33
     ok(actual[1].rCN === "03", "first relation from FL.dd.relationsOf('sales_rep') has rCN=='03'");//34
     ok(actual[1].semantic === "sales_rep is responsable by complaints of  many clients", "first relation from FL.dd.relationsOf('sales_rep') has semantic 'sales_rep is responsable by complaints of  many clients'");//35
-    console.log("relations ="+JSON.stringify(actual));
+    FL.common.printToConsole("relations ="+JSON.stringify(actual));
 
     actual = FL.dd.relationsOf("client");
     ok(actual[0].rCN === "01", "first relation from FL.dd.relationsOf('client') has rCN=='01'");//36+4
     ok(actual[0].semantic === "client has many orders", "first relation from FL.dd.relationsOf('client') has semantic 'client has many orders'");//37
-    console.log("relations="+JSON.stringify(actual));
+    FL.common.printToConsole("relations="+JSON.stringify(actual));
 
     actual = FL.dd.relationsOf("order");
-    console.log("relations="+JSON.stringify(actual));
+    FL.common.printToConsole("relations="+JSON.stringify(actual));
 
     ok(actual[0].rCN === "01", "first relation from FL.dd.relationsOf('order') has rCN=='01'");//36
     ok(actual[0].semantic === "order is referred by one and only one client", "first relation from FL.dd.relationsOf('order') has semantic 'order is referred by one and only one client'");//37
 
 
-    console.log("%%%%%%%%%%%%%%% end %%%%%%%%%%%%%%%%%%%%%%%%");
+    FL.common.printToConsole("%%%%%%%%%%%%%%% end %%%%%%%%%%%%%%%%%%%%%%%%");
     FL.API.customTable({singular:"shipment"});
-    console.log("********************************************name**************>"+FL.API.data.shipment.name);
-    console.log("********************************************descrption**************>"+FL.API.data.shipment.description);
-    console.log("********************************************eCN**************>"+FL.API.data.shipment.eCN);
-    console.log("**********************************************************>"+FL.API.data.shipment.get("singular"));
-    console.log("**********************************************************>"+FL.API.data.shipment.get("csingular"));
-    console.log("**********************************************************>"+FL.API.data.shipment.get("plural"));
-    console.log("**********************************************************>"+FL.API.data.shipment.get("description"));
-    console.log("**********************************************************>"+FL.API.data.shipment.get("sync"));
+    FL.common.printToConsole("********************************************name**************>"+FL.API.data.shipment.name);
+    FL.common.printToConsole("********************************************descrption**************>"+FL.API.data.shipment.description);
+    FL.common.printToConsole("********************************************eCN**************>"+FL.API.data.shipment.eCN);
+    FL.common.printToConsole("**********************************************************>"+FL.API.data.shipment.get("singular"));
+    FL.common.printToConsole("**********************************************************>"+FL.API.data.shipment.get("csingular"));
+    FL.common.printToConsole("**********************************************************>"+FL.API.data.shipment.get("plural"));
+    FL.common.printToConsole("**********************************************************>"+FL.API.data.shipment.get("description"));
+    FL.common.printToConsole("**********************************************************>"+FL.API.data.shipment.get("sync"));
     // // FL.API.data.shipment.tfunc();
     FL.API.data.shipment.set("description","place to send merchandise");
-    console.log("***************after set*******************************************>"+FL.API.data.shipment.get("description"));
+    FL.common.printToConsole("***************after set*******************************************>"+FL.API.data.shipment.get("description"));
     // var records=[{"name":"Joao","phone":"123"},{"name":"Anton","phone":"456"}];
     // FL.API.saveTable("sales_rep",records);
-    // console.log("*********************************after saveTable*******************************************");
+    // FL.common.printToConsole("*********************************after saveTable*******************************************");
 
     actual = FL.dd.isEntityInLocalDictionary("order");
     ok(actual === true, "FL.dd.isEntityInLocalDictionary -->'order' exists in local dictionary.");//45
@@ -910,9 +910,9 @@ $(function () {
     actual = FL.dd.isEntityWithTypeUI("sales_rep","phonebox");
     ok(actual === true, "FL.dd.isEntityWithTypeUI --> Now after FL.dd.setFieldTypeUI sales_rep has a phone field - typeUI='phonebox'");//57
     
-    console.log("====================================================================================");
-    console.log("histoMailPeer for sales_rep is "+FL.dd.histoMailPeer("histoMail","sales_rep"));
-    console.log("====================================================================================");
+    FL.common.printToConsole("====================================================================================");
+    FL.common.printToConsole("histoMailPeer for sales_rep is "+FL.dd.histoMailPeer("histoMail","sales_rep"));
+    FL.common.printToConsole("====================================================================================");
     actual = FL.dd.isHistoMailPeer("sales_rep");
     ok(actual === false, "FL.dd.isHistoMailPeer --> sales_rep has no " + FL.dd.histoMailPeer("sales_rep") + " =>'_histoMail_<eCN>' peer table");//58
 
@@ -948,35 +948,35 @@ $(function () {
       {shipped:true,product:"Super 4"}
     ];
     FL.grid.csvToStore(rowsArr);//id is injected here...
-    console.log("---->csvStore.csvRows="+JSON.stringify(csvStore.csvRows));
+    FL.common.printToConsole("---->csvStore.csvRows="+JSON.stringify(csvStore.csvRows));
 
     var obj = FL.server.preparePutRowFromCsvStoreById("order",1);
-    console.log("---->preparePutRowFromCsvStoreById="+JSON.stringify(obj));
+    FL.common.printToConsole("---->preparePutRowFromCsvStoreById="+JSON.stringify(obj));
     deepEqual( obj, {d:{ "00":1,"01":true,"02":"Super 1" },r:[]}, "FL.server.preparePutRowFromCsvStoreById correct for id=1" );//61
     obj = FL.server.preparePutRowFromCsvStoreById("order",3);
-    console.log("---->preparePutRowFromCsvStoreById="+JSON.stringify(obj));
+    FL.common.printToConsole("---->preparePutRowFromCsvStoreById="+JSON.stringify(obj));
     deepEqual( obj, {d:{ "00":3,"01":false,"02":"Super 3" },r:[]}, "FL.server.getSavingObjFromCsvStoreById correct for id=3" );//62
     arrOfObj = FL.server.preparePutAllCsvStore("order");
-    console.log("---->preparePutAllCsvStore="+JSON.stringify(arrOfObj));
+    FL.common.printToConsole("---->preparePutAllCsvStore="+JSON.stringify(arrOfObj));
     
     //now we force compressed names to match those in server 
-    console.log("before setFieldCompressedName ");
+    FL.common.printToConsole("before setFieldCompressedName ");
     FL.dd.displayEntities();
     FL.dd.setFieldCompressedName("order","id","62");
     FL.dd.setFieldCompressedName("order","shipped","63");
     FL.dd.setFieldCompressedName("order","product","64");
-    console.log("after setFieldCompressedName ");
+    FL.common.printToConsole("after setFieldCompressedName ");
     FL.dd.displayEntities();
 
     csvStore.csvRows = {};
     FL.dd.setSync("order",true);//force sync
-    console.log("test 0  convertToCsvStore csvStore.csvRows ="+JSON.stringify(csvStore.csvRows));
+    FL.common.printToConsole("test 0  convertToCsvStore csvStore.csvRows ="+JSON.stringify(csvStore.csvRows));
     // var simulObjFromServer = _.map(arrOfObj,function(element){return element.d;});
     var simulObjFromServer = arrOfObj;
-    console.log("test 1 convertArrC2LForEntity ---->before function: simulObjFromServer="+JSON.stringify(simulObjFromServer));
+    FL.common.printToConsole("test 1 convertArrC2LForEntity ---->before function: simulObjFromServer="+JSON.stringify(simulObjFromServer));
     var csvStoreArray = FL.server.convertArrC2LForEntity("order",simulObjFromServer);
     //FL.server.loadCsvStoreFromEntity("order");
-    console.log("test 2  convertArrC2LForEntity csvStoreArray ="+JSON.stringify(csvStoreArray));
+    FL.common.printToConsole("test 2  convertArrC2LForEntity csvStoreArray ="+JSON.stringify(csvStoreArray));
 
     FL.server.offline = false;
     var oEntity =  FL.dd.getEntityBySingular("order");
@@ -1023,13 +1023,13 @@ $(function () {
     //     // ok(err === true, "Good connection");
     //     if(err){
     //       if(err.status != "offline")
-    //         console.log("Connection Error !!!"+err);
+    //         FL.common.printToConsole("Connection Error !!!"+err);
     //     }else{
-    //       console.log("Good connection--> begin loadCsvStoreFromEntity(entity)-------------------");
+    //       FL.common.printToConsole("Good connection--> begin loadCsvStoreFromEntity(entity)-------------------");
     //       FL.server.loadCsvStoreFromEntity("order",function(err){//all csvStore will be stored in server as "order" content
-    //           console.log("loadCsvStoreFromEntity is done !!! Error:"+err);
+    //           FL.common.printToConsole("loadCsvStoreFromEntity is done !!! Error:"+err);
     //           FL.server.disconnect();
-    //           console.log("show csvStore="+JSON.stringify(csvStore.csvRows));
+    //           FL.common.printToConsole("show csvStore="+JSON.stringify(csvStore.csvRows));
     //       });
     //     }
     // });

@@ -21,7 +21,7 @@ FL["mixinTourMap"] = function(tourMap) { //puts in FL.currentTourMap the current
 			});
 		}		
 	}
-	// _.map(FL.currentTourMap, function(n,i) { console.log(i+"->"+n);});
+	// _.map(FL.currentTourMap, function(n,i) { FL.common.printToConsole(i+"->"+n);});
 };
 FL["findTourMapFor"] = function(onEvent,onEventValue) { //finds the first stepsChangeEvents that matches a double key entry TEST OK
 	var stepTourMap = _.find(FL.tourSettings.stepsChangeEvents,function(n) {
@@ -96,7 +96,7 @@ FL["setNextPrevOfCurrentStep"] = function() {//normally this will return the cur
 			var prev = FL.prevOnTourMap(currentStep);
 			if( prev === null )
 				prev = currentStep;
-			console.log("setNextPrevOfCurrentStep -> currentStep ="+currentStep+" next will be "+next+" and previous will be "+prev);
+			FL.common.printToConsole("setNextPrevOfCurrentStep -> currentStep ="+currentStep+" next will be "+next+" and previous will be "+prev);
 			FL.tourSettings.steps[currentStep].next = next;
 			FL.tourSettings.steps[currentStep].prev = prev;
 			
@@ -330,7 +330,7 @@ FL["tourIn"] = function() {//called by tour icon
 		}
 		FL.showTourStep0 = false;
 	}else{
-		console.log("No tour available...");
+		FL.common.printToConsole("No tour available...");
 		BootstrapDialog.alert('No tour available for the moment.');
 	}
 };
@@ -355,7 +355,7 @@ FL["tourBegin"] = function() {
 			FL.tour.start();
 		}
 	}else{
-		console.log("No tour available...");
+		FL.common.printToConsole("No tour available...");
 	}
 };
 FL["setTourOn"] = function(is_tour) {//if true, creates tour object with steps. Sets FL is_tour status

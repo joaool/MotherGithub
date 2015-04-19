@@ -34,7 +34,7 @@ jQuery(document).ready(function($){
 				if (fileName.length == 0){
 					$('#confirmStatment').empty();
 					$('#confirm').hide();
-					console.log("Filename is empty");
+					FL.common.printToConsole("Filename is empty");
 				}else{
 					$('#confirmStatment').html("<h4 id='confirmStatment' style='color:white;'>If <u>" + fileName + "</u> is the file you want to import, press the OK button</h4>");
 					$('#confirm').show();
@@ -94,7 +94,7 @@ jQuery(document).ready(function($){
 									//now we sync the dictionary for the new entity put grid data ond server and create menu option
 										// FL.server.insertCsvStoreDataTo(singular,function(err){
 										// 	if(err){
-										// 		console.log("Data from entity "+singular+" Error trying to store on server error="+err);
+										// 		FL.common.printToConsole("Data from entity "+singular+" Error trying to store on server error="+err);
 										// 		return;
 										// 	}
 										// 	FL.clearSpaceBelowMenus();
@@ -121,7 +121,7 @@ jQuery(document).ready(function($){
 				});
 				$('input').change(function(e) { //this change occurs after file selection - thi is the code to produce the grid
 					// alert("FLLoadCss2 managePanel3 input changed");
-					// console.log("input changed");
+					// FL.common.printToConsole("input changed");
 					var fileName = extractFileName( $("input[type=file]").val() );//ex:c:\fakepath\weadvice.csv
 					// alert("1---->"+fileName);
 					csvStore.currentGridCandidate["fileName"] = fileName;
@@ -135,7 +135,7 @@ jQuery(document).ready(function($){
 					// alert("2---->"+JSON.stringify(csvFile));
 
 					FL.grid.csvToGrid(csvFile);//csvFile is a JQuery object
-					console.log("------------------------------------>"+fileName);
+					FL.common.printToConsole("------------------------------------>"+fileName);
 				});
 			},
 			dictTemplateChangeWhatIsLabel: function(form){
@@ -169,8 +169,8 @@ jQuery(document).ready(function($){
 				var descriptionId =  "_dictEditEntityTemplate__f" + order + "_description";
 				var attribute = $("#" + attrId).val();
 				var attributeDescription = $("#" + descriptionId).val();
-				// console.log("FLSlidePanel.js dictTemplateAttributeValidation statementId=" + statementId + " attrId="+attrId+" attribute="+attribute);
-				// console.log("FLSlidePanel.js dictTemplateAttributeValidation form.singular.value=" + form.singular.value);
+				// FL.common.printToConsole("FLSlidePanel.js dictTemplateAttributeValidation statementId=" + statementId + " attrId="+attrId+" attribute="+attribute);
+				// FL.common.printToConsole("FLSlidePanel.js dictTemplateAttributeValidation form.singular.value=" + form.singular.value);
 
 
 				var articleAndWord = FL.dd.preArticle(form.entityName.value,"En");
@@ -181,7 +181,7 @@ jQuery(document).ready(function($){
 				var descriptionBeginning = FL.dd.preArticle(description,"En");
 				description = descriptionBeginning;
 				var statement = "The " + attribute + " of " + articleAndWord + " is the " +  attributeDescription;
-				// console.log("FLSlidePanel.js dictTemplateAttributeValidation statement=" + statement);
+				// FL.common.printToConsole("FLSlidePanel.js dictTemplateAttributeValidation statement=" + statement);
 				$("#" + statementId ).html(statement);
 			},
 			editForm: function(formName){//Panel 2  when Home Link is clicked

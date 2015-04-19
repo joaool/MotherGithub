@@ -105,7 +105,7 @@
 					localStorage.connection = null;
 					alert('flLoging: err=' + JSON.stringify(err));
 					return connectServerCB(err);
-					// return console.log ('flLoging: err=' + JSON.stringify(err));
+					// return FL.common.printToConsole ('flLoging: err=' + JSON.stringify(err));
 				}
 				var myApp = null;  
 				if(data.applications.length == 0){
@@ -127,7 +127,7 @@
 						alert('fa.connect: err=' + JSON.stringify(err2));
 						localStorage.connection = null;
 						return connectServerCB(false);
-						// return console.log ('fla.connect: err=' + JSON.stringify(err2));
+						// return FL.common.printToConsole ('fla.connect: err=' + JSON.stringify(err2));
 					}
 					FL.menuLevel = data2.menuLevel;
 					FL.restrictions = data2.restrictions;
@@ -172,9 +172,9 @@
 					entityJSON.fields.push(attrJSON);
 				}
 				fEntity.addWithFields(entityJSON, function (err, data){
-					// console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
+					// FL.common.printToConsole(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
 
-					// console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
+					// FL.common.printToConsole(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
 					if(err){
 						alert("createEntity Error: "+JSON.stringify(err));
 						return createServerEntity_FieldsCB(err);
@@ -203,7 +203,7 @@
 							alert('insertCsvStoreDataTo: err=' + JSON.stringify(err));
 							return insertCB(false);
 						}
-						console.log("exit from insertCsvStoreDataTo -->"+JSON.stringify(data));
+						FL.common.printToConsole("exit from insertCsvStoreDataTo -->"+JSON.stringify(data));
 						return insertCB(null);
 						// var myApp =data.applications[0];
 					});
@@ -223,7 +223,7 @@
 							alert('insertCsvStoreDataTo: err=' + JSON.stringify(err));
 							return insertCB(false);
 						}
-						console.log("exit from insertCsvStoreDataTo -->"+JSON.stringify(data));
+						FL.common.printToConsole("exit from insertCsvStoreDataTo -->"+JSON.stringify(data));
 						return insertCB(null);
 						// var myApp =data.applications[0];
 					});
@@ -296,7 +296,7 @@
 					var eCN =  oEntity.csingular;
 					var sync = oEntity.sync;
 					if(sync){//now we can import from server
-						console.log("FL.server.loadCsvStoreFromEntity Entity=" + entityName + " exists and is in sync -->eCN/sync=" + eCN + "/"+sync);
+						FL.common.printToConsole("FL.server.loadCsvStoreFromEntity Entity=" + entityName + " exists and is in sync -->eCN/sync=" + eCN + "/"+sync);
 						var flData = new FL.server.fl.data();
 						// var flData = new FL.server.fl.entity();
 						flData.findAll(eCN, {query:{}},function(err, docs){
@@ -304,14 +304,14 @@
 								alert('FL.server.loadCsvStoreFromEntity: Error returning from server -> err=' + JSON.stringify(err));
 								return loadCsvStoreFromEntityCB(false);
 							}
-							console.log("docs="+JSON.stringify(docs));
+							FL.common.printToConsole("docs="+JSON.stringify(docs));
 
 							var arrToStoreLocally = FL.server.convertArrC2LForEntity(entityName,docs);//docs =>[{"_id":123,d:{},r:[]},{"_id":124,d:{},r:[]},....{"_id":125,d:{},r:[]}]
-							console.log("arrToStoreLocally="+JSON.stringify(arrToStoreLocally));
+							FL.common.printToConsole("arrToStoreLocally="+JSON.stringify(arrToStoreLocally));
 
 							csvStore.store(arrToStoreLocally);
 							alert("import is done");
-							console.log("import is done");
+							FL.common.printToConsole("import is done");
 							return loadCsvStoreFromEntityCB(true);
 						});
 
@@ -350,24 +350,24 @@
 						//code here
 						var sucess = null;
 						var oEntity = null;
-						// console.log("&&&&&&&&&&&&&&&&&&& begin syncLocalDictionary &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&");
+						// FL.common.printToConsole("&&&&&&&&&&&&&&&&&&& begin syncLocalDictionary &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&");
 						FL.dd.clear();//clears local dictionary
 						// FL.dd.displayEntities();
-						// console.log("--- *** Entities *** ---");
+						// FL.common.printToConsole("--- *** Entities *** ---");
 						for( var i = 0; i < entities.length; i++){
-							// console.log("Entity eCN=" + entities[i]._id + " singular=" + entities[i].d["3"] );
+							// FL.common.printToConsole("Entity eCN=" + entities[i]._id + " singular=" + entities[i].d["3"] );
 							success = FL.dd.createEntity(entities[i].d["3"],entities[i].d["4"]);//("client","company we may invoice")
 							oEntity = FL.dd.entities[entities[i].d["3"]];
 							oEntity.plural = entities[i].d["E"];
 							oEntity.csingular = entities[i]._id;
-							console.log("--- *** fields *** ---");
+							FL.common.printToConsole("--- *** fields *** ---");
 							for( var fieldIndex = 0; fieldIndex < entities[i].fields.length; fieldIndex++){//boucle fields
-								// console.log("--->field fCN=" + entities[i].fields[fieldIndex]._id + " fieldName=" + entities[i].fields[fieldIndex].d["3"] );
+								// FL.common.printToConsole("--->field fCN=" + entities[i].fields[fieldIndex]._id + " fieldName=" + entities[i].fields[fieldIndex].d["3"] );
 								FL.dd.addAttribute(entities[i].d["3"],entities[i].fields[fieldIndex].d["3"] ,entities[i].fields[fieldIndex].d["4"],entities[i].fields[fieldIndex].d["K"],entities[i].fields[fieldIndex].d["M"],entities[i].fields[fieldIndex].d["9"],entities[i].fields[fieldIndex].d["N"]);//("order","shipped","expedition status","Shipped","boolean",null)
 								//addAttribute uses a local compressed name. Now we have to force the field compressed name comming from server								
 								FL.dd.setFieldCompressedName(entities[i].d["3"],entities[i].fields[fieldIndex].d["3"], entities[i].fields[fieldIndex]._id );
 							}
-							// console.log("--- *** relations *** ---");
+							// FL.common.printToConsole("--- *** relations *** ---");
 							var rCN = null;
 							var relationName = null;
 							var withEntityCN = null;
@@ -380,7 +380,7 @@
 
 							oEntity.relations = [];
 							for( var relationIndex = 0; relationIndex < entities[i].relations.length; relationIndex++){//boucle relations
-								// console.log("--->relation  rCN=" + entities[i].relations[relationIndex]._id );
+								// FL.common.printToConsole("--->relation  rCN=" + entities[i].relations[relationIndex]._id );
 								relation = {};
 								relation["rCN"] = entities[i].relations[relationIndex]._id;
 								relation["withEntityCN"] = entities[i].relations[relationIndex].d["00"][0]["U"];
@@ -404,11 +404,11 @@
 						// - Step 2 is done below filling "withEntity" from "withEntityCN" (saved in step 1) and setting sync=true at entity level. 
 						FL.dd.relationPass2();//goes thru all entities and for all relations of each entity fills withEntity and semantic using withEntityCN
 						// FL.dd.displayEntities();
-						// console.log("&&&&&&&&&&&&&&&&&&&& end syncLocalDictionary &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&");
+						// FL.common.printToConsole("&&&&&&&&&&&&&&&&&&&& end syncLocalDictionary &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&");
 						return syncLocalDictionaryCB(null);
 					}
 					catch(e){
-						console.log("Big error !!!"+e.stack);
+						FL.common.printToConsole("Big error !!!"+e.stack);
 						return syncLocalDictionaryCB(e.toString());
 					}
 				});
@@ -422,14 +422,14 @@
 						alert('FL.server.saveMainMenu: err=' + JSON.stringify(err));
 						return saveMainMenuCB(false);
 					}
-					console.log("exit from update with success -->"+JSON.stringify(data));
+					FL.common.printToConsole("exit from update with success -->"+JSON.stringify(data));
 					if(data.count == 0){//data.count == 0 =>we need to insert
 						fd.insert("40",{_id:1, d:{"45":oMenu,"46":style,"47":fontFamily}}, function(err, data){
 							if (err){
 								alert('FL.server.saveMainMenu: err=' + JSON.stringify(err));
 								return saveMainMenuCB(false);
 							}
-							console.log("exit from saveMainMenu insert after failling update. Success -->"+JSON.stringify(data));
+							FL.common.printToConsole("exit from saveMainMenu insert after failling update. Success -->"+JSON.stringify(data));
 							return saveMainMenuCB(null);
 						});
 					}
@@ -443,7 +443,7 @@
 				var oMenu = JSON.parse(lastMenuStr);
 				// FL.menu.currentMenuObj.jsonMenu = FL.menu.currentOptions.jsonMenu;//HACK - because FL.menu.currentMenuObj.jsonMenu does not reflect the last menu update
 				FL.server.saveMainMenu(oMenu,lastStyleStr,lastFontFamilyStr,function(err){
-					console.log("FL.server syncLocalStoreToServer() -> menu style and font saved on server -->"+err);
+					FL.common.printToConsole("FL.server syncLocalStoreToServer() -> menu style and font saved on server -->"+err);
 					// alert("FLMenu2.js saveMenuToLocalAndServer called FL.server.saveMainMenu with style="+lastStyleStr+ " font="+lastFontFamilyStr);
 				});
 			},
@@ -455,7 +455,7 @@
 						alert('FL.server.saveMainMenu: err=' + JSON.stringify(err));
 						return saveMainMenuCB(false);
 					}
-					console.log("exit from saveMainMenu with success -->"+JSON.stringify(data));
+					FL.common.printToConsole("exit from saveMainMenu with success -->"+JSON.stringify(data));
 					return saveMainMenuCB(null);
 				});
 			},			
@@ -467,12 +467,12 @@
 						alert('FL.server.restoreMainMenu: err=' + JSON.stringify(err));
 						return restoreMainMenuCB(false);
 					}
-					// console.log("restoreMainMenu -->")
+					// FL.common.printToConsole("restoreMainMenu -->")
 					var oMenu= data.d["45"];
 					var style= data.d["46"];
 					var fontFamily= data.d["47"];
 					var retData = {oMenu: oMenu,style: style,fontFamily: fontFamily};
-					console.log("FL.server.restoreMainMenu exit with success -->"+JSON.stringify(data));
+					FL.common.printToConsole("FL.server.restoreMainMenu exit with success -->"+JSON.stringify(data));
 					return restoreMainMenuCB(null,retData);
 				});
 			},
@@ -490,7 +490,7 @@
 							alert('FL.server.savePage: ERROR ON UPDATE err=' + JSON.stringify(err));
 							return savePageCB(false);
 						}					
-						console.log("FL.server.savePage: exit from update with success -->"+JSON.stringify(data));
+						FL.common.printToConsole("FL.server.savePage: exit from update with success -->"+JSON.stringify(data));
 						if(data.count == 0){//data.count == 0 =>we need to insert
 
 							fd.insert("43",{_id:pagNo, d:{html:htmlContent}}, function(err, data){
@@ -498,7 +498,7 @@
 									alert('FL.server.savePage: ERROR ON INSERT err=' + JSON.stringify(err));
 									return savePageCB(false);
 								}
-								console.log("FL.server.savePage: exit with success after insert -->"+JSON.stringify(data));
+								FL.common.printToConsole("FL.server.savePage: exit with success after insert -->"+JSON.stringify(data));
 								return savePageCB(null);
 							});
 						}
@@ -520,7 +520,7 @@
 							alert('FL.server.restorePage: err=' + JSON.stringify(err));
 							return restorePageCB(false);
 						}
-						console.log("exit from restorePage with success -->"+JSON.stringify(data));
+						FL.common.printToConsole("exit from restorePage with success -->"+JSON.stringify(data));
 						return restorePageCB(null,data);
 					});
 				}else{

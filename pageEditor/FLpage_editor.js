@@ -58,20 +58,20 @@ var FL = FL || {};
 			var font = FL.common.getTag(fullUrl,"font","#");//FL.domain is globally defined - the last # is disregarded
 			FL.common.setStyleAndFont(style,font);			//Now we will restore the style and font
 
-			console.log("FLpage_editor.js fullUrl="+fullUrl);
-			console.log("FLpage_editor.js connectionString="+connectionString);
-			console.log("FLpage_editor.js style="+style);
-			console.log("FLpage_editor.js font="+font);
+			FL.common.printToConsole("FLpage_editor.js fullUrl="+fullUrl);
+			FL.common.printToConsole("FLpage_editor.js connectionString="+connectionString);
+			FL.common.printToConsole("FLpage_editor.js style="+style);
+			FL.common.printToConsole("FLpage_editor.js font="+font);
 		}else{
 			alert("inside FLpage_editor - ERROR fullUrl is empty");
 		}
 		FL.API.connectUserToDefaultApp(loginObject.email,loginObject.password)
 		.then(function(){
-				console.log("FLpage_editor -> success connecting to default app - Now we extract application data");
+				FL.common.printToConsole("FLpage_editor -> success connecting to default app - Now we extract application data");
 				var loadAppPromise=FL.API.loadAppDataForSignInUser2();//gets data dictionary + main menu + style + fontFamily + home page
 				loadAppPromise.done(function(menuData,homeHTML){
-					console.log("appSetup ---> homeHTML=" + homeHTML);
-					// console.log("appSetup --------------------------------------------->first menu=" + menuData.oMenu.menu[0].title);
+					FL.common.printToConsole("appSetup ---> homeHTML=" + homeHTML);
+					// FL.common.printToConsole("appSetup --------------------------------------------->first menu=" + menuData.oMenu.menu[0].title);
 					// $('#pageEditorTemplate');
 					var templateHTML = $('#pageEditorTemplate').html();
 					FL.domInject("_placeHolder",templateHTML );
@@ -85,7 +85,7 @@ var FL = FL || {};
 					alert("FLpage_editor ->  --> after successfull connectUserToDefaultApp FAILURE in loadAppDataForSignInUser2 <<<<< error="+err);
 				});
 			},function(err){
-				console.log("FLpage_editor -> failure connecting to default app  err="+err);
+				FL.common.printToConsole("FLpage_editor -> failure connecting to default app  err="+err);
 			});
 		var editPage = function(pageName,htmlStr){
 			// alert("continueFunction !!!! code to develop here !!! pageName="+pageName);
@@ -117,27 +117,27 @@ var FL = FL || {};
 					});
 				}
 			});
-			console.log("-->"+htmlStr);
+			FL.common.printToConsole("-->"+htmlStr);
 		};
 	});
 	exitSaving = function(){
 		sHTML = tinyMCE.get('my_editor').getContent();
 		FL.API.saveHomePage(sHTML)
 		.then(function(){
-					console.log("FLpage_editor ->saved ok!");
+					FL.common.printToConsole("FLpage_editor ->saved ok!");
 					FL.API.disconnect()
-					.then(function(){console.log("FLpage_editor->after sucessfull saveHomePage --> disconnect ok!");closeWindows();return;} 
-						,function(err){console.log("FLpage_editor->after sucessfull saveHomePage -->failure on disconnect err ="+err);return;}
+					.then(function(){FL.common.printToConsole("FLpage_editor->after sucessfull saveHomePage --> disconnect ok!");closeWindows();return;} 
+						,function(err){FL.common.printToConsole("FLpage_editor->after sucessfull saveHomePage -->failure on disconnect err ="+err);return;}
 					);
 				}
-			,function(err){console.log("FLpage_editor -> failure saving page err="+err);FL.API.disconnect();});
+			,function(err){FL.common.printToConsole("FLpage_editor -> failure saving page err="+err);FL.API.disconnect();});
 	};
 	exitNoSave = function(){
 		// alert("exitNoSave");
-		console.log("exitNoSave ");
+		FL.common.printToConsole("exitNoSave ");
 		FL.API.disconnect()
-		.then(function(){console.log("FLpage_editor->no save --> disconnect ok!");closeWindows();return;} 
-			,function(err){console.log("FLpage_editor->no save -->failure on disconnect err ="+err);return;}
+		.then(function(){FL.common.printToConsole("FLpage_editor->no save --> disconnect ok!");closeWindows();return;} 
+			,function(err){FL.common.printToConsole("FLpage_editor->no save -->failure on disconnect err ="+err);return;}
 		);
 	};
 	window.onbeforeunload = function (e) {//works for close tab - and for close browser because:
@@ -154,11 +154,11 @@ var FL = FL || {};
 		//OPERA 9.80 - Not working see comment above
 		e = e || window.event;
 		if (e) {
-			console.log("disconnect here");
+			FL.common.printToConsole("disconnect here");
 			// FL.server.disconnect();
 			e.returnValue = 'test returnValue...';
 		}
 		return 'You are exiting FrameLink page editor...';
 	};
-	console.log(document.title+"......  END..");
+	FL.common.printToConsole(document.title+"......  END..");
 })();

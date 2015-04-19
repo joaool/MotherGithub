@@ -7,13 +7,13 @@ window.utils = {
 
         $.each(views, function(index, view) {
             if (window[view]) {
-                console.log(index+" - carrega view="+view+" with template "+ 'tpl/' + templates[index] + '.html');
+                FL.common.printToConsole(index+" - carrega view="+view+" with template "+ 'tpl/' + templates[index] + '.html');
                 deferreds.push($.get('tpl/' + templates[index] + '.html', function(data) {//loads with jquery.get()
                     // alert("data coming from "+view+":\n"+data);
                     window[view].prototype.template = _.template(data);//view should match template names...
                 }));
-               console.log("utils.loadTemplate-----ok--------->carregou view="+view);
-               // console.log("utils.loadTemplate-----ok--------->carregou view="+view+" com:\n"+data);
+               FL.common.printToConsole("utils.loadTemplate-----ok--------->carregou view="+view);
+               // FL.common.printToConsole("utils.loadTemplate-----ok--------->carregou view="+view+" com:\n"+data);
                // alert("utils.loadTemplate-----ok--------->carregou view="+view+" com:\n"+data);
 
             } else {
@@ -43,27 +43,27 @@ window.utils = {
    createView_Template: function(mvt,callback) {//to each view must always correspond one template
         //Creates views for the mvt structure and loads templates from disk
         //if a view has several templates (array.len>1) loadTemplates creates a duplicate of the base view with the same name as the yemplate
-        console.log("--------------------------- load Template ----------------------------");
+        FL.common.printToConsole("--------------------------- load Template ----------------------------");
         var deferreds = [];
 
         var thiz = this;
         _.map( mvt, function( value, key ) {
             var model = key;
-            console.log(    "_.---->Model="+ model);//
+            FL.common.printToConsole(    "_.---->Model="+ model);//
             _.map( value, function( value, key ) {
                 var view = key;
                 var templateArr = value;
-                console.log("_.----------View="+view+"  tpl:-->"+templateArr);// value is an array
+                FL.common.printToConsole("_.----------View="+view+"  tpl:-->"+templateArr);// value is an array
                 _.each( templateArr, function( element, index ) {
                     if (!window[view]) {//if the view does not exist, creates it
                     // if (true) {//if the view does not exist, creates it
                         thiz.createView(view,model);
                     } else {
-                        console.log("utils.loadTemplate-------------->existing view="+view);
-                        // console.log("utils.loadTemplate-----ok--------->carregou view="+view+" com:\n"+data);
-                         // console.log(view+"************>"+index);
-                        // console.log(" ------------------> carrega view="+view+" with template "+ 'tpl/' + templates[key] + '.html');
-                     // console.log("@@@@@ "+index+"------------------> carrega view="+view+" with template " + 'tpl/' + element + '.html');
+                        FL.common.printToConsole("utils.loadTemplate-------------->existing view="+view);
+                        // FL.common.printToConsole("utils.loadTemplate-----ok--------->carregou view="+view+" com:\n"+data);
+                         // FL.common.printToConsole(view+"************>"+index);
+                        // FL.common.printToConsole(" ------------------> carrega view="+view+" with template "+ 'tpl/' + templates[key] + '.html');
+                     // FL.common.printToConsole("@@@@@ "+index+"------------------> carrega view="+view+" with template " + 'tpl/' + element + '.html');
                         // deferreds.push($.get('tpl/' + templates[index] + '.html', function(data) {//loads with jquery.get()
                         //     // alert("data coming from "+view+":\n"+data);
                         //     window[view].prototype.template = _.template(data);//view should match template names...
@@ -71,19 +71,19 @@ window.utils = {
                         // alert("utils.loadTemplate-----ok--------->carregou view="+view+" com:\n"+data);
                     
                         // alert("FrameLink could not find " + view + ".html in directory 'tpl'");
-                    // console.log("FrameLink could not find " + view + ". It did not load "+element+".html in directory 'tpl'");
+                    // FL.common.printToConsole("FrameLink could not find " + view + ". It did not load "+element+".html in directory 'tpl'");
                     }
-                    // var x=deferreds; console.log(" inside template type of x=" + utils.typeOf(x));
+                    // var x=deferreds; FL.common.printToConsole(" inside template type of x=" + utils.typeOf(x));
                     thiz.createTemplate(element,view,model,deferreds);
                 });
-                // console.log(    "_.---->Value="+value);//
+                // FL.common.printToConsole(    "_.---->Value="+value);//
             });
         });
         $.when.apply(null, deferreds).done(callback);
-        console.log("--------------------------- load Template END------------------------");
+        FL.common.printToConsole("--------------------------- load Template END------------------------");
     },
     createView: function(view,model) {
-        console.log("utils2.createView ------------------------------------------------------> creates view=" + view + " for model="+model);
+        FL.common.printToConsole("utils2.createView ------------------------------------------------------> creates view=" + view + " for model="+model);
         if(model == "_no_model") {
             window[view] = Backbone.View.extend({
                 initialize:function () {
@@ -95,14 +95,14 @@ window.utils = {
                 }
             });
         } else {
-            console.log("we need to define a complex view in utils2.loadTemplate.createView()");
+            FL.common.printToConsole("we need to define a complex view in utils2.loadTemplate.createView()");
         }
     },
     createTemplate: function(template,view,model,deferreds){
-        console.log("utils2.createTemplate ------------------------------------------------------------> creates template="+
+        FL.common.printToConsole("utils2.createTemplate ------------------------------------------------------------> creates template="+
                     template + " for view=" + view + " and model="+model);
-        console.log(" - carrega view="+view+" with template "+ 'tpl/' + template + '.html');
-        // var x=deferreds; console.log(" inside createTemplate type of x=" + utils.typeOf(x));
+        FL.common.printToConsole(" - carrega view="+view+" with template "+ 'tpl/' + template + '.html');
+        // var x=deferreds; FL.common.printToConsole(" inside createTemplate type of x=" + utils.typeOf(x));
         deferreds.push($.get('tpl/' + template + '.html', function(data) {//loads with jquery.get()
             if(window[view]) {
                 window[view].prototype.template = _.template(data);//view should match template names...
@@ -124,7 +124,7 @@ window.utils = {
             contentType: false
         })
         .done(function () {
-            console.log(file.name + " uploaded successfully");
+            FL.common.printToConsole(file.name + " uploaded successfully");
             callbackSuccess();
         })
         .fail(function () {
@@ -254,7 +254,7 @@ window.utils = {
             if(fieldType=="enumerable"){
                 enumerable = element[attrName].enumerable;
             }
-            // console.log(index+" - createEntityFromCsvAnalisys -->"+attrName +" type="+fieldType+" label="+label );
+            // FL.common.printToConsole(index+" - createEntityFromCsvAnalisys -->"+attrName +" type="+fieldType+" label="+label );
             FL.dd.addAttribute(entityName, attrName,entityName+"' "+attrName,label,fieldType,fieldTypeUI,enumerable);//xEntity,xAttribute,xDescription,xLabel,xType,xEnumerable
         });
         return entityName;
@@ -355,9 +355,9 @@ window.utils = {
                     //     this.render();
                     // }
                 }).on('show', function(ev) {//necessary to convert 
-                    console.log("show calendar !!!");
+                    FL.common.printToConsole("show calendar !!!");
                     var z=  ev.target.value;
-                    console.log("--->"+z);
+                    FL.common.printToConsole("--->"+z);
                     // ev.target.value = window.currentDateValue;////terrible HACK !!!
                     var formatedValue = window.input.formatter.fromRaw(window.currentDateValue.toISOString());
                     ev.target.value = formatedValue;////terrible HACK !!!
@@ -369,7 +369,7 @@ window.utils = {
                         newDateValue.setHours(12);
                     }
                     input.model.set(input.column.get("name"),newDateValue);
-                    console.log("hide calendar !!!");
+                    FL.common.printToConsole("hide calendar !!!");
                 });
                 // $(this.el).datepicker("setDate",new Date(2006, 11, 24));
                 $(this.el).datepicker("setDate", currentDateValue);
@@ -379,7 +379,7 @@ window.utils = {
                 // });
                 // $( ".datepicker prev icon-arrow-left" ).addClass( "glyphicon arrow-left" );
 
-                console.log("datepicker initialize()");
+                FL.common.printToConsole("datepicker initialize()");
                 var z=32;
             },
         });
@@ -398,7 +398,7 @@ window.utils = {
                     dateValue = new Date();
                 }
                 var formatedValue = this.formatter.fromRaw(dateValue.toISOString());
-                console.log("render----->"+dateValue + " formated->"+formatedValue);
+                FL.common.printToConsole("render----->"+dateValue + " formated->"+formatedValue);
                 this.$el.html(formatedValue);
                 this.delegateEvents();
                 return this;
@@ -456,7 +456,7 @@ window.utils = {
         // });
         // var oEntity = FL.dd.getEntity(entityName);
         _.each(arrOfColumns, function(element,index){
-            console.log("utils2 backGridColumnsFromArray defaultEntityColumns *********************--->"+element.name);
+            FL.common.printToConsole("utils2 backGridColumnsFromArray defaultEntityColumns *********************--->"+element.name);
             var column = {};
             column["name"] = element.name;
             if( element.name=="id" ) {
@@ -509,7 +509,7 @@ window.utils = {
             }else{
                 newRow[fieldName] = '';
             }
-           console.log("defaultNewGridRow newRow="+JSON.stringify(newRow));
+           FL.common.printToConsole("defaultNewGridRow newRow="+JSON.stringify(newRow));
         });
         return newRow;
     },
@@ -532,7 +532,7 @@ window.utils = {
 
         var CsvElement = Backbone.Model.extend({
             initialize: function () {
-                console.log("initializing CsvElement model");
+                FL.common.printToConsole("initializing CsvElement model");
                 this.on('change',this.modelUpdate,this);
                 this.on('add',this.modelAdd,this);
             },
@@ -544,7 +544,7 @@ window.utils = {
             modelAdd: function(){
                 // alert("CsvElement modelUpdate !!!! --->"+ this.get("id") + " _id="+ this.get("_id") + " nome="+this.get("nome"));
                 // alert("CsvElement modelAdd !!!! --->"+ JSON.stringify(this.toJSON()));
-                console.log("mountGridInCsvStore CsvElement Add model id="+this.id+" marca="+this.attributes.marca+" _id="+this.attributes._id);
+                FL.common.printToConsole("mountGridInCsvStore CsvElement Add model id="+this.id+" marca="+this.attributes.marca+" _id="+this.attributes._id);
 
             },
             // sync:csvStore.sync
@@ -557,9 +557,9 @@ window.utils = {
         });
         var csvSetCollection = new CsvSet(csvStore.csvRows);//We can instantiate our new collection by passing in an array of models.       
         csvSetCollection.fetch({remove:false,success: function(){
-            console.log(" csvSetCollection.fetch ==========================================> success !!!");
+            FL.common.printToConsole(" csvSetCollection.fetch ==========================================> success !!!");
         },error:function(){
-            console.log(" csvSetCollection.fetch ==========================================> ERROR !!!");
+            FL.common.printToConsole(" csvSetCollection.fetch ==========================================> ERROR !!!");
         }});
 
         var CsvPageableCollection = Backbone.PageableCollection.extend({
@@ -603,7 +603,7 @@ window.utils = {
             collection: csvPageableCollection // the collection subclass that supports pagination
         });
         csvPageableCollection.on('backgrid:selected', function(model, selected) {
-            console.log("model--->"+model);
+            FL.common.printToConsole("model--->"+model);
             // $(".backgrid").before("<p style='padding-top:30px;float:right;margin-right:800px'>abcde</p>");
         });
         $("#_belowMenus").show();
@@ -701,13 +701,13 @@ window.utils = {
                         });
                         var promise=FL.API.removeRecordFromTable(csvStore.getEntityName(),arrOf_Ids);
                         promise.done(function(count){
-                            console.log(">>>>>util.placeGridButtonsInDOM destroy removeRecordFromTable SUCCESS <<<<<");
+                            FL.common.printToConsole(">>>>>util.placeGridButtonsInDOM destroy removeRecordFromTable SUCCESS <<<<<");
                             if(count!=selectedModels.length)
                                 preStr = "Count="+count+" deleted instead of "+selectedModels.length+" --->";
                             FL.common.makeModalInfo(  preStr + " were deleted....");
                             return;
                         });
-                        promise.fail(function(err){console.log(">>>>>util.placeGridButtonsInDOM destroy removeRecordFromTable FAILURE <<<<<"+err);
+                        promise.fail(function(err){FL.common.printToConsole(">>>>>util.placeGridButtonsInDOM destroy removeRecordFromTable FAILURE <<<<<"+err);
                             FL.common.makeModalInfo( "Impossible to delete " + preStr + ". Error "+err);
                             return;
                         });

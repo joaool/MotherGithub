@@ -1,6 +1,8 @@
 var sId;
 var secret;
 var bIsConnected = false;
+var callcount=0;
+
 function isEmpty(obj) {
     for(var prop in obj) {
         if(obj.hasOwnProperty(prop))
@@ -9,6 +11,10 @@ function isEmpty(obj) {
     return true;
 }
 function  callAjax(protocol, srv, port, path, jsonData, inSession, callBack, flTraceSession, flTraceServer){
+    if(callcount != 0){
+        alert("flClient: Appels imbriques, call: "+path);
+        alert("Data: " + JSON.stringify(jsonData));
+    }
     if (path == 'getsId')
         return  sId;
 
@@ -158,6 +164,7 @@ function  callAjax(protocol, srv, port, path, jsonData, inSession, callBack, flT
 		alert("ajaxBrowser: the browser doesn't support cross domain calls");
 		return callBack("Your browser does not support cross domain calls", null);
 	}
+    callcount++;
 
     request=$.ajax({
 	    url: url,
@@ -170,9 +177,11 @@ function  callAjax(protocol, srv, port, path, jsonData, inSession, callBack, flT
         crossDomain: true,
 
 	    success: function (dataReceived) {
+            callcount--;
+
             try
             {
-                console.log("***** ajaNode: data received: " + dataReceived); 
+                FL.common.printToConsole("***** ajaNode: data received: " + dataReceived); 
                 if(typeof dataReceived == 'string')
                     resultJson=JSON.parse(dataReceived);
                 else
@@ -181,11 +190,11 @@ function  callAjax(protocol, srv, port, path, jsonData, inSession, callBack, flT
             catch (err)
             {
                 var errMsg = "Bad data received from client. Exception: " + err;
-                console.log("***** ajax: ERROR DURING RECEIVE: " + err); 
+                FL.common.printToConsole("***** ajax: ERROR DURING RECEIVE: " + err); 
                 return callBack(errMsg);
             }
             if (resultJson == null){
-	            console.log("***** ajax: ERROR DURING RECEIVE: " + err);             	
+	            FL.common.printToConsole("***** ajax: ERROR DURING RECEIVE: " + err);             	
                 return callBack('Error: empty response from server', null);
             }
 
@@ -194,12 +203,12 @@ function  callAjax(protocol, srv, port, path, jsonData, inSession, callBack, flT
                 delete resultJson.d.sId;
             }
             if (resultJson.ctrl != null && resultJson.ctrl.secret != undefined){
-                //console.log('@@@@@@ secret updated: ' + resultJson.ctrl.secret)
+                //FL.common.printToConsole('@@@@@@ secret updated: ' + resultJson.ctrl.secret)
                 secret = resultJson.ctrl.secret;
                 delete resultJson.ctrl.secret;
             }
             //else
-            //    console.log('@@@@@@ secret not updated');
+            //    FL.common.printToConsole('@@@@@@ secret not updated');
 
             if (path === "/api/application/disconnect"){
                 secret=undefined;
@@ -208,9 +217,9 @@ function  callAjax(protocol, srv, port, path, jsonData, inSession, callBack, flT
             
             if (resultJson["ctrl"] != null && resultJson["ctrl"]["isOK"] == true){
                 var resultJsonResponse = resultJson.d;
-                console.log('typeof resultJson: ' + typeof resultJson.d + ', isempty: '+isEmpty(resultJson.d)+', val: '+ JSON.stringify(resultJson));
+                FL.common.printToConsole('typeof resultJson: ' + typeof resultJson.d + ', isempty: '+isEmpty(resultJson.d)+', val: '+ JSON.stringify(resultJson));
                 if (typeof resultJson.d === 'object' && isEmpty(resultJson.d)){
-                    console.log('I null resultJson.d');
+                    FL.common.printToConsole('I null resultJson.d');
                     resultJson.d=null;
                 }
 
@@ -228,8 +237,9 @@ function  callAjax(protocol, srv, port, path, jsonData, inSession, callBack, flT
             }
         },
 		error: function(jqXHR, textStatus, errorThrown) {
-            console.log("errorThrown:"+errorThrown);
-            console.log("textStatus:"+textStatus);
+            callcount--;
+            FL.common.printToConsole("errorThrown:"+errorThrown);
+            FL.common.printToConsole("textStatus:"+textStatus);
             console.dir(jqXHR);
             var strTmp = errorThrown;
             if (strTmp.length < 1)

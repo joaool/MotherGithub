@@ -11,7 +11,7 @@
 	FL = (typeof FL === 'undefined') ? {} : FL;
 	FL["emailServices"] = (function(){//name space FL.dd
 		var internalTest = function ( x) { //returns a 2 bytes string from number 
-			console.log( "emailServices2.js internalTest -->"+x );
+			FL.common.printToConsole( "emailServices2.js internalTest -->"+x );
 		};
 		return{
 			abc: "abc",
@@ -19,23 +19,24 @@
 				internalTest(x);
 				alert("Fl.emailServices2.test(x) x="+x);
 			},
-			extractMandrillInfoFromId: function(md_id){
+			extractMandrillInfoFromId: function(md_id){//not used anywhere 16-04-2015
 				//return format: https://mandrillapp.com/api/docs/messages.JSON.html#method=info
 				var def = $.Deferred();
+				var mandrillKey = FL.common.getMandrillKey();
 				$.ajax({
 					type: "POST",
 					url: "https://mandrillapp.com/api/1.0/messages/info.json",
 					data: {
-						'key': 'vVC6R5SZJEHq2hjEZfUwRg',
+						'key': mandrillKey,
 						'id':md_id
 					}
 				})
 				.done(function(response) {
-					console.log('FL.emailServices.extractMandrillInfoFromId sender='+response.sender + ' located in ' + response.opens ); // show success message
+					FL.common.printToConsole('FL.emailServices.extractMandrillInfoFromId sender='+response.sender + ' located in ' + response.opens ); // show success message
 					return def.resolve(response);
 				})
 				.fail(function(response) {
-					console.log("FL.emailServices.extractMandrillInfoFromId FAILURE err="+response.message);
+					FL.common.printToConsole("FL.emailServices.extractMandrillInfoFromId FAILURE err="+response.message);
 					return def.reject("FL.emailServices.extractMandrillInfoFromId FAILURE err="+response.message);
 				});
 				return def.promise();
@@ -43,19 +44,20 @@
 			mandrillStats: function(){
 				//return format: https://mandrillapp.com/api/docs/senders.JSON.html
 				var def = $.Deferred();
+				var mandrillKey = FL.common.getMandrillKey();
 				$.ajax({
 					type: "POST",
 					url: "https://mandrillapp.com/api/1.0/senders/list.json",
 					data: {
-						'key': 'vVC6R5SZJEHq2hjEZfUwRg',
+						'key': mandrillKey,
 					}
 				})
 				.done(function(response) {
-					console.log('FL.emailServices.mandrillStats SUCCESS' ); // show success message
+					FL.common.printToConsole('FL.emailServices.mandrillStats SUCCESS' ); // show success message
 					return def.resolve(response);
 				})
 				.fail(function(response) {
-					console.log("FL.emailServices.mandrillStats FAILURE err="+response.message);
+					FL.common.printToConsole("FL.emailServices.mandrillStats FAILURE err="+response.message);
 					return def.reject("FL.emailServices.mandrillStats FAILURE err="+response.message);
 				});
 				return def.promise();
@@ -70,18 +72,9 @@
 					alert("Send Mail ->Cannot send an empty email !");
 					return 0;
 				}
-				// if(NewsletterName === null){
-				// 	alert("Send Mail ->Do document identifier (Newslettername) !");
-				// 	return 0;
-				// }
-				// var eCN = null;
-				// var fCN = null;
-				// if(entityName !== null){//if the send request comes from sendEmailTest entityName = null
-				// 	eCN = FL.dd.getCEntity(FL.dd.histoMailPeer(entityName));
-				// 	fCN = FL.dd.getFieldCompressedName(FL.dd.histoMailPeer(entityName),"msg");//necessary for metadata
-				// }
-				// var dbName = FL.login.token.dbName;//necessary for metadata		
-				var m = new mandrill.Mandrill('vVC6R5SZJEHq2hjEZfUwRg');
+				var mandrillKey = FL.common.getMandrillKey();
+				// var m = new mandrill.Mandrill('vVC6R5SZJEHq2hjEZfUwRg');
+				var m = new mandrill.Mandrill(mandrillKey);
 				var toEmail = null;
 				var count = 0;
 				var countSend = 0;
@@ -112,21 +105,21 @@
 								}				
 							}
 						};
-						console.log("sendEmail() "+ count +"/"+total_toSend+ " --> sent Count=" + countSend + " -->" + element + " with label=" +metadataObj.newsletterName);
-						console.log("	to from_name:"+senderObj.from_name+" email:"+senderObj.from_email+" subject:"+senderObj.subject);
-						console.log("	Sends to -->"+JSON.stringify(element));
-						console.log("----------------------------------------------------------------------");
-					 m.messages.send(params2,function(res){console.log(res);},function(err){console.log(err);});
+						FL.common.printToConsole("sendEmail() "+ count +"/"+total_toSend+ " --> sent Count=" + countSend + " -->" + element + " with label=" +metadataObj.newsletterName);
+						FL.common.printToConsole("	to from_name:"+senderObj.from_name+" email:"+senderObj.from_email+" subject:"+senderObj.subject);
+						FL.common.printToConsole("	Sends to -->"+JSON.stringify(element));
+						FL.common.printToConsole("----------------------------------------------------------------------");
+					 m.messages.send(params2,function(res){FL.common.printToConsole(res);},function(err){FL.common.printToConsole(err);});
 						//how to recover from an accident ?	
 					}else{
-						console.log("sendEmail not sent ! "+ count +"/"+total_toSend+ " -->" + element + " has a format error and was bypassed");				
+						FL.common.printToConsole("sendEmail not sent ! "+ count +"/"+total_toSend+ " -->" + element + " has a format error and was bypassed");				
 					}
 				});
 				return countSend;		
 			},
 			testEmail: function(x) {//sends a sample email with mandrill javascript API
 				alert(x);
-				FL.API.debug = true;
+				// FL.API.debug = true;
 				csvStore.extractEmailArray();
 				//http://getairmail.com/
 				var mailHTML = '<p>Thank you for selecting <a href="http://www.framelink.co"><strong>FrameLink version 7</strong></a> to build your backend site !</p>';			
@@ -140,8 +133,10 @@
 				var fCN = FL.dd.getFieldCompressedName("_histoMail","msg");//necessary for metadata
 				var dbName = FL.login.token.dbName;//necessary for metadata
 				
-				var m = new mandrill.Mandrill('vVC6R5SZJEHq2hjEZfUwRg');
-				m.users.ping(function(res){console.log(res);},function(err){console.log(err);});
+				var mandrillKey = FL.common.getMandrillKey();
+				// var m = new mandrill.Mandrill('vVC6R5SZJEHq2hjEZfUwRg');
+				var m = new mandrill.Mandrill(mandrillKey);
+				m.users.ping(function(res){FL.common.printToConsole(res);},function(err){FL.common.printToConsole(err);});
 				var mailHTML = '<p>Thank you for selecting <a href="http://www.framelink.co"><strong>FrameLink version 3</strong></a> to build your backend site !</p>';			
 				//var apikey ="04c0cdcfe7d52fbc844dfa496f1d78d5-us8";//mailchimp key
 				// create a variable for the API call parameters
@@ -235,7 +230,7 @@
 				};
 				//The global_merge_vars parameter lets you specify some default values in the event that a recipient
 				//   doesn't have recipient-specific information.
-				m.messages.send(params2,function(res){console.log(res);},function(err){console.log(err);});
+				m.messages.send(params2,function(res){FL.common.printToConsole(res);},function(err){FL.common.printToConsole(err);});
 				alert("Send a test email");
 				// var xId = 'id_1';
 				// var xEmail = 'joaoccoliveira@live.com';

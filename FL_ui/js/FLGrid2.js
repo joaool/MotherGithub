@@ -157,7 +157,7 @@
 						numberVal = rowElement[attrName];
 						rowElement[attrName] =  FL.common.localeStringToNumber(numberVal,numberFormat);
 					});
-					console.log("createAttributesArrFromCsvAnalisys NUMERIC attrName="+attrName + " is complete........");
+					FL.common.printToConsole("createAttributesArrFromCsvAnalisys NUMERIC attrName="+attrName + " is complete........");
 					var z= 32;
 				}else if(fieldType=="date"){
 					//we will see
@@ -167,7 +167,7 @@
 							rowElement[attrName] = new Date( rowElement[attrName] );//old content in string is converted to date
 						}
 					});
-					console.log("createAttributesArrFromCsvAnalisys DATE attrName="+attrName + " is complete........");
+					FL.common.printToConsole("createAttributesArrFromCsvAnalisys DATE attrName="+attrName + " is complete........");
 				}
 			});
 		};
@@ -308,24 +308,20 @@
 			var updateDictionaryAllAttributesPromise = FL.API.updateDictionaryAllAttributes(entityName,newSingularName,description,newAttributesArr);
 			updateDictionaryAllAttributesPromise.done(function(){//this update local and server dictionary
 				if(changedTypeArr.length>0){//there is type change(s)
-					FL.API.debug = true; FL.API.debugStyle= 0;
 					csvStore.transformStoreTo(newAttributesArr,changedAttributesArr,changedTypeArr);//does changes in csvStore
 					var updatePromise = FL.grid.updateCurrentCSVToServer(entityName);
 					updatePromise.done(function(){
 						spinner.stop();
-						FL.API.debug = false; FL.API.debugStyle= 0;
 						FL.grid.displayDefaultGrid(entityName);//loads from server and display
 					});
 					updatePromise.fail(function(err){
 						spinner.stop();
 						FL.dd.entities[newSingularName] = localDictEntityBackup;//rools back local dictionary update
 						FL.dd.setSync(entityName,false); //warns that local dict is not in sync with server dictionary
-						FL.API.debug = false; FL.API.debugStyle= 0;
 						alert("editGrid updateCurrentCSVToServer Failure err="+err);//loads from server and displaywithout newsl
 					});
 				}else{
 					spinner.stop();
-					FL.API.debug = false; FL.API.debugStyle= 0;
 					FL.grid.displayDefaultGrid(entityName);//loads from server and display
 				}	
 			});
@@ -485,7 +481,7 @@
 					"_sendNewsletter_template":{
 						arr:arrOfObj,//titles,
 						default:"No template",
-						onSelect:function(objSelected){// console.log("Template choice was "+objSelected.text + " cId=" + objSelected.cId);
+						onSelect:function(objSelected){// FL.common.printToConsole("Template choice was "+objSelected.text + " cId=" + objSelected.cId);
 							FL.login.emailTemplateName = objSelected.text;
 							var htmlTemplate = getHTMLContent(objSelected.template);
 							FL.login.emailContentTemplate = htmlTemplate;
@@ -532,14 +528,14 @@
 			var getTemplatesPromise = FL.API.loadTableId("_templates","jsonTemplate");//("_templates","jsonTemplate");
 			var entityName = entityName;
 			getTemplatesPromise.done(function(data){
-				console.log(">>>>>FLGrid2.js prepareNewsletterEmission  SUCCESS <<<<<");
+				FL.common.printToConsole(">>>>>FLGrid2.js prepareNewsletterEmission  SUCCESS <<<<<");
 				if( data.length === 0 ){
 					FL.common.makeModalInfo('No templates available. You must have at least one template saved.');
 				}else{
 					// aGrid2nulinks2.js prepareNewsletterEmission =>\n" + JSON.stringify(data));//data array of objects
 					var emissionPromise = newsletterEmissionUI(data,entityName,grid,emailAttributeName);
 					emissionPromise.done(function(data){
-						console.log("FLmenulinks2 prepareNewsletterEmission emission done !");
+						FL.common.printToConsole("FLmenulinks2 prepareNewsletterEmission emission done !");
 						return;// def.resolve(data);					
 					});
 					emissionPromise.fail(function(){
@@ -550,19 +546,19 @@
 				}
 			});
 			getTemplatesPromise.fail(function(err){
-				console.log(">>>>>FLGrid2.js prepareNewsletterEmission  FAILURE <<<<<"+err);
+				FL.common.printToConsole(">>>>>FLGrid2.js prepareNewsletterEmission  FAILURE <<<<<"+err);
 				return;
 			});
 		};
 		var getMailchimpHTML = function(cId) {
 			var def = $.Deferred();
 			var arr = null;
-			var fl = FL.login.token.fl;
+			var fl = FL.fl;
 			if(fl){
 				var mc = new fl.mailChimp();
 				mc.campaignContent({cid: cId}, function(err, data){
 					if(!err){
-						console.log("campaignlist returns no error data="+JSON.stringify(data.html));
+						FL.common.printToConsole("campaignlist returns no error data="+JSON.stringify(data.html));
 						def.resolve(data.html);
 					}else{
 						return def.reject( "FLmenulink2.js getMailchimpHTML - ERROR:"+err );
@@ -576,11 +572,11 @@
 		var getMailchimpTemplates = function() {
 			var def = $.Deferred();
 			var arr = null;
-			var fl = FL.login.token.fl;
+			var fl = FL.fl;
 			if(fl){
 				var mc = new fl.mailChimp();
 				mc.campaignList( {data:1}, function(err, data){
-					// console.log("campaignlist returns no error data="+JSON.stringify(data.data));
+					// FL.common.printToConsole("campaignlist returns no error data="+JSON.stringify(data.data));
 					if(!err){
 						var arrOfObj = [];
 						var item = null;
@@ -592,7 +588,7 @@
 						// arrTitles = _.pluck(data.data,"title");
 						def.resolve(arrOfObj);
 						// oneCampaign=data.data[data.data.length-1];
-						// console.log("requesting content for cid: " + oneCampaign.id);					
+						// FL.common.printToConsole("requesting content for cid: " + oneCampaign.id);					
 					}else{
 						return def.reject( "FLmenulink2.js getTemplates -ERROR:"+err );
 					}
@@ -625,7 +621,7 @@
 						"_sendNewsletter_template":{
 							arr:arrOfObj,//titles,
 							default:"No template",
-							onSelect:function(objSelected){// console.log("Template choice was "+objSelected.text + " cId=" + objSelected.cId);
+							onSelect:function(objSelected){// FL.common.printToConsole("Template choice was "+objSelected.text + " cId=" + objSelected.cId);
 								//now we will get the html for the selected cId saving it in FL.login.emailContentTemplate for future consummation
 								var getMailchimpHTMLPromise = getMailchimpHTML(objSelected.cId);
 								getMailchimpHTMLPromise.done(function(data){
@@ -634,7 +630,7 @@
 									FL.login.emailTemplateName = objSelected.text;
 								});
 								getMailchimpHTMLPromise.fail(function(err){
-									console.log(">>>>>FLGrid2.js prepareNewsletterMCEmission onSelect inside dropdown FAILURE <<<<<"+err);
+									FL.common.printToConsole(">>>>>FLGrid2.js prepareNewsletterMCEmission onSelect inside dropdown FAILURE <<<<<"+err);
 								});
 							}
 						}
@@ -659,7 +655,7 @@
 				return;
 			});
 			getTemplatesPromise.fail(function(err){
-				console.log(">>>>>FLGrid2.js prepareNewsletterMCEmission  FAILURE <<<<<"+err);
+				FL.common.printToConsole(">>>>>FLGrid2.js prepareNewsletterMCEmission  FAILURE <<<<<"+err);
 			});
 		};
 		var checkDuplicateEmission = function(entityName,NName,toSend,senderObj){
@@ -672,15 +668,14 @@
 			var promise = FL.API.mailRecipientsOfTemplate(entityName,NName);
 			promise.done(function(sent){
 				// var toSend =  _.pluck(recipientsArr, "email");
-				FL.API.debug = true; FL.API.debugStyle= 0;
-				console.log("==========================================");
-				console.log("toSend->"+JSON.stringify(toSend));
+				FL.common.printToConsole("==========================================");
+				FL.common.printToConsole("toSend->"+JSON.stringify(toSend));
 				var missingEmails = _.difference(toSend, sent); //if sent = null =>missing = toSend
 
 				// missingEmails = [];//TEST CASE 2 - REEMISSION
 				// missingEmails.splice(0,2);//TEST CASE 3 - NEW ADDITIONS - remove position 0 and 1
 	
-				console.log("Emails to sent->"+JSON.stringify(missingEmails));
+				FL.common.printToConsole("Emails to sent->"+JSON.stringify(missingEmails));
 				// alert("missingEmails->"+JSON.stringify(missingEmails));
 				var confirmQuestion = null;
 				var button2 = null;
@@ -724,7 +719,6 @@
 						FL.common.makeModalInfo("Canceled !!! you can always send these emails later...");
 					}
 				});
-				FL.API.debug = false; FL.API.debugStyle= 0;
 			});
 			promise.fail(function(){
 				alert("checkDuplicateEmission ->ERROR !!!");
@@ -777,7 +771,13 @@
 								FL.grid.csvToStore(emptyRowArr); //feeds the csvStore data store object. It inserts id element and converts keys to lowercase
 								FL.common.clearSpaceBelowMenus();
 								utils.mountGridInCsvStore(columnsArr);//mount backbone views and operates grid - columnsArr must be prepared to backGrid
-								FL.grid.storeCurrentCSVToServerAndInsertMenu(entityName);//the 
+								var promise = FL.grid.storeCurrentCSVToServerAndInsertMenu(entityName);
+								promise.done(function(){
+									FL.grid.displayDefaultGrid(entityName);
+								});
+								promise.fail(function(err){
+									alert("FLgrid2.js createGrid Error:"+err);
+								});	
 							}else{
 								FL.common.makeModalInfo("The entity name '" + entityName + "' already exist. Please choose another name.");
 							}
@@ -862,7 +862,7 @@
 							// alert("Result of verification:-->"+JSON.stringify(resultObj));
 							FL.grid.csvEncoding = resultObj.encoding;
 							if(resultObj.ok){
-								console.log("OK on first attempt !!!!!!!!!!!!!! FILE IS A GOOD CSV ");
+								FL.common.printToConsole("OK on first attempt !!!!!!!!!!!!!! FILE IS A GOOD CSV ");
 								// alert("OK on first attempt !!!!!!!!!!!!!! FILE IS A GOOD CSV ");
 							}else{
 								//SECOND ATTEMPT we will try again forcing the delimiter
@@ -939,7 +939,7 @@
 				//feeds the csvStore (memoryCsv.js)  with rows injecting id column and converting other column names to lower case
 				var csvrows = [];
 				_.each( rows, function( element, index ) {
-					// console.log((index+1)+" ---> "+element[data.fields[0]] + " --- " + element[data.fields[6]]);//shows column 0 and column 6
+					// FL.common.printToConsole((index+1)+" ---> "+element[data.fields[0]] + " --- " + element[data.fields[6]]);//shows column 0 and column 6
 					element["id"] = index+1;//to insert id in element...
 					//we need to be sure that each key is lowercase
 					var arrOfPairs = _.pairs(element);//returns an array w/ pairs [["one", 1], ["two", 2], ["three", 3]]
@@ -957,11 +957,11 @@
 				var singularToUseInMenu = singular.replace(/ /g,"_");
 				// var arrToSend = FL.grid.extractFromCsvStore(singular);
 				var arrToSend = csvStore.extractFromCsvStore(singular);
-				// console.log("FLGrid2.js --> insertDefaultGridMenu show arrToSend="+JSON.stringify(arrToSend));
+				// FL.common.printToConsole("FLGrid2.js --> insertDefaultGridMenu show arrToSend="+JSON.stringify(arrToSend));
 				// format for arraTosend must be-->[{"name":"Jojox","phone":"123"},{"name":"Anton","phone":"456"}];
 				var saveTablePromise = FL.API.saveTable(singular,arrToSend);
 				saveTablePromise.done(function(data){
-					// console.log("FLGrid2.js --> insertDefaultGridMenu Succeded saving table. returned:"+JSON.stringify(data));
+					// FL.common.printToConsole("FLGrid2.js --> insertDefaultGridMenu Succeded saving table. returned:"+JSON.stringify(data));
 					FL.common.clearSpaceBelowMenus();
 					$.Topic( 'createGridOption' ).publish( plural,singularToUseInMenu );//broadcast that will be received by FL.menu to add an option
 				});
@@ -974,6 +974,7 @@
 				// insertMenu - true=> create new menu false=>no menu will be created
 				// cursor over menu position <plural> will show: javascript:FL.links.setDefaultGridByCN('<eCN>')
 				// if entityName has spaces, they will be changed by "_"
+				var def = $.Deferred();
 				var spinner=FL.common.loaderAnimationON('spinnerDiv');
 				if(_.isUndefined(insertMenu) || insertMenu === null )
 					insertMenu = true;
@@ -990,7 +991,7 @@
 				var arrToSend = csvStore.extractFromCsvStore();
 				var saveTablePromise = FL.API.saveTable(entityName,arrToSend);
 				saveTablePromise.done(function(data){
-					console.log("FL.grid.storeCurrentCSVToServerAndInsertMenu --> dict synch and saveTable sucessfull ->"+JSON.stringify(data));
+					FL.common.printToConsole("FL.grid.storeCurrentCSVToServerAndInsertMenu --> dict synch and saveTable sucessfull ->"+JSON.stringify(data));
 					if(insertMenu){
 						var eCN = FL.dd.getCEntity(entityName);
 						FL.login.permissionToAddMenu = true;//forces true...tis flag is set to false in FL.menu.topicCreateGridByCN to prevent 2 calls
@@ -998,17 +999,18 @@
 					}
 					FL.common.clearSpaceBelowMenus();
 					spinner.stop();
-					return;
+					return def.resolve();
 					// $.Topic( 'createGridOption' ).publish( plural,entityNameToUseInMenu );//broadcast that will be received by FL.menu to add an option
 				});
 				saveTablePromise.fail(function(err){
 					spinner.stop();
 					alert("FL.grid.storeCurrentCSVToServerAndInsertMenu --> after successful synch->FAILURE in FL.API.saveTable err="+err);
-					return;
+					def.reject("FL.grid.storeCurrentCSVToServerAndInsertMenu --> after successful synch->FAILURE in FL.API.saveTable err="+err);
 				});
 
 				//--------------------- old code
 				var singularToUseInMenu = entityName.replace(/ /g,"_");
+				return def.promise();
 			},			
 			updateCurrentCSVToServer: function(entityName){ //update all records of entityName Table existing in dictionary
 				// entityName- Name of entity that will be stored
@@ -1022,7 +1024,7 @@
 					var eCN = FL.dd.getCEntity(entityName);
 					var removeAllPromise = FL.API.removeAllRecords(eCN);
 					removeAllPromise.done(function(data){
-						console.log("FL.grid.updateCurrentCSVToServer --> removeAll sucessfull !!! ->"+JSON.stringify(data));
+						FL.common.printToConsole("FL.grid.updateCurrentCSVToServer --> removeAll sucessfull !!! ->"+JSON.stringify(data));
 						//FL.API  var convertOneRecordTo_arrToSend
 						// var arrToSend = csvStore.extractFromCsvStoreWith_Id();  //convertRecordsTo_arrToSend in FLAPI
 						var arrToSend = csvStore.extractFromCsvStore();
@@ -1037,13 +1039,13 @@
 						});
 						insertAllPromise.fail(function(err){
 							spinner.stop();
-							console.log("FL.grid.updateCurrentCSVToServer --> after successful remove ->FAILURE in insertAllPromise err="+err);
+							FL.common.printToConsole("FL.grid.updateCurrentCSVToServer --> after successful remove ->FAILURE in insertAllPromise err="+err);
 							return def.reject(err);
 						});
 					});
 					removeAllPromise.fail(function(err){
 						spinner.stop();
-						console.log("FL.grid.updateCurrentCSVToServer --> after successful remove ->FAILURE in FL.API.saveTable err="+err);
+						FL.common.printToConsole("FL.grid.updateCurrentCSVToServer --> after successful remove ->FAILURE in FL.API.saveTable err="+err);
 						return def.reject(err);
 					});
 				}else{
@@ -1099,7 +1101,7 @@
 		                injectId("id",arrOfColumns); //now the first column is an "id" column 
 		                var columnsArr = utils.backGridColumnsFromArray(arrOfColumns);//extracts attributes from dictionary and prepares columns object for backgrid
 
-		                console.log("columns defined...");
+		                FL.common.printToConsole("columns defined...");
 		                var columnsArr2 = [//columns definition to mountGrid - Manual equivalent  to utils.backGridColumnsExtractedFromDictionary()
 		                    {label:"Order",name:"id",type:"string",enumerable:null},
 		                    {label:"Col1",name:"f1",type:"string",enumerable:null},
@@ -1192,74 +1194,82 @@
 				                FL.grid.csvToStore(data.data); //feeds the csvStore data store object. It inserts id element and converts keys to lowercase
 				                
 				                var columnsArr = utils.backGridColumnsFromArray(arrOfColumns);//extracts attributes from dictionary and prepares columns object for backgrid
-				               	console.log("columns defined..."+JSON.stringify(columnsArr));
+				               	FL.common.printToConsole("columns defined..."+JSON.stringify(columnsArr));
 				                
 				                utils.mountGridInCsvStore(columnsArr);//mount backbone views and operates grid - columnsArr must be prepared to backGrid
 				                // to prepare columnArr to backGrid use utils.backGridColumnsExtractedFromDictionary() or backGridColumnsFromArray()
 				                // utils.mountGridInCsvStore(columnsArr2);//mount backbone views and operates grid - columnsArr must be prepared to backGrid
-				                FL.grid.storeCurrentCSVToServerAndInsertMenu(entityName);//the 
+				                // FL.grid.storeCurrentCSVToServerAndInsertMenu(entityName);//the 
+								var promise = FL.grid.storeCurrentCSVToServerAndInsertMenu(entityName);
+								promise.done(function(){
+									FL.grid.displayDefaultGrid(entityName);
+								});
+								promise.fail(function(err){
+									alert("FLgrid2.js csvToGrid2 Error:"+err);
+								});					                
 				                // spinner.stop();
 				            }
 		        		});
 		    },		    
 			displayDefaultGrid: function(entityName) { //loads entity from server and display the grid with add,del,edit grid buttons at left and newsletter if a email field exist
+				//condition to execute is: FL.API.serverCallBlocked = false;	
 				entityName = entityName.replace(/_/g," ");
-				// FL.common.spin(true);
 				var spinner=FL.common.loaderAnimationON('spinnerDiv');
-				// setInterval(function(){spinner.stop();},1000);
-				var promise=FL.API.loadTable(entityName);
-				promise.done(function(data){
-					console.log("New %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
-					csvStore.setEntityName(entityName);//stores <entityName> in csvStore object 
-					csvStore.store(data);//data is an array of objects [{},{},....{}] where id field is mandatory inside {}
-					var z=csvStore.csvRows;//only for debugging
-					// alert("New DefaultGridWithNewsLetterAndEditButtons -->import is done");
-					console.log("New DefaultGridWithNewsLetterAndEditButtons -->import is done");
-					console.log("show csvStore="+JSON.stringify(csvStore.csvRows));
-					var columnsArr = utils.backGridColumnsExtractedFromDictionary(entityName);//extracts attributes from dictionary and prepares columns object for backgrid
-					console.log("New &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&& entity="+entityName);
-					console.log("show columnsArr="+JSON.stringify(columnsArr));
-					// FL.common.spin(false);
-					spinner.stop();
-					FL.common.clearSpaceBelowMenus();
-					$("#addGrid").show();
-					$("#addGrid").html(" Add Row");
-					$('#_editGrid').off('click');
-					$("#_editGrid").click(function(){
-						editGrid(entityName);
+				
+				var promiseUnblock = FL.API.checkServerCallBlocked()
+				.then(function(){
+					var promise=FL.API.loadTable(entityName);
+					promise.done(function(data){
+						FL.common.printToConsole("New %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
+						csvStore.setEntityName(entityName);//stores <entityName> in csvStore object 
+						csvStore.store(data);//data is an array of objects [{},{},....{}] where id field is mandatory inside {}
+						var z=csvStore.csvRows;//only for debugging
+						FL.common.printToConsole("show csvStore="+JSON.stringify(csvStore.csvRows));
+						var columnsArr = utils.backGridColumnsExtractedFromDictionary(entityName);//extracts attributes from dictionary and prepares columns object for backgrid
+						FL.common.printToConsole("New &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&& entity="+entityName);
+						FL.common.printToConsole("show columnsArr="+JSON.stringify(columnsArr));
+						// FL.common.spin(false);
+						spinner.stop();
+						FL.common.clearSpaceBelowMenus();
+						$("#addGrid").show();
+						$("#addGrid").html(" Add Row");
+						$('#_editGrid').off('click');
+						$("#_editGrid").click(function(){
+							editGrid(entityName);
+						});				
+						$("#_editGrid").show();
+						var eCN = FL.dd.getCEntity(entityName);//to remove later when we change entityName by eCN
+						var emailAttributeName = FL.dd.firstEmailAttribute(eCN);
+						if(emailAttributeName) {
+						// if( FL.dd.isEntityWithTypeUI(entityName,"emailbox") || FL.dd.isEntityWithTypeUI(entityName,"email") ){//the newsletter option only appears to entities that have an email
+							$('#_newsletter').off('click');
+							$("#_newsletter").click(function(){
+								var templatePromise=FL.API.createTemplates_ifNotExisting();
+								templatePromise.done(function(){
+									// alert("FLGrid2 l1143 grid = "+grid);
+									prepareNewsletterEmission(entityName,grid,emailAttributeName);
+									return;
+								});
+								templatePromise.fail(function(err){
+									alert("FLmenulinks2.js set3ButtonsAndGrid ->FAILURE with createTemplates_ifNotExisting err="+err);
+									return;
+								});
+							});
+							$('#_newsletter').show();
+							$('#_newsletterMC').off('click');
+							$("#_newsletterMC").click(function(){
+								prepareNewsletterMCEmission(entityName);
+							});							
+							$('#_newsletterMC').show();
+							$("#_newsletterMC").html(" MC");
+						}	
+						var grid = utils.mountGridInCsvStore(columnsArr);//mount backbone views and operates grid -	
+					});
+					promise.fail(function(err){
+						spinner.stop();
+						alert("DefaultGridWithNewsLetterAndEditButtons Error="+err);
 					});				
-					$("#_editGrid").show();
-					var eCN = FL.dd.getCEntity(entityName);//to remove later when we change entityName by eCN
-					var emailAttributeName = FL.dd.firstEmailAttribute(eCN);
-					if(emailAttributeName) {
-					// if( FL.dd.isEntityWithTypeUI(entityName,"emailbox") || FL.dd.isEntityWithTypeUI(entityName,"email") ){//the newsletter option only appears to entities that have an email
-						$('#_newsletter').off('click');
-						$("#_newsletter").click(function(){
-							var templatePromise=FL.API.createTemplates_ifNotExisting();
-							templatePromise.done(function(){
-								// alert("FLGrid2 l1143 grid = "+grid);
-								prepareNewsletterEmission(entityName,grid,emailAttributeName);
-								return;
-							});
-							templatePromise.fail(function(err){
-								alert("FLmenulinks2.js set3ButtonsAndGrid ->FAILURE with createTemplates_ifNotExisting err="+err);
-								return;
-							});
-						});
-						$('#_newsletter').show();
-						$('#_newsletterMC').off('click');
-						$("#_newsletterMC").click(function(){
-							prepareNewsletterMCEmission(entityName);
-						});							
-						$('#_newsletterMC').show();
-						$("#_newsletterMC").html(" MC");
-					}	
-					var grid = utils.mountGridInCsvStore(columnsArr);//mount backbone views and operates grid -	
-				});
-				promise.fail(function(err){
-					spinner.stop();
-					alert("DefaultGridWithNewsLetterAndEditButtons Error="+err);
-				});				
+				}, function(err){ alert("FL.grid.displayDefaultGrid ERROR: Please try again !" + err); } );			
 			},
 			displayDefaultGrid2: function(entityName) { //loads entity from server and display the grid with add,del,edit grid buttons at left and newsletter if a email field exist
 				var def = $.Deferred();
@@ -1273,9 +1283,9 @@
 					promise.done(function(data){
 						csvStore.setEntityName(entityName);//stores <entityName> in csvStore object 
 						csvStore.store(data);//data is an array of objects [{},{},....{}] where id field is mandatory inside {}
-						console.log("FL.grid.displayDefaultGrid2 -->loadTable is done");console.log("show csvStore="+JSON.stringify(csvStore.csvRows));
+						FL.common.printToConsole("FL.grid.displayDefaultGrid2 -->loadTable is done");FL.common.printToConsole("show csvStore="+JSON.stringify(csvStore.csvRows));
 						var columnsArr = utils.backGridColumnsExtractedFromDictionary(entityName);//extracts attributes from dictionary and prepares columns object for backgrid
-						console.log("FL.grid.displayDefaultGrid2 &&&&&&&& entity="+entityName);console.log("show columnsArr="+JSON.stringify(columnsArr));
+						FL.common.printToConsole("FL.grid.displayDefaultGrid2 &&&&&&&& entity="+entityName);FL.common.printToConsole("show columnsArr="+JSON.stringify(columnsArr));
 						FL.common.clearSpaceBelowMenus();
 						$("#addGrid").show();$("#addGrid").html(" Add Row");$('#_editGrid').off('click');$("#_editGrid").click(function(){ editGrid(entityName);});
 						$("#_editGrid").show();
@@ -1319,10 +1329,10 @@
 					var toArr = [senderObj.testEmail];
 					var metadataObj={newsletterName:"test",dbName:"test",eCN:null,fCN:null}
 
-					console.log("Sends test email to from_name:"+senderObj.from_name+" email:"+senderObj.from_email+" subject:"+senderObj.subject);
-					console.log("Sends to -->"+JSON.stringify(toArr));
-					console.log("Sends HTML -->"+mailHTML);
-					console.log("----------------------------------------------------------------------");
+					FL.common.printToConsole("Sends test email to from_name:"+senderObj.from_name+" email:"+senderObj.from_email+" subject:"+senderObj.subject);
+					FL.common.printToConsole("Sends to -->"+JSON.stringify(toArr));
+					FL.common.printToConsole("Sends HTML -->"+mailHTML);
+					FL.common.printToConsole("----------------------------------------------------------------------");
 					// FL.links.sendEmail(null,mailHTML,imagesArr,toArr,senderObj,"test");
 					// FL.emailServices.sendEmail(null,mailHTML,imagesArr,toArr,senderObj,"test","test");//2 last param: FL.login.emailTemplateName,FL.login.token.dbName
 					FL.emailServices.sendEmail(mailHTML,imagesArr,toArr,senderObj,metadataObj);

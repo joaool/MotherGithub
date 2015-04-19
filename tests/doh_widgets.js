@@ -81,7 +81,7 @@ define([
                 doh.assertEqual("300", this.n.height);
             },
             runTest:function(){
-                console.log("===========================>value="+this.n.value);
+                FL.common.printToConsole("===========================>value="+this.n.value);
                 doh.assertEqual(129.2, this.n.value);
             }
         },
