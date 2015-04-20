@@ -48,14 +48,6 @@ var FL = FL || {};
 		var fl = new flMain();//only place where this must exist !!!!
 		FL.fl = fl; //new flMain();
 		fl.serverName(FL.common.getServerName());
-		var md = new fl.mandrill();
-		md.init( {key:FL.common.getMandrillKey()},function(err,data){
-			if(err){
-				alert("FLMain.js --> error in Mandrill initialization ");
-			}else{
-				FL.common.printToConsole("FLMain.js --> Mandrill initialization Successfull");
-			}
-		});//call once
 
 
 		FL.oMenu = FL.login.defaultMenu; //why is this necessary ? it is !
@@ -123,11 +115,6 @@ var FL = FL || {};
 		loginPromise.done(function(){
 			// FL.common.printToConsole("FLMain --> success in checkSignIn2 ");
 			FL.common.printToConsole("FLMain.js --> success in checkSignIn2 ");
-			// alert("FLMain checkSignIn2 OK ");
-			// var myMenu = FL.menu.createMenu({jsonMenu:FL.clone(FL.oMenu),initialMenu:"_home",editable:true});
-			// var myMenu = FL.menu.createMenu({jsonMenu:FL.clone(FL.oMenu)});
-			// FL.clearSpaceBelowMenus();
-			// myMenu.menuRefresh();
 			return;
 		});
 		loginPromise.fail(function(err){

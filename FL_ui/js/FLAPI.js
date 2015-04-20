@@ -105,19 +105,22 @@
 							// alert("ERROR ON _login");
 							FL.common.printToConsole("============================>ERROR ON _login");
 							FL.login.token.error = "_login";
-							def.reject("ERROR ON _login err="+err);
+							return def.reject("ERROR ON _login err="+err);
 						}else{
 							var appDef =data.applications[0];//it has a single application because it was just created
 							if(appDef){
 								FL.common.printToConsole("....................................>fl.login RESPONSE OK ON _login....");
 								FL.login.token.appDef = appDef;
 								FL.login.token.appDescription = appDef.description;
-								def.resolve();
+								
+
+								return def.resolve();
+
 							}else{
 								FL.login.token.appDef = null;
 								FL.login.token.appDescription = null;
 								FL.common.printToConsole("....................................>fl.login RESPONSE OK ON _login but ERROR:no application available....");
-								def.reject("no application available");
+								return def.reject("no application available");
 							}
 						}
 					});
@@ -141,12 +144,12 @@
 							FL.common.printToConsole("....................................>fl.login RESPONSE OK ON _login....");
 							FL.login.token.appDef = appDef;
 							FL.login.token.appDescription = appDef.description;
-							def.resolve();
+							return def.resolve();
 						}else{
 							FL.login.token.appDef = null;
 							FL.login.token.appDescription = null;
 							FL.common.printToConsole("....................................>fl.login RESPONSE OK ON _login but ERROR:no application available....");
-							def.reject("no application available");
+							return def.reject("no application available");
 						}
 					}
 				});
@@ -162,7 +165,6 @@
 			fa.connect(FL.login.token.appDef, function(err, data2){
 				// err = "abc";
 				if(err){
-					// alert("ERROR ON _connect");
 					FL.common.printToConsole("=============================>ERROR ON _connect");
 					FL.login.token.error = "_connect";
 					def.reject(err);
@@ -171,7 +173,16 @@
 					FL.login.token.dbName = FL.login.token.appDef.dbName;
 					// alert("OK USER CREATED AND CONNECTED  ->"+JSON.stringify(FL.login.token));
 					FL.common.printToConsole("=====================================>_connect: OK USER CONNECTED  ->"+JSON.stringify(FL.login.token));
-					def.resolve();
+					var md = new FL.fl.mandrill();
+					md.init( {key:FL.common.getMandrillKey()},function(err,data){
+						if(err){
+							alert("_connect --> error in Mandrill initialization ");
+							return def.reject("_connect --> error in Mandrill initialization");
+						}else{
+							FL.common.printToConsole("_connect --> Mandrill initialization Successfull");
+							return def.resolve();
+						}
+					});//call once
 				}
 			});
 			return def.promise();

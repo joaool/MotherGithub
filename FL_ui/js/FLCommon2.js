@@ -907,6 +907,8 @@ FL["common"] = (function(){//name space FL.common
         },
         debugFilter: null,//an object with all  filters collected from the app. Each key is a filter with value true or false. To be created by printToConsole()
         printToConsole: function(toDisplay,filter){//forces (whatever the debug or debugStyle values) a display without line numbers link
+            //example of use:FL.common.printToConsole("   => " + apiName + ' : ' + JSON.stringify(superJ),"API");
+
             // var debugStatus = FL.API.debug;
             // var debugStyleStatus = FL.API.debugStyle;
             // FL.API.debug = true;FL.API.debugStyle = 1;//show FL.common.printToConsole without line numbers link;
