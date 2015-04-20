@@ -25,6 +25,10 @@ FormMaker.BaseElement = Backbone.View.extend({
 	},
 	render : function(){
 		$("body").append($.parseHTML(this.m_html));
+		this.onRender();
+	},
+	onRender : function(){
+		
 	}
 });
 FormMaker.TextLabel = FormMaker.BaseElement.extend({
@@ -73,4 +77,32 @@ FormMaker.Combo = FormMaker.BaseElement.extend({
 		console.log('Combo init');
 		this.m_template = Handlebars.compile($("#__combo").html());
 	}
+});
+
+FormMaker.TextArea = FormMaker.BaseElement.extend({
+	
+	initialize : function(){
+		console.log('TextArea init');
+		this.m_template = Handlebars.compile($("#__textarea").html());
+	}
+});
+
+FormMaker.Date = FormMaker.BaseElement.extend({
+	datePicker : null,
+	
+	initialize : function(){
+		console.log('Date init');
+		this.m_template = Handlebars.compile($("#__date").html());
+		
+	},
+	events : {
+		"change .datePicker" : "onDatePickerValueChange"
+	},
+	onDatePickerValueChange : function(){
+		
+	},
+	onRender: function(){
+		$(".datePicker").datepicker();
+	}
+	
 });
