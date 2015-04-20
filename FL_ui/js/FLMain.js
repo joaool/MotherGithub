@@ -40,7 +40,7 @@ var FL = FL || {};
 		FL.API.debugFiltersToShow = ["API","checkServerCall"];
 		FL.API.fl.setTraceClient(2);
 
-		FL.common.printToConsole("joakimMMMM","abc");
+		FL.common.printToConsole("joakimZZZZ","abc");
 		FL.common.printToConsole("manel","cde");
 		FL.common.printToConsole("joakim2","abc");
 		FL.common.printToConsole("jojo1","jojo");
