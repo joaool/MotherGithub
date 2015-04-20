@@ -118,7 +118,7 @@ FL["menu"] = (function(){//name space FL.menu
 		if (!$placeHolder.length ) {
 			alert("FrameLink Menus Error. Undefined _placeHolder in DOM");
 		}else{//"#_placeHolder" exists in DOM
-			console.log("           loadInternalPage -> the id placeHolder exists and loadInternalPage will try to load "+menuName+".html");
+			FL.common.printToConsole("           loadInternalPage -> the id placeHolder exists and loadInternalPage will try to load "+menuName+".html");
 			// $placeHolder.empty();//removes the child elements in placeHolder.
 			//for firefox https://support.mozilla.org/en-US/kb/how-clear-firefox-cache
 			$.get(menuName+".html")
@@ -181,14 +181,14 @@ FL["menu"] = (function(){//name space FL.menu
 			}
 		}else{
 			var menuTag = getMenuTag(href);
-			console.log("   dispatchHref called by refHandler href="+href+" ---------> menuTag="+menuTag);
+			FL.common.printToConsole("   dispatchHref called by refHandler href="+href+" ---------> menuTag="+menuTag);
 			// alert("dispatchHref href="+href+" ---------> menuTag="+menuTag);
 			if(menuTag.substr(0,1) == "_"){ //ex:"http://www.microsoft.com" or "./mission.html"
 				// alert("Special menu command ->"+menuTag);
 				loadInternalPage(menuTag);
 			}else{
 				// alert("Normal dispatch to internal and external url for "+menuTag);
-				console.log("------------------------------------>Is going to leave to  ->"+href);
+				FL.common.printToConsole("------------------------------------>Is going to leave to  ->"+href);
 				// ---> temporary suspended --->localStorage.storedMenu = JSON.stringify(menuSettings.jsonMenu);//stores before leaving
 				// alert("SAI com:"+JSON.stringify(oMenu) );
 				location.href = href;
@@ -217,14 +217,14 @@ FL["menu"] = (function(){//name space FL.menu
 			}
 		}else{
 			var menuTag = getMenuTag(href);
-			console.log("   dispatchHref called by refHandler href="+href+" ---------> menuTag="+menuTag);
+			FL.common.printToConsole("   dispatchHref called by refHandler href="+href+" ---------> menuTag="+menuTag);
 			// alert("dispatchHref href="+href+" ---------> menuTag="+menuTag);
 			if(menuTag !== null && menuTag.substr(0,1) == "_"){ //ex:"http://www.microsoft.com" or "./mission.html"
 				// alert("Special menu command ->"+menuTag);
 				loadInternalPage(menuTag);
 			}else{
 				// alert("Normal dispatch to internal and external url for "+menuTag);
-				console.log("------------------------------------>Is going to leave to  ->"+href);
+				FL.common.printToConsole("------------------------------------>Is going to leave to  ->"+href);
 				// ---> temporary suspended --->localStorage.storedMenu = JSON.stringify(menuSettings.jsonMenu);//stores before leaving
 				// alert("SAI com:"+JSON.stringify(oMenu) );
 				// alert(" FLMenu2 dispatchHref ->"+href);
@@ -233,7 +233,7 @@ FL["menu"] = (function(){//name space FL.menu
 		}
 	};
 	var refHandler = function(event) {
-		console.log("refHandler called by click inside id main-menu with target "+event.target.nodeName);
+		FL.common.printToConsole("refHandler called by click inside id main-menu with target "+event.target.nodeName);
 		// alert("refHandler  called by click inside id main-menu with target "+event.target.nodeName+" and href="+event.target.href);
 		if(event.target.nodeName === 'A') {
 			var href = event.target.href;
@@ -335,11 +335,11 @@ FL["menu"] = (function(){//name space FL.menu
 		id =parseInt(id,10);
 		var retId = -1;
 		var isFoundElement=!(_.isUndefined(_.findWhere( menuArray,{id:id} )));//at top level ->true if found false if not found
-		console.log("isFoundElement="+isFoundElement);
+		FL.common.printToConsole("isFoundElement="+isFoundElement);
 		if(!isFoundElement) {
 			menuEach(menuArray,function(element,order,top){//menuEach passes (element,order,top )
 				if(element.menu) {//goes up
-					// console.log("getParentIdOfId -->"+element.title+" order="+element.id+" top="+element.top+" retId="+retId);
+					// FL.common.printToConsole("getParentIdOfId -->"+element.title+" order="+element.id+" top="+element.top+" retId="+retId);
 					if(element.id == id) {//the id belongs to a menuItem with a menu
 						//
 					}else{
@@ -400,7 +400,7 @@ FL["menu"] = (function(){//name space FL.menu
 		// alert(submenu[index].title + "/" + submenu[index].id);
 		if(submenu[index].menu) {
 			//submenu[index].menu.push({title:"New",uri:"#"});
-			console.log("Nothing to do ...this menu is already a gate to other submenus");
+			FL.common.printToConsole("Nothing to do ...this menu is already a gate to other submenus");
 		}else{
 			submenu[index]["menu"] = [{title:"New",uri:"#"}];
 		}
@@ -437,7 +437,7 @@ FL["menu"] = (function(){//name space FL.menu
 
 
 		FL.server.saveMainMenu(FL.menu.currentOptions.jsonMenu,lastStyleStr,lastFontFamilyStr,function(err){
-			console.log("FL.menu saveMenuToLocalAndServer() -> menu was saved on server -->"+err);
+			FL.common.printToConsole("FL.menu saveMenuToLocalAndServer() -> menu was saved on server -->"+err);
 			// alert("FLMenu2.js saveMenuToLocalAndServer called FL.server.saveMainMenu with style="+lastStyleStr+ " font="+lastFontFamilyStr);
 		});
 		// alert("Menu was Saved to local !!!");
@@ -457,7 +457,7 @@ FL["menu"] = (function(){//name space FL.menu
 	};
 	var insideContextMenu = function(event) {
 
-		// console.log("insideContextMenu was clicked ----->"+JSON.stringify(thizz.jsonMenu));
+		// FL.common.printToConsole("insideContextMenu was clicked ----->"+JSON.stringify(thizz.jsonMenu));
 
 		event.stopImmediatePropagation();
 		var selectedMenuInContextMenu = $(event.target);
@@ -465,15 +465,15 @@ FL["menu"] = (function(){//name space FL.menu
 		var is_beingEdited = false;
 		var el = $("#contextMenu")[0];
 		var idBeingEdited = $.data(el,"invokedOn").attr("id");//$(e.target) was stored into element #contextMenu before right mouse click
-		console.log("insideContextMenu with "+contextSelection+" and idBeingEdited="+idBeingEdited);
+		FL.common.printToConsole("insideContextMenu with "+contextSelection+" and idBeingEdited="+idBeingEdited);
 		if(contextSelection == "Cancel") {//2nd level+ only. Append a submenu to second level menus
-			console.log("******************************> insideContextMenu 'Cancel' was the selection !");
+			FL.common.printToConsole("******************************> insideContextMenu 'Cancel' was the selection !");
 		}else if(contextSelection == "Add top menu") {//top level only.
 			// var newId = appendLastTop(parentThis.settings.jsonMenu.menu,"New");
 			// appendLastTopOnDOM(parentThis.settings.jsonMenu.menu);
 			// parentThis.is_menuHide = true;
 			// parentThis.menuRefresh(parentThis.settings.jsonMenu.menu);	
-			// console.log("insideContextMenu----->"+JSON.stringify(FL.menu.menuArray));
+			// FL.common.printToConsole("insideContextMenu----->"+JSON.stringify(FL.menu.menuArray));
 			// var newId = appendLastTop(this.jsonMenu.menu,"New");
 			var newId = appendLastTop(FL.menu.menuArray,"New");
 			// appendLastTopOnDOM(this.jsonMenu.menu);
@@ -484,7 +484,7 @@ FL["menu"] = (function(){//name space FL.menu
 			FL.menu.currentMenuObj.menuRefresh(FL.menu.menuArray);
 
 			saveMenuToLocalAndServer();
-			console.log("******************************> insideContextMenu 'Add top menu' was the selection !");
+			FL.common.printToConsole("******************************> insideContextMenu 'Add top menu' was the selection !");
 		}else if( contextSelection.substring(0,6) == "Rename" ) {
 			var editId="#"+idBeingEdited;
 			is_beingEdited = true;
@@ -506,10 +506,10 @@ FL["menu"] = (function(){//name space FL.menu
 					$.Topic( 'inMenuEdition' ).publish( false );
 				}
 			});
-			console.log("before $(editId).editable('show');");
+			FL.common.printToConsole("before $(editId).editable('show');");
 			$("#contextMenu").hide();
 			$(editId).editable('show');
-			console.log("******************************> insideContextMenu 'Rename' was the selection ! idBeingEdited="+idBeingEdited);
+			FL.common.printToConsole("******************************> insideContextMenu 'Rename' was the selection ! idBeingEdited="+idBeingEdited);
 		}else if( contextSelection == "Add submenu" ) {//2nd level+ only. Append a submenu to second level menus
 			onId(idBeingEdited,addSubmenu);
 			// menuEach(parentThis.settings.jsonMenu.menu,add_Id_Top);
@@ -519,7 +519,7 @@ FL["menu"] = (function(){//name space FL.menu
 			// parentThis.menuRefresh(parentThis.settings.jsonMenu.menu);
 			FL.menu.currentMenuObj.menuRefresh(FL.menu.menuArray);
 			saveMenuToLocalAndServer();
-			console.log("******************************> insideContextMenu 'Add submenu' was the selection !");
+			FL.common.printToConsole("******************************> insideContextMenu 'Add submenu' was the selection !");
 		}else if(contextSelection == "Add submenu before") {//2nd level+ only. Insert a menu before
 			onId(idBeingEdited,addSubmenuBefore);
 			// menuEach(parentThis.settings.jsonMenu.menu,add_Id_Top);
@@ -529,7 +529,7 @@ FL["menu"] = (function(){//name space FL.menu
 			// parentThis.menuRefresh(parentThis.settings.jsonMenu.menu);
 			FL.menu.currentMenuObj.menuRefresh(FL.menu.menuArray);
 			saveMenuToLocalAndServer();
-			console.log("******************************> insideContextMenu 'addSubmenuBefore' was the selection !");
+			FL.common.printToConsole("******************************> insideContextMenu 'addSubmenuBefore' was the selection !");
 		}else if(contextSelection == "Add submenu after") {//2nd level+ only. Insert a menu after
 			onId(idBeingEdited,addSubmenuAfter);
 			// menuEach(parentThis.settings.jsonMenu.menu,add_Id_Top);
@@ -539,7 +539,7 @@ FL["menu"] = (function(){//name space FL.menu
 			// parentThis.menuRefresh(parentThis.settings.jsonMenu.menu);
 			FL.menu.currentMenuObj.menuRefresh(FL.menu.menuArray);
 			saveMenuToLocalAndServer();
-			console.log("******************************> insideContextMenu 'addSubmenuAfter' was the selection !");
+			FL.common.printToConsole("******************************> insideContextMenu 'addSubmenuAfter' was the selection !");
 		}else if(contextSelection == "Create inside submenu") {//2nd level+ only. Makes an inside gate to a menu
 			onId(idBeingEdited,changeToSubmenuInside);
 			// menuEach(parentThis.settings.jsonMenu.menu,add_Id_Top);
@@ -549,7 +549,7 @@ FL["menu"] = (function(){//name space FL.menu
 			// parentThis.menuRefresh(parentThis.settings.jsonMenu.menu);
 			FL.menu.currentMenuObj.menuRefresh(FL.menu.menuArray);
 			saveMenuToLocalAndServer();	
-			console.log("******************************> insideContextMenu 'changeToSubmenuInside' was the selection !");
+			FL.common.printToConsole("******************************> insideContextMenu 'changeToSubmenuInside' was the selection !");
 		}else if(contextSelection == "Remove this menu item") {//2nd level+ only
 			onId(idBeingEdited,removeSubmenu);
 			// menuEach(parentThis.settings.jsonMenu.menu,add_Id_Top);
@@ -559,13 +559,13 @@ FL["menu"] = (function(){//name space FL.menu
 			// parentThis.menuRefresh(parentThis.settings.jsonMenu.menu);
 			FL.menu.currentMenuObj.menuRefresh(FL.menu.menuArray);
 			saveMenuToLocalAndServer();		
-			console.log("******************************> insideContextMenu 'removeSubmenu' was the selection !");
+			FL.common.printToConsole("******************************> insideContextMenu 'removeSubmenu' was the selection !");
 		}else if(contextSelection == "Remove inside submenus") {//2nd level+ only
 			// var menuItem = menuFindById(parentThis.settings.jsonMenu.menu,idBeingEdited);
 			var menuItem = menuFindById(FL.menu.menuArray,idBeingEdited);
 			if(menuItem.menu){//menu has subitems
 				BootstrapDialog.confirm("All sub menus of " + menuItem.title + " will be lost. Do you want to delete them anyway ?", function(result) {
-					console.log("Confirm result: "+result);
+					FL.common.printToConsole("Confirm result: "+result);
 					if(result){
 						delete menuItem.menu;
 						// menuEach(parentThis.settings.jsonMenu.menu,add_Id_Top);
@@ -584,7 +584,7 @@ FL["menu"] = (function(){//name space FL.menu
 			var menuItem = menuFindById(FL.menu.menuArray,idBeingEdited);
 			if(menuItem.menu){//menu has subitems - requires confirmation to delete
 				BootstrapDialog.confirm("All sub menus of " + menuItem.title + " will be lost. Do you want to delete them anyway ?", function(result) {
-					console.log("Confirm result: "+result);
+					FL.common.printToConsole("Confirm result: "+result);
 					if(result){
 						// removeTopMenu(parentThis.settings.jsonMenu.menu,idBeingEdited);
 						removeTopMenu(FL.menu.menuArray,idBeingEdited);
@@ -618,17 +618,17 @@ FL["menu"] = (function(){//name space FL.menu
 			is_menuHide = true;
 			is_contextOn = false;
 
-			// console.log("parentThis.is_menuHide was set to true after context selection");
-			// console.log("==================================================>context menu has hidden after context selection");
+			// FL.common.printToConsole("parentThis.is_menuHide was set to true after context selection");
+			// FL.common.printToConsole("==================================================>context menu has hidden after context selection");
 			$('.nav ul').hide();//hide any dropdown menu
 			$.Topic( 'inMenuEdition' ).publish( false );
 		}
 	};
 	this.displayInitialMenu = function() {
-		console.log("displayInitialMenu -->"+this.settings.initialMenu);
+		FL.common.printToConsole("displayInitialMenu -->"+this.settings.initialMenu);
 	};
 	this.init = function() { //constructor
-		console.log("-------------------------------> a new instance of FL.menu was constructed... ");
+		FL.common.printToConsole("-------------------------------> a new instance of FL.menu was constructed... ");
 	};
 	// this.init();
 	var car = function(model,year){
@@ -651,11 +651,11 @@ FL["menu"] = (function(){//name space FL.menu
 		this.is_contextOn = false;//informs if contextmenu is On/Off
 		this.test ="abc";
 		FL.menu.currentMenuObj = this;
-		// console.log("LINE 711 menu constructor with this.editable="+this.editable+" ->"+this.test);
+		// FL.common.printToConsole("LINE 711 menu constructor with this.editable="+this.editable+" ->"+this.test);
 
 	};
 	menu.prototype.toString = function(){ //do not use var HERE !!!
-		console.log("menu.prototype.toString was called");
+		FL.common.printToConsole("menu.prototype.toString was called");
 		return JSON.stringify(this.jsonMenu) +" has editable="+this.editable+" test="+this.test;
 	};
 	menu.prototype.test_Add_Id_Top = function() {//only for testing
@@ -686,7 +686,7 @@ FL["menu"] = (function(){//name space FL.menu
 				if (!$placeHolder.length ) {
 					alert("FrameLink Menus Error. Undefined _placeHolder in DOM");
 				}else{//"#_placeHolder" exists in DOM
-					console.log("menu.prototype.menuRefresh load memory home page -> the id placeHolder exists and homeMemory will be displayed");
+					FL.common.printToConsole("menu.prototype.menuRefresh load memory home page -> the id placeHolder exists and homeMemory will be displayed");
 					$placeHolder.empty();//removes the child elements in placeHolder.
 					$placeHolder.append(FL.menu.homeMemory);
 				}
@@ -698,7 +698,7 @@ FL["menu"] = (function(){//name space FL.menu
 		// var settings = this.settings; //to make settings accessible to anonimous function...
 		var thiz = this;
 		// var isEditable = this.editable;
-		console.log("LINE 740 menuRefresh was called with this.editable="+this.editable+" -->"+this.test);
+		FL.common.printToConsole("LINE 740 menuRefresh was called with this.editable="+this.editable+" -->"+this.test);
 
 
 		var is_menuHide = this.is_menuHide;
@@ -710,8 +710,8 @@ FL["menu"] = (function(){//name space FL.menu
 				case 2://Middle Mouse button pressed
 					break;
 				case 3://Right Mouse button pressed
-					console.log("---------------------------------------------->Right Mouse button pressed...");
-					console.log("contextmenu was clicked inside mousedown ->3 event with thiz.editable="+thiz.editable);
+					FL.common.printToConsole("---------------------------------------------->Right Mouse button pressed...");
+					FL.common.printToConsole("contextmenu was clicked inside mousedown ->3 event with thiz.editable="+thiz.editable);
 
 					// parentThis.is_menuHide = true;
 					is_menuHide = true;
@@ -720,11 +720,11 @@ FL["menu"] = (function(){//name space FL.menu
 					if(thiz.editable){
 						// parentThis.is_menuHide = false;
 						is_menuHide = false;
-						console.log("is_menuHide was set to false in mousedown !!!");
+						FL.common.printToConsole("is_menuHide was set to false in mousedown !!!");
 					}
 					break;
 				default:
-					console.log('You have a strange Mouse!');
+					FL.common.printToConsole('You have a strange Mouse!');
 			}
 		});
 		var is_contextOn = this.is_contextOn;
@@ -737,18 +737,18 @@ FL["menu"] = (function(){//name space FL.menu
 				//parentThis.is_menuHide = true;
 				is_menuHide = true;
 			}
-			// console.log("activate " + k +" item id="+item.attributes[1].value+ " was activated ! is_menuHide="+parentThis.is_menuHide+" is_contextOn="+parentThis.is_contextOn);
+			// FL.common.printToConsole("activate " + k +" item id="+item.attributes[1].value+ " was activated ! is_menuHide="+parentThis.is_menuHide+" is_contextOn="+parentThis.is_contextOn);
 		});
 		$("#main-menu").bind('beforehide.smapi', function(e, item) {//Fired by smartmenus right before a sub menu is hidden.
-			// console.log("hide" + k +" status is_menuHide="+FL.menu.is_menuHide);//OK
-			console.log("hide" + k +" status is_menuHide="+is_menuHide);//OK
+			// FL.common.printToConsole("hide" + k +" status is_menuHide="+FL.menu.is_menuHide);//OK
+			FL.common.printToConsole("hide" + k +" status is_menuHide="+is_menuHide);//OK
 			// return FL.menu.is_menuHide;//submenu will not be hidden if is_menuHide=false
 			return is_menuHide;//submenu will not be hidden if is_menuHide=false
 		});
 		var $mainMenu = $("#menuContainer");
 		// var thiz = this;
 		$mainMenu.on("contextmenu", function (e) {//Set of DOM elements #menuContainer got a click handler
-			console.log("contextmenu was clicked inside contextmenu event with thiz.editable="+thiz.editable);
+			FL.common.printToConsole("contextmenu was clicked inside contextmenu event with thiz.editable="+thiz.editable);
 			// menuArray = FL.menu.currentOptions.jsonMenu;
 			var jsonMenu = FL.menu.currentOptions.jsonMenu;
 			$.Topic( 'inMenuEdition' ).publish( true );
@@ -759,7 +759,7 @@ FL["menu"] = (function(){//name space FL.menu
 			// if(parentThis.settings.editable){
 			if(thiz.editable) {
 				is_menuHide = false;
-				console.log("is_menuHide was set to false");
+				FL.common.printToConsole("is_menuHide was set to false");
 				// var menuTag = setupContextMenu(menuArray,e);//prepares #contextMenu for right clicked element
 				var menuTag = setupContextMenu(jsonMenu,e);//prepares #contextMenu for right clicked element
 				$( "#contextMenu" ).on( "click", insideContextMenu);//a click inside main-menu will call refHandler 
@@ -774,13 +774,14 @@ FL["menu"] = (function(){//name space FL.menu
 				return false;
 			}
 		});
+		$( "#main-menu" ).off('click');
 		$( "#main-menu" ).on( "click", refHandler);//a click inside main-menu will call refHandler 
 	};//menu.prototype.menuRefresh
 	menu.prototype.setEditable = function(status) {
-		// console.log("set editable was called inside object !!!! with status="+status +" before ->this.editable="+this.editable +" ->" + this.test);
+		// FL.common.printToConsole("set editable was called inside object !!!! with status="+status +" before ->this.editable="+this.editable +" ->" + this.test);
 		this.editable = status;
 		this.test = "def";
-		// console.log("set editable after ->this.editable="+this.editable +" ->" + this.test);
+		// FL.common.printToConsole("set editable after ->this.editable="+this.editable +" ->" + this.test);
 	};
 	menu.prototype.updateJsonMenu = function(jsonMenu) {
 		this.jsonMenu = jsonMenu;
@@ -811,26 +812,26 @@ FL["menu"] = (function(){//name space FL.menu
 		createMenu: function(options) {
 			//ex:var myMenu = new FL.menu({jsonMenu:FL.clone(oMenu),initialMenu:"_home",editable:true});
 			var newMenuObj = new menu(options);
-			console.log("createMenu ->begin");
+			FL.common.printToConsole("createMenu ->begin");
 			$.Topic( 'signInDone' ).subscribe( FL.menu.topicSetEditable );
 			$.Topic( 'jsonMenuUpdate' ).subscribe( FL.menu.topicUpdateJsonMenu );
 			$.Topic( 'createOption' ).subscribe( FL.menu.topicCreateDatabaseAcess );
 			$.Topic( 'createGridOption' ).subscribe( FL.menu.topicCreateGrid );
 			$.Topic( 'createGridOptionByCN' ).subscribe( FL.menu.topicCreateGridByCN );
-			console.log("createMenu ->end");
+			FL.common.printToConsole("createMenu ->end");
 			return newMenuObj;
 		},
 		topicSetEditable: function(status) {//this method is used to subscribe topics on createMenu
 			//	$.Topic( 'signInDone' ).subscribe( FL.menu.topicSetEditable );
 			FL.menu.currentMenuObj.setEditable(status);
-			console.log("======================================================================");
-			// console.log(FL.menu.currentMenuObj.toString());
+			FL.common.printToConsole("======================================================================");
+			// FL.common.printToConsole(FL.menu.currentMenuObj.toString());
 			// alert("FL.menu.topicSetEditable status="+status);
 		},
 		topicUpdateJsonMenu: function(jsonMenu) {//this method is used to subscribe topics on createMenu
-			console.log("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% FLMenu2.js topicUpdateJsonMenu was called");
+			FL.common.printToConsole("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% FLMenu2.js topicUpdateJsonMenu was called");
 			if(_.isEmpty(jsonMenu)){
-				console.log("menu is empty");
+				FL.common.printToConsole("menu is empty");
 				jsonMenu = FL.login.defaultMenu;
 			}
 			FL.menu.currentMenuObj.updateJsonMenu(jsonMenu);
@@ -840,8 +841,8 @@ FL["menu"] = (function(){//name space FL.menu
 			// parentThis.createMenuEntryLastTop(optionTitle,"__windowOpen(weadvice.knackhq.com/weadvice1)");
 			FL.menu.currentMenuObj.createMenuEntryLastTop(optionTitle,"__windowOpen(weadvice.knackhq.com/weadvice1)");
 
-			console.log("======================================================================");
-			// console.log(FL.menu.currentMenuObj.toString());
+			FL.common.printToConsole("======================================================================");
+			// FL.common.printToConsole(FL.menu.currentMenuObj.toString());
 			// alert("FL.menu.topicCreateDatabaseAcess optionTitle="+optionTitle);
 		},
 		topicCreateGrid: function(optionTitle, singular) {//this method is used to subscribe topics on createMenu
@@ -853,22 +854,22 @@ FL["menu"] = (function(){//name space FL.menu
 
 			FL.menu.currentMenuObj.createMenuEntryLastTop(optionTitle,uri);
 
-			console.log("======================================================================");
-			// console.log(FL.menu.currentMenuObj.toString());
+			FL.common.printToConsole("======================================================================");
+			// FL.common.printToConsole(FL.menu.currentMenuObj.toString());
 			// alert("FL.menu.topicCreateGrid with optionTitle="+optionTitle+ " singular="+singular);
 		},
 		topicCreateGridByCN: function(optionTitle, eCN) {//this method is used to subscribe topics on createMenu
 			// $.Topic( 'topicCreateGridByCN' ).subscribe( FL.menu.topicCreateGrid );
 			// FL.menu.currentMenuObj.X_createMenuEntryLastTop(optionTitle,singular);
-
+			FL.API.serverCallBlocked = true;//HACK to prevent server call (menu calling a grid) before this promise is 
 			var uri ="javascript:FL.links.setDefaultGridByCN('" + eCN + "')";
 			//"javascript:FL.links.setDefaultGrid('Order')"
 			if(FL.login.permissionToAddMenu){//HACK to prevent double call
 				FL.menu.currentMenuObj.createMenuEntryLastTop(optionTitle,uri);
 				FL.login.permissionToAddMenu = false;
 			}
-			console.log("======================================================================");
-			// console.log(FL.menu.currentMenuObj.toString());
+			FL.common.printToConsole("======================================================================");
+			// FL.common.printToConsole(FL.menu.currentMenuObj.toString());
 			// alert("FL.menu.topicCreateGrid with optionTitle="+optionTitle+ " singular="+singular);
 		},		
 		set: function(x) {
@@ -883,5 +884,5 @@ FL["menu"] = (function(){//name space FL.menu
 // FL["menuTopicRouter"] = function(status){
 // 	FL.menu.currentMenuObj.setEditable(status);
 // 	alert("menuTopicRouter status="+status);
-// 	console.log("======================================================================");
+// 	FL.common.printToConsole("======================================================================");
 // };

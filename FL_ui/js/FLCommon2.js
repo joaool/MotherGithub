@@ -107,16 +107,28 @@ FL["common"] = (function(){//name space FL.common
 		});
 	};
     var getDialogHTML = function(id,stackLevel,title,htmlIn,options){
+        //to work in IE and Firefox always enclose button inside a tag. not a tag inside button tag. - http://stackoverflow.com/questions/12856851/jquery-modal-window-only-working-on-chrome-but-not-ff-ie9
+        // CORRECT - Button inside a ref
+        //  <div class="btn-group" style="margin: 0 5px 0 0;">
+        //     <a href="#?w=385" rel="login_popup" class="poplight" style="text-decoration:none;"><button type="button">Login</button></a>
+        //  </div><!-- /btn-group --> 
+        // INCORRECT - ref inside a button tag
+        //  <div class="btn-group" style="margin: 0 5px 0 0;">
+        //      <button class="btn btn-small btn-info" type="button"><a href="#?w=385" rel="login_popup" class="poplight" style="text-decoration:none;">Login</a></button>
+        //  </div><!-- /btn-group --> 
         var modalId = "__FLmodalId_"+id;
         var zIndexContent = "";
         if(stackLevel>1) zIndexContent = "z-Index:"+(1000*stackLevel);//place a modal inside a modal
         var iconHTML = "";
         if(options.icon) iconHTML = '<i class="glyphicon glyphicon-' + options.icon +'"></i>';
         var button1HTML = "";
-        if(options.button1) button1HTML = '<a href="#" id="__FLDialog_button1" data-dismiss="modal" class="btn">' + options.button1 + '</a>';
+        if(options.button1){
+            button1HTML = '<a href="#" id="__FLDialog_button1" data-dismiss="modal" class="btn">' + options.button1 + '</a>';
+        }
         var button2HTML = "";
-        if(options.button2) //this button has the parsley validate (like APPLE ->OK at right)
-            button2HTML = '<a href="#" id="__FLDialog_button2" class="btn btn-' + options.type + ' validate">' + options.button2 + '</a>';
+        if(options.button2){ //this button has the parsley validate (like APPLE ->OK at right)
+            button2HTML = '<a href="#" id="__FLDialog_button2" class="btn btn-' + options.type + ' validate">' + options.button2 + '</a>';   
+        }
         var before = '<div class="modal fade" id="' +modalId+ '" style="' + zIndexContent + '">' +
                         '<div class="modal-dialog">' +
                             '<div class="modal-content">' +
@@ -154,7 +166,7 @@ FL["common"] = (function(){//name space FL.common
 			//			{attribute:"postal code", description:"postal reference for delivery",statement:"The postal code of the client is the postal reference for delivery"}
 			//		]
 			//	};
-            // options - {type:"primary", icon:"send",button1:"Cancel",button2:"Send Newsletter",dropdown:{"#_sendNewsletter_templates":{arr:["op1","op2"],onSelect:function(){console.log("choise was "+selected);}}}
+            // options - {type:"primary", icon:"send",button1:"Cancel",button2:"Send Newsletter",dropdown:{"#_sendNewsletter_templates":{arr:["op1","op2"],onSelect:function(){FL.common.printToConsole("choise was "+selected);}}}
 			//   notice the optional dropdown key in options. This is a way to send dropdown options yp edit masterdetail
             //     for each dropdown editmaster detail must receive: the set of values to present, the function to run on selection
             //     Example:
@@ -162,13 +174,13 @@ FL["common"] = (function(){//name space FL.common
             //              "#dropdownId1":{ arr:['a','b','c','d','e'],
             //                                  default:"c",
             //                                  onSelect:function(selected){
-            //                                        console.log("The choice was "+selected);    
+            //                                        FL.common.printToConsole("The choice was "+selected);    
             //                                  }
             //                             },                                   
             //              "#dropdownId2":{ arr:['a1','a2','a3','a4','a5'],
             //                                  default:"a3",
             //                                  onSelect:function(selected){
-            //                                        console.log("For id2 the choice was "+selected);    
+            //                                        FL.common.printToConsole("For id2 the choice was "+selected);    
             //                                  }                                   
             //                            }
             //               }
@@ -240,7 +252,7 @@ FL["common"] = (function(){//name space FL.common
                 });
             }else{
                 // $modal.off('hidden.bs.modal');              
-				console.log("makeModal ----->No callback");
+				FL.common.printToConsole("makeModal ----->No callback");
 				$modal.modal('hide');
 				$('body').removeClass('modal-open');
 				$('.modal-backdrop').remove();
@@ -265,7 +277,7 @@ FL["common"] = (function(){//name space FL.common
             //      button1 - name of first button
             //      button2 - name of second button (null =>only one button is available)
             //      dropdown - optional to be used when template has dropdowns
-            //          dropdown:{ "#_sendNewsletter_templates":{ arr:["op1","op2"],default:"op2",onSelect:function(){console.log("choise was "+selected);} } }
+            //          dropdown:{ "#_sendNewsletter_templates":{ arr:["op1","op2"],default:"op2",onSelect:function(){FL.common.printToConsole("choise was "+selected);} } }
             //
             //  callback - to return result example:
             //          makeModal(" Juakim","dictTemplate",{type:"primary", icon:"search",button1:"Close",button2:"Save Changes"},function(result){
@@ -290,7 +302,7 @@ FL["common"] = (function(){//name space FL.common
 				// alert("the id="+ ("#_modalDialog"+id) + " does not exist in DOM !!");
 				//<div id='_modalDialogB'></div> -->
 				var htmlId = "<div id='#_modalDialog" + id + "'></div>";
-				console.log(htmlId);
+				FL.common.printToConsole(htmlId);
 				$(htmlId).prependTo('body');
 				$modalDialog = $("#_modalDialog"+id);
 				var z= 32;
@@ -360,7 +372,7 @@ FL["common"] = (function(){//name space FL.common
                 $("#__FLDialog_button1").off('click');
                 $modal.on("click","#__FLDialog_button1", function() {
                     // alert("makeModal - You clicked button1"); 
-                    console.log("Button 1 was clicked");
+                    FL.common.printToConsole("Button 1 was clicked");
                     $modal.off('hidden.bs.modal');
                     $modal.modal('hide');
                     window.masterDetailItems = null;
@@ -374,18 +386,18 @@ FL["common"] = (function(){//name space FL.common
                     window.masterDetailItems = null;
                     return makeModalCB(true);
 */
-					console.log("Button 2 was clicked");
+					FL.common.printToConsole("Button 2 was clicked");
 					// var form = $("#form_" + templateName );
 					// form.parsley();
 					// form.parsley().validate();
 					if(form.parsley().isValid()){//http://stackoverflow.com/questions/19821934/parsley-js-validation-not-triggering
-						console.log('no client side errors!');
+						FL.common.printToConsole('no client side errors!');
 						$modal.off('hidden.bs.modal');
 						$modal.modal('hide');
 						window.masterDetailItems = null;
 						return makeModalCB(true);						
 					}else{
-						console.log('Client side errors!!!!');
+						FL.common.printToConsole('Client side errors!!!!');
 						$('.invalid-form-error-message')
 							.html("You must correctly fill the fields...")
 							.addClass("filled");
@@ -399,7 +411,7 @@ FL["common"] = (function(){//name space FL.common
                 });
             }else{
                 // $modal.off('hidden.bs.modal');              
-				console.log("makeModal ----->No callback");
+				FL.common.printToConsole("makeModal ----->No callback");
 				$modal.modal('hide');
 				$('body').removeClass('modal-open');
 				$('.modal-backdrop').remove();
@@ -469,7 +481,7 @@ FL["common"] = (function(){//name space FL.common
 			if(retStr){	
 				for(var i=0;i<tagTerminator.length;i++){
 					terminatorChar = tagTerminator[i];
-					// console.log("getLastTagInString -> char="+terminatorChar);
+					// FL.common.printToConsole("getLastTagInString -> char="+terminatorChar);
 					terminatorPos = retStr.indexOf(terminatorChar);
 					if(terminatorPos>=0){
 						retStr = retStr.substring(0,terminatorPos);
@@ -873,7 +885,52 @@ FL["common"] = (function(){//name space FL.common
             return _.map(arr,function(element){ 
                 return FL.common.localeStringToNumber(element,format); 
             });
-        },      
+        }, 
+        getServerName: function() {//return server name form url. if server is local host =>test.framelink.co
+            //extracts content from url in browser (after // and before the first /)
+            //example (in FL.API _login):fl.serverName(FL.common.getServerName());
+            var currentURL =window.location.href;
+            var server = this.stringAfterLast(currentURL,"//");
+            server = this.stringBeforeFirst(server,"/");
+            if (server =="localhost")
+                server = "test.framelink.co";            
+            FL.common.printToConsole("FL.common.getServerName() -->"+server);
+            return server;
+        },
+        getMandrillKey: function() {
+            var server = this.getServerName();
+            var key = "S8_4ExqKlIdZiSBqgiLBUw"; //assume
+            if(server == "framelink.co"){//production
+                key = "vVC6R5SZJEHq2hjEZfUwRg";
+            }
+            return key;
+        },
+        debugFilter: null,//an object with all  filters collected from the app. Each key is a filter with value true or false. To be created by printToConsole()
+        printToConsole: function(toDisplay,filter){//forces (whatever the debug or debugStyle values) a display without line numbers link
+            //example of use:FL.common.printToConsole("   => " + apiName + ' : ' + JSON.stringify(superJ),"API");
+
+            // var debugStatus = FL.API.debug;
+            // var debugStyleStatus = FL.API.debugStyle;
+            // FL.API.debug = true;FL.API.debugStyle = 1;//show FL.common.printToConsole without line numbers link;
+            if(filter){
+                this.debugFilter = this.debugFilter || {};
+                if(_.isUndefined(this.debugFilter[filter]))
+                    this.debugFilter[filter]=true;
+            };    
+            if(FL.API.debug){
+                console.log(toDisplay);
+            }else{
+                if(filter){//if there is no filter, does not display, otherwise checks if there is a reason to display
+                    _.each(FL.API.debugFiltersToShow, function(element){
+                        if( element == filter ) //checks if print request is inside filters to display (FL.API.debugFiltersToShow)
+                            if( this.debugFilter[element] )//checks if the current filter is active
+                                console.log(" -->"+filter+":"+toDisplay);
+                    },this);
+                }
+            }    
+            // FL.API.debug = debugStatus;
+            // FL.API.debugStyle = debugStyleStatus;
+        },        
 		testFunc: function(x) {
 			alert("FL.common.test() -->"+x);
 		}

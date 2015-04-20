@@ -9,13 +9,17 @@ function OnTemplatesLoaded()
 {
 	// --------------------code to connect to Framelink Database --------------------
 	// alert("MailerTemplate.js ->begins connection with FrameLink");
+	FL.API.debug = false;
+	FL.API.debugFiltersToShow = ["API","checkServerCall"];
+	FL.API.fl.setTraceClient(2);
+
 	var promise=FL.API.getFLContextFromBrowserLocationBar();
 	promise.done(function(data){
-		console.log("MailerTemplate.js OnTemplatesLoaded ->getFLContextFromBrowserLocationBar SUCCESS <<<<< ");
+		FL.common.printToConsole("MailerTemplate.js OnTemplatesLoaded ->getFLContextFromBrowserLocationBar SUCCESS <<<<< ");
 		var loadAppPromise=FL.API.loadAppDataForSignInUser2();//gets data dictionary + main menu + style + fontFamily + home page
 		loadAppPromise.done(function(menuData,homeHTML){
-			console.log("appSetup ---> homeHTML=" + homeHTML);
-			console.log("appSetup ---> menudata=" + JSON.stringify(menuData));
+			FL.common.printToConsole("appSetup ---> homeHTML=" + homeHTML);
+			FL.common.printToConsole("appSetup ---> menudata=" + JSON.stringify(menuData));
 			var templatePromise=FL.API.createTemplates_ifNotExisting();
 			templatePromise.done(function(){
 				instantiateMainView();//Kartik code originally the only code in OnTemplatesLoaded()
@@ -54,7 +58,7 @@ function instantiateMainView(){
 window.onbeforeunload = function (e) {//works for close tab - and for close browser because:
 	e = e || window.event;
 	if (e) {
-		console.log("xxx disconnect here");
+		FL.common.printToConsole("xxx disconnect here");
 		// FL.server.disconnect();
 		e.returnValue = 'test returnValue...';
 	}

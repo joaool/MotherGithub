@@ -205,6 +205,10 @@ MailerTemplate.Views.MainView = Backbone.View.extend({
 					console.log(">>>>>OnLoadTemplateBtnClick selectedTemplatePromise SUCCESS <<<<< ");
 					data = JSON.parse(selectedTemplate);
 					thiz.m_Editor.LoadJson(data);
+					if (data.pageStyles){
+						thiz.m_DesignPage.setValues(data.pageStyles);
+						thiz.m_Editor.setAllPageValues(data.pageStyles);
+					}
 					return;
 				});
 				selectedTemplatePromise.fail(function(err){console.log(">>>>>OnLoadTemplateBtnClick selectedTemplatePromise FAILURE <<<<<"+err);return def.reject(err);});

@@ -874,6 +874,9 @@ TODO
             var mandrill = function() {
             }
             // API going to the server
+            mandrill.prototype.init = function(data, callBack){
+                sendCommand(2, 'mandrill/init', "0", data, { }, callBack);
+            }
             mandrill.prototype.rejectList = function(data, callBack){
                 sendCommand(2, 'mandrill/rejectlist', "0", data, { }, callBack);
             }
@@ -1006,35 +1009,37 @@ TODO
      return o1;
     }
     function sendMainSrv (apiName, superJ, callBack){
+        FL.common.printToConsole(" ------ sendMainSrv ---------","API" );
         if(isFlagged(2) )
-            console.log("   => " + apiName + ' : ' + JSON.stringify(superJ));
+            FL.common.printToConsole("   => " + apiName + ' : ' + JSON.stringify(superJ),"API");
 
         function api2CallBack(err, data){
             //console.log ('<= ' + apiName + '-callBack data= ' + JSON.stringify(data) + ', err: ' + err);
             if (err){
                 if(isFlagged(2) )
-                        console.log("   <= " +apiName + '-callBack : ** ERROR ** : ' + err);
+                        FL.common.printToConsole("   <= " +apiName + '-callBack : ** ERROR ** : ' + err,"API");
                 return callBack(err, null);
             }
             if(isFlagged(2) )
-                console.log("   <= " + apiName + " data: " + JSON.stringify(data));
+                FL.common.printToConsole("   <= " + apiName + " data: " + JSON.stringify(data),"API");
             return callBack(null, data);
         }
         axCall(urlMainProt, urlMainSrv, urlMainPort, '/api/' + apiName, superJ, false, api2CallBack, flTraceSession, flTraceServer);
     }
     function sendApiSrv (apiName, superJ, callBack){
+        FL.common.printToConsole(" **** sendApiSrv ****" ,"API");
         if(isFlagged(2) )
-            console.log("   => " + apiName + ' : ' + JSON.stringify(superJ));
+            FL.common.printToConsole("   => " + apiName + ' : ' + JSON.stringify(superJ),"API");
 
         function apiCallBack(err, data){
             //console.log ('<= ' + apiName + '-callBack data= ' + JSON.stringify(data) + ', err: ' + err);
             if (err){
                 if(isFlagged(2) )
-                        console.log("   <= " +apiName + '-callBack : ** ERROR ** : ' + err);
+                        FL.common.printToConsole("   <= " +apiName + '-callBack : ** ERROR ** : ' + err,"API");
                 return callBack(err, null);
             }
             if(isFlagged(2) )
-                console.log("   <= " + apiName + " data: " + JSON.stringify(data));
+                FL.common.printToConsole("   <= " + apiName + " data: " + JSON.stringify(data),"API");
             return callBack(null, data);
         }
         axCall(urlAbeProt, urlAbeSrv, urlAbePort, '/api/' + apiName, superJ, true, apiCallBack, flTraceSession, flTraceServer);

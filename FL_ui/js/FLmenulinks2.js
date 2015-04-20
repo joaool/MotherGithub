@@ -11,17 +11,17 @@
 	FL = (typeof FL === 'undefined') ? {} : FL;
 	FL["links"] = (function(){//name space FL.dd
 		var internalTest = function ( x) { //returns a 2 bytes string from number 
-			console.log( "FLmenulinks2.js internalTest -->"+x );
+			FL.common.printToConsole( "FLmenulinks2.js internalTest -->"+x );
 		};
 		var XgetMailchimpHTML = function(cId) {
 			var def = $.Deferred();
 			var arr = null;
-			var fl = FL.login.token.fl;
+			var fl = FL.fl;
 			if(fl){
 				var mc = new fl.mailChimp();
 				mc.campaignContent({cid: cId}, function(err, data){
 					if(!err){
-						console.log("campaignlist returns no error data="+JSON.stringify(data.html));
+						FL.common.printToConsole("campaignlist returns no error data="+JSON.stringify(data.html));
 						def.resolve(data.html);
 					}else{
 						return def.reject( "FLmenulink2.js getMailchimpHTML - ERROR:"+err );
@@ -43,7 +43,7 @@
 			appendTemplate(jsonObj.templateItems.footer,footer);
 		};
 		var tt = function(){
-			console.log("tt");
+			FL.common.printToConsole("tt");
 		};
 
 		var set3ButtonsAndGrid = function(entityName){//displays addGrid, delete and editGrid buttons (with clicks prepared) and services to the right
@@ -84,14 +84,13 @@
 			//A)shows add button, newsletter and grid edit buttons if an email field exist in entityName
 			//  	checks if _histoMail_<ecn(entityName)> exists. If not creates it.
 			//B)shows add button and grid edit buttons if no email field exist in entityName	
-			FL.API.debug = true; FL.API.debugStyle= 0;			
 			if(FL.dd.isHistoMailPeer(entityName)){
-				var promiseUnblock = FL.API.checkServerCallBlocked()
-				.then(function(){
-					FL.grid.displayDefaultGrid(entityName);//loads from server and display buttons and Grid
-					FL.API.debug = false; FL.API.debugStyle= 0;
-					return;
-				}, function(err){ alert("FL.links.DefaultGridWithNewsLetterAndEditButtons ERROR: Please try again " + err); } );
+				// var promiseUnblock = FL.API.checkServerCallBlocked()
+				// .then(function(){
+				// 	FL.grid.displayDefaultGrid(entityName);//loads from server and display buttons and Grid
+				// 	return;
+				// }, function(err){ alert("FL.links.DefaultGridWithNewsLetterAndEditButtons ERROR: Please try again " + err); } );
+				FL.grid.displayDefaultGrid(entityName);//loads from server and display buttons and Grid
 			}else{
 				// alert("_histoMail for "+entityName+" does not exist! we need to create it");
 				promise = FL.API.createTableHistoMails_ifNotExisting(entityName)
@@ -215,7 +214,6 @@
 			setDefaultGrid: function(entityName) {//called with menu key "uri": "javascript:FL.links.setDefaultGrid('JOJO')"
 				// alert("setDefaultGrid"+entityName);
 				// entityName = entityName.replace(/_/g," ");//if entityName as a space like "test contacts" it will be saved in menu as "test_contact"
-				// FL.API.debug = true;
 				if(FL.dd.isEntityInLocalDictionary(entityName)){
 					if(FL.dd.isEntityInSync(entityName) ){//entityName exists in local dictionary and is in sync
 						DefaultGridWithNewsLetterAndEditButtons(entityName);
@@ -235,16 +233,16 @@
 				}
 			},
 			clearDictionary: function() {
-				console.log("------------------------- before clearing data dictionary -----------------------------");
+				FL.common.printToConsole("------------------------- before clearing data dictionary -----------------------------");
 				FL.dd.displayEntities();
-				console.log("------------------------- after clearing data dictionary -----------------------------");
+				FL.common.printToConsole("------------------------- after clearing data dictionary -----------------------------");
 				FL.dd.clear();
 				FL.dd.displayEntities();
 				FL.common.makeModalInfo("Local frameLink dictionary deleted. Synchronization with server failled.");
 
 				// FL.server.syncLocalStoreToServer(function(err){
 				// 	if(err){
-				// 		console.log("FL.server.clearDictionary() ERROR --> failled !");
+				// 		FL.common.printToConsole("FL.server.clearDictionary() ERROR --> failled !");
 				// 		FL.common.makeModalInfo("Local frameLink dictionary deleted. Synchronization with server failled.");
 				// 	}else{	
 				// 		FL.dd.displayEntities();
@@ -290,7 +288,7 @@
 				promise = FL.API.mandrillRejectListForSender(senderEmail);
 				// promise = FL.API.mandrillRejectListForSender('jessica.costa@weadvice.pt');
 				promise.done(function(data){
-					console.log(">>>>> FL.links.getMandrillRejectListForSender() SUCCESS <<<<< list returned!");
+					FL.common.printToConsole(">>>>> FL.links.getMandrillRejectListForSender() SUCCESS <<<<< list returned!");
 					// alert("getMandrillRejectListForSender:"+JSON.stringify(data));
 					FL.common.clearSpaceBelowMenus();
 					$( "#_placeHolder" ).show();
@@ -301,23 +299,23 @@
 					});
 					return;
 				});
-				promise.fail(function(err){console.log(">>>>> FL.links.getMandrillRejectListForSender() FAILURE returning list<<<<<"+err); return def.reject(err);});
+				promise.fail(function(err){FL.common.printToConsole(">>>>> FL.links.getMandrillRejectListForSender() FAILURE returning list<<<<<"+err); return def.reject(err);});
 			},
 			setMandrillDeleteFromReject: function(arrayOfEmails) {//delete Emails from  Madrill rejectList
 				promise = FL.API.mandrillDeleteFromReject(arrayOfEmails);
 				promise.done(function(data){
-					console.log(">>>>> FL.links.setMandrillDeleteFromReject() SUCCESS <<<<< list returned!");
+					FL.common.printToConsole(">>>>> FL.links.setMandrillDeleteFromReject() SUCCESS <<<<< list returned!");
 					alert("setMandrillDeleteFromReject:"+JSON.stringify(data));
 					return;
 				});
-				promise.fail(function(err){console.log(">>>>> FL.links.getMandrillRejectListForSender() FAILURE returning list<<<<<"+err); return def.reject(err);});
+				promise.fail(function(err){FL.common.printToConsole(">>>>> FL.links.getMandrillRejectListForSender() FAILURE returning list<<<<<"+err); return def.reject(err);});
 
 			},
-			displayStatistics: function() {//delete Emails from  Madrill rejectList
+			displayStatistics: function() {//show all user statistics in mandrill
 				var user = "test";
 				promise = FL.emailServices.mandrillStats();
 				promise.done(function(data){
-					console.log(">>>>> FL.links.displayStatistics() SUCCESS <<<<< list returned!");
+					FL.common.printToConsole(">>>>> FL.links.displayStatistics() SUCCESS <<<<< list returned!");
 					// alert("FL.links.displayStatistics():"+JSON.stringify(data));
 					FL.common.clearSpaceBelowMenus();
 					$( "#_placeHolder" ).show();
@@ -339,7 +337,7 @@
 					});
 					return;
 				});
-				promise.fail(function(err){console.log(">>>>> FL.links.getMandrillRejectListForSender() FAILURE returning list<<<<<"+err); return def.reject(err);});
+				promise.fail(function(err){FL.common.printToConsole(">>>>> FL.links.getMandrillRejectListForSender() FAILURE returning list<<<<<"+err); return def.reject(err);});
 
 			}
 		};

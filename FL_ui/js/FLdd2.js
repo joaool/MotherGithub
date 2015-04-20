@@ -313,7 +313,7 @@
 		// Tests
 		// xPre="reserve";xIn="is done by";xPos="member";
 		// var xOut=dDictionary.invertedToOneVerb(xIn,"En");
-		// console.log(xPre+" "+xIn+" one "+xPos+" ->"+xPos+" "+xOut+" many "+dDictionary.plural(xPre,"En"));
+		// FL.common.printToConsole(xPre+" "+xIn+" one "+xPos+" ->"+xPos+" "+xOut+" many "+dDictionary.plural(xPre,"En"));
 			var DirDefault = {"En":{"default":"is referred by","has":"is referred by","is done by":"does"},
 								"Fr":{"default":"appartient a","a":"appartient a"},
 								"Pt":{"default":"pertence a","tem":"pertence a"},
@@ -433,24 +433,24 @@
 		}; //relationSemantics			
 		var attributeIndex= function(xSingular,xAttribute) {//for entity=xSingular, returns the index of attribute=xAttribute
 			// if attribute exists within xSingular returns it. Returns -1 otherwise
-			// console.log("dd.attributeIndex ->check index for "+xAttribute);
+			// FL.common.printToConsole("dd.attributeIndex ->check index for "+xAttribute);
 			var xRet = -1;
 			var oEntity = FL.dd.entities[xSingular];
 			if(oEntity){
 				var xArr = oEntity.attributes;
 				if(xArr.length>0){
-					// console.log("-------------- dd.attributeIndex  existing attribute names ------------BEGIN");
+					// FL.common.printToConsole("-------------- dd.attributeIndex  existing attribute names ------------BEGIN");
 					for (var i=0;i<xArr.length;i++){
-						// console.log(xArr[i].name);
+						// FL.common.printToConsole(xArr[i].name);
 						if (xArr[i].name==xAttribute) {
 							xRet=i;
 						}
 					}
-					// console.log("-------------- dd.attributeIndex  existing attribute names ------------END");
+					// FL.common.printToConsole("-------------- dd.attributeIndex  existing attribute names ------------END");
 				}else{
-					console.log("FL.dd.attributeIndex ->no attributes defined !");
+					FL.common.printToConsole("FL.dd.attributeIndex ->no attributes defined !");
 				}
-				// console.log("dd.attributeIndex ->for attribute="+xAttribute+" returns position="+xRet);
+				// FL.common.printToConsole("dd.attributeIndex ->for attribute="+xAttribute+" returns position="+xRet);
 			}
 			return xRet;
 		};//attributeIndex
@@ -475,6 +475,15 @@
 			relation["storedHere"] = storedHere;
 			relation["withEntityCN"] = null;//this is an auxiliary field to support FL.server.syncLocalDictionary()
 			return relation;
+		};
+		var getDictAttributesBackup = function(attrArr){//returns a copy of an attributes Array (to be used by getDictEntityBackup)
+			var backupArr = _.map(attrArr, function(element){
+				var eNumBackup = _.clone(element.enumerable);
+				var elBackup = _.clone(element);
+				elBackup.enumerable = eNumBackup;
+				return(elBackup);
+			});
+			return backupArr;
 		};
 		return{
 			entities: {__Last:9999,__LastRelation:0},
@@ -504,20 +513,20 @@
 				//		{name:"address",description:"address to send invoices",label:"Address",type:"string",enumerable:null,key:false});
 				//			NOTE: enumerable is null for all type except "enumerable" - in this case enumerable is an array of strings
 				// 
-				FL.API.debug = true;FL.API.debugStyle = 1;
-				console.log("********************************** FL.dd.displayEntities ********************************");
-				console.log("********************************************** BEGIN ******************************************");
+				// FL.API.debug = true;FL.API.debugStyle = 1;
+				FL.common.printToConsole("********************************** FL.dd.displayEntities ********************************");
+				FL.common.printToConsole("********************************************** BEGIN ******************************************");
 
 				var oEntities = this.entities;
 				for (var key in oEntities) {
 					if (oEntities.hasOwnProperty(key)) {//this restrain the iteration only to the object's own attributes
 						if(key=="__Last"){
 
-							console.log("(__Last) -> Number of entities in dictionary="+ (oEntities[key]-9999) );
+							FL.common.printToConsole("(__Last) -> Number of entities in dictionary="+ (oEntities[key]-9999) );
 						}else if(key=="__LastRelation"){
-							console.log("(__LastRelation) -> Number of relations in dictionary="+oEntities[key]);
+							FL.common.printToConsole("(__LastRelation) -> Number of relations in dictionary="+oEntities[key]);
 						}else{
-							console.log("Entity="+oEntities[key].singular+"/"+oEntities[key].csingular +" - Plural="+oEntities[key].plural+"- description="+oEntities[key].description + " sync="+oEntities[key].sync );
+							FL.common.printToConsole("Entity="+oEntities[key].singular+"/"+oEntities[key].csingular +" - Plural="+oEntities[key].plural+"- description="+oEntities[key].description + " sync="+oEntities[key].sync );
 							//now we display each attribute
 							var oL2C = oEntities[key].L2C;
 							var xArr = oEntities[key].attributes;
@@ -531,16 +540,16 @@
 									var xTypeUI=xArr[i].typeUI;
 									var xKey=xArr[i].key;
 									var xEnumerable=xArr[i].enumerable;
-									// console.log("-----> attribute["+i+"]="+xName+"/"+xDescr+"/"+xCName+",key="+xKey+",type="+xType);
-									console.log("-----> attribute["+i+"]="+xName+"/"+xDescr+"/"+xCName+",label="+xLabel+",key="+xKey+",type="+xType+",typeUI="+xTypeUI);
+									// FL.common.printToConsole("-----> attribute["+i+"]="+xName+"/"+xDescr+"/"+xCName+",key="+xKey+",type="+xType);
+									FL.common.printToConsole("-----> attribute["+i+"]="+xName+"/"+xDescr+"/"+xCName+",label="+xLabel+",key="+xKey+",type="+xType+",typeUI="+xTypeUI);
 									if(xEnumerable) {
 										for (var j=0;j<xEnumerable.length;j++){
-											console.log("------------> enumerable["+j+"]="+xEnumerable[j]);
+											FL.common.printToConsole("------------> enumerable["+j+"]="+xEnumerable[j]);
 										}
 									}
 								}
 							}else{
-								console.log("----->no attributes defined !");
+								FL.common.printToConsole("----->no attributes defined !");
 							}
 							xArr=oEntities[key].relations;
 							if(xArr.length>0){//the entity has attribute(s)
@@ -556,16 +565,16 @@
 									var side = xArr[i].side;
 									var storeHere = xArr[i].storeHere;
 
-									console.log("-----> relation["+i+"] with rCN="+rCN+" -> "+xSemantic+" - #="+cardinality);
+									FL.common.printToConsole("-----> relation["+i+"] with rCN="+rCN+" -> "+xSemantic+" - #="+cardinality);
 								}
 							}else{
-								console.log("----->no relations defined !");
+								FL.common.printToConsole("----->no relations defined !");
 							}
 						}
 					}
 				}
-				console.log("********************************************** END of displayEntities *****************************************");
-				FL.API.debug = false; FL.API.debugStyle = 0;
+				FL.common.printToConsole("********************************************** END of displayEntities *****************************************");
+				// FL.API.debug = false; FL.API.debugStyle = 0;
 			},
 			countEntitiesBeginningBy: function(singularPrefix) {//return the number of entities whose singular name begins by singularPrefix
 				//example   var count = FL.dd.countsEntitiesBeginningBy("_unNamed");=>count = 0
@@ -603,12 +612,12 @@
 				// NOTE:plural is calculated by dDictionary.plural(xSingular,"En");
 				// returns true if succeded false if it fails
 				//alert("dDictionary.createEntity xSingular="+xSingular);
-				// console.log("BEGIN ############################ FL.dd.createEntity ##############################");
+				// FL.common.printToConsole("BEGIN ############################ FL.dd.createEntity ##############################");
 				var oEntity=null;
 				var xPlural = null;
 				var xRet = false;
 				if(!this.entities[xSingular]){//xSingular does not exist in dictionary
-					// console.log("FL.dd.createEntity ----------------->"+xSingular+" new!!!");
+					// FL.common.printToConsole("FL.dd.createEntity ----------------->"+xSingular+" new!!!");
 					var xNext = this.entities["__Last"]+1;
 					this.entities["__Last"] = xNext;
 					var xCSingular = getCompressed(xNext);
@@ -775,14 +784,17 @@
 				if(oEntity){
 					var xIndex = attributeIndex(xSingular,xAttribute);
 					if(xIndex>=0){//if attribute exists
-						var oAttributes = _.extend(oEntity.attributes[xIndex], changeObj);//notice that the attribute name may also belong to changeObj
+						var attributesCopy = getDictAttributesBackup(oEntity.attributes);//it is an overkill- we only need one attribute
+						var attrCopy = attributesCopy[xIndex];
+						// var oAttributes = _.extend(oEntity.attributes[xIndex], changeObj);//notice that the attribute name may also belong to changeObj
+						var oAttributes = _.extend(attrCopy, changeObj);//notice that the attribute name may also belong to changeObj
 						if(oAttributes.name != xAttribute ){//attribute name was changed. It is necessary to update L2C and C2L
-							compressedAttr = oEntity.L2C[xAttribute];
+							var compressedAttr = oEntity.L2C[xAttribute];
 							oEntity.C2L[compressedAttr] = oAttributes.name;//Compressed to Logical is updated
 							delete oEntity.L2C[xAttribute];
 							oEntity.L2C[oAttributes.name] = compressedAttr;
 						}
-						oEntity.attributes[xIndex] = oAttributes;
+						oEntity.attributes[xIndex] = _.omit(oAttributes,"oldname","singular");
 						var fCN = oEntity.L2C[oAttributes.name];
 						//send to server
 						var promise = FL.API.updateDictionaryAttribute(fCN,oAttributes);
@@ -864,7 +876,7 @@
 				//note for _.find: if valuesArr is and array of objects =>element is the value of each key/value and returns value
 				_.each(valuesArr, function(element){//element is each array element. If is an object it returns the value
 					if(typeof element != "number"){
-						// console.log("Pass2 -->"+element.singular);
+						// FL.common.printToConsole("Pass2 -->"+element.singular);
 						var xSingular = element.singular;
 						_.each(element.relations, function(relation){//relation is a relation from the current entity
 							relation["withEntity"] = FL.dd.getEntityByCName(relation["withEntityCN"]);
@@ -1074,6 +1086,23 @@
 				}
 				return xRetArr;
 			},
+			setEntityFieldsBySingular: function(xSingular,fieldsArr,changedAttributesArr) {//sets all fields of entity xSingular.If xSingular does not exist nothing is done.
+				// fieldsArr - an Array of objects, each one with the format:
+				//     {name:"address",description:"address to send invoices",label:"Address",type:"string",typeUI:"textbox",enumerable:eNumArr,key:false});
+				//changedAttributesArr - an array of arrays. Each array element is an array with 2 elements [oldName,newName]
+				if( !_.isUndefined(this.entities[xSingular]) ){
+					var oEntity = this.entities[xSingular];
+					_.each(changedAttributesArr, function(element){
+						var oldName = element[0];
+						var newName = element[1];
+						var compressedAttr = oEntity.L2C[oldName];
+						oEntity.C2L[compressedAttr] = newName;
+						delete oEntity.L2C[oldName];
+						oEntity.L2C[newName] = compressedAttr;
+					});
+					this.entities[xSingular].attributes = fieldsArr;
+				}	
+			},
 			userTypes: {///the opposite of userType() -->for a single userType returns type and typeUI. Ex FL.dd.userTypes.email =>{type:"string",typeUI:"emailbox"}
 				"number":{type:"number",typeUI:"numberbox"},
 				"text"  :{type:"string",typeUI:"textbox"},//"textbox" is hard coded in FLgrid2.js --> dataRowAnalisys(rows,percent) for most basic type
@@ -1135,7 +1164,7 @@
 					}else{
 						newRow[fieldName] = '';
 					}
-					// console.log("defaultNewGridRow newRow="+JSON.stringify(newRow));
+					// FL.common.printToConsole("defaultNewGridRow newRow="+JSON.stringify(newRow));
 				});
 				return newRow;
 			},
@@ -1152,7 +1181,7 @@
 					xRet = true;
 				}else{
 					// alert("FL.dd.createEntityAndFields createEntity() Error entity " + masterDetailItems.master.entityName + " already exists !");
-					console.log("FL.dd.createEntityAndFields Error:trying to create existing entity " + entityName + " !!!");
+					FL.common.printToConsole("FL.dd.createEntityAndFields Error:trying to create existing entity " + entityName + " !!!");
 				}
 				return xRet;
 			},
@@ -1232,6 +1261,23 @@
 				}else{
 					alert("dDictionary.removeEntity Error:Trying to remove a non existing entity:"+xSingular);
 				}
+			},
+			getDictEntityBackup: function(entityName){//returns a copy of an whole entity (with all its internal objects) 
+				var entityBackup = null;
+				if( !_.isUndefined(this.entities[entityName]) ){
+					var oEntity = FL.dd.getEntityBySingular(entityName);
+					entityBackup = _.clone(oEntity);
+					var C2LBackup = _.clone(oEntity.C2L);
+					var L2CBackup = _.clone(oEntity.L2C);
+					var attributesBackup = getDictAttributesBackup(oEntity.attributes);
+					var relationsBackup = _.clone(oEntity.relations);
+
+					entityBackup.C2L = C2LBackup;
+					entityBackup.L2C = L2CBackup;
+					entityBackup.attributes = attributesBackup;
+					entityBackup.relations = relationsBackup;
+				}
+				return entityBackup;
 			}
 		};
 	})();
