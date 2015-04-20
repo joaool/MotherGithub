@@ -922,7 +922,7 @@ FL["common"] = (function(){//name space FL.common
                     _.each(FL.API.debugFiltersToShow, function(element){
                         if( element == filter ) //checks if print request is inside filters to display (FL.API.debugFiltersToShow)
                             if( this.debugFilter[element] )//checks if the current filter is active
-                                console.log(toDisplay);
+                                console.log(" -->"+filter+":"+toDisplay);
                     },this);
                 }
             }    

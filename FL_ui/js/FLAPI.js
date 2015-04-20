@@ -1022,10 +1022,10 @@
 			if( FL.API.serverCallBlocked ){
 				var delay = 100;//time between tries to check if FL.API.serverCallBlocked was set to false
 				var counter = 0;//number of check attempts
-				var maxRefused = 50;//limit of refused - more than this limit =>error
+				var maxRefused = 100;//limit of refused - more than this limit =>error
 				var intervalId = setInterval(function () {
 					counter++;
-					FL.common.printToConsole("_checkServerCallBlocked counter=" + counter + "/" + maxRefused );
+					FL.common.printToConsole("_checkServerCallBlocked counter=" + counter + "/" + maxRefused,"checkServerCall" );
 					if( counter >= maxRefused ){
 						clearInterval(intervalId);
 						FL.API.serverCallBlocked = false;					
@@ -1037,6 +1037,7 @@
 					}	
 				}, delay);	
 			}else{
+				FL.common.printToConsole("No checkServerCallBlocked ->passed on first attempt","checkServerCall");
 				return def.resolve();
 			}
             return def.promise();

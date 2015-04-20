@@ -1218,6 +1218,7 @@
 				
 				var promiseUnblock = FL.API.checkServerCallBlocked()
 				.then(function(){
+					FL.API.serverCallBlocked = true;
 					var promise=FL.API.loadTable(entityName);
 					promise.done(function(data){
 						FL.common.printToConsole("New %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
@@ -1264,8 +1265,10 @@
 							$("#_newsletterMC").html(" MC");
 						}	
 						var grid = utils.mountGridInCsvStore(columnsArr);//mount backbone views and operates grid -	
+						FL.API.serverCallBlocked = false;
 					});
 					promise.fail(function(err){
+						FL.API.serverCallBlocked = false;
 						spinner.stop();
 						alert("DefaultGridWithNewsLetterAndEditButtons Error="+err);
 					});				

@@ -37,7 +37,7 @@ var FL = FL || {};
 	setInterval(function(){spinner.stop();},1000);
 	$(document).ready(function() {
 		FL.API.debug = false;
-		FL.API.debugFiltersToShow = ["API"];
+		FL.API.debugFiltersToShow = ["API","checkServerCall"];
 		FL.API.fl.setTraceClient(2);
 
 		FL.common.printToConsole("joakim1","abc");
