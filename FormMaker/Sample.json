@@ -5,7 +5,7 @@
 			"type": "email",
 			"leftLabel": "Your Name:",
 			"placeholder": "Please introduce your name",
-			"value": "Antonio",
+			"value": "Antonio1111",
 			"icon": "glyphicon-envelope",
 			"trigger": "change",
 			"icon": "glyphicon-envelope",
@@ -16,7 +16,7 @@
 			"type": "password",
 			"leftLabel": "Password:",
 			"placeholder": "Password",
-			"value": "Antonio123",
+			"value": "Antonio444",
 			"icon": "glyphicon-lock",
 			"trigger": "change",
 			"label": "Please introduce your password:",
@@ -39,7 +39,12 @@
 					"label": "Like FrameLink",
 					"checked": true,
 					"onChange": null
-				}
+				},
+				{
+					"label": "a test",
+					"checked": false,
+					"onChange": null
+				}				
 			]
 		 },
 		{
