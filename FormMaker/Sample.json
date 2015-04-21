@@ -130,7 +130,7 @@
 			"element": "Date",
 			"type": "text",
 			"leftLabel": "Date",
-			"value": "26/12/2015",
+			"value": "5/12/2015 1:30",
 			"trigger": "change",
 			"tooltip": "Select a date.",
             "class" : "datePicker",

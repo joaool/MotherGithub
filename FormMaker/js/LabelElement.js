@@ -102,7 +102,11 @@ FormMaker.Date = FormMaker.BaseElement.extend({
 		
 	},
 	onRender: function(){
-		$(".datePicker").datepicker();
+		$(".datePicker").datetimepicker({
+            timeFormat: "hh:mm tt",
+            controlType: 'select',
+            oneLine: true,
+        });
 	}
 	
 });
