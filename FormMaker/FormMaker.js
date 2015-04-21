@@ -33,5 +33,7 @@ FormMaker.Elements = {
 	Button : "Button",
 	Checkbox : "Checkbox",
 	Radio : "Radio",
-	Combo : "Combo"
+	Combo : "Combo",
+    Date : "Date",
+    TextArea : "TextArea"
 	};

@@ -125,6 +125,25 @@
 					"tooltip": "please press special"
 				}
 			]
+		},
+        {
+			"element": "Date",
+			"type": "text",
+			"leftLabel": "Date",
+			"value": "26/12/2015",
+			"trigger": "change",
+			"tooltip": "Select a date.",
+            "class" : "datePicker",
+            "placeholder" : "select date"
+		},
+        {
+			"element": "TextArea",
+			"type": "textarea",
+			"leftLabel": "Enter text",
+			"value": "Sample text area text",
+			"trigger": "change",
+			"tooltip": "Enter text.",
+            "placeholder" : "enter some text."
 		}
 	]
 }
