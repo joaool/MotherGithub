@@ -1,0 +1,154 @@
+<html>
+    <head>
+        <title>Mail Template Editor </title>
+		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+
+		<link rel="stylesheet" type="text/css" href="../mailer/bootstrap/css/bootstrap.min.css"/>
+        <link rel="stylesheet" type="text/css" href="css/simple-sidebar.css"/>
+		<link rel="stylesheet" type="text/css" href="css/style.css"/>
+        
+        <script src="../mailer/js/lib/ckeditor/ckeditor.js"></script>
+		<script src="../mailer/js/lib/underscore.js"></script>
+		<script src="../mailer/js/lib/jquery-1.11.0.js"></script>
+		<script src="../mailer/js/lib/backbone.js"></script>
+		<script src="../mailer/js/lib/jquery-ui-1.10.4.js"></script>
+		<script src="../mailer/js/lib/handlebars-v1.3.0.js"></script>
+		<script src="../mailer/bootstrap/js/bootstrap.min.js"></script>
+<!--        <script type="text/javascript" src="https://rawgithub.com/powmedia/backbone.bootstrap-modal/master/src/backbone.bootstrap-modal.js"></script>-->
+        
+    </head>
+    <body>
+        <div id="wrapper">
+
+        <!-- Sidebar -->
+        <div id="sidebar-wrapper">
+            <ul class="sidebar-nav">
+                <li class="sidebar-brand">
+                    <a href=#>Basic elements</a>
+                </li>
+            </ul>
+            <table class="sidebar-nav">
+                <tr>
+                  <td class="standard-fields__field field-section ng-scope ui-draggable ui-draggable-handle"  data-type="text">
+                    <i class="fa fa-arrows icon-drag fa-lg"></i>
+                    <a href=""  class="builder__label ng-binding field-text">Short Answer</a>
+                  </td>
+                    <td class="standard-fields__field field-section ng-scope ui-draggable ui-draggable-handle"  data-type="textarea">
+                    <i class="fa fa-arrows icon-drag fa-lg"></i>
+                    <a href=""  class="builder__label ng-binding field-textarea">Long Answer</a>
+                  </td>
+                </tr>
+                <tr>
+                <td class="standard-fields__field field-section ng-scope ui-draggable ui-draggable-handle"  data-type="checkbox">
+                <i class="fa fa-arrows icon-drag fa-lg"></i>
+                <a href=""  class="builder__label ng-binding field-checkbox">Checkbox</a>
+              </td>
+                <td class="standard-fields__field field-section ng-scope ui-draggable ui-draggable-handle"  data-type="radio">
+                <i class="fa fa-arrows icon-drag fa-lg"></i>
+                <a href=""  class="builder__label ng-binding field-radio">Radio Button</a>
+              </td>
+                    </tr>
+                <tr>
+                <td class="standard-fields__field field-section ng-scope ui-draggable ui-draggable-handle"  data-type="select">
+                <i class="fa fa-arrows icon-drag fa-lg"></i>
+                <a href=""  class="builder__label ng-binding field-select">Dropdown List</a>
+              </td>
+                <td class="standard-fields__field field-section ng-scope ui-draggable ui-draggable-handle"  data-type="number">
+                <i class="fa fa-arrows icon-drag fa-lg"></i>
+                <a href=""  class="builder__label ng-binding field-number">Number</a>
+              </td>
+                    </tr>
+                <tr>
+                <td class="standard-fields__field field-section ng-scope ui-draggable ui-draggable-handle"  data-type="name">
+                <i class="fa fa-arrows icon-drag fa-lg"></i>
+                <a href=""  class="builder__label ng-binding field-name">Name</a>
+              </td>
+                <td class="standard-fields__field field-section ng-scope ui-draggable ui-draggable-handle"  data-type="email">
+                <i class="fa fa-arrows icon-drag fa-lg"></i>
+                <a href=""  class="builder__label ng-binding field-email">Email Address</a>
+              </td>
+                    </tr>
+                <tr>
+                <td class="standard-fields__field field-section ng-scope ui-draggable ui-draggable-handle"  data-type="phone">
+                <i class="fa fa-arrows icon-drag fa-lg"></i>
+                <a href=""  class="builder__label ng-binding field-phone">Phone Number</a>
+              </td>
+                <td class="standard-fields__field field-section ng-scope ui-draggable ui-draggable-handle"  data-type="address">
+                <i class="fa fa-arrows icon-drag fa-lg"></i>
+                <a href=""  class="builder__label ng-binding field-address">Address</a>
+              </td>
+                    </tr>
+                
+            </table>
+            <ul class="sidebar-nav">
+                <li class="sidebar-brand">
+                    <a href=#>Properties</a>
+                </li>
+            </ul>
+            <div>
+                <table id="properties">
+                    <tr>
+                        <td>Name</td>
+                        <td><input type="text" value="" id="name"/></td>
+                    </tr>
+                    <tr>
+                        <td>Type</td>
+                        <td><input type="text" value="" id="type"/></td>
+                    </tr>
+                    <tr>
+                        <td>Value</td>
+                        <td><input type="text" value="" id="value"/></td>
+                    </tr>
+                    <tr>
+                        <td>Label</td>
+                        <td><input type="text" value="" id="label"/></td>
+                    </tr>
+                    <tr>
+                        <td>Placeholder</td>
+                        <td><input type="text" value="" id="placeholder"/></td>
+                    </tr>
+                    <tr>
+                        <td>Icon</td>
+                        <td><input type="text" value="" id="icon"/></td>
+                    </tr>
+                    <tr>
+                        <td>Tooltip</td>
+                        <td><input type="text" value="" id="tooltip"/></td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+        <!-- /#sidebar-wrapper -->
+
+        <!-- Page Content -->
+        <div id="page-content-wrapper">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-lg-12">
+                        <h1>Form Designer</h1>
+                        <div id="droppable">
+                        
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="toggleBtn">
+                <a href="#menu-toggle" class="btn btn-primary" id="menu-toggle"></a>
+            </div>
+        </div>
+        <!-- /#page-content-wrapper -->
+        <div id="buttonContainer">
+            <a href="#" class="btn btn-primary" id="save"><span class="glyphicon glyphicon-save"></span> Save </a>    
+        </div>
+            
+    </div>
+        
+        <script>
+            $("#menu-toggle").click(function(e) {
+                e.preventDefault();
+                $("#wrapper").toggleClass("toggled");
+            });
+        </script>
+    </body>
+    
+</html>

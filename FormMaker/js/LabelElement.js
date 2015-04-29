@@ -24,7 +24,7 @@ FormMaker.BaseElement = Backbone.View.extend({
 		//console.log(this.m_html);
 	},
 	render : function(){
-		$("body").append($.parseHTML(this.m_html));
+		this.$el.append($.parseHTML(this.m_html));
 		this.onRender();
 	},
 	onRender : function(){
@@ -85,6 +85,36 @@ FormMaker.TextArea = FormMaker.BaseElement.extend({
 		console.log('TextArea init');
 		this.m_template = Handlebars.compile($("#__textarea").html());
 	}
+});
+
+FormMaker.Image = FormMaker.BaseElement.extend({
+	
+    m_ImagePreview : null,
+    m_ImageUploadBtn : null,
+	initialize : function(){
+		console.log('Image init');
+		this.m_template = Handlebars.compile($("#__image").html());
+	},
+    onRender: function(){
+        this.m_ImagePreview = this.$("#imagePreview");
+		this.m_ImageUploadBtn = this.$("#imageUploadBtn");  
+    },
+    events : {
+        "change #imageUploadBtn" : "ImageFileSelected",
+        "load #imagePreview" : "OnImageLoaded"
+    },
+	OnImageLoaded : function(evt,obj){
+		obj.m_ImagePreview[0].src = evt.target.result;
+		
+	},
+	ImageFileSelected : function(evt){
+		if (evt.target.files && evt.target.files[0]) {
+			var reader = new FileReader();
+			var temp = this;
+			reader.onload = function(evt){temp.OnImageLoaded(evt,temp)};
+			reader.readAsDataURL(evt.target.files[0]);
+		}
+	},
 });
 
 FormMaker.Date = FormMaker.BaseElement.extend({

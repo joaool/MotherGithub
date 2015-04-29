@@ -149,6 +149,14 @@
 			"trigger": "change",
 			"tooltip": "Enter text.",
             "placeholder" : "enter some text."
+		},
+        {
+			"element": "Image",
+			"type": "image",
+			"leftLabel": "Select an image",
+			"source": "",
+			"trigger": "change",
+			"tooltip": "Select an image"
 		}
 	]
 }

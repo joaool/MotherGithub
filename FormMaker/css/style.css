@@ -1,0 +1,76 @@
+.toggleBtn {
+    display: inline-block;
+    position: absolute;
+    top: 0px;
+    left: -15px;
+    z-index: 9999;
+}
+
+div#page-content-wrapper {
+    position: relative;
+    height: 100%;
+    padding-bottom: 40px;
+}
+#wrapper a#menu-toggle:before{
+    content: "<";
+}
+
+#wrapper.toggled a#menu-toggle:before {
+    content: ">";
+}
+
+
+
+a#menu-toggle {
+    width: 35px;
+    height: 35px;
+}
+
+.sidebar-nav > .sidebar-brand {
+    height: 45px;
+}
+
+.sidebar-nav > .sidebar-brand a {
+    height: 45px;
+    line-height: 45px;
+    color: white;
+}
+
+table#properties td {
+    padding: 3px;
+}
+
+.sidebar-nav a {
+    color: white;
+}
+
+div#wrapper {
+    width: 100%;
+    height: 100%;
+    padding-bottom: 50px;
+    overflow-y: auto;
+    /* margin-bottom: 40px; */
+}
+
+body {
+    overflow: hidden;
+}
+
+div#buttonContainer {
+    position: absolute;
+    bottom: 5px;
+    display: block;
+    width: 100%;
+    left: 0px;
+    padding-left: 20px;
+    text-align: right;
+}
+
+div#droppable {
+    border: 1px solid #CACACA;
+    height: 500px;
+}
+
+h1 {
+    margin-top: 0px;
+}

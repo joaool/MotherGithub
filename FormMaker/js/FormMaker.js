@@ -12,7 +12,7 @@ FormMaker = Backbone.View.extend({
 		$.each(elements,(function(i,item){
 			if (FormMaker[item.element])
 			{
-				var obj = new FormMaker[item.element]();
+				var obj = new FormMaker[item.element]({el : "body"});
 				obj.loadData(item);
 				arrObjs.push(obj);
 			}
@@ -35,5 +35,6 @@ FormMaker.Elements = {
 	Radio : "Radio",
 	Combo : "Combo",
     Date : "Date",
-    TextArea : "TextArea"
+    TextArea : "TextArea",
+    Image : "Image"
 	};
