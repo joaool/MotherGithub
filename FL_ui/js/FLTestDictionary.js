@@ -7,7 +7,7 @@ var FL = FL || {};
 	$(document).ready(function() {
 		console.log("Dict 1.0 on MotherGithub");
 		FL.API.debug = false;
-		FL.API.debugFiltersToShow = ["xAPI","xlogin","xdump","dd"];//note that "dump" is a reserved word for FL.dd.displayEntities()
+		FL.API.debugFiltersToShow = ["xAPI","login","xdump","dd"];//note that "dump" is a reserved word for FL.dd.displayEntities()
 		FL.API.fl.setTraceClient(2);
 
 		// console.log("login:"+FL.login.test);
@@ -21,7 +21,7 @@ var FL = FL || {};
 		FL.common.printToConsole("Before display","login");
 		var loadDefaultAppPromise = FL.API.loadDefaultApp(loginObject)
 			.then(function(menuData,homeHTML){
-				alert("style="+menuData.style+", fontFamily="+menuData.fontFamily+"\nHTML=>"+homeHTML+"\n--------\n"+JSON.stringify(menuData));
+				// alert("style="+menuData.style+", fontFamily="+menuData.fontFamily+"\nHTML=>"+homeHTML+"\n--------\n"+JSON.stringify(menuData));
 				testMockUp();
 				return;
 			},function(err){alert("ERROR ->"+err.code+" - "+err.message);return;});
@@ -33,11 +33,11 @@ var FL = FL || {};
 testMockUp = function(){
 	// alert("Inside testMockUp");
     //----------------- to delete
-	FL.dd.init_t();//to set mockup on
+	FL.dd.init_t();//to init
 	var display=null;
+
 	_.each(FL.dd.t.entities.list(),function(element){display+=element.singular+"/"+element.csingular+"\n"});
 	alert("List all entities:\n"+display+"\nCompressed name of sub="+FL.dd.t.entities.getCName("sub"));
-	// var foo= new FL.dd.t.entities("a","b");
 
 	FL.common.printToConsole("singular -->"+FL.dd.t.entities["53"].singular+"-->","login");
 	FL.common.printToConsole("description -->"+FL.dd.t.entities["53"].description+"-->","login");
