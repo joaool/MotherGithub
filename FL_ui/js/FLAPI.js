@@ -210,7 +210,7 @@
 			return def.promise();
 		};
 		var _isUserExist = function(userName){
-			FL.common.printToConsole("....................................>beginning _isUserExist...."+JSON.stringify(FL.login.token));
+			FL.common.printToConsole("....................................>beginning _isUserExist...."+JSON.stringify(FL.login.token),"API");
 			var def = $.Deferred();
 			var fl = FL.fl;//new flMain();
 			// if(!fl){
@@ -1339,14 +1339,13 @@
 			},
 			isUserExist: function(userName){
 				var def = $.Deferred();
-				FL.common.printToConsole("....................................>beginning isUserExist....with token="+JSON.stringify(FL.login.token));
+				FL.common.printToConsole("....................................>beginning isUserExist....with token="+JSON.stringify(FL.login.token),"API");
 				var isUserExistPromise=_isUserExist(userName);
-				// FL.API.trace = false;
 				isUserExistPromise.done(function(exists){
-					FL.common.printToConsole(">>>>> isUserExist SUCCESS <<<<< exist="+exists);
+					FL.common.printToConsole(">>>>> isUserExist SUCCESS <<<<< exist="+exists,"API");
 					return def.resolve(exists);
 				});
-				isUserExistPromise.fail(function(err){FL.common.printToConsole(">>>>> isUserExist FAILURE <<<<<"); return def.reject(err);});
+				isUserExistPromise.fail(function(err){FL.common.printToConsole(">>>>> isUserExist FAILURE <<<<<","API"); return def.reject(err);});
 				return def.promise();
 			},		
 			temporaryRebuildsLocalDictionaryFromServer: function(entities){
@@ -1504,6 +1503,66 @@
 				save_Menu_style_fontFamily.fail(function(err){FL.common.printToConsole(">>>>> save_Menu_style_fontFamily FAILURE <<<<<"+err);def.reject(err);});
 				return def.promise();
 			},
+			loadDefaultApp: function(loginObject){//returns menuData,homeHTML for user loginObject or 
+				//																err={code:<[1,2,3,4]>,message:<error message>}	
+				//	1-user not existing  2-isUserExist faillure  3-connectUserToDefaultApp faillure  
+				//	4-loadAppDataForSignInUser2 faillure 5-wrong password on existing user
+				//  Check if user exists with FL.API.isUserExist
+				//		if it exists => FL.API.connectUserToDefaultApp
+				//			if it is connected  =>FL.API.loadAppDataForSignInUser2  =>loads dd and returns menuData and homeHTML
+				//				Now we have the dictionary loaded and objects menuData and homeHTML
+				var def = $.Deferred();
+				FL.common.printToConsole("....................................>beginning loadDefaultApp....","API");
+			    var existingUserPromise=FL.API.isUserExist(loginObject.email);
+			    existingUserPromise.done(function(exist){
+					if(exist){//the user exists
+						FL.common.printToConsole(loginObject.email + " exists !!!!","login");
+						var setupExistingUserPromise = FL.API.connectUserToDefaultApp(loginObject.email,loginObject.password);
+						setupExistingUserPromise.done(function(){
+							var loadAppPromise=FL.API.loadAppDataForSignInUser2();//gets data dictionary + main menu + style + fontFamily + home page
+							loadAppPromise.done(function(menuData,homeHTML){
+								return def.resolve(menuData,homeHTML);
+							});
+							loadAppPromise.fail(function(err){
+								FL.common.printToConsole("loadAppDataForSignInUser2 FAILURE  <<<<< error="+err,"API");
+								return def.reject({code:4,message:"loadAppDataForSignInUser2 FAILURE  <<<<< error="+err});				
+							});
+						});
+						setupExistingUserPromise.fail(function(err){
+							if(err.indexOf("Access denied")>=0){//user exist but password is wrong
+								return def.reject({code:5,message:"wrong password for existing user"});
+							}else{
+								FL.common.printToConsole("connectUserToDefaultApp FAILURE  <<<<< error="+err,"API");
+								return def.reject({code:3,message:"connectUserToDefaultApp FAILURE  <<<<< error="+err});
+							}
+						});
+					}else{//user does not exist !!!
+						FL.common.printToConsole("FL.API.loadDefaultApp >>>>> user " + loginObject.email + " does not exist !","API");
+						return def.reject({code:1,message:"user " + loginObject.email + " does not exist !"});
+					}
+			    });
+			    existingUserPromise.fail(function(err){
+			      FL.common.printToConsole("FL.API.loadDefaultApp >>>>> isUserExist FAILURE Service no accessible<<<<<","API");
+			      return def.reject({code:2,message:"isUserExist FAILURE"});
+			    });
+				return def.promise();
+			},
+			loadDefaultAppByAPI_Key: function(API_Key) {//returns menuData,homeHTML for API_key or 
+				//																err={code:<[1,2,3,4]>,message:<error message>}	
+				//	1-user not existing  2-isUserExist faillure  3-connectUserToDefaultApp faillure  4-loadAppDataForSignInUser2 faillure				
+				// API_Key - is the database access key
+				var def = $.Deferred();
+				FL.common.printToConsole("....................................>beginning loadDefaultAppByAPI_Key....","API");
+				var pairString = FL.common.enc(API_Key,-1);//pairString is "{email:x1,password:x2}". Encripted with API_Key = FL.common.enc(pairString,1);
+				var loginObject = JSON.parse(pairString);
+				var loadDefaultAppPromise = FL.API.loadDefaultApp(loginObject)
+					.then(function(menuData,homeHTML){return def.resolve(menuData,homeHTML);}
+					,function(err){return def.reject(err);});			
+				return def.promise();
+			},
+			generateAPI_key: function(loginObject){//loginObject has format {email:x1,password:x3,domain:x4};->domain key is optional 
+				return FL.common.enc(JSON.stringify(loginObject),1);
+			},	
 			removeTable: function(entityName) {//remove existing or unexisting table - after this we are sure that table does not exist
 				//assumes a connection to an application exists
 				//Temporary instead of removing --> we rename tables on server to unique names beginning by $+ecn
@@ -1773,7 +1832,7 @@
 				// });
 				return def.promise();
 			},			
-			createHistoMails_ifNotExisting: function() {//checks if histoMails exist. If not creates it
+			XcreateHistoMails_ifNotExisting: function() {//checks if histoMails exist. If not creates it
 				var eCN = FL.dd.getCEntity("_histoMail");
 				// eCN = 23;
 				var def = $.Deferred();

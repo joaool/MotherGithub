@@ -19,6 +19,28 @@
 				internalTest(x);
 				alert("Fl.emailServices2.test(x) x="+x);
 			},
+			testGoogleGeo: function(city){
+				//return format: https://mandrillapp.com/api/docs/senders.JSON.html
+				var def = $.Deferred();
+				$.ajax({
+					type: "POST",
+					url: "https://maps.googleapis.com/maps/api/geocode/json?address="+city,
+					data: {
+						'address': city,
+					}
+				})
+				.done(function(response) {
+					var toDisplay = response.results[0].address_components[2].long_name + "/" + response.results[0].address_components[2].short_name;
+					FL.common.printToConsole('FL.emailServices. testGoogleGeo->'+toDisplay,"geo" ); // show success message
+					alert("FLemailServices2.js  testGoogleGeo->"+toDisplay);
+					return def.resolve(response);
+				})
+				.fail(function(response) {
+					alert("FLemailServices2.js  testGoogleGeo ->err="+response);
+					return def.reject("FL.emailServices.testGoogleGeo FAILURE err="+response);
+				});
+				return def.promise();
+			},					
 			extractMandrillInfoFromId: function(md_id){//not used anywhere 16-04-2015
 				//return format: https://mandrillapp.com/api/docs/messages.JSON.html#method=info
 				var def = $.Deferred();
@@ -61,7 +83,7 @@
 					return def.reject("FL.emailServices.mandrillStats FAILURE err="+response.message);
 				});
 				return def.promise();
-			},			
+			},	
 			sendEmail:function(mailHTML,imagesArr,recipientsArray,senderObj,metadataObj){//NewsletterName,dbName){//sends an email to the recipients
 			  	//paramenter-->mailHTML, images array, recipients Array, senderObj={from_name:name,from_email:email,subject:subject,testEmail:testEmail}
       			//   and metadataObj={newsletterName:FL.login.emailTemplateName,dbName:FL.login.token.dbName,eCN:null,fCN:null}
@@ -109,7 +131,7 @@
 						FL.common.printToConsole("	to from_name:"+senderObj.from_name+" email:"+senderObj.from_email+" subject:"+senderObj.subject);
 						FL.common.printToConsole("	Sends to -->"+JSON.stringify(element));
 						FL.common.printToConsole("----------------------------------------------------------------------");
-					 m.messages.send(params2,function(res){FL.common.printToConsole(res);},function(err){FL.common.printToConsole(err);});
+						m.messages.send(params2,function(res){FL.common.printToConsole(res);},function(err){FL.common.printToConsole(err);});
 						//how to recover from an accident ?	
 					}else{
 						FL.common.printToConsole("sendEmail not sent ! "+ count +"/"+total_toSend+ " -->" + element + " has a format error and was bypassed");				

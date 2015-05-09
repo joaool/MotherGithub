@@ -917,7 +917,7 @@ FL["common"] = (function(){//name space FL.common
                 if(_.isUndefined(this.debugFilter[filter]))
                     this.debugFilter[filter]=true;
             };    
-            if(FL.API.debug){
+            if(FL.API.debug){//shows all FL.common.printToConsole() even without filter parameter
                 console.log(toDisplay);
             }else{
                 if(filter){//if there is no filter, does not display, otherwise checks if there is a reason to display

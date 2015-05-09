@@ -193,9 +193,8 @@ jQuery(document).ready(function($){
 				def.resolve(menuData,homeHTML);
 			});
 			loadAppPromise.fail(function(err){
-				alert("FLLoadCss2.js  --> loginAccess appSetup FAILURE in loadAppDataForSignInUser2 <<<<< error="+err);
-				// return loginAccessCB(err,loginObject);
-				return def.reject("FLLoadCss2.js  --> loginAccess appSetup FAILURE in loadAppDataForSignInUser2 <<<<< error="+err);
+				alert("FLLoadCss2.js  --> appSetup FAILURE  <<<<< error="+err);
+				return def.reject("FLLoadCss2.js  --> appSetup FAILURE <<<<< error="+err);
 			});
 			return def.promise();
 		};
@@ -326,7 +325,7 @@ jQuery(document).ready(function($){
 				FL.common.printToConsole("loginAccess not a guest -------------------------------------------------------> checks if user exists");
 				var existingUserPromise=FL.API.isUserExist(loginObject.email);
 				existingUserPromise.done(function(exist){
-					FL.common.printToConsole("existingUserPromise.done------------------------------------------------------------>next will text exist !!!");
+					FL.common.printToConsole("existingUserPromise.done----------------------------------->next will test exist !!!");
 					if(exist){//the user exists
 						var spinner=FL.common.loaderAnimationON('spinnerDiv');
 						// setInterval(function(){spinner.stop();},3000);
@@ -359,7 +358,7 @@ jQuery(document).ready(function($){
 			var def = $.Deferred();
 			var loginPromise = null;
 			// check if the user exists - if it does not exist => creates it.
-			FL.common.printToConsole("loginAccess not a guest -------------------------------------------------------> checks if user exists");
+			FL.common.printToConsole("newUserAccess not a guest -------------------------------------------------------> checks if user exists");
 			var existingUserPromise=FL.API.isUserExist(loginObject.email);
 			existingUserPromise.done(function(exist){
 				FL.common.printToConsole("newUserAccess existingUserPromise.done-------------------------------->next will text exist !!!");
@@ -372,9 +371,6 @@ jQuery(document).ready(function($){
 							
 							var histoPromise=FL.API.createHistoMails_ifNotExisting();
 							histoPromise.done(function(){
-								// FL.login.checkSignIn();
-								// displaySignInUser(loginObject.email);
-								// return loginAccessCB(null,loginObject);
 								FL.common.printToConsole("FLLoadCss2.js newUserAccess _histoMail SUCESSFULLY created for new user");
 								return def.resolve(true);//true ==>user was created
 							});
@@ -393,7 +389,7 @@ jQuery(document).ready(function($){
 				}
 			});
 			existingUserPromise.fail(function(err){
-				alert("loginAccess --> error while checking if user " + loginObject.email + " exists !!!! err="+JSON.stringify(err));
+				alert("newUserAccess --> error while checking if user " + loginObject.email + " exists !!!! err="+JSON.stringify(err));
 				return def.reject("Error while checking if user " + loginObject.email + " exists!");
 			});
 			return def.promise();
@@ -581,7 +577,7 @@ jQuery(document).ready(function($){
 						var loginPromise = loginAccess(lastLoginObj);
 
 						loginPromise.then(function(userExists,loginObject){
-							FL.common.printToConsole("loginAccess well done! email="+loginObject.email+" userExists="+userExists);
+							FL.common.printToConsole("loginAccess well done! email="+loginObject.email+" userExists="+userExists,"login");
 							if(!userExists){
 								FL.login.signOut();//saves logout in local storage ->hide slide panels  ->updates upper right corner display
 								logOutMenu();//displays menu and homepage for logout status
@@ -611,7 +607,6 @@ jQuery(document).ready(function($){
 			},
 			signIn: function() {//called from href in first line
 				// http://www.sitepoint.com/11-ways-to-enhance-your-web-application/
-				// signIn calls loginDialogs ->calls loginAccess and disconnect
 				// Use cases:
 				// 		New user
 				FL.common.printToConsole("enter signIn");
@@ -672,7 +667,6 @@ jQuery(document).ready(function($){
 				});	
 				loadAppPromise.fail(function(err){
 					alert("FLpage_editor ->  --> after successfull connectUserToDefaultApp FAILURE in loadAppDataForSignInUser2 <<<<< error="+err);
-					// return def.reject("FLLoadCss2.js  --> loginAccess appSetup FAILURE in loadAppDataForSignInUser2 <<<<< error="+err);
 				});				
 			},
 			clearAllSettings: function(){//restore original menu in local storage and updates DOM status - called directly from DOM link

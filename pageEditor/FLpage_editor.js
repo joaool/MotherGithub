@@ -40,31 +40,48 @@ var FL = FL || {};
 	$(document).ready(function() {
 		// alert("inside FLpage_editor");
 		var fullUrl = window.location.href;
+		var API_key = null;
 		// alert(fullUrl);
 		if(fullUrl){//gets domain from url string ->http://localhost/pdojo/MotherGithub/test_menu13.html?d=myDomain1#
-		// if(false){//gets domain from url string ->http://localhost/pdojo/MotherGithub/test_menu13.html?d=myDomain1#
-			//ex. http://www.framelink.co/app?d=myDomain1 Nico's definition
-			// isolate with http://localhost/pdojo/MotherGithub/page_editor.html?=cs#page=home
-			//this is equivalent to  http://localhost/pdojo/MotherGithub/test_menu13.html?d=myDomain1
-			//
 			page = FL.common.getTag(fullUrl,"page","#");//FL.domain is globally defined - the last # is disregarded
-			var connectionString = FL.common.getTag(fullUrl,"connectionString","#");//FL.domain is globally defined - the last # is disregarded
-			// alert("FLpage_editor => before enc connectionString="+connectionString);
-			connectionString = FL.common.enc(connectionString,-1);
-			// alert("FLpage_editor => after enc connectionString="+connectionString);
-
-			var loginObject = JSON.parse(connectionString);
 			var style = FL.common.getTag(fullUrl,"style","#");//FL.domain is globally defined - the last # is disregarded
 			var font = FL.common.getTag(fullUrl,"font","#");//FL.domain is globally defined - the last # is disregarded
 			FL.common.setStyleAndFont(style,font);			//Now we will restore the style and font
+			
+			API_key = FL.common.getTag(fullUrl,"API_key","#");//FL.domain is globally defined - the last # is disregarded
+			
+			var loginObject = JSON.parse( FL.common.enc(API_key,-1) );//to remove...only for FL.common.printToConsole
+			
+			FL.API.debug = false;
+			FL.API.debugFiltersToShow = ["xAPI","login","peditor","dd"];//note that "dump" is a reserved word for FL.dd.displayEntities()
+			FL.API.fl.setTraceClient(2);
 
-			FL.common.printToConsole("FLpage_editor.js fullUrl="+fullUrl);
-			FL.common.printToConsole("FLpage_editor.js connectionString="+connectionString);
-			FL.common.printToConsole("FLpage_editor.js style="+style);
-			FL.common.printToConsole("FLpage_editor.js font="+font);
+			FL.common.printToConsole("FLpage_editor.js fullUrl="+fullUrl,"peditor");
+			FL.common.printToConsole("FLpage_editor.js ** login="+JSON.stringify(loginObject),"peditor");//to remove...
+			FL.common.printToConsole("FLpage_editor.js style="+style,"peditor");
+			FL.common.printToConsole("FLpage_editor.js font="+font,"peditor");
+			
+			var fl = new flMain();//only place where this must exist !!!!
+			FL.fl = fl; //new flMain();
+			fl.serverName(FL.common.getServerName());
 		}else{
 			alert("inside FLpage_editor - ERROR fullUrl is empty");
 		}
+		var loadDefaultAppPromise = FL.API.loadDefaultAppByAPI_Key(API_key)
+			.then(function(menuData,homeHTML){
+				var templateHTML = $('#pageEditorTemplate').html();
+				FL.domInject("_placeHolder",templateHTML );
+				//-------- Replace headers
+				$("#pageTitle").empty();
+				$("#pageTitle").text("FrameLink - editing " + page +" page");
+				// --------
+				editPage("home",homeHTML);
+			},function(err){
+				alert("FLpage_editor -> ERROR ->"+err.code+" - "+err.message);
+				return;
+			});
+
+		/* working code - replaced because of new method FL.API.loadDefaultApp(loginObject)
 		FL.API.connectUserToDefaultApp(loginObject.email,loginObject.password)
 		.then(function(){
 				FL.common.printToConsole("FLpage_editor -> success connecting to default app - Now we extract application data");
@@ -87,6 +104,8 @@ var FL = FL || {};
 			},function(err){
 				FL.common.printToConsole("FLpage_editor -> failure connecting to default app  err="+err);
 			});
+		*/
+
 		var editPage = function(pageName,htmlStr){
 			// alert("continueFunction !!!! code to develop here !!! pageName="+pageName);
 			tinymce.init({

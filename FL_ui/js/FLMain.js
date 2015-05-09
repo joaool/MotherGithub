@@ -31,24 +31,81 @@ var FL = FL || {};
 //     }
 //   };
 // })();
+// $.getScript('http://cdnjs.cloudflare.com/ajax/libs/dropzone/3.8.4/dropzone.min.js',function(){
+//   // instantiate the uploader
+//   $('#file-dropzone').dropzone({ 
+//     url: "/upload",
+//     maxFilesize: 100,
+//     paramName: "uploadfile",
+//     maxThumbnailFilesize: 5,
+//     init: function() {
+      
+//       this.on('success', function(file, json) {
+//       });
+      
+//       this.on('addedfile', function(file) {
+        
+//       });
+      
+//       this.on('drop', function(file) {
+//         alert('file');
+//       }); 
+//     }
+//   });
+// });
+
 
 (function() { //App is a name space.
 	var spinner=FL.common.loaderAnimationON('spinnerDiv');
 	setInterval(function(){spinner.stop();},1000);
 	$(document).ready(function() {
 		FL.API.debug = false;
-		FL.API.debugFiltersToShow = ["API","checkServerCall","abc"];
+		FL.API.debugFiltersToShow = ["API","checkServerCall","abc","geo","login","xdump","dd"];//note that "dump" is a reserved word for FL.dd.displayEntities()
 		FL.API.fl.setTraceClient(2);
 
 		FL.common.printToConsole("joakimX1X1","abc");
 		FL.common.printToConsole("manel","cde");
-		FL.common.printToConsole("joakim2","abc");
-		FL.common.printToConsole("jojo1","jojo");
-		
+		FL.common.printToConsole("joakim2 "+FL.login.test,"abc");
+		FL.common.printToConsole("====------------------------------------------->next will test exist !!!"+FL.login.test,"login");
+		console.log("login:"+FL.login.test);
+
+
+		// var geoPromise = FL.emailServices.testGoogleGeo("chicago");
+		// geoPromise.done(function(){
+		// 	// FL.common.printToConsole("FLMain --> success in checkSignIn2 ");
+		// 	FL.common.printToConsole("FLMain.js --> success in testGoogleGeo ","geo");
+		// 	return;
+		// });
+		// geoPromise.fail(function(err){
+		// 	alert("FLMain --> error in testGoogleGeo err="+JSON.stringify(err),"geo");
+		// 	return;
+		// });
+		// filepicker.setKey("AQ4FJXxNSy66KTmrqp5nzz");//to use pick widget - no need for loadPicture();
+		// loadPicture();
+		// Dropzone.options.myAwesomeDropzone = { maxFilesize: 1 };
+		// Dropzone.options.myAwesomeDropzone = false;
+		Dropzone.options.fileDropzone = {//match id=file-dropzone
+		  accept: function(file, done) {
+		    // Test if the file is valid
+		    if (file.size == 1337) {
+		      done("Can't accept the file because the filesize is weird.");
+		    }
+		    else done(); // All good
+		  },
+		  init: function() {
+		    // Setup event listeners if necessary, example:
+		    this.on("success", function() { alert("Thank you for uploading a file."); });
+		  }
+		};
+		$(document).on('click','#btnTestUpload',function(){
+ 			var myDropzone = new Dropzone("form#file-dropzone", { url: 'file_upload_route'});
+		});
+	
 		var fl = new flMain();//only place where this must exist !!!!
 		FL.fl = fl; //new flMain();
 		fl.serverName(FL.common.getServerName());
 
+		FL.common.printToConsole("jojo1","abc");
 
 		FL.oMenu = FL.login.defaultMenu; //why is this necessary ? it is !
 		FL.common.clearSpaceBelowMenus();
@@ -104,21 +161,20 @@ var FL = FL || {};
 		FL.server.offline = false;
 		localStorage.connection = '';
 
-		//checkSignIn2 ->recover last saved loginObject and:
+		//checkSignIn ->recover last saved loginObject and:
 		//	if user/password exists ->logs in ->updates upper right corner
 		//	if not keeps user in logout mode. ->updates upper right corner
 
 
 		var myMenu = FL.menu.createMenu({jsonMenu:FL.clone(FL.oMenu)});
 
-		var loginPromise = FL.login.checkSignIn2();
+		var loginPromise = FL.login.checkSignIn();
 		loginPromise.done(function(){
-			// FL.common.printToConsole("FLMain --> success in checkSignIn2 ");
-			FL.common.printToConsole("FLMain.js --> success in checkSignIn2 ");
+			FL.common.printToConsole("FLMain.js --> success in checkSignIn ","login");
 			return;
 		});
 		loginPromise.fail(function(err){
-			alert("FLMain --> error in checkSignIn2 err="+JSON.stringify(err));
+			alert("FLMain --> error in checkSignIn err="+JSON.stringify(err)+"login");
 			return;
 		});
 
@@ -189,3 +245,27 @@ var FL = FL || {};
 	// p2();
 	FL.common.printToConsole(document.title+"......  END..");
 })();
+loadPicture= function() {//call filepicker.io to get name
+	FL.common.printToConsole("frames.selectURL ------------------------------------------------------> !!!!","picker");
+	filepicker.setKey("AQ4FJXxNSy66KTmrqp5nzz");
+	filepicker.pick({
+			mimetypes: ['image/*', 'text/plain'],
+			container: 'modal',   // 'window',
+			//services:['COMPUTER', 'FACEBOOK', 'GOOGLE_DRIVE', 'PICASA','DROPBOX','INSTAGRAM'],
+			services:['COMPUTER', 'DROPBOX','FACEBOOK'],
+		},function(FPFile){
+			FL.common.printToConsole("frames.selectURL----------------  file uploaded -----------------------------------","picker");
+			FL.common.printToConsole(JSON.stringify(FPFile),"picker");
+			FL.common.printToConsole("URL="+FPFile.url,"picker");
+			FL.common.printToConsole("frames.selectURL----------------  fim de file uploaded -----------------------------------","picker");
+			xTest=FPFile.url;
+			// frames._fprop.setFieldPropsByName("txtURL",{value:xTest});
+			//frames.frames[frames.currentFrameOrder].address=FPFile.url;
+			// frames.updateImage(frames.currentFrameOrder,FPFile.url);
+			FL.common.printToConsole("frames.selectURL----------------  CONCLUIU -----------------------------------");
+		  },
+	  function(FPError){
+	    FL.common.printToConsole(FPError.toString(),"picker");
+	  }
+	);
+};//selectURL	

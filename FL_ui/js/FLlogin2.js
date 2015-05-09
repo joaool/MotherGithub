@@ -477,7 +477,7 @@ jQuery(document).ready(function($){
 				displaySignInUser();//displays no user, just icon and "Sign In" link
 				FL.mix("Entering",{});
 			},
-			checkSignIn2:function() {
+			checkSignIn:function() {
 				//checkSignIn2 ->recover last saved loginObject and:
 				//	if user/password exists ->logs in -> shows slide panels ->updates upper right corner
 				//	if not keeps user in logout mode. -> hide slide panels  ->updates upper right corner
@@ -496,19 +496,22 @@ jQuery(document).ready(function($){
 					}
 					if(lastLoginStr !== null) {//user/password exist
 						var lastLoginObj = JSON.parse(lastLoginStr);
+						var spinner=FL.common.loaderAnimationON('spinnerDiv');
 						var loadDefaultAppPromise = FL.API.loadDefaultApp(lastLoginObj)//no loginAcess, no appSetup
 							.then(function(menuData,homeHTML){
+								spinner.stop();
 								setupApp(menuData,homeHTML,lastLoginObj);						
 								$('#trigger1').show();$('#trigger2').show();$('#trigger3').show();
 								$.Topic( 'signInDone' ).publish( true ); //informs FL.menu that edition is allowed						
 								return def.resolve();
 							},function(err){
 								if(err.code == 1){//user does not exist
+									spinner.stop();
 									FL.login.signOut();//saves logout in local storage ->hide slide panels  ->updates upper right corner display
 									logOutMenu();//displays menu and homepage for logout status
 									return def.resolve();
 								}
-								alert("checkSignIn2 ->access ERROR ->"+err.code+" - "+err.message);
+								alert("checkSignIn ->access ERROR ->"+err.code+" - "+err.message);
 								return def.reject("Login access error err="+JSON.stringify(err));
 							});
 					}else{//the status is signed out
