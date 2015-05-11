@@ -931,6 +931,14 @@ FL["common"] = (function(){//name space FL.common
             // FL.API.debug = debugStatus;
             // FL.API.debugStyle = debugStyleStatus;
         },
+        getBrowserWidth: function(){
+            if (window.innerWidth){
+                return window.innerWidth;}  
+            else if (document.documentElement && document.documentElement.clientWidth != 0){
+                return document.documentElement.clientWidth;    }
+            else if (document.body){return document.body.clientWidth;}      
+                return 0;
+        },
 		testFunc: function(x) {
 			alert("FL.common.test() -->"+x);
 		}
