@@ -930,7 +930,7 @@ FL["common"] = (function(){//name space FL.common
             }    
             // FL.API.debug = debugStatus;
             // FL.API.debugStyle = debugStyleStatus;
-        },        
+        },
 		testFunc: function(x) {
 			alert("FL.common.test() -->"+x);
 		}

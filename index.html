@@ -3,7 +3,7 @@
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width">
-	<title>version 13.7</title>
+	<title>version 13.8</title>
 <!-- start Mixpanel --><script type="text/javascript">(function(f,b){if(!b.__SV){var a,e,i,g;window.mixpanel=b;b._i=[];b.init=function(a,e,d){function f(b,h){var a=h.split(".");2==a.length&&(b=b[a[0]],h=a[1]);b[h]=function(){b.push([h].concat(Array.prototype.slice.call(arguments,0)))}}var c=b;"undefined"!==typeof d?c=b[d]=[]:d="mixpanel";c.people=c.people||[];c.toString=function(b){var a="mixpanel";"mixpanel"!==d&&(a+="."+d);b||(a+=" (stub)");return a};c.people.toString=function(){return c.toString(1)+".people (stub)"};i="disable track track_pageview track_links track_forms register register_once alias unregister identify name_tag set_config people.set people.set_once people.increment people.append people.track_charge people.clear_charges people.delete_user".split(" ");
 for(g=0;g<i.length;g++)f(c,i[g]);b._i.push([a,e,d])};b.__SV=1.2;a=f.createElement("script");a.type="text/javascript";a.async=!0;a.src="//cdn.mxpnl.com/libs/mixpanel-2.2.min.js";e=f.getElementsByTagName("script")[0];e.parentNode.insertBefore(a,e)}})(document,window.mixpanel||[]);
 mixpanel.init("19ada1cb259cc3272c67085eb1bf03fc");</script><!-- end Mixpanel -->	
@@ -38,7 +38,15 @@ mixpanel.init("19ada1cb259cc3272c67085eb1bf03fc");</script><!-- end Mixpanel -->
 	  	return !FL.dd.isEntityInLocalDictionary(value);
 	  }, 32)
 	</script>
-    <link type="text/css" rel="stylesheet" href="FL_ui/css/parsley.css" />	
+    <link type="text/css" rel="stylesheet" href="FL_ui/css/parsley.css" />
+
+    <!-- http://www.particletree.com/features/dynamic-resolution-dependent-layouts/ and dynamiclayout.js"
+ 	<link rel="stylesheet" type="text/css" href="FL_ui/css/FLreadable.css" title="default"/>
+	<link rel="alternate stylesheet" type="text/css" href="FL_ui/css/FLred.css" title="thin"/>
+	<link rel="alternate stylesheet" type="text/css" href="FL_ui/css/FLcerulean.css" title="wide"/>
+	<link rel="alternate stylesheet" type="text/css" href="FL_ui/css/FLspacelab.css" title="wider"/>
+	-->
+
 	<!-- next line is necessary because jquery.slidePanel.js needs $.browser has been removed from JQuery 1.9. -->
 	<!-- // <script src="http://code.jquery.com/jquery-migrate-1.0.0.js" type="text/javascript"></script>  -->
     <!-- <link href="FL_ui/css/bootstrap.min.css" rel="stylesheet" type="text/css" /> -->
@@ -135,12 +143,16 @@ mixpanel.init("19ada1cb259cc3272c67085eb1bf03fc");</script><!-- end Mixpanel -->
 </script>
 
     <script type="text/javascript" src="//api.filepicker.io/v1/filepicker.js"></script>
-	<!-- <script src="js/main3.js"></script> -->
+    <!-- <script src="FL_ui/js/dynamiclayout.js" type="text/javascript"></script> -->
+	<!-- <script src="js/main3.js"></script> --> 
 
     <!--
 	-->  	
 </head>
 <style>
+	img {
+	    max-width: 100%;
+	}
 	.modal-header-success {
 	    color:#fff;
 	    padding:9px 15px;
@@ -276,6 +288,14 @@ mixpanel.init("19ada1cb259cc3272c67085eb1bf03fc");</script><!-- end Mixpanel -->
 	body {
 		overflow-x:hidden;
 	}
+	.navbar-default{
+	    line-height: 150px;
+	    margin-left:0%;
+	    /*margin-right:1.0em;*/
+	    /*width:95%;*/
+	    height: auto;
+	    padding-top: 0;
+	}	
 	.navbar-brand{
 	    line-height: 150px;
 	    height: 150px;
@@ -477,6 +497,7 @@ mixpanel.init("19ada1cb259cc3272c67085eb1bf03fc");</script><!-- end Mixpanel -->
 /*    .loginExample{
     	margin-top:-100px;
     }*/
+
 </style>
     <script id="_dictEditEntityTemplate" type="text/template"> 
         <div class="dictTemplate" style="margin-top:0px;">
@@ -745,7 +766,6 @@ mixpanel.init("19ada1cb259cc3272c67085eb1bf03fc");</script><!-- end Mixpanel -->
 		</div>
 	</div>      
 </script>
-
 <script type="text/template" id="titleDroppedItem">
 	<div id="titleTemplateItem0" class="titleDroppedItem droppedObject ui-state-default" type="title"> 
 		Put your Text Here 
@@ -799,7 +819,6 @@ mixpanel.init("19ada1cb259cc3272c67085eb1bf03fc");</script><!-- end Mixpanel -->
 		</table>	
 	</div>
 </script>
-
 <body style="padding-top:10px;">
 	<div id="_modalDialog"></div>
     <div id="_modalDialogA"></div>
@@ -886,7 +905,7 @@ mixpanel.init("19ada1cb259cc3272c67085eb1bf03fc");</script><!-- end Mixpanel -->
 				<a class="pull-right text-muted" href="javascript:FL.signIn()"> <i class="glyphicon glyphicon-log-in"></i>
 	  				<span> Login</span> </a> -->
 			</div>
-			<div id="menuContainer" class="container" style="margin-left:3.2em;width:87.0em;margin-right:1.0em;margin-top:0.0em;">
+			<div id="menuContainer" class="container" style="margin-right:2%;margin-top:0.0em;">
 				<div class="navbar navbar-default" role="navigation">
 					<div class="navbar-header">
 						<button  type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">

@@ -245,6 +245,7 @@ var FL = FL || {};
 	// p2();
 	FL.common.printToConsole(document.title+"......  END..");
 })();
+
 loadPicture= function() {//call filepicker.io to get name
 	FL.common.printToConsole("frames.selectURL ------------------------------------------------------> !!!!","picker");
 	filepicker.setKey("AQ4FJXxNSy66KTmrqp5nzz");
