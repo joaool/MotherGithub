@@ -106,35 +106,39 @@ jQuery(document).ready(function($){
 		};
 		var displaySignInUser = function(user) {//if user is null displays signIn icon+"Sign In" otherwise displays user
 			var browserW = FL.common.getBrowserWidth();
-			var htmlToInject = '<div style="line-height:2.2em;"><span id="_signInDomain" class="small hidden-xs" style="margin-left:2%;" >'+
+			// var htmlToInject = '<div style="line-height:2.2em;"><span id="_signInDomain" class="small hidden-xs" style="margin-left:2%;" >'+
+			// 						'Welcome to FrameLink: support@framelink.co App:'+  FL.domain + " / "+browserW +
+			// 					'</span>'+
+			// 					'<a class="pull-right" href="javascript:FL.login.signIn()" style="margin-right:2%;">'+
+			// 						'<img src="FL_ui/img/signIn.png">'+
+			// 						'<span id="_signIn" style="font-size: 1.2em;"> Sign In</span>'+
+			// 					'</a>'+
+			// 				'</div>';
+			var htmlToInject = '<span id="_signInDomain" class="small" style="margin-left:2%;line-height:2.2em; display:inline;float:left" >'+
 									'Welcome to FrameLink: support@framelink.co App:'+  FL.domain + " / "+browserW +
 								'</span>'+
-								// '<a class="pull-right text-muted" href="javascript:FL.signIn()" style="margin-right:12em">'+
-								'<a class="pull-right" href="javascript:FL.login.signIn()" style="margin-right:2%;">'+
+								'<a class="pull-right" href="javascript:FL.login.signIn()" style="margin-right:2%;line-height:2.2em; display:inline;float:left">'+
 									'<img src="FL_ui/img/signIn.png">'+
 									'<span id="_signIn" style="font-size: 1.2em;"> Sign In</span>'+
-								'</a>'+
-								// '<a class="pull-right text-muted" style="margin-right:1.5em" href="javascript:FL.tourIn()" >'+
-								// '<a class="pull-right" style="margin-right:1.5em;" href="javascript:FL.tourIn()" >'+
-								// 	'<i  class="glyphicon glyphicon-eye-open" style="font-size: 1.5em;color:black;"></i>'+
-								// 	'<span style="font-size: 1.2em;"> Tour</span>'+
-								// '</a>'+
-							'</div>';
+								'</a>';					
 			if(user) {
-				htmlToInject = '<div style="line-height:2.2em;"><span class="small hidden-xs" style="margin-left:2%;">'+
-										'Welcome to FrameLink: support@framelink.co App:' + FL.domain + " / "+browserW +
-									'</span>'+
-									// '<a class="pull-right text-muted" href="javascript:FL.signIn()" style="margin-right:12em">'+
-									'<a class="pull-right " href="javascript:FL.login.signIn()" style="margin-right:2%">'+
-										'<i  class="glyphicon glyphicon-user"></i>'+
-										'<span id="_signIn" style="font-size: 1.2em;"> '+ user +'</span>'+
-									'</a>'+
-									// '<a class="pull-right text-muted" style="margin-right:1.5em" href="javascript:FL.tourIn()" >'+
-									// '<a class="pull-right" style="margin-right:1.5em;" href="javascript:FL.tourIn()" >'+
-									// 	'<i class="glyphicon glyphicon-eye-open" style="font-size: 1.5em;color:black;"></i>'+
-									// 	'<span style="font-size: 1.2em;"> Tour</span>'+
-									// '</a>'+
-								'</div>';
+				// htmlToInject = '<div style="line-height:2.2em;"><span class="small" style="margin-left:2%;">'+
+				// 						'Welcome to FrameLink: support@framelink.co App:' + FL.domain + " / "+browserW +
+				// 					'</span>'+
+				// 					// '<a class="pull-right text-muted" href="javascript:FL.signIn()" style="margin-right:12em">'+
+				// 					'<a class="pull-right " href="javascript:FL.login.signIn()" style="margin-right:2%">'+
+				// 						'<i  class="glyphicon glyphicon-user"></i>'+
+				// 						'<span id="_signIn" style="font-size: 1.2em;"> '+ user +'</span>'+
+				// 					'</a>'+
+				// 				'</div>';
+				htmlToInject = '<span class="small" style="margin-left:2%;line-height:2.2em; display:inline;float:left">'+
+									'Welcome to FrameLink:' + FL.domain + " / "+browserW +
+								'</span>'+
+								// '<a class="pull-right text-muted" href="javascript:FL.signIn()" style="margin-right:12em">'+
+								'<a class="pull-right " href="javascript:FL.login.signIn()" style="margin-right:2%;line-height:2.2em; display:inline;float:left">'+
+									'<i  class="glyphicon glyphicon-user"></i>'+
+									'<span id="_signIn" style="font-size: 1.2em;"> '+ user +'</span>'+
+								'</a>';
 			}
 			FL.domInject("_login",htmlToInject );
 		};
