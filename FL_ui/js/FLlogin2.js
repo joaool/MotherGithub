@@ -106,11 +106,11 @@ jQuery(document).ready(function($){
 		};
 		var displaySignInUser = function(user) {//if user is null displays signIn icon+"Sign In" otherwise displays user
 			var browserW = FL.common.getBrowserWidth();
-			var htmlToInject = '<div style="line-height:2.2em;"><span id="_signInDomain" class="small hidden-xs" style="margin-left:10%;" >'+
+			var htmlToInject = '<div style="line-height:2.2em;"><span id="_signInDomain" class="small hidden-xs" style="margin-left:2%;" >'+
 									'Welcome to FrameLink: support@framelink.co App:'+  FL.domain + " / "+browserW +
 								'</span>'+
 								// '<a class="pull-right text-muted" href="javascript:FL.signIn()" style="margin-right:12em">'+
-								'<a class="pull-right" href="javascript:FL.login.signIn()" style="margin-right:4%;">'+
+								'<a class="pull-right" href="javascript:FL.login.signIn()" style="margin-right:2%;">'+
 									'<img src="FL_ui/img/signIn.png">'+
 									'<span id="_signIn" style="font-size: 1.2em;"> Sign In</span>'+
 								'</a>'+
@@ -121,11 +121,11 @@ jQuery(document).ready(function($){
 								// '</a>'+
 							'</div>';
 			if(user) {
-				htmlToInject = '<div style="line-height:2.2em;"><span class="small hidden-xs" style="margin-left:10%">'+
+				htmlToInject = '<div style="line-height:2.2em;"><span class="small hidden-xs" style="margin-left:2%;">'+
 										'Welcome to FrameLink: support@framelink.co App:' + FL.domain + " / "+browserW +
 									'</span>'+
 									// '<a class="pull-right text-muted" href="javascript:FL.signIn()" style="margin-right:12em">'+
-									'<a class="pull-right " href="javascript:FL.login.signIn()" style="margin-right:4%">'+
+									'<a class="pull-right " href="javascript:FL.login.signIn()" style="margin-right:2%">'+
 										'<i  class="glyphicon glyphicon-user"></i>'+
 										'<span id="_signIn" style="font-size: 1.2em;"> '+ user +'</span>'+
 									'</a>'+
