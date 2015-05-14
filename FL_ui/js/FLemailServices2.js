@@ -19,6 +19,25 @@
 				internalTest(x);
 				alert("Fl.emailServices2.test(x) x="+x);
 			},
+			testApigee: function(){
+				 // http://framelink-test.apigee.net/v1/hello
+				var def = $.Deferred();
+				$.ajax({
+					type: "GET",
+					url: "http://framelink-test.apigee.net/v1/hello",
+				})
+				.done(function(response) {
+					var toDisplay = response;
+					FL.common.printToConsole('FL.emailServices. testApigee->'+toDisplay,"apigee" ); // show success message
+					alert("FLemailServices2.js  OK testApigee->"+toDisplay);
+					return def.resolve(response);
+				})
+				.fail(function(response) {
+					alert("FLemailServices2.js  FAIL testApigee ->err="+response);
+					return def.reject("FL.emailServices.testApigee FAILURE err="+response);
+				});
+				return def.promise();
+			},				
 			testGoogleGeo: function(city){
 				//return format: https://mandrillapp.com/api/docs/senders.JSON.html
 				var def = $.Deferred();

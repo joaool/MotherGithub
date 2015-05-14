@@ -420,7 +420,7 @@
 				footerPaddingRight:jsonObj.pageStyles.footerPaddingRight,				
 				totWidth:jsonObj.pageStyles.pageWidth,
 				lateralMargin:"80"
-			});
+			});		
 			$("#templateHolder").empty();
 			$(emailTemplate).appendTo('body');//place emailTemplate HTML in DOM
 			

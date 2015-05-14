@@ -60,7 +60,7 @@ var FL = FL || {};
 	setInterval(function(){spinner.stop();},1000);
 	$(document).ready(function() {
 		FL.API.debug = false;
-		FL.API.debugFiltersToShow = ["API","checkServerCall","abc","geo","login","xdump","dd"];//note that "dump" is a reserved word for FL.dd.displayEntities()
+		FL.API.debugFiltersToShow = ["API","checkServerCall","abc","apigee","login","xdump","dd"];//note that "dump" is a reserved word for FL.dd.displayEntities()
 		FL.API.fl.setTraceClient(2);
 
 		FL.common.printToConsole("joakimX1X1","abc");
@@ -80,6 +80,17 @@ var FL = FL || {};
 		// 	alert("FLMain --> error in testGoogleGeo err="+JSON.stringify(err),"geo");
 		// 	return;
 		// });
+			// var apigeePromise = FL.emailServices.testApigee();
+			// apigeePromise.done(function(){
+			// 	// FL.common.printToConsole("FLMain --> success in checkSignIn2 ");
+			// 	FL.common.printToConsole("FLMain.js --> success in testApigee ","apigee");
+			// 	return;
+			// });
+			// apigeePromise.fail(function(err){
+			// 	alert("FLMain --> error in testApigee err="+JSON.stringify(err),"apigee");
+			// 	return;
+			// });
+
 		// filepicker.setKey("AQ4FJXxNSy66KTmrqp5nzz");//to use pick widget - no need for loadPicture();
 		// loadPicture();
 		// Dropzone.options.myAwesomeDropzone = { maxFilesize: 1 };
