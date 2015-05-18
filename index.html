@@ -3,7 +3,7 @@
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width">
-	<title>version 13.16</title>
+	<title>version 13.31</title>
 	<!--
 		testApigee
 	-->
@@ -795,41 +795,39 @@ mixpanel.init("19ada1cb259cc3272c67085eb1bf03fc");</script><!-- end Mixpanel -->
 
 <script type="text/template" id="emailTemplateHolder">
 	<div id="templateHolder" class="template_holder">
-		<style type="text/css">
-			/**This is to overwrite Outlook.com’s Embedded CSS************/
-			table {border-collapse:separate;}
-			a, a:link, a:visited {text-decoration: none; color: #00788a} 
-			a:hover {text-decoration: underline;}
-			h2,h2 a,h2 a:visited,h3,h3 a,h3 a:visited,h4,h5,h6,.t_cht {color:#000 !important}
-			.ExternalClass p, .ExternalClass span, .ExternalClass font, .ExternalClass td {line-height: 100%}
-			/**This is to center your email in Outlook.com************/
-			.ExternalClass {width: 100%;}
-		</style> 
-		<table align="center" border="1" cellpadding="0" cellspacing="0" width="<%= totWidth %>px">
-		<tbody>
- 			<tr bgcolor="<%= headerBgcolor %>">
-  				<td  style="padding-top: 10px; padding-right: <%= headerPaddingRight %>px; padding-bottom: 8px; padding-left: <%= headerPaddingLeft %>px;">
-					<div id="template_holder_header" class="header sortable droppable" >		
-
-					</div>
-  				</td>
- 			</tr>
-			<tr bgcolor="<%= bodyBgcolor %>">
- 				<td  style="padding-top: 10px; padding-right: <%= bodyPaddingRight %>px; padding-bottom: 8px; padding-left: <%= bodyPaddingLeft %>px;">
-					<div id="template_holder_body" class="template_holder_body sortable droppable">
-						
-					</div>
-				</td>
-			</tr> 			
-			<tr bgcolor="<%= footerBgcolor %>">
- 				<td  style="padding-top: 10px; padding-right: <%= footerPaddingRight %>px; padding-bottom: 8px; padding-left: <%= footerPaddingLeft %>px;">
-					<div id="template_holder_footer" class="footer sortable droppable">
-						
-					</div>
-				</td>
-			</tr>
-		</tbody>
-		</table>	
+		<center>		
+			<table cellspacing="0" cellpadding="0" border="0" width="<%= globalPercent %>%">
+				<tr bgcolor="<%= headerBgcolor %>">
+					<td bgcolor="<%= headerBgcolor %>" width="<%= headerPaddingLeft %>">_____</td>
+					<td bgcolor="<%= headerBgcolor %>" width="<%= totWidth %>px"></td>
+					<td bgcolor="<%= headerBgcolor %>" width="<%= headerPaddingRight %>">_____</td>
+				</tr>
+				<tr bgcolor="<%= headerBgcolor %>">
+					<td width="<%= headerPaddingLeft %>"></td>
+					<td  width="<%= totWidth %>px" style="padding-top: 10px; padding-bottom: 8px;">
+						<div id="template_holder_header" class="header sortable droppable" >
+						</div>
+					</td>
+	 				<td width="<%= headerPaddingRight %>"></td>
+	 			</tr>	
+				<tr bgcolor="<%= bodyBgcolor %>">
+					<td width="<%= headerPaddingLeft %>"></td>
+	 					<td width="<%= totWidth %>px" style="padding-top: 10px; padding-bottom: 8px;">
+							<div id="template_holder_body" class="template_holder_body sortable droppable">
+							</div>
+						</td>
+					<td width="<%= headerPaddingRight %>"></td>
+				</tr>
+				<tr bgcolor="<%= footerBgcolor %>">
+					<td width="<%= headerPaddingLeft %>"></td>
+		 				<td width="<%= totWidth %>px" style="padding-top: 10px; padding-bottom: 8px;">
+							<div id="template_holder_footer" class="footer sortable droppable">
+							</div>
+						</td>
+					<td width="<%= headerPaddingRight %>"></td>
+				</tr>
+			</table>	
+		</center>
 	</div>
 </script>
 <body style="padding-top:10px;">

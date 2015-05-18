@@ -939,6 +939,15 @@ FL["common"] = (function(){//name space FL.common
             else if (document.body){return document.body.clientWidth;}      
                 return 0;
         },
+        getBase64Width: function(imageData) {
+            $("body").append("<img id='hiddenImage' src='"+imageData+"' />");
+            var w = $('#hiddenImage').width();
+            var h = $('#hiddenImage').height();
+            $('#hiddenImage').remove();
+            console.log("width:"+w+" height:"+h);
+            FL.common.printToConsole("getBase64Width before exit w="+w+" h="+h,"abc");
+            return w;
+        },        
 		testFunc: function(x) {
 			alert("FL.common.test() -->"+x);
 		}

@@ -350,9 +350,14 @@
 			}			
 			return is_social;
 		};		
-		var appendTemplate = function(jsonObject, parentElement){
+		var appendTemplate = function(jsonObject, parentElement,centralWidth,percent,marginL,marginR){
 			// jsonObject - array jsons corresponding to a parentElement (ex.header, body or footer) 
 			// ex:[{"title":"<p>Mastruncio1</p>","style":{"fontColor":"#000","fontFamily":"Arial",...."imagePadding":"10px"},"type":"title"}]
+			this.centralWidth = centralWidth;
+			this.marginL = marginL;
+			this.marginR = marginR;
+			var thiz = this;
+			var centralWidth = centralWidth;
 			$.each(jsonObject,function(i,item){//item is array element i
 				// var element = temp.getElementToDrop(item.type);
 				var element = null;
@@ -376,11 +381,12 @@
 					element = $("#"+elementId).html();
 					// element = $(element).filter("div");			
 					element = $(element).prop("id","template"+ window.templateCounter);
-					$(parentElement).append(element);
 					if( item.type == "title" ) {
+						$(parentElement).append(element);
 						$(element).css(item.style);
 						$(element).html(item.title);
 					}else if(item.type == "image"){
+						$(parentElement).append(element);
 						var elementImg = $('#'+"template"+ window.templateCounter+ ' img');//Id already assigned we search the sub element image
 						var elementAnchor = $('#'+"template"+ window.templateCounter+ ' a');//Id already assigned we search the sub element anchor
 						if (item.link)
@@ -388,27 +394,31 @@
 						addImageToMandrillImageArr("template"+ window.templateCounter,item.source.substring(23));//name,imageFromJson - removes the beginning chars:"data:image/jpeg;base64,"
 						$(elementImg).attr('src','cid:template'+ window.templateCounter);
 						
-						//test
-						// if(window.templateCounter == 1){
-						// 	item.style["width"] = "52px";						
+						var w = FL.common.getBase64Width(item.source);//check if size is bigger than central zone to prevebt broken layout
+						// if (w>thiz.centralWidth){//reduce size keeping ratio: (convenient for outlook)  width="400px" height="auto"
+						var maxAvailableWidth =  percent*1300/100 - thiz.marginL - thiz.marginR;
+						// if (w> maxAvailableWidth){//reduce size keeping ratio: (convenient for outlook)  width="400px" height="auto"
+							item.style["width"]= maxAvailableWidth + "px";
+							// item.style["width"]="550px";
+							item.style["height"]="auto";
 						// }
-						
-						$(elementImg).css(item.style);
+						$(elementImg).css(item.style);//this will
 					}
 					window.templateCounter++;
-				}	
+				}
 			});
 		};		
 		var getHTMLContent = function(jsonTemplate){
 			// alert(jsonTemplate);
 			var jsonObj = JSON.parse(jsonTemplate);
-
-			//FORCING BACKGROUND TO BLACK
-			// jsonObj.templateItems.header[0].style.backgroundColor = "#ffffff";
-			// jsonObj.templateItems.footer[0].style.backgroundColor = "#ffffff";
+			var percent = Math.floor( Math.min(jsonObj.pageStyles.pageWidth,900)/10 );
+			var marginL = jsonObj.pageStyles.headerPaddingLeft;
+			var marginR = jsonObj.pageStyles.headerPaddingRight;
+			var centralWidthHeader = Math.min(jsonObj.pageStyles.pageWidth,900) - marginL - marginR;
 			var rawEmailTemplate = $("#emailTemplateHolder").html();
 			var templateFunc =  _.template(rawEmailTemplate);
 			var emailTemplate = templateFunc({
+				globalPercent:percent,
 				headerBgcolor:jsonObj.pageStyles.headerBgColor,
 				headerPaddingLeft:jsonObj.pageStyles.headerPaddingLeft,
 				headerPaddingRight:jsonObj.pageStyles.headerPaddingRight,
@@ -418,9 +428,10 @@
 				footerBgcolor:jsonObj.pageStyles.footerBgColor,
 				footerPaddingLeft:jsonObj.pageStyles.footerPaddingLeft,
 				footerPaddingRight:jsonObj.pageStyles.footerPaddingRight,				
-				totWidth:jsonObj.pageStyles.pageWidth,
+				// totWidth:jsonObj.pageStyles.pageWidth,
+				totWidth:centralWidthHeader,
 				lateralMargin:"80"
-			});		
+			});	
 			$("#templateHolder").empty();
 			$(emailTemplate).appendTo('body');//place emailTemplate HTML in DOM
 			
@@ -435,15 +446,16 @@
 			FL.login.emailImagesArray = [];
 			// mountTemplate(jsonObj,header,body,footer);
 			window.templateCounter = 0;
-			appendTemplate(jsonObj.templateItems.header,header);//fills header template with header content extracted from jsonObj
-			appendTemplate(jsonObj.templateItems.body,body);//fills body template with body content extracted from jsonObj
-			appendTemplate(jsonObj.templateItems.footer,footer);//fills footer template with footer content extracted from jsonObj
+			appendTemplate(jsonObj.templateItems.header,header,centralWidthHeader,percent,marginL,marginR);//fills header template with header content extracted from jsonObj
+			appendTemplate(jsonObj.templateItems.body,body,centralWidthHeader,percent,marginL,marginR);//fills body template with body content extracted from jsonObj
+			appendTemplate(jsonObj.templateItems.footer,footer,centralWidthHeader,percent,marginL,marginR);//fills footer template with footer content extracted from jsonObj
 			
 			var emailJQ = $(emailTemplate);
 			emailJQ.find("#template_holder_header").append(header.contents());
 			emailJQ.find("#template_holder_body").append(body.contents());
 			emailJQ.find("#template_holder_footer").append(footer.contents());
 			// return $("#templateHolder").html();
+			var z=$(emailJQ).html();
 			return $(emailJQ).html();
 		};		
 		var convertsToArrOfObj = function(templateOptionsArr){
