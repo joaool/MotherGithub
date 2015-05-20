@@ -17,11 +17,10 @@ MailerTemplate.Views.PageDesign = Backbone.View.extend({
 		this.footerBgColor = this.$("#footerBgColor");
 		this.headerPaddingLeft = this.$("#headerPaddingLeft");
 		this.headerPaddingRight = this.$("#headerPaddingRight");
-		this.bodyPaddingLeft = this.$("#bodyPaddingLeft");
-		this.bodyPaddingRight = this.$("#bodyPaddingRight");
-		this.footerPaddingLeft = this.$("#footerPaddingLeft");
-		this.footerPaddingRight = this.$("#footerPaddingRight");
-		
+		// this.bodyPaddingLeft = this.$("#bodyPaddingLeft");
+		// this.bodyPaddingRight = this.$("#bodyPaddingRight");
+		// this.footerPaddingLeft = this.$("#footerPaddingLeft");
+		// this.footerPaddingRight = this.$("#footerPaddingRight");	
 	},
 	events:{
 		"change #newsletterWidth" : "newsletterWidthChange",
@@ -31,16 +30,16 @@ MailerTemplate.Views.PageDesign = Backbone.View.extend({
 		"change.bfhcolorpicker #footerBgColor" : "footerBgColorChange",
 		"change #headerPaddingLeft" : "headerPaddingLeftChange",
 		"change #headerPaddingRight" : "headerPaddingRightChange",
-		"change #bodyPaddingLeft" : "bodyPaddingLeftChange",
-		"change #bodyPaddingRight" : "bodyPaddingRightChange",
-		"change #footerPaddingLeft" : "footerPaddingLeftChange",
-		"change #footerPaddingRight" : "footerPaddingRightChange",
+		// "change #bodyPaddingLeft" : "bodyPaddingLeftChange",
+		// "change #bodyPaddingRight" : "bodyPaddingRightChange",
+		// "change #footerPaddingLeft" : "footerPaddingLeftChange",
+		// "change #footerPaddingRight" : "footerPaddingRightChange",
 		"keyup #headerPaddingLeft" : "headerPaddingLeftChange",
-		"keyup #headerPaddingRight" : "headerPaddingRightChange",
-		"keyup #bodyPaddingLeft" : "bodyPaddingLeftChange",
-		"keyup #bodyPaddingRight" : "bodyPaddingRightChange",
-		"keyup #footerPaddingLeft" : "footerPaddingLeftChange",
-		"keyup #footerPaddingRight" : "footerPaddingRightChange"
+		"keyup #headerPaddingRight" : "headerPaddingRightChange"
+		// "keyup #bodyPaddingLeft" : "bodyPaddingLeftChange",
+		// "keyup #bodyPaddingRight" : "bodyPaddingRightChange",
+		// "keyup #footerPaddingLeft" : "footerPaddingLeftChange",
+		// "keyup #footerPaddingRight" : "footerPaddingRightChange"
 	},
 	setValues : function(data){
 		this.pageWidth.val(data.pageWidth);
@@ -49,10 +48,10 @@ MailerTemplate.Views.PageDesign = Backbone.View.extend({
 		this.footerBgColor.val(data.footerBgColor);
 		this.headerPaddingLeft.val(data.headerPaddingLeft);
 		this.headerPaddingRight.val(data.headerPaddingRight);
-		this.bodyPaddingLeft.val(data.bodyPaddingLeft);
-		this.bodyPaddingRight.val(data.bodyPaddingRight);
-		this.footerPaddingLeft.val(data.footerPaddingLeft);
-		this.footerPaddingRight.val(data.footerPaddingRight);
+		// this.bodyPaddingLeft.val(data.bodyPaddingLeft);
+		// this.bodyPaddingRight.val(data.bodyPaddingRight);
+		// this.footerPaddingLeft.val(data.footerPaddingLeft);
+		// this.footerPaddingRight.val(data.footerPaddingRight);
 	},
 	newsletterWidthChange : function(evt){
 		if (evt.which != 8 && evt.which != 0 && (evt.which < 48 || evt.which > 57)) {
@@ -91,6 +90,8 @@ MailerTemplate.Views.PageDesign = Backbone.View.extend({
 			value : $(evt.target).val()
 		}
 		this.trigger(MailerTemplate.Views.PageDesign.PROPERTY_CHANGE,data);
+		this.bodyPaddingLeftChange(evt);
+		this.footerPaddingLeftChange(evt);
 	},
 	headerPaddingRightChange : function(evt){
 		var data = {
@@ -98,6 +99,8 @@ MailerTemplate.Views.PageDesign = Backbone.View.extend({
 			value : $(evt.target).val()
 		}
 		this.trigger(MailerTemplate.Views.PageDesign.PROPERTY_CHANGE,data);
+		this.bodyPaddingRightChange(evt);
+		this.footerPaddingRightChange(evt);
 	},
 	bodyPaddingLeftChange : function(evt){
 		var data = {
