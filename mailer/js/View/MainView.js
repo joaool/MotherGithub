@@ -81,6 +81,13 @@ MailerTemplate.Views.MainView = Backbone.View.extend({
 		var modelData = this.m_Editor.getModelData();
 		var jsonData = this.m_jsonGenerator.GenerateJson(modelData);
 		console.log("jsonData.pageStyles.bodyPaddingLeft="+jsonData.pageStyles.bodyPaddingLeft);
+		console.log("jsonData.pageStyles.footerPaddingLeft="+jsonData.pageStyles.footerPaddingLeft);
+		// to overwrite body and footer PageStyles - necessary for old data
+		jsonData.pageStyles.bodyPaddingLeft = jsonData.pageStyles.headerPaddingLeft;
+		jsonData.pageStyles.footerPaddingLeft = jsonData.pageStyles.headerPaddingLeft;
+		jsonData.pageStyles.bodyPaddingRight = jsonData.pageStyles.headerPaddingRight;
+		jsonData.pageStyles.footerPaddingRight = jsonData.pageStyles.headerPaddingRight;
+		//-----------------------------
 		this.storeTemplateUI(this,jsonData);
 	},
 	OnLoadTemplateBtnClick : function(){
@@ -204,13 +211,17 @@ MailerTemplate.Views.MainView = Backbone.View.extend({
 				var selectedTemplatePromise = thiz.loadTemplateForm(data);
 				selectedTemplatePromise.done(function(selectedTemplate){
 					console.log(">>>>>OnLoadTemplateBtnClick selectedTemplatePromise SUCCESS <<<<< ");
-					data = JSON.parse(selectedTemplate);
-					thiz.m_Editor.LoadJson(data);
-					if (data.pageStyles){
-						thiz.m_DesignPage.setValues(data.pageStyles);
-						thiz.m_Editor.setAllPageValues(data.pageStyles);
+					if(selectedTemplate){//a specific template was selected
+						data = JSON.parse(selectedTemplate);
+						thiz.m_Editor.LoadJson(data);
+						if (data.pageStyles){
+							thiz.m_DesignPage.setValues(data.pageStyles);
+							thiz.m_Editor.setAllPageValues(data.pageStyles);
+						}
+						return;
+					}else{//no template was choosen (selectedTemplate=null)
+						return;
 					}
-					return;
 				});
 				selectedTemplatePromise.fail(function(err){console.log(">>>>>OnLoadTemplateBtnClick selectedTemplatePromise FAILURE <<<<<"+err);return def.reject(err);});
 			}
