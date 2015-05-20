@@ -80,6 +80,7 @@ MailerTemplate.Views.MainView = Backbone.View.extend({
 		// var modelData = this.m_Editor.generatePlainHtml();
 		var modelData = this.m_Editor.getModelData();
 		var jsonData = this.m_jsonGenerator.GenerateJson(modelData);
+		console.log("jsonData.pageStyles.bodyPaddingLeft="+jsonData.pageStyles.bodyPaddingLeft);
 		this.storeTemplateUI(this,jsonData);
 	},
 	OnLoadTemplateBtnClick : function(){
