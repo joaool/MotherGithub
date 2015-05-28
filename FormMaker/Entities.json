@@ -1,0 +1,115 @@
+{
+	"elements": [
+		{
+            "cname":"1",
+            "name" : "Name",
+			"element": "Text",
+			"type": "text",
+			"leftLabel": "Your Name:",
+			"placeholder": "Please introduce your name",
+			"value": "katk.1989@gmail.com",
+			"icon": "glyphicon-envelope",
+			"tooltip": "This is a nice name"
+		},
+        {
+            "cname":"2",
+            "name" : "Phone number",
+			"element": "Text",
+			"type": "email",
+			"leftLabel": "Your phone number:",
+			"placeholder": "Please enter your phone number",
+			"value": "1234567890",
+			"icon": "glyphicon-envelope",
+			"tooltip": "This is a nice email"
+		},
+        {
+            "cname":"3",
+            "name" : "Email address",
+			"element": "Text",
+			"type": "email",
+			"leftLabel": "Your email:",
+			"placeholder": "Please enter your email",
+			"value": "katk.1989@gmail.com",
+			"icon": "glyphicon-envelope",
+			"tooltip": "This is a nice email"
+		},
+		{
+            "cname" : "4",
+            "name" : "Password",
+			"element": "TextLabel",
+			"type": "password",
+			"leftLabel": "Password:",
+			"placeholder": "Password",
+			"value": "Antonio444",
+			"icon": "glyphicon-lock",
+			"trigger": "change",
+			"label": "Please introduce your password:",
+			"tooltip": "This is a nice password"
+		},
+		{
+            "cname" : "5",
+            "name" : "Gender",
+			"element": "Radio",
+			"radioArr": [
+				{
+					"label": "Male",
+                    "tooltip": "gender"
+				}
+		},
+		{
+            "cname" : "6",
+            "name" : "Gender",
+			"element": "Radio",
+			"radioArr": [
+				{
+					"label": "Female"
+				}
+			 ]
+		},
+		{
+            "cname" : "7",
+            "name" : "Save",
+			"element": "Button",
+			"buttonArr": [
+				{
+					"btnType": "submit",
+					"label": "Save",
+					"tooltip": "save"
+				}
+			]
+		},
+        {
+            "cname" : "8",
+            "name" : "date",
+			"element": "Date",
+			"type": "text",
+			"leftLabel": "Date",
+			"value": "5/12/2015 1:30",
+			"trigger": "change",
+			"tooltip": "Select a date.",
+            "class" : "datePicker",
+            "placeholder" : "select date"
+		},
+        {
+            "cname" : "9",
+            "name" : "Feedback",
+			"element": "TextArea",
+			"type": "textarea",
+			"leftLabel": "Enter text",
+			"value": "Sample text area text",
+			"trigger": "change",
+			"tooltip": "Enter text.",
+            "placeholder" : "enter some text."
+		},
+        {
+            "cname" : "10",
+            "name" : "Profile Pic",
+			"element": "Image",
+			"type": "image",
+			"leftLabel": "Select an image",
+			"source": "",
+			"trigger": "change",
+			"tooltip": "Select an image"
+		}
+	]
+}

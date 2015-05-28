@@ -8,7 +8,6 @@
 			"value": "Antonio1111",
 			"icon": "glyphicon-envelope",
 			"trigger": "change",
-			"icon": "glyphicon-envelope",
 			"tooltip": "This is a nice email"
 		},
 		{
