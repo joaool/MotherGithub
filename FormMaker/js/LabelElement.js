@@ -1,6 +1,7 @@
 FormMaker.BaseElement = Backbone.View.extend({
 	m_template : null,
 	m_html : null,
+    
 	initialize : function(){
 		console.log('baseElement init');
 	},
@@ -19,17 +20,23 @@ FormMaker.BaseElement = Backbone.View.extend({
 	valueChange : function(evt){
 		console.log("value change");
 	},
-	loadData : function(item){
-		this.m_html = this.m_template(item);
-		//console.log(this.m_html);
+	loadData : function(data){
+        this.jsonData = data;
 	},
 	render : function(){
-		this.$el.append($.parseHTML(this.m_html));
+		var element = $.parseHTML(this.m_template(this.jsonData).trim());
+        this.$el.append(element);
+        this.setElement(element);
 		this.onRender();
 	},
 	onRender : function(){
 		
-	}
+	},
+    update: function(data){
+        this.jsonData[data.property] = data.value;
+        this.m_html = this.m_template(this.jsonData);
+        
+    }
 });
 FormMaker.TextLabel = FormMaker.BaseElement.extend({
 	
@@ -112,7 +119,7 @@ FormMaker.Image = FormMaker.BaseElement.extend({
 			var reader = new FileReader();
 			var temp = this;
 			reader.onload = function(evt){temp.OnImageLoaded(evt,temp)};
-			reader.readAsDataURL(evt.target.files[0]);
+			reader.readAsDataURL     (evt.target.files[0]);
 		}
 	},
 });

@@ -2,14 +2,14 @@
     display: inline-block;
     position: absolute;
     top: 0px;
-    left: -15px;
-    z-index: 9999;
+    left: -1px;
+    z-index: 99999;
 }
 
 div#page-content-wrapper {
     position: relative;
     height: 100%;
-    padding-bottom: 40px;
+    padding: 0px;
 }
 #wrapper a#menu-toggle:before{
     content: "<";
@@ -36,19 +36,20 @@ a#menu-toggle {
     color: white;
 }
 
-table#properties td {
+#properties td {
     padding: 3px;
 }
 
 .sidebar-nav a {
     color: white;
+    text-decoration: none;
 }
 
 div#wrapper {
     width: 100%;
     height: 100%;
-    padding-bottom: 50px;
-    overflow-y: auto;
+    padding-bottom: 10px;
+    /* overflow-y: auto; */
     /* margin-bottom: 40px; */
 }
 
@@ -64,11 +65,13 @@ div#buttonContainer {
     left: 0px;
     padding-left: 20px;
     text-align: right;
+    padding-right: 20px;
 }
 
 div#droppable {
-    border: 1px solid #CACACA;
+    /* border: 1px solid #CACACA; */
     height: 500px;
+    width: 100%;
 }
 
 h1 {
@@ -77,15 +80,16 @@ h1 {
 
 .selectbox {
     display: inline-block;
-    position: relative;
-    border: 1px solid;
+    /* position: relative; */
+    border: 1px solid rgb(197, 197, 197);
     min-width: 30px;
     box-sizing: content-box;
     cursor: pointer;
+    width: auto;
 }
 
 .selectedOption {
-    padding-right: 3px;
+    padding: 3px;
 }
 
 .selectedOption:after {
@@ -97,11 +101,11 @@ ul.options {
     position: absolute;
     list-style: none;
     padding: 0px;
-    min-width: 100%;
+    /* min-width: 100%; */
     margin: 0px;
     border: 1px solid;
     box-sizing: content-box;
-    left: 0px;
+    /* left: 0px; */
     background: white;
     display: none;
 }
@@ -109,6 +113,7 @@ ul.options {
 ul.options li {
     line-height: 20px;
     border-top: 1px solid;
+    padding: 2px;
 }
 
 ul.options li:hover {
@@ -121,9 +126,110 @@ ul.options li:first-child {
 }
 
 ul.options.toggled {
-    display: block;
+    display: inline-block;
 }
 
 .entities {
     margin-bottom: 10px;
+}
+
+
+button#loadForm {
+    position: absolute;
+    top: 0px;
+    right: 0px;
+    margin-top: 5px;
+    margin-right: 20px;
+}
+
+.container-fluid {
+    overflow-y: auto;
+    height: 100%;
+    box-sizing: content-box;
+}
+
+.row {
+    margin-right: 0px;    
+    margin-left: 0px;
+}
+
+.col-lg-12 {
+    padding: 0px;
+}
+
+h3 {
+    text-align: center;
+    margin-top: 10px;
+}
+
+div#sidebar-wrapper {
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+table#fields {
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+#Add {
+    display: inline-block;
+    position: absolute;
+    width: 30px;
+    height: 30px;
+    top: 2px;
+    right: 5px;
+    background-image: url('../images/plus.png');
+    background-color: white;
+    padding: 5px;
+    box-sizing: content-box;
+    background-size: 50%;
+    background-position: 50%;
+    background-repeat: no-repeat;
+    cursor: pointer;
+    border-radius: 2px;
+}
+
+#Add:hover {
+    background-color: rgb(146, 180, 224);
+}
+
+
+textarea {
+    resize: none;
+    vertical-align: top;
+}
+
+div#properties {
+    height: 237px;
+    width: 100%;
+}
+
+#type label.btn {
+    width: 97px;
+    text-align: left;
+    padding: 5px;
+}
+
+.btn:active, .btn.active {
+    background: transparent;
+    box-shadow: none;
+}
+
+div#type {
+    width: 300px;
+    background-color: rgb(146, 180, 224);
+    color: white;
+}
+
+#type label.btn:hover {
+    background-color: rgba(36, 44, 194, 0.25);
+    color: white;
+}
+
+div#droppable > div {
+    height: 100%;
+    border: 1px solid #CACACA;
+    display: inline-block;
+    width: 50%;
 }
