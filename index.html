@@ -3,7 +3,7 @@
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width">
-	<title>version 13.35</title>
+	<title>version 13.42</title>
 	<!--
 		testApigee
 	-->
@@ -770,63 +770,50 @@ mixpanel.init("19ada1cb259cc3272c67085eb1bf03fc");</script><!-- end Mixpanel -->
 	</div>      
 </script>
 <script type="text/template" id="titleDroppedItem">
-	<div id="titleTemplateItem0" class="titleDroppedItem droppedObject ui-state-default" type="title"> 
-		Put your Text Here 
-	</div>
+	<tr>
+		<td bgcolor="<%= bgColor %>" width="<%= paddingLeft %>"><%= elNo %></td>
+		<td bgcolor="<%= bgColor %>" width="<%= centralWidth %>" style="padding-top: 10; padding-bottom: 8;">
+			<div id="titleTemplateItem0" class="titleDroppedItem droppedObject ui-state-default" type="title"> 
+				Put your Text Here 
+			</div>
+		</td>	
+		<td bgcolor="<%= bgColor %>" width="<%= paddingRight %>"><%= elNo %></td>
+	</tr>	
 </script>
 <script type="text/template" id="imageDroppedItem">
-	<div id="imageTemplateItem0" class="imageDroppedItem droppedObject ui-state-default" type="image"> 
-		<a id="imageLink" href="#" target="_blank">
-			<div> 
-				<img class="" src="./mailer/images/empty_image-72.png" />
+	<tr>
+		<td bgcolor="<%= bgColor %>" width="<%= paddingLeft %>"><%= elNo %></td>
+		<td bgcolor="<%= bgColor %>" width="<%= centralWidth %>" style="padding-top: 10; padding-bottom: 8;" border="1">
+			<div id="imageTemplateItem0" class="imageDroppedItem droppedObject ui-state-default" type="image"> 
+				<a id="imageLink" href="#" target="_blank">
+					<div> 
+						<img class="" src="./mailer/images/empty_image-72.png" style="display:block" />
+					</div>
+				</a>
 			</div>
-		</a>
-	</div>
+		</td>		
+		<td bgcolor="<%= bgColor %>" width="<%= paddingRight %>"><%= elNo %></td>
+	</tr>		
 </script>
-<script type="text/template" id="socialblockDroppedItem" align="center">
-	<div style="text-align: center">
-		<a href="https://www.facebook.com/Weadvice.living.web"><img id="facebook" title="Facebook" src="images/social/Facebook.png" alt="Facebook" width="48" height="48"></a>
-		<a href="https://plus.google.com/112849724150312489427/posts"><img id="googlePlus" title="Google Plus" src="images/social/Google-Plus.png" alt="Google Plus" width="48" height="48" ></a>
-		<a href="https://www.linkedin.com/company/weadvice"><img id="linkedin" title="LinkedIn" src="images/social/Linkedin.png" alt="LinkedIn" width="48" height="48" ></a>
-		<a href="https://www.youtube.com/user/weadvice4"><img id="youtube" title="Youtube" src="images/social/Youtube.png" alt="Youtube" width="48" height="48" ></a>
-	</div>
+<script type="text/template" id="SocialLinksDroppedItem" >
+	<tr>
+		<td bgcolor="<%= bgColor %>" width="<%= paddingLeft %>"><%= elNo %></td>
+		<td bgcolor="<%= bgColor %>" width="<%= centralWidth %>" style="padding-top: 10; padding-bottom: 8;" border="1">
+			<div style="text-align: center"></div>
+		</td>		
+		<td bgcolor="<%= bgColor %>" width="<%= paddingRight %>"><%= elNo %></td>
+	</tr>					
 </script>
 
 
 <script type="text/template" id="emailTemplateHolder">
 	<div id="templateHolder" class="template_holder">
 		<center>		
-			<table cellspacing="0" cellpadding="0" border="0" width="<%= globalPercent %>%">
-				<tr>
-					<td width="<%= headerPaddingLeft %>">&nbsp</td>
-					<td width="<%= totWidth %>px">&nbsp</td>
-					<td width="<%= headerPaddingRight %>">&nbsp</td>
-				</tr>
-				<tr bgcolor="<%= headerBgcolor %>">
-					<td width="<%= headerPaddingLeft %>"></td>
-					<td  width="<%= totWidth %>px" style="padding-top: 10px; padding-bottom: 8px;">
-						<div id="template_holder_header" class="header sortable droppable" >
-						</div>
-					</td>
-	 				<td width="<%= headerPaddingRight %>"></td>
-	 			</tr>	
-				<tr bgcolor="<%= bodyBgcolor %>">
-					<td width="<%= headerPaddingLeft %>"></td>
-	 					<td width="<%= totWidth %>px" style="padding-top: 10px; padding-bottom: 8px;">
-							<div id="template_holder_body" class="template_holder_body sortable droppable">
-							</div>
-						</td>
-					<td width="<%= headerPaddingRight %>"></td>
-				</tr>
-				<tr bgcolor="<%= footerBgcolor %>">
-					<td width="<%= headerPaddingLeft %>"></td>
-		 				<td width="<%= totWidth %>px" style="padding-top: 10px; padding-bottom: 8px;">
-							<div id="template_holder_footer" class="footer sortable droppable">
-							</div>
-						</td>
-					<td width="<%= headerPaddingRight %>"></td>
-				</tr>
-			</table>	
+			<table cellspacing="0" cellpadding="0" border="0" width="<%= globalPercent %>%" style="border-collapse:collapse;">
+				<tbody id="template_holder_header"></tbody>
+				<tbody id="template_holder_body"></tbody>
+				<tbody id="template_holder_footer"></tbody>
+			</table>
 		</center>
 	</div>
 </script>
