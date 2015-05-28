@@ -2,7 +2,7 @@
 	<div class="input-group dropped" style="padding:5px 5px 5px" id="{{id}}" cname={{cname}}>
 		<div class="input-group" style="line-height:0px;">
 			<span class="input-group-addon" id="leftLabel">{{leftLabel}}</span>
-			 <input id="value" type={{type}} class="form-control" placeholder={{placeholder}} value={{value}} data-parsley-trigger={{trigger}} data-toggle="tooltip" data-placement="top" title="{{tooltip}}">
+			 <input id="value" type={{type}} class="form-control" placeholder={{placeholder}} value="{{value}}" data-parsley-trigger={{trigger}} data-toggle="tooltip" data-placement="top" title="{{tooltip}}">
 			<span class="input-group-addon"><span id="icon" class="glyphicon {{icon}}"></span></span>
 		</div>
 	</div>    
@@ -12,7 +12,7 @@
 		<legend>{{label}}</legend>
 		<div class="input-group" style="line-height:0px;">
 			<span class="input-group-addon" id="leftLabel">{{leftLabel}}</span>
-			<input  id="value" type={{type}} class="form-control" placeholder={{placeholder}} value={{value}} data-parsley-trigger={{trigger}} data-toggle="tooltip" data-placement="top" title="{{tooltip}}">
+			<input  id="value" type={{type}} class="form-control" placeholder={{placeholder}} value="{{value}}" data-parsley-trigger={{trigger}} data-toggle="tooltip" data-placement="top" title="{{tooltip}}">
 			<span class="input-group-addon"><span class="glyphicon {{icon}}"></span></span>
 		</div>
 	</div>
@@ -25,23 +25,17 @@
 </script>
 <script id="__button" type="text/x-handlebars-template"> 
 	<div class="pull-right dropped" style="padding:5px 5px 5px;" id="{{id}}"  cname={{cname}}>
-		{{#each buttonArr}}
-			<button type="button" class="btn btn-{{btnType}} {{buttonHide}}" onclick="{{onClick}}" data-toggle="tooltip" data-placement="top" title="{{tooltip}}" >{{label}}</button>
-		 {{/each}}
+        <button type="button" class="btn btn-{{btnType}} {{buttonHide}}" onclick="{{onClick}}" data-toggle="tooltip" data-placement="top" title="{{tooltip}}" >{{label}}</button>
 	</div>
 </script>
 <script id="__checkbox" type="text/x-handlebars-template"> 
 	<div id="{{id}}" class="input-group dropped" style="padding:5px 5px 5px" cname={{cname}}>
-		{{#each chkArr}}
-		<label class="checkbox-inline {{chkHide}}"><input type="checkbox" {{checked}} value="1">{{label}}</label>
-		{{/each}}
+		<label class="checkbox-inline {{chkHide}}"><input type="checkbox" {{checked}} value="{{value}}">{{value}}</label>
 	</div>
 </script>
 <script id="__radiobox" type="text/x-handlebars-template"> 
 	<div id="{{id}}" class="input-group dropped" style="padding:5px 5px 5px" cname={{cname}}>
-		{{#each radioArr}}
-		<label class="radio-inline {{radioHide}}"><input type="radio" {{checked}} name="optradio" value="1">{{label}}</label>
-		{{/each}}
+		<label class="radio-inline {{radioHide}}"><input type="radio" {{checked}} name="{{name}}" value="{{value}}">{{value}}</label>
 	</div>
 </script>    
 <script id="__combo" type="text/x-handlebars-template">    
@@ -51,10 +45,10 @@
 			<button type="button" class="btn btn-{{btnType}} dropdown-toggle" data-toggle="dropdown">
 				<span data-bind="label" data-toggle="tooltip" data-placement="top" title="{{tooltip}}" >{{comboLabel}}</span>&nbsp;<span class="caret"></span>
 			</button> 
-			<ul id="Items" class="dropdown-menu">
+			<ul id="Items" class="dropdown-menu" value="{{value}}" id="value">
 				{{#each comboArr}}
 					<li><a href="#">{{label}}</a></li>
-				 {{/each}}
+				 {{/each}} 
 			</ul>
 		</div>
 	</div>    

@@ -1,7 +1,14 @@
 FormMaker.BaseElement = Backbone.View.extend({
 	m_template : null,
 	m_html : null,
-    
+    name : null,
+    element : null,
+    placeholder : null,
+    value : null,
+    icon : null,
+    btnType : null,
+    label : null,
+    tooltip : null,
 	initialize : function(){
 		console.log('baseElement init');
 	},
@@ -9,7 +16,8 @@ FormMaker.BaseElement = Backbone.View.extend({
 		"focus input" : "focusIn",
 		"blur input" : "focusOut",
 		"change input" : "valueChange",
-		"keyup input" : "valueChange"
+		"keyup input" : "valueChange",
+        "click " : "onElementClick",
 	},
 	focusIn : function(evt){
 		console.log("Focus In");
@@ -19,6 +27,8 @@ FormMaker.BaseElement = Backbone.View.extend({
 	},
 	valueChange : function(evt){
 		console.log("value change");
+        var cname = $(evt.target).closest(".dropped").attr("cname");
+        this.trigger(FormDesigner.Events.ElementClick,cname);
 	},
 	loadData : function(data){
         this.jsonData = data;
@@ -28,14 +38,33 @@ FormMaker.BaseElement = Backbone.View.extend({
         this.$el.append(element);
         this.setElement(element);
 		this.onRender();
+        this.setElements();
 	},
+    setElements : function(){
+        this.name = this.$("#name");
+        this.element = this.$("#element");
+        this.placeholder = this.$("#placeholder");
+        this.value = this.$("#value");
+        this.icon = this.$("#icon");
+        this.btnType = this.$("#btnType");
+        this.leftLabel = this.$("#leftLabel");
+        this.tooltip = this.$("#tooltip");
+    },
 	onRender : function(){
 		
 	},
     update: function(data){
         this.jsonData[data.property] = data.value;
         this.m_html = this.m_template(this.jsonData);
-        
+        var newElement = $.parseHTML(this.m_html.trim());
+        this.$el.replaceWith(newElement);
+        this.setElement(newElement);
+        this.onRender();
+        this.setElements();
+    },
+    onElementClick: function(evt){
+        var cname = $(evt.target).closest(".dropped").attr("cname");
+        this.trigger(FormDesigner.Events.ElementClick,cname);
     }
 });
 FormMaker.TextLabel = FormMaker.BaseElement.extend({
