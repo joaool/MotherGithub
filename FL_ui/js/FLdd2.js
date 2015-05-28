@@ -44,7 +44,7 @@
 			//
 			//			name -  is the human (logical) attribute name or field name
 			//			description - description of attribute (answer to: "what the <name > of a <entity.singular> ?")
-			//			label - defaul value that will appear in UI labeling the attribute
+			//			label - default value that will appear in UI labeling the attribute
 			//	OLD>>	type - one of: "string","number","integer","boolean","date","weak" (a json object)
 			//			type - string, integer, number, boolean, date, or json (Nico's field "M")
 			//				NOTE: if type is "enumerable", the key enumerable must have an array of enumerables
@@ -81,7 +81,38 @@
 			//		cardinality - leftEntity <verb><cardinality> rightEntity ex. "zero or many"
 			//		side - only for Nico's use - convention when  relation was created with relation.add in server side
 			//		storedHere - only for Nico's use - Permission to save defined when  relation was created with relation.add in server side
+			//
+			//		mock up for next version of dictionary --> t stands for temporary --> general format FL.dd.t.entities
+			//			FL.dd.t.entities.add(singular,description) - creates a new entity in dictionary
+			//			FL.dd.t.entities.dumpToConsole() - dump the whole dictionary to console
+			//			FL.dd.t.entities.list() - returns an array with all entity names (singular) in the dictionary
+			//			FL.dd.t.entities.getCName(<entityName>) - returns the compressed name of a singular entity name or null if it does not exist
+			//
+			//			FL.dd.t.entities[<entity Compressed Name>].<property> - returns the property (singular,plural or description) of that eCN
+			//			FL.dd.t.entities[<entity Compressed Name>].set(options) - sets one or several properties (singular,plural or description)
+			//						Example FL.dd.t.entities["53"].set({singular:"subContractor",plural:"subContractors",description:"company subcontracted"})
+			//			
+			//			FL.dd.t.entities[<entity Compressed Name>].fieldsList() - returns an array where each item has field properties
+			//				name,description,label,statment,type,typeUI,enumerable) of that eCN
+			//				Example						
+			//					var entity ="sub";
+			//					var eCN = FL.dd.t.entities.getCName(entity);
+			//					var display=null;
+			//					_.each(FL.dd.t.entities[eCN].fieldsList(),function(element){display+=element.name+":::"+element.description+"\n"});
+			//			FL.dd.t.entities[<entity Compressed Name>].addField(name,descriptiom,label,type,typeUI,enumerable) - creates a new field for the entity
+			//				Example: 
+			//					var eCN = FL.dd.t.entities.getCName(entity);
+			//					FL.dd.t.entities[eCN].addField("joakim","dummy field joakim","Joakim'label","text","textbox");
 
+			//			FL.dd.t.entities[<eCN>].getFieldCName(<fieldName>) - returns the compressed name of a singular field name or null if it does not exist
+			//						Example var fCN = FL.dd.t.entities["53"].getCName("id");
+			//			FL.dd.t.entities[<eCN>].fields[<fCN>].<property> - returns the field properties 
+			//				(name,description,label,type,typeUI,enumerable) of that fCN
+			//				Example: FL.dd.t.entities[eCN].fields[fCN].name
+
+			//
+
+			//      
 		var getCompressed = function ( iGenNext ) { //returns a 2 bytes string from number 
 			var sOut="";
 			//-------------
@@ -514,19 +545,19 @@
 				//			NOTE: enumerable is null for all type except "enumerable" - in this case enumerable is an array of strings
 				// 
 				// FL.API.debug = true;FL.API.debugStyle = 1;
-				FL.common.printToConsole("********************************** FL.dd.displayEntities ********************************");
-				FL.common.printToConsole("********************************************** BEGIN ******************************************");
+				FL.common.printToConsole("********************************** FL.dd.displayEntities ********************************","dump");
+				FL.common.printToConsole("********************************************** BEGIN ******************************************","dump");
 
 				var oEntities = this.entities;
 				for (var key in oEntities) {
 					if (oEntities.hasOwnProperty(key)) {//this restrain the iteration only to the object's own attributes
 						if(key=="__Last"){
 
-							FL.common.printToConsole("(__Last) -> Number of entities in dictionary="+ (oEntities[key]-9999) );
+							FL.common.printToConsole("(__Last) -> Number of entities in dictionary="+ (oEntities[key]-9999) ,"dump");
 						}else if(key=="__LastRelation"){
-							FL.common.printToConsole("(__LastRelation) -> Number of relations in dictionary="+oEntities[key]);
+							FL.common.printToConsole("(__LastRelation) -> Number of relations in dictionary="+oEntities[key],"dump");
 						}else{
-							FL.common.printToConsole("Entity="+oEntities[key].singular+"/"+oEntities[key].csingular +" - Plural="+oEntities[key].plural+"- description="+oEntities[key].description + " sync="+oEntities[key].sync );
+							FL.common.printToConsole("Entity="+oEntities[key].singular+"/"+oEntities[key].csingular +" - Plural="+oEntities[key].plural+"- description="+oEntities[key].description + " sync="+oEntities[key].sync ,"dump");
 							//now we display each attribute
 							var oL2C = oEntities[key].L2C;
 							var xArr = oEntities[key].attributes;
@@ -541,15 +572,15 @@
 									var xKey=xArr[i].key;
 									var xEnumerable=xArr[i].enumerable;
 									// FL.common.printToConsole("-----> attribute["+i+"]="+xName+"/"+xDescr+"/"+xCName+",key="+xKey+",type="+xType);
-									FL.common.printToConsole("-----> attribute["+i+"]="+xName+"/"+xDescr+"/"+xCName+",label="+xLabel+",key="+xKey+",type="+xType+",typeUI="+xTypeUI);
+									FL.common.printToConsole("-----> attribute["+i+"]="+xName+"/"+xDescr+"/"+xCName+",label="+xLabel+",key="+xKey+",type="+xType+",typeUI="+xTypeUI,"dump");
 									if(xEnumerable) {
 										for (var j=0;j<xEnumerable.length;j++){
-											FL.common.printToConsole("------------> enumerable["+j+"]="+xEnumerable[j]);
+											FL.common.printToConsole("------------> enumerable["+j+"]="+xEnumerable[j],"dump");
 										}
 									}
 								}
 							}else{
-								FL.common.printToConsole("----->no attributes defined !");
+								FL.common.printToConsole("----->no attributes defined !","dump");
 							}
 							xArr=oEntities[key].relations;
 							if(xArr.length>0){//the entity has attribute(s)
@@ -565,15 +596,15 @@
 									var side = xArr[i].side;
 									var storeHere = xArr[i].storeHere;
 
-									FL.common.printToConsole("-----> relation["+i+"] with rCN="+rCN+" -> "+xSemantic+" - #="+cardinality);
+									FL.common.printToConsole("-----> relation["+i+"] with rCN="+rCN+" -> "+xSemantic+" - #="+cardinality,"dump");
 								}
 							}else{
-								FL.common.printToConsole("----->no relations defined !");
+								FL.common.printToConsole("----->no relations defined !","dump");
 							}
 						}
 					}
 				}
-				FL.common.printToConsole("********************************************** END of displayEntities *****************************************");
+				FL.common.printToConsole("********************************************** END of displayEntities *****************************************","dump");
 				// FL.API.debug = false; FL.API.debugStyle = 0;
 			},
 			countEntitiesBeginningBy: function(singularPrefix) {//return the number of entities whose singular name begins by singularPrefix
@@ -1278,7 +1309,166 @@
 					entityBackup.relations = relationsBackup;
 				}
 				return entityBackup;
-			}
+			},
+			init_t:function(){
+				FL.dd.t.entities = FL.dd.reverseEnt();
+			},
+			t: {
+				entities: null,
+				save:function(){
+					return "save done";
+				}
+			},
+			reverseEnt:function(){
+				var z = {};
+				var oEntities = FL.dd.entities;
+				FL.common.printToConsole("reverseEnt will process "+(oEntities.__Last-9999)+" entities..","dd");
+				_.each(oEntities,function(value,key){//mounts a JSON whose keys are eCN -the loop has each entity
+					if(key!="__Last" && key!="__LastRelation"){
+						var fieldsObj = {};
+						var thiz = this;
+						_.each(value.attributes,function(element){//for each entity mounts a JSON whose keys are fCN
+							var fCN = value.L2C[element.name];
+							element["parent"] = key;
+							element["disp"] = function(x){return "hello "+x;};
+							element["setField"] = function(options){//options:(name,description,label,type,typeUI,enumerable)
+								var entityName = this.parent;
+								var fieldName = this.name;
+								var promise = FL.dd.updateAttribute(entityName,fieldName,options);
+								promise.done(function(dataArray){
+									FL.dd.init_t();//update changes to FL.dd.t.entities
+									return;
+								});
+								promise.fail(function(err){
+									alert("FL.dd.t.entities[].fields[].setField() error impossible to update field attributes");
+									return;
+								});								
+							};
+							fieldsObj[fCN] = element;
+							// fieldsObj["disp"] = function(x){return "hello "+x;};
+						});	
+						var properties = _.omit(value,"lastId","L2C","C2L","attributes","relations");
+						properties["fields"] = fieldsObj;
+						properties["set"] = function(options){
+							var entityName = this.singular;
+							FL.dd.updateEntityBySingular(entityName,options);
+							FL.dd.init_t();//update changes to FL.dd.t.entities
+						};
+						properties["getFieldCName"] = function(fieldName){//if field name does not exist returns null
+							var entityName = this.singular;
+							return FL.dd.getFieldCompressedName(entityName,fieldName);//returns null if entity name does not exist
+						};
+						properties["fieldsList"] = function(){
+							var fieldsListArr=[];
+							var oEntity = FL.dd.entities[this.singular];
+							if(oEntity){//if entity exists
+								_.each(oEntity.attributes, function(element, index){
+									if(element.name != "id"){
+										var el = {};
+										el["name"] = element.name;
+										el["description"] = element.description;
+										el["label"] = element.label;
+										el["statement"] = attributeSemantics(element.name,element.description,oEntity,"En");
+										el["type"] = element.type;
+										el["enumerable"] = element.enumerable;
+										el["typeUI"] = element.typeUI;
+										// ----
+										fieldsListArr.push(el);
+									}
+								});
+							}else{
+								return null;
+							}
+							return fieldsListArr;
+						};
+						properties["addField"] = function(name,description,label,type,typeUI,arrEnumerable){//if it exists update it otherwise a new is created
+							FL.dd.addAttribute(this.singular,name,description,label,type,typeUI,arrEnumerable);
+							FL.dd.init_t();//update changes to FL.dd.t.entities
+						};																			
+						properties["XgetCName"] = function(fieldName){//if field name does not exist returns null
+							var entityName = "sub";//this.singular;
+							return FL.dd.getFieldCompressedName(entityName,fieldName);//returns null if entity name does not exist
+						};	
+						z[value.csingular] = properties;
+						// z["disp"] = function(x){return "hello "+x;};
+						// _.extend(z[value.csingular],{disp:function(x){return "hello "+x;});
+					}	
+				});
+				z["add"] = function(singular,description){
+					FL.dd.createEntity(singular,description);
+					//now we need to replicate it to the mockup structure - creating a new entry with the compressed name
+					var oEntity = FL.dd.entities[singular];
+					var eCN = FL.dd.getCEntity(singular);
+					FL.dd.init_t();//update changes to FL.dd.t.entities
+					// var newEntry = {};
+					// newEntry[eCN] = {singular:oEntity.singular,csingular:oEntity.csingular,plural:oEntity.plural,description:oEntity.description,sync:oEntity.sync};
+					// _.extend(FL.dd.t.entities,newEntry);
+				};
+				z["dumpToConsole"] = function(singular,description){
+					FL.dd.displayEntities();
+				};
+				z["list"] = function(){
+					var listArr=[];
+					var oEntities = FL.dd.entities;
+					_.each(oEntities,function(value,key){
+						if(key!="__Last" && key!="__LastRelation"){
+							listArr.push(oEntities[key]);
+						}	
+					});
+					return listArr;
+				};
+				z["getCName"] = function(entityName){//if entity name does not exist returns null
+					var oEntity=FL.dd.entities[entityName];
+					if(FL.dd.entities[entityName])
+						return FL.dd.entities[entityName].csingular;
+					return null;//oEntity; //gives undefined
+				};												
+				return z;
+			},
+			// entity:{
+			// 	"50":{"singular":"customer",disp:function(){return "hello";}},
+			// 	"60":{"singular":"contact"}
+			// },
+			// ent.prototype:{
+			// 	display:function(){return this.arg1+"/"+this.arg2;};
+			// },
+			// e: new FL.dd.ent(),
+			entityX: {//object model mockup
+				// x: Object.create(FL.dd.ent),
+				//example
+				//		var display=null;
+				// 		_.each(FL.dd.entityX.list(),function(element){display+=element.singular+"/"+element.csingular+"\n"});
+				// 		alert("List all entities:\n"+display+"\nCompressed name of sub="+FL.dd.entityX.getCName("sub"));
+				add:function(entityName,optionsObj){
+					alert("Entity "+entityName+" was created !");
+					return "50";
+				},
+				save:function(){
+					alert("entity.save() - Hello !");
+				},
+				dump:function(){
+					FL.dd.displayEntities();
+				},
+				getCName:function(entityName){
+					var oEntity=FL.dd.entities[entityName];
+					if(FL.dd.entities[entityName])
+						return FL.dd.entities[entityName].csingular;
+					return null;//oEntity; //gives undefined
+				},
+				list:function(){
+					var listArr=[];
+					var oEntities = FL.dd.entities;
+					_.each(oEntities,function(value,key){
+						if(key!="__Last" && key!="__LastRelation"){
+							listArr.push(oEntities[key]);
+						}	
+					});
+					return listArr;
+				}				
+			}			
 		};
 	})();
+	// FL.dd.t.entities.prototype.fullName = function() {
+	//    return "joao oliveira";   
+	// };	
 // });

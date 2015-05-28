@@ -130,23 +130,21 @@
 				alert("Fl.link.test(x) x="+x);
 			},
 			pageEditor: function(xPage) {//call with menu key "uri": "javascript:FL.links.pageEditor('home')"
-				var connectionString = localStorage.login;// Retrieve format {email:x1,password:x3,domain:x4};
-				if(connectionString.length === 0){
-					alert("Fl.link.pageEditor PLEASE CONNECT TO THE DATABASE ");
+				var loginStr = localStorage.login;// Retrieve format {email:x1,password:x3,domain:x4};
+				if(loginStr.length === 0){
+					alert("Fl.link.pageEditor no login in storage !. PLEASE CONNECT TO THE DATABASE ");
 					return;
 				}
-				connectionString = FL.common.enc(connectionString,1);
+				var API_key = FL.API.generateAPI_key(JSON.parse(loginStr));
 				var style = localStorage.style;
 				var font = localStorage.fontFamily;
-				var child = window.open("./page_editor.html?connectionString="+connectionString+"#page=" + xPage + "#style=" + style + "#font="+font, 'theWindow');
-				// var child = window.open("./page_editor.html?connectionString="+connectionString+"#page=" + xPage + "#style=" + style + "#font="+font, "_blank");
+				var child = window.open("./page_editor.html?API_key="+API_key+"#page=" + xPage + "#style=" + style + "#font="+font, 'theWindow');
 				if (window.focus) {
 					child.focus();
 				}
 				var timer = setInterval(checkChild, 500);
 				function checkChild() {
 					if (child.closed) {// we need this to show the new home page
-						// alert("FrameLink Page Editor was closed \nconnectionString="+connectionString);
 						clearInterval(timer);
 						FL.login.home();
 					}else{

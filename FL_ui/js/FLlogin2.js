@@ -105,35 +105,40 @@ jQuery(document).ready(function($){
 			$.Topic( 'sidePanelOpened' ).publish( false ); //informs FL.menu that sidePanel is closed 
 		};
 		var displaySignInUser = function(user) {//if user is null displays signIn icon+"Sign In" otherwise displays user
-			var htmlToInject = '<div style="line-height:2.2em;"><span id="_signInDomain" class="small hidden-xs" style="margin-left:6.5em" >'+
-									'Welcome to FrameLink: support@framelink.co App:'+  FL.domain +
+			var browserW = FL.common.getBrowserWidth();
+			// var htmlToInject = '<div style="line-height:2.2em;"><span id="_signInDomain" class="small hidden-xs" style="margin-left:2%;" >'+
+			// 						'Welcome to FrameLink: support@framelink.co App:'+  FL.domain + " / "+browserW +
+			// 					'</span>'+
+			// 					'<a class="pull-right" href="javascript:FL.login.signIn()" style="margin-right:2%;">'+
+			// 						'<img src="FL_ui/img/signIn.png">'+
+			// 						'<span id="_signIn" style="font-size: 1.2em;"> Sign In</span>'+
+			// 					'</a>'+
+			// 				'</div>';
+			var htmlToInject = '<span id="_signInDomain" class="small" style="margin-left:2%;line-height:2.2em; display:inline;float:left" >'+
+									'Welcome to FrameLink: support@framelink.co App:'+  FL.domain + " / "+browserW +
 								'</span>'+
-								// '<a class="pull-right text-muted" href="javascript:FL.signIn()" style="margin-right:12em">'+
-								'<a class="pull-right" href="javascript:FL.login.signIn()" style="margin-right:12em;">'+
+								'<a class="pull-right" href="javascript:FL.login.signIn()" style="margin-right:2%;line-height:2.2em; display:inline;float:left">'+
 									'<img src="FL_ui/img/signIn.png">'+
 									'<span id="_signIn" style="font-size: 1.2em;"> Sign In</span>'+
-								'</a>'+
-								// '<a class="pull-right text-muted" style="margin-right:1.5em" href="javascript:FL.tourIn()" >'+
-								// '<a class="pull-right" style="margin-right:1.5em;" href="javascript:FL.tourIn()" >'+
-								// 	'<i  class="glyphicon glyphicon-eye-open" style="font-size: 1.5em;color:black;"></i>'+
-								// 	'<span style="font-size: 1.2em;"> Tour</span>'+
-								// '</a>'+
-							'</div>';
+								'</a>';					
 			if(user) {
-				htmlToInject = '<div style="line-height:2.2em;"><span class="small hidden-xs" style="margin-left:6.5em">'+
-										'Welcome to FrameLink: support@framelink.co App:' + FL.domain +
-									'</span>'+
-									// '<a class="pull-right text-muted" href="javascript:FL.signIn()" style="margin-right:12em">'+
-									'<a class="pull-right " href="javascript:FL.login.signIn()" style="margin-right:12em">'+
-										'<i  class="glyphicon glyphicon-user"></i>'+
-										'<span id="_signIn" style="font-size: 1.2em;"> '+ user +'</span>'+
-									'</a>'+
-									// '<a class="pull-right text-muted" style="margin-right:1.5em" href="javascript:FL.tourIn()" >'+
-									// '<a class="pull-right" style="margin-right:1.5em;" href="javascript:FL.tourIn()" >'+
-									// 	'<i class="glyphicon glyphicon-eye-open" style="font-size: 1.5em;color:black;"></i>'+
-									// 	'<span style="font-size: 1.2em;"> Tour</span>'+
-									// '</a>'+
-								'</div>';
+				// htmlToInject = '<div style="line-height:2.2em;"><span class="small" style="margin-left:2%;">'+
+				// 						'Welcome to FrameLink: support@framelink.co App:' + FL.domain + " / "+browserW +
+				// 					'</span>'+
+				// 					// '<a class="pull-right text-muted" href="javascript:FL.signIn()" style="margin-right:12em">'+
+				// 					'<a class="pull-right " href="javascript:FL.login.signIn()" style="margin-right:2%">'+
+				// 						'<i  class="glyphicon glyphicon-user"></i>'+
+				// 						'<span id="_signIn" style="font-size: 1.2em;"> '+ user +'</span>'+
+				// 					'</a>'+
+				// 				'</div>';
+				htmlToInject = '<span class="small" style="margin-left:2%;line-height:2.2em; display:inline;float:left">'+
+									'Welcome to FrameLink:' + FL.domain + " / "+browserW +
+								'</span>'+
+								// '<a class="pull-right text-muted" href="javascript:FL.signIn()" style="margin-right:12em">'+
+								'<a class="pull-right " href="javascript:FL.login.signIn()" style="margin-right:2%;line-height:2.2em; display:inline;float:left">'+
+									'<i  class="glyphicon glyphicon-user"></i>'+
+									'<span id="_signIn" style="font-size: 1.2em;"> '+ user +'</span>'+
+								'</a>';
 			}
 			FL.domInject("_login",htmlToInject );
 		};
@@ -163,61 +168,56 @@ jQuery(document).ready(function($){
 			FL.domain = FL.login.token.appDescription;
 			displaySignInUser(loginObject.email);
 		};
-		var appSetup = function(loginObject){//(local dict + menu + style + fontFamily) from server, and displays UI accordingly ->menu, style, font and homepage 
-			//if application database has no _histoMail the table is created 
-			var def = $.Deferred();
-			var loadAppPromise=FL.API.loadAppDataForSignInUser2();//gets data dictionary + main menu + style + fontFamily + home page
-			loadAppPromise.done(function(menuData,homeHTML){
-				FL.common.printToConsole("appSetup ---> homeHTML=" + homeHTML);
-				FL.common.printToConsole("appSetup ---> menudata=" + JSON.stringify(menuData));
-				// FL.common.printToConsole("appSetup --------------------------------------------->first menu=" + menuData.oMenu.menu[0].title);
+		var getLoginObject = function(){
+			var email = $('#getStarted_email').val();
+			email = email.trim();
+			var password = $('#getStarted_password').val();
+			password = password.trim();
+			return {email:email,password:password};
+		};
+		var setupApp = function(menuData,homeHTML,loginObject){
+			$.Topic( 'jsonMenuUpdate' ).publish( menuData.oMenu );//broadcast that will be received by FL.menu to update jsonMenu
+			FL.common.clearSpaceBelowMenus();
+			FL.domInject("_placeHolder",homeHTML );
 
-				// var loginMenu = FL.menu.createMenu({jsonMenu:menuData.oMenu});//FL.oMenu is a global defined  in FLMain.js
-				$.Topic( 'jsonMenuUpdate' ).publish( menuData.oMenu );//broadcast that will be received by FL.menu to update jsonMenu
-
-				FL.common.clearSpaceBelowMenus();
-				// loginMenu.menuRefresh();
-				FL.domInject("_placeHolder",homeHTML );
-
-				FL.domain = FL.login.token.appDescription; //test with "jojo"+loginObject.email;
-				
-				localStorage.storedMenu  = JSON.stringify(menuData.oMenu);
-				localStorage.style = menuData.style;
-				localStorage.fontFamily = menuData.fontFamily;
-				resetStyle(true);
-				localStorage.login = JSON.stringify(loginObject);
-				$.Topic( 'signInDone' ).publish( true );
-				recoverLastMenu();//recover locally saved menu and informs FL.menu about the new menu if any
-				displaySignInUser(loginObject.email);
-				
-				def.resolve(menuData,homeHTML);
-			});
-			loadAppPromise.fail(function(err){
-				alert("FLLoadCss2.js  --> appSetup FAILURE  <<<<< error="+err);
-				return def.reject("FLLoadCss2.js  --> appSetup FAILURE <<<<< error="+err);
-			});
-			return def.promise();
+			FL.domain = FL.login.token.appDescription; //test with "jojo"+loginObject.email;
+			
+			localStorage.storedMenu  = JSON.stringify(menuData.oMenu);
+			localStorage.style = menuData.style;
+			localStorage.fontFamily = menuData.fontFamily;
+			resetStyle(true);
+			localStorage.login = JSON.stringify(loginObject);
+			$.Topic( 'signInDone' ).publish( true );
+			recoverLastMenu();//recover locally saved menu and informs FL.menu about the new menu if any
+			displaySignInUser(loginObject.email);
 		};
 		var loginDialogs = function(loginObject){
 			var def = $.Deferred();
 
 			var masterDetailItems = {
-				master:{eMail:loginObject.email,password:loginObject.password},
+				master:{email:loginObject.email,password:loginObject.password},
 				detail:{} //format is array with {attribute:<attribute name>,description:<attr description>,statement;<phrase>}
 			};
 			// FL.common.makeModal("B"," FrameLink Login","loginTemplate",{icon:"user",button1:"Logout",button2:"Login"},function(result){// "Cancel and "Ok" will be assumed with result = true for "Ok"
 			var btn1Caption = "Cancel";//if it enters in logout mode the first button is "Cancel"
-			if(FL.fl)
+			if(FL.fl.getsId())
 				btn1Caption = "Logout";//if it enters in loggedin mode the first button is "Logout"
 			FL.common.editMasterDetail("B"," Sign in to FrameLink","loginTemplate",masterDetailItems,{type:"primary", icon:"user",button1:btn1Caption,button2:"Sign in"},function(result){
 				if(result){//user choosed login
 					var email = $('#login_email').val();
 					var password = $('#login_password').val();
-					var loginPromise = loginAccess({email:email,password:password,domain:null});
-					// loginPromise.then(function(okToContinue,loginObject){
-					loginPromise.then(function(userExists,loginObject){
-						FL.common.printToConsole("loginAccess well done! email="+loginObject.email+" userExists="+userExists);
-						if(!userExists){
+					var spinner=FL.common.loaderAnimationON('spinnerDiv');
+					var loginPromise = FL.API.loadDefaultApp({email:email,password:password,domain:null});
+					loginPromise.done(function(menuData,homeHTML){
+						setupApp(menuData,homeHTML,{email:email,password:password,domain:null});
+						$('#trigger1').show();$('#trigger2').show();$('#trigger3').show();
+						var okToContinue = true;
+						spinner.stop();
+						return def.resolve(okToContinue,loginObject);
+					});
+					loginPromise.fail(function(err){
+						spinner.stop();
+						if(err.code == 1 || err.code == 5){//user does not exist or wrong password
 							FL.common.makeModalInfo(
 								"Invalid Email/password.<br> - If you are an existing user please correct your EMail/password.<br>" +
 								" - If you are a <strong>new user</strong> please press <strong>'Logout'</strong> and then " +
@@ -226,26 +226,11 @@ jQuery(document).ready(function($){
 								return def.resolve(false,loginObject);//true ==>continue false=>repeat						
 							});
 						}else{
-							$('#trigger1').show();$('#trigger2').show();$('#trigger3').show();
-							var okToContinue = true;
-							return def.resolve(okToContinue,loginObject);
-						}
-					},function(err){
-						if(err.indexOf("Access denied")>=0){
-							FL.common.makeModalInfo("Wrong password. Please correct it and retry.",function(){
-								FL.common.printToConsole("makeModalInfo --->pressed 'Ok' after wrong password warning");
-								return def.resolve(false,loginObject);//true ==>continue false=>repeat						
-							});
-						}else{
-							return def.reject("Login access error err="+JSON.stringify(err));
-						}
+							alert("FLlogin2.js loginDialogs >>>>> access FAILURE <<<<< ERROR ->"+err.code+" - "+err.message);    		
+							return def.reject(err);
+				    	}
 					});
 				}else{//the user choosed Cancel or Logout (it is the same button)
-					var z = $('#__FLDialog_button2').attr("class");
-					FL.common.printToConsole("()()()()()()()->z="+z);
-
-					// logOutMenu();//displays menu and homepage for logout status
-					// FL.login.signOut();
 					if (btn1Caption == "Cancel") {				
 						return def.resolve(true,loginObject);
 					}else{
@@ -268,41 +253,33 @@ jQuery(document).ready(function($){
 			};
 			FL.common.editMasterDetail("B"," Get started with FrameLink","getStartedTemplate",masterDetailItems,{type:"primary", icon:"thumbs-up",button1:"Cancel",button2:"Start now"},function(result){
 				if(result){//user choosed login
-					var email = $('#getStarted_email').val();
-					email = email.trim();
-					var password = $('#getStarted_password').val();
-					password = password.trim();
-					loginObject  = {eMail:email,password:password};
-					if(email.length>0 && password.length === 0){
+					var loginObject  = getLoginObject();
+					if(loginObject.email.length>0 && loginObject.password.length === 0){
 						FL.common.makeModalInfo('You must introduce a password to sign up !',function(){
-							FL.common.printToConsole("getStartedDialogs-->missing password for email="+email+" !!!");
+							FL.common.printToConsole("getStartedDialogs-->missing password for email="+loginObject.email+" !!!");
 							def.resolve(false,loginObject);//true ==>continue false=>repeat	
 						});
-					}else if(email.length === 0 && password.length === 0){
+					}else if(loginObject.email.length === 0 && loginObject.password.length === 0){
 						FL.common.printToConsole("getStartedDialogs-->sign up for trial");
 						// TO BE DONE
 						// loginPromise = FL.API.prepareTrialApp().then(function(){return appSetup(loginObject);})
 							// .then(function(){return def.resolve();},function(err){return def.reject(err);});
 
 						def.resolve(true);//true ==>continue false=>repeat	
-					}else if(email.length >0  && password.length > 0){//a potencial new user
-						FL.common.printToConsole("getStartedDialogs-->sign up for email="+email+"/"+password);
-						loginObject = {email:email,userName:"",password:password}
+					}else if(loginObject.email.length >0  && loginObject.password.length > 0){//a potencial new user
+						FL.common.printToConsole("getStartedDialogs-->sign up for email="+loginObject.email+"/"+loginObject.password);
 						var newUserPromise=newUserAccess( loginObject );
 						newUserPromise.done(function(userWasCreated){
 							if(userWasCreated){
-								FL.common.printToConsole("getStartedDialogs ->newUserAccess-> new user " + email +" successfully created!");
+								FL.common.printToConsole("getStartedDialogs ->newUserAccess-> new user " + loginObject.email +" successfully created!");
 								loginDefaultMenu_and_homePage(loginObject);//default for new users
 								def.resolve(true);//true ==>continue false=>repeat	
 							}else{
-								FL.common.printToConsole("getStartedDialogs ->newUserAccess-> user " + email + " alread exists !!!");
+								FL.common.printToConsole("getStartedDialogs ->newUserAccess-> user " + loginObject.email + " alread exists !!!");
 								def.resolve(false,loginObject);//true ==>continue false=>repeat	
 							}
 						});
 						newUserPromise.fail(function(err){alert("getStartedDialogs --> error in newUserAccess for " + loginObject.email + " !!!!");});
-
-
-						def.resolve(true);//true ==>continue false=>repeat	
 					}
 				}else{//the user choosed logout
 					FL.common.printToConsole("getStartedDialogs-->cancel");
@@ -311,54 +288,13 @@ jQuery(document).ready(function($){
 			});//OK	
 			return def.promise();
 		};
-		var loginAccess = function(loginObject){//when login email is valid and other data acceptable - {email:email,userName:userName,password:password};
-			// loginObject = {email:email,userName:userName,password:password};
-			var def = $.Deferred();
-			var loginPromise = null;
-			if( loginObject.email == "guest@framelink.co"){//create temporary account
-				// loginPromise = FL.API.connectAdHocUser();
-				loginPromise = FL.API.prepareTrialApp().then(function(){return appSetup(loginObject);})
-					// .then(function(){return loginAccessCB(null,loginObject);},function(err){return loginAccessCB(err,loginObject);});
-					.then(function(){return def.resolve();},function(err){return def.reject(err);});
-			}else{//use an existing account or a new account
-				// check if the user exists - if it exists => connect if not create new user.
-				FL.common.printToConsole("loginAccess not a guest -------------------------------------------------------> checks if user exists");
-				var existingUserPromise=FL.API.isUserExist(loginObject.email);
-				existingUserPromise.done(function(exist){
-					FL.common.printToConsole("existingUserPromise.done----------------------------------->next will test exist !!!");
-					if(exist){//the user exists
-						var spinner=FL.common.loaderAnimationON('spinnerDiv');
-						// setInterval(function(){spinner.stop();},3000);
-						FL.common.printToConsole("existingUserPromise.done------------------------------------------------------------> user exists !!!");
-						var setupExistingUserPromise = FL.API.connectUserToDefaultApp(loginObject.email,loginObject.password)
-							.then(function(){return appSetup(loginObject);})
-							.then(function(){
-								FL.common.printToConsole("FLLoadCss2 -> success connecting to default app and doing app setup!");
-								spinner.stop();
-								return def.resolve(true,loginObject);//true =>user exists
-								},function(err){
-									FL.common.printToConsole("loginAccess ===>fail ->err="+err);
-									spinner.stop();
-									return def.reject(err);
-								});//true ==>continue false=>repeat	
-							// alert("xxxzzz");
-					}else{//user does not exist !!!
-						return def.resolve(false,loginObject);//false ==>user does not exist					
-					}
-				});
-				existingUserPromise.fail(function(err){
-					alert("loginAccess --> error while checking if user " + loginObject.email + " exists !!!! err="+JSON.stringify(err));
-					return def.reject("Error while checking if user " + loginObject.email + " exists!");
-				});
-			}
-			return def.promise();
-		};
 		var newUserAccess = function(loginObject){//when login email is valid and other data acceptable - {email:email,userName:userName,password:password};
 			// loginObject = {email:email,userName:userName,password:password};
 			var def = $.Deferred();
 			var loginPromise = null;
 			// check if the user exists - if it does not exist => creates it.
 			FL.common.printToConsole("newUserAccess not a guest -------------------------------------------------------> checks if user exists");
+			var spinner=FL.common.loaderAnimationON('spinnerDiv');
 			var existingUserPromise=FL.API.isUserExist(loginObject.email);
 			existingUserPromise.done(function(exist){
 				FL.common.printToConsole("newUserAccess existingUserPromise.done-------------------------------->next will text exist !!!");
@@ -367,28 +303,20 @@ jQuery(document).ready(function($){
 					var userName = FL.common.stringBeforeLast(loginObject.email,"@");
 					createUserPromise = FL.API.createUserAndDefaultApp(loginObject.email,loginObject.password, "First app of " + userName)
 						.then(function(){
-							FL.common.printToConsole("FLLoadCss2 ->newUserAccess-> success creating a new user! ->now we create _histoMail");
-							
-							var histoPromise=FL.API.createHistoMails_ifNotExisting();
-							histoPromise.done(function(){
-								FL.common.printToConsole("FLLoadCss2.js newUserAccess _histoMail SUCESSFULLY created for new user");
-								return def.resolve(true);//true ==>user was created
-							});
-							histoPromise.fail(function(err){
-								alert("FLLoadCss2.js newUserAccess _histoMail FAILURE creating _histoMail err="+err);
-								// return newUserAccessCB(err,loginObject);
-								return def.reject("FLLoadCss2.js newUserAccess _histoMail FAILURE creating _histoMail err="+err);
-							});
-							// return def.resolve(true);//true ==>user was created
-							},function(err){FL.common.printToConsole("FLLoadCss2 ->newUserAccess->fail");return def.reject(err);});
+							spinner.stop();
+							FL.common.printToConsole("FLlogin2 ->newUserAccess-> success creating a new user! ->now we create _histoMail");
+							return def.resolve(true);//true ==>user was created
+							},function(err){FL.common.printToConsole("FLlogin2newUserAccess->fail");return def.reject(err);});
 				}else{//user exist !!!
+					spinner.stop();
 					FL.common.makeModalInfo("Cannot sign up because " + loginObject.email + " is already registered.<br> - If " + loginObject.email + " is your Email, please choose <strong>'Sign In'</strong> to enter as an existing user.",function(){
-						FL.common.printToConsole("FLLoadCss2 ->newUserAccess->makeModalInfo --->pressed 'Ok' after existing email message for email="+loginObject.email);
+						FL.common.printToConsole("FLlogin2newUserAccess->makeModalInfo --->pressed 'Ok' after existing email message for email="+loginObject.email);
 						return def.resolve(false);//false ==>user not created because it already exists						
 					});
 				}
 			});
 			existingUserPromise.fail(function(err){
+				spinner.stop();
 				alert("newUserAccess --> error while checking if user " + loginObject.email + " exists !!!! err="+JSON.stringify(err));
 				return def.reject("Error while checking if user " + loginObject.email + " exists!");
 			});
@@ -554,7 +482,7 @@ jQuery(document).ready(function($){
 				displaySignInUser();//displays no user, just icon and "Sign In" link
 				FL.mix("Entering",{});
 			},
-			checkSignIn2:function() {
+			checkSignIn:function() {
 				//checkSignIn2 ->recover last saved loginObject and:
 				//	if user/password exists ->logs in -> shows slide panels ->updates upper right corner
 				//	if not keeps user in logout mode. -> hide slide panels  ->updates upper right corner
@@ -573,31 +501,29 @@ jQuery(document).ready(function($){
 					}
 					if(lastLoginStr !== null) {//user/password exist
 						var lastLoginObj = JSON.parse(lastLoginStr);
-						user = lastLoginObj.email;
-						var loginPromise = loginAccess(lastLoginObj);
-
-						loginPromise.then(function(userExists,loginObject){
-							FL.common.printToConsole("loginAccess well done! email="+loginObject.email+" userExists="+userExists,"login");
-							if(!userExists){
-								FL.login.signOut();//saves logout in local storage ->hide slide panels  ->updates upper right corner display
-								logOutMenu();//displays menu and homepage for logout status
-								return def.resolve();
-							}else{
+						var spinner=FL.common.loaderAnimationON('spinnerDiv');
+						var loadDefaultAppPromise = FL.API.loadDefaultApp(lastLoginObj)//no loginAcess, no appSetup
+							.then(function(menuData,homeHTML){
+								spinner.stop();
+								setupApp(menuData,homeHTML,lastLoginObj);						
 								$('#trigger1').show();$('#trigger2').show();$('#trigger3').show();
-								$.Topic( 'signInDone' ).publish( true ); //informs FL.menu that edition is allowed
+								$.Topic( 'signInDone' ).publish( true ); //informs FL.menu that edition is allowed						
 								return def.resolve();
-							}
-						},function(err){return def.reject("Login access error err="+JSON.stringify(err));});						
-
-
+							},function(err){
+								if(err.code == 1){//user does not exist
+									spinner.stop();
+									FL.login.signOut();//saves logout in local storage ->hide slide panels  ->updates upper right corner display
+									logOutMenu();//displays menu and homepage for logout status
+									return def.resolve();
+								}
+								alert("checkSignIn ->access ERROR ->"+err.code+" - "+err.message);
+								return def.reject("Login access error err="+JSON.stringify(err));
+							});
 					}else{//the status is signed out
 						logOutMenu();//displays menu and homepage for logout status
 						FL.login.signOut();//saves logout in local storage ->hide slide panels  ->updates upper right corner display
 						return def.resolve();
 					}				
-				// recoverLastTourActiveStatus();
-				// resetStyle(true);//the status is login 
-
 				}else{
 					FL.common.makeModalInfo('No menu persistence because your browser does not support Web Storage...',function(){
 						return def.reject("Unsupported browser");
@@ -605,7 +531,7 @@ jQuery(document).ready(function($){
 				}
 				return def.promise();
 			},
-			signIn: function() {//called from href in first line
+			signIn: function() {//called from href in first line of screen (htmlToInject)
 				// http://www.sitepoint.com/11-ways-to-enhance-your-web-application/
 				// Use cases:
 				// 		New user

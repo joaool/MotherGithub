@@ -917,7 +917,7 @@ FL["common"] = (function(){//name space FL.common
                 if(_.isUndefined(this.debugFilter[filter]))
                     this.debugFilter[filter]=true;
             };    
-            if(FL.API.debug){
+            if(FL.API.debug){//shows all FL.common.printToConsole() even without filter parameter
                 console.log(toDisplay);
             }else{
                 if(filter){//if there is no filter, does not display, otherwise checks if there is a reason to display
@@ -930,6 +930,23 @@ FL["common"] = (function(){//name space FL.common
             }    
             // FL.API.debug = debugStatus;
             // FL.API.debugStyle = debugStyleStatus;
+        },
+        getBrowserWidth: function(){
+            if (window.innerWidth){
+                return window.innerWidth;}  
+            else if (document.documentElement && document.documentElement.clientWidth != 0){
+                return document.documentElement.clientWidth;    }
+            else if (document.body){return document.body.clientWidth;}      
+                return 0;
+        },
+        getBase64Width: function(imageData) {
+            $("body").append("<img id='hiddenImage' src='"+imageData+"' />");
+            var w = $('#hiddenImage').width();
+            var h = $('#hiddenImage').height();
+            $('#hiddenImage').remove();
+            console.log("width:"+w+" height:"+h);
+            FL.common.printToConsole("getBase64Width before exit w="+w+" h="+h,"abc");
+            return w;
         },        
 		testFunc: function(x) {
 			alert("FL.common.test() -->"+x);
