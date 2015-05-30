@@ -294,41 +294,36 @@
 			// if data dictionary update succeds but entity update on server fails 
 			var storedArr= csvStore.extractFromCsvStore();
 			if( FL.API.nicoTestDuplicateIds(storedArr) ){//only works if no duplicate _id exist in csvStore
-				alert("FLGrid2 updateTypesInServer - csvStore.csvRows _id duplicate DETECTED !!!. Nothing was done");
+				alert("FLGrid2 updateDictionaryAndTypesInServer - csvStore.csvRows _id duplicate DETECTED !!!. Nothing was done");
 				return;	
 			}
 			// var z = msg.abc; //to force error
 			var localDictEntityBackup = FL.dd.getDictEntityBackup(entityName);
-			var xPlural = FL.dd.plural(newSingularName,"En");  //+"s";
-			FL.dd.updateEntityBySingular(entityName,{singular:newSingularName,plural:xPlural,description:description});
-			// FL.dd.setEntityFieldsBySingular(entityName,newAttributesArr,changedAttributesArr);
-
 			var spinner=FL.common.loaderAnimationON('spinnerDiv');
-			//FL.API.updateDictionaryAllAttributes also updates local dictionary
 			var updateDictionaryAllAttributesPromise = FL.API.updateDictionaryAllAttributes(entityName,newSingularName,description,newAttributesArr);
 			updateDictionaryAllAttributesPromise.done(function(){//this update local and server dictionary
 				if(changedTypeArr.length>0){//there is type change(s)
 					csvStore.transformStoreTo(newAttributesArr,changedAttributesArr,changedTypeArr);//does changes in csvStore
-					var updatePromise = FL.grid.updateCurrentCSVToServer(entityName);
+					var updatePromise = FL.grid.updateCurrentCSVToServer(newSingularName);
 					updatePromise.done(function(){
 						spinner.stop();
-						FL.grid.displayDefaultGrid(entityName);//loads from server and display
+						FL.grid.displayDefaultGrid(newSingularName);//loads from server and display
 					});
 					updatePromise.fail(function(err){
 						spinner.stop();
 						FL.dd.entities[newSingularName] = localDictEntityBackup;//rools back local dictionary update
 						FL.dd.setSync(entityName,false); //warns that local dict is not in sync with server dictionary
-						alert("editGrid updateCurrentCSVToServer Failure err="+err);//loads from server and displaywithout newsl
+						alert("FLGrid2 updateDictionaryAndTypesInServer updateCurrentCSVToServer Failure err="+err);//loads from server and displaywithout newsl
 					});
 				}else{
 					spinner.stop();
-					FL.grid.displayDefaultGrid(entityName);//loads from server and display
+					FL.grid.displayDefaultGrid(newSingularName);//loads from server and display
 				}	
 			});
 			updateDictionaryAllAttributesPromise.fail(function(err){
 				spinner.stop();
 				FL.dd.entities[newSingularName] = localDictEntityBackup;//rools back local dictionary update - TESTED OK
-				alert("editGrid updateTypesInServer updateDictionaryAllAttributes Failure err="+err);//loads from server and displaywithout newsl
+				alert("FLGrid2 updateDictionaryAndTypesInServer updateDictionaryAllAttributes Failure err="+err);//loads from server and displaywithout newsl
 			});
 		};		
 		var addImageToMandrillImageArr = function(name,srcContent){//mandrillImagesArr is formed to FL.login.emailImagesArray

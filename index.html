@@ -3,7 +3,7 @@
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width">
-	<title>version 13.42</title>
+	<title>version 13.43</title>
 	<!--
 		testApigee
 	-->
@@ -39,6 +39,15 @@ mixpanel.init("19ada1cb259cc3272c67085eb1bf03fc");</script><!-- end Mixpanel -->
 	window.ParsleyValidator
 	  .addValidator('entityDuplicate', function (value) {
 	  	return !FL.dd.isEntityInLocalDictionary(value);
+	  }, 32)
+	  .addValidator('entityDuplicateExceptDefault', function (value,inputId) {
+	  	// var defaultValue = $("#_dictEditEntityTemplate_entityName")[0].defaultValue;
+	  	var defaultValue = $("#"+inputId)[0].defaultValue;
+	  	if(value != defaultValue){
+	  		return !FL.dd.isEntityInLocalDictionary(value);
+	  	}else{
+	  		return true;
+	  	}	
 	  }, 32)
 	</script>
     <link type="text/css" rel="stylesheet" href="FL_ui/css/parsley.css" />
@@ -511,7 +520,11 @@ mixpanel.init("19ada1cb259cc3272c67085eb1bf03fc");</script><!-- end Mixpanel -->
                             <label class="control-label" for="_dictEditEntityTemplate_entityName">Please give a name common to every single line...</label>
                             <div class="input-group" style="line-height:0px;">
                                 <span class="input-group-addon">Each line is a single:</span>
-                                <input type="text" class="form-control" id="_dictEditEntityTemplate_entityName" name="entityName" placeholder="Ex. client, supplier, member, partner..." value="<%= masterDetailItems.master.entityName %>" data-parsley-trigger="change" required onkeyup="FL.slidePanels.dictTemplateChangeWhatIsLabel(this.form)">
+                                <input type="text" class="form-control" id="_dictEditEntityTemplate_entityName" name="entityName" placeholder="Ex. client, supplier, member, partner..." value="<%= masterDetailItems.master.entityName %>" 
+                                	data-parsley-trigger="change" 
+                                	data-parsley-entityDuplicateExceptDefault = "_dictEditEntityTemplate_entityName"
+                                	data-parsley-entityDuplicateExceptDefault-message="This entity name already exists in your database !. Please choose another name or keep the current name." 
+                                	required onkeyup="FL.slidePanels.dictTemplateChangeWhatIsLabel(this.form)">
                             </div>
                             <label class="control-label" for="_dictEditEntityTemplate_entityDescription" id="_dictEditEntityTemplate_whatIsLabel" >What is a </label>
                             <div class="input-group" style="line-height:0px;">

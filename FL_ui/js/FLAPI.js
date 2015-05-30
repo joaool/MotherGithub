@@ -417,6 +417,7 @@
 			return def.promise();
 		};
 		var _entity_update = function(json){
+			//ex 	var removeTablePromise =_entity_update({query:{"_id":ecn},update:{$set:{"3":'$'+ecn} } });
 			var def = $.Deferred();
 			var fl = FL.fl; //new flMain();
 			if(!fl){
@@ -950,7 +951,7 @@
 		};
 		var queueManager = function(funcName,param1,arrToDispatch){ //call a function each 200 milisecondsremove  a single row within table ecn (entity compressed name)
 			// calls the same asynchronous function several times assuring that after the first call all subsequent calls are done after a successfull completion of the previous call.
-			//   funcName = name of the function to be called...it must be in the list: _dummy,_remove,_fieldUpdate
+			//   funcName = name of the function to be called...it must be in the list: _dummy,_remove,_fieldUpdate,updateAttribute
 			//	 param1 - a parameter constant between calls
 			//   arrToDispatch - array where each element is passed in each call (one at a time)
 			//		for "_remove" - a list of _ids to remove
@@ -1402,6 +1403,15 @@
 				addWithFields.fail(function(err){FL.common.printToConsole(">>>>> syncLocalDictionaryToServer FAILURE <<<<< "+err);return def.reject();});
 				return def.promise();
 			},
+			updateDictionaryEntityProperties: function(eCN,oProperties){//works with FL.dd.updateEntityBySingular to update singular,plural and description properties to server
+				//ex:updateDictionaryEntityProperties("50",{singular:singular,plural:xPlural,description:description});entityName,{singular:singular,plural:xPlural,description:description});
+				var def = $.Deferred();
+				var propertiesJSON = {query:{"_id":eCN},update:{$set:{"3":oProperties.singular,"E":oProperties.plural,"4":oProperties.description}}};
+				var entityUpdatePromise=_entity_update(propertiesJSON);
+				entityUpdatePromise.done(function(result){FL.common.printToConsole(">>>>> updateDictionaryEntityProperties SUCCESS count="+result+"<<<<<");return def.resolve(result);});
+				entityUpdatePromise.fail(function(err){FL.common.printToConsole(">>>>> updateDictionaryEntityProperties FAILURE <<<<< "+err);return def.reject(err);});
+				return def.promise();
+			},			
 			updateDictionaryAttribute: function(fCN,oAttribute){//works with FL.dd.updateAttribute to update attribute to server
 				var def = $.Deferred();
 				var attrJSON = {"_id":fCN,"name_3":oAttribute.name, "description_4":oAttribute.description, 'label_K': oAttribute.label,'typeUI_9':oAttribute.typeUI, 'type_M': oAttribute.type, 'enumerable_N':oAttribute.enumerable, 'Nico_O':false };
@@ -1418,10 +1428,12 @@
 				//		ex: {name:"address",description:"address to send invoices",label:"Address",type:"string",typeUI:"textbox",enumerable:null,key:false,oldName:"Address"}
 				// if it fails the dictionary  it is not rolled back - the roll back task must be done above this code (ex.FLGrid2 updateDictionaryAndTypesInServer)
 				var def = $.Deferred();
-				if(FL.dd.isEntityInLocalDictionary(entityName)){
-					// return def.reject();//force failure to test above code
-					var xPlural = FL.dd.plural(singular,"En");  //+"s";
-					FL.dd.updateEntityBySingular(entityName,{singular:singular,plural:xPlural,description:description});
+				var xPlural = FL.dd.plural(singular,"En");  //+"s";
+				var updatePromise = FL.dd.updateEntityBySingular(entityName,{singular:singular,plural:xPlural,description:description});
+				updatePromise.done(function(result){
+					FL.common.printToConsole(">>>>> updateEntityBySingular SUCCESS count="+result+"<<<<<","API");
+					// return def.resolve(result);});
+	
 					var bufferChangeObjs = [];
 					_.each(newAttributesArr, function(element){//change type based on old attributes
 						if(element.name!="id"){
@@ -1439,9 +1451,11 @@
 					promise.fail(function(err){
 						return def.reject(err);
 					});
-				}else{
-					return def.reject("FL.API.updateDictionaryAllAttributes --> " + entityName + " does not exist in Local Dictionary !");
-				}
+				});
+				updatePromise.fail(function(err){
+					FL.common.printToConsole(">>>>> updateEntityBySingular  FAILURE <<<<< "+err,"API");
+					return def.reject(err);
+				});
 				return def.promise();
 			},
 			loadAppDataForSignInUser2: function() {//loads (local dict + menu + style + fontFamily) from server
@@ -2107,6 +2121,9 @@
 				}
 				return def.promise();
 			},
+			nicoTestDuplicateIds: function(arrToTest) {
+				return nicoTestDuplicateIds(arrToTest);
+			},				
 			nicoTestDuplicateIds: function(arrToTest) {
 				return nicoTestDuplicateIds(arrToTest);
 			},			
