@@ -10,7 +10,7 @@ FormDesigner.Views.PropertyPanel = Backbone.View.extend({
     
     initialize: function(){
         this.name = this.$("#name");
-        this.label = this.$("#label");
+        this.label = this.$("#leftLabel");
         this.value = this.$("#value");
         this.placeholder = this.$("#placeholder");
         this.icon = this.$("#icon");
@@ -18,7 +18,7 @@ FormDesigner.Views.PropertyPanel = Backbone.View.extend({
     },
     events: {
         "keyup #name" : "onNameChange",
-        "keyup #label" : "onLabelChange",
+        "keyup #leftLabel" : "onLabelChange",
         "keyup #value" : "onValueChange",
         "keyup #placeholder" : "onPlaceholderChange",
         "keyup #icon" : "onTconChange",
@@ -36,7 +36,7 @@ FormDesigner.Views.PropertyPanel = Backbone.View.extend({
     onLabelChange : function(evt){
         var value = this.label.val();
         var data = {
-            property : "label",
+            property : "leftLabel",
             value : value,
             id : this.currentId
         }

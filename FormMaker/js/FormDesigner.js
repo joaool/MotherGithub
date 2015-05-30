@@ -2,7 +2,8 @@
         Views : {},
         Models : {},
         Events : {
-            "PropertyChange" : "propChange"
+            "PropertyChange" : "propChange",
+            "ElementClick" : "elementClick"
         }
         
     }; 

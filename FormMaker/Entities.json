@@ -15,11 +15,11 @@
             "cname":"2",
             "name" : "Phone number",
 			"element": "Text",
-			"type": "email",
+			"type": "text",
 			"leftLabel": "Your phone number:",
 			"placeholder": "Please enter your phone number",
 			"value": "1234567890",
-			"icon": "glyphicon-envelope",
+			"icon": "glyphicon-phone",
 			"tooltip": "This is a nice email"
 		},
         {
@@ -50,33 +50,36 @@
             "cname" : "5",
             "name" : "Gender",
 			"element": "Radio",
-			"radioArr": [
-				{
-					"label": "Male",
-                    "tooltip": "gender"
-				}
+			"type": "radio",
+			"leftLabel": "",
+			"placeholder": "",
+			"value": "Male",
+			"icon": "",
+            "label": "Male",
+            "tooltip": "gender"
 		},
 		{
             "cname" : "6",
             "name" : "Gender",
 			"element": "Radio",
-			"radioArr": [
-				{
-					"label": "Female"
-				}
-			 ]
-		},
+            "type": "radio",
+			"leftLabel": "",
+			"placeholder": "",
+			"value": "Female",
+			"icon": "",
+            "label": "Female",
+            "tooltip": "gender"		
+        },
 		{
             "cname" : "7",
             "name" : "Save",
 			"element": "Button",
-			"buttonArr": [
-				{
-					"btnType": "submit",
-					"label": "Save",
-					"tooltip": "save"
-				}
-			]
+			"placeholder": "",
+			"value": "",
+			"icon": "",
+            "btnType": "submit",
+            "label": "Save",
+            "tooltip": "save"
 		},
         {
             "cname" : "8",
@@ -106,7 +109,7 @@
             "name" : "Profile Pic",
 			"element": "Image",
 			"type": "image",
-			"leftLabel": "Select an image",
+			"leftLabel": "Image",
 			"source": "",
 			"trigger": "change",
 			"tooltip": "Select an image"

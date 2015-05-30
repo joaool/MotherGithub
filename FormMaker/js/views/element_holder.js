@@ -74,6 +74,7 @@ FormDesigner.Views.ElementHolder = Backbone.View.extend({
         element.id = id;
         element.cname = cname;
         var obj = new FormMaker[element.element]({el : "#"+target.id});
+        this.listenTo(obj, FormDesigner.Events.ElementClick,this.onElementClick.bind(this));
         obj.loadData(element);
         obj.render();
         this.droppedElements[id] = obj;
@@ -82,6 +83,10 @@ FormDesigner.Views.ElementHolder = Backbone.View.extend({
 		this.propertiesPanel.setElementProperties(element);
         $("body").css("cursor","default");
 	},
+    onElementClick: function(cname){
+        var element = this.model.getElement(cname);
+        this.propertiesPanel.setElementProperties(element);
+    },
     getNextId : function(){
         return "Element" + (++this.elementCount);
     },
