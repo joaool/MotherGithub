@@ -3,7 +3,7 @@
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width">
-	<title>version 13.43</title>
+	<title>version 13.44</title>
 	<!--
 		testApigee
 	-->
@@ -718,13 +718,13 @@ mixpanel.init("19ada1cb259cc3272c67085eb1bf03fc");</script><!-- end Mixpanel -->
 					        <input type="email" class="form-control" id="_sendNewsletter_testEmail" placeholder="full email sender ex:jessica.costa@weadvice.pt" value="<%= masterDetailItems.master.testEmail %>" >
 							<span class="input-group-addon"><span class="glyphicon glyphicon-envelope"></span></span>
 					    </div>					    
-                        <button type="submit" class="btn btn-default" onclick="FL.grid.sendEmailTest()">Send test email</button>
+                        <button type="submit" id="form__sendNewsletterTemplate_emailTest" name="submit" value="submit" onclick="FL.grid.sendEmailTest();" class="btn btn-default">Send test email</button>
 
 				    </div>
 		    	</div>
 			</form>
 		</div>
-	</script>		
+	</script>	
 <script id="dictTemplate23" type="text/template"> 
 	<div class="container">
 	    <div class="row">
@@ -822,7 +822,7 @@ mixpanel.init("19ada1cb259cc3272c67085eb1bf03fc");</script><!-- end Mixpanel -->
 <script type="text/template" id="emailTemplateHolder">
 	<div id="templateHolder" class="template_holder">
 		<center>		
-			<table cellspacing="0" cellpadding="0" border="0" width="<%= globalPercent %>%" style="border-collapse:collapse;">
+			<table cellspacing="0" cellpadding="0" border="0" width="<%= globalPercent %>%" >
 				<tbody id="template_holder_header"></tbody>
 				<tbody id="template_holder_body"></tbody>
 				<tbody id="template_holder_footer"></tbody>

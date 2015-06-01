@@ -1459,6 +1459,10 @@
 					// alert("Email content is empty - choose a template and try again ");
 					FL.common.makeModalInfo("Email content is empty - choose a template and try again",null,2);
 				}
+				if(FL.common.getBrowser() == "ie"){
+	        		var elem = document.getElementById('form__sendNewsletterTemplate_emailTest');
+           			elem.parentNode.removeChild(elem);
+	        	}
 			},			
 			testFunc: function(x) {
 				alert("FL.grid.test() -->"+x);
