@@ -61,6 +61,7 @@ FormMaker.BaseElement = Backbone.View.extend({
         this.setElement(newElement);
         this.onRender();
         this.setElements();
+        this.$el.on("contextmenu", this.onRightClick.bind(this));
     },
     onElementClick: function(evt){
         this.trigger(FormDesigner.Events.ElementClick,this.model.toJSON());
