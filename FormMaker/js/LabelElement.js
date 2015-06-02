@@ -1,3 +1,4 @@
+FormMaker.CurrentElement = null;
 FormMaker.BaseElement = Backbone.View.extend({
 	m_template : null,
 	m_html : null,
@@ -11,6 +12,7 @@ FormMaker.BaseElement = Backbone.View.extend({
     tooltip : null,
 	initialize : function(options){
         this.model = new FormMaker.ElementModel(options.model);
+        
 	},
 	events : {
 		"focus input" : "focusIn",
@@ -19,6 +21,15 @@ FormMaker.BaseElement = Backbone.View.extend({
 		"keyup input" : "valueChange",
         "click " : "onElementClick",
 	},
+    onRightClick: function(e){
+        console.log(e);
+        var offset = {left : e.pageX,top:e.pageY};
+        $("#contextMenu").css(offset);
+        $("#contextMenu").show();
+        FormMaker.CurrentElement = this;
+        e.stopPropagation();
+        e.preventDefault();
+    },
 	loadData : function(data){
         this.model.set(data);
 	},
@@ -28,6 +39,7 @@ FormMaker.BaseElement = Backbone.View.extend({
         this.setElement(element);
 		this.onRender();
         this.setElements();
+        this.$el.on("contextmenu", this.onRightClick.bind(this));
 	},
     setElements : function(){
         this.name = this.$("#name");

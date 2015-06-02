@@ -28,6 +28,16 @@ FormDesigner.Views.ElementHolder = Backbone.View.extend({
 									  });
         
         this.model = new FormDesigner.Models.DesignerModel();
+        $(".menuItem").on("click",this.onMenuItemClick.bind(this))
+    },
+    onMenuItemClick: function(e){
+        if (e.currentTarget.id == "delete"){
+            if (FormMaker.CurrentElement){
+                FormMaker.CurrentElement.remove()
+                delete this.droppedElements[FormMaker.CurrentElement.model.get("id")];
+                this.propertiesPanel.setElementProperties({});
+            }
+        }
     },
     OnStart : function(){
 		console.log("Drag Started");	
