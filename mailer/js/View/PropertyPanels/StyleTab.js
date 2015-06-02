@@ -135,7 +135,7 @@ MailerTemplate.Views.StyleTab = Backbone.View.extend({
 	OnImageMarginChanged : function(e){
 		data = {
 			"property" : "imagePadding",
-			"value" : $(e.target).prop("checked") == "checked" ? "10px" : "0px"
+			"value" : $(e.currentTarget).prop("checked") ? "10px" : "0px"
 		}
 		this.trigger(MailerTemplate.Views.StyleTab.STYLE_PROPERTY_CHANGED,data);
 	},
