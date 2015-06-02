@@ -9,8 +9,8 @@ FormMaker.BaseElement = Backbone.View.extend({
     btnType : null,
     label : null,
     tooltip : null,
-	initialize : function(){
-		console.log('baseElement init');
+	initialize : function(options){
+        this.model = new FormMaker.ElementModel(options.model);
 	},
 	events : {
 		"focus input" : "focusIn",
@@ -19,22 +19,11 @@ FormMaker.BaseElement = Backbone.View.extend({
 		"keyup input" : "valueChange",
         "click " : "onElementClick",
 	},
-	focusIn : function(evt){
-		console.log("Focus In");
-	},
-	focusOut : function(evt){
-		console.log("focus out");
-	},
-	valueChange : function(evt){
-		console.log("value change");
-        var cname = $(evt.target).closest(".dropped").attr("cname");
-        this.trigger(FormDesigner.Events.ElementClick,cname);
-	},
 	loadData : function(data){
-        this.jsonData = data;
+        this.model.set(data);
 	},
 	render : function(){
-		var element = $.parseHTML(this.m_template(this.jsonData).trim());
+		var element = $.parseHTML(this.m_template(this.model.toJSON()).trim());
         this.$el.append(element);
         this.setElement(element);
 		this.onRender();
@@ -54,22 +43,32 @@ FormMaker.BaseElement = Backbone.View.extend({
 		
 	},
     update: function(data){
-        this.jsonData[data.property] = data.value;
-        this.m_html = this.m_template(this.jsonData);
-        var newElement = $.parseHTML(this.m_html.trim());
+        this.model.set(data);
+        var newElement = $.parseHTML(this.m_template(this.model.toJSON()).trim());
         this.$el.replaceWith(newElement);
         this.setElement(newElement);
         this.onRender();
         this.setElements();
     },
     onElementClick: function(evt){
-        var cname = $(evt.target).closest(".dropped").attr("cname");
-        this.trigger(FormDesigner.Events.ElementClick,cname);
-    }
+        this.trigger(FormDesigner.Events.ElementClick,this.model.toJSON());
+    },
+	focusIn : function(evt){
+		console.log("Focus In");
+	},
+	focusOut : function(evt){
+		console.log("focus out");
+	},
+	valueChange : function(evt){
+		console.log("value change");
+        this.model.set("value",this.value.val());
+        this.trigger(FormDesigner.Events.ValueChange,this.model.toJSON());
+	}, 
 });
 FormMaker.TextLabel = FormMaker.BaseElement.extend({
 	
-	initialize : function(){
+	initialize : function(options){
+        FormMaker.TextLabel.__super__.initialize.apply(this,arguments);
 		console.log('TextLabel init');
 		this.m_template = Handlebars.compile($("#__textLabel").html());
 	}
@@ -77,7 +76,8 @@ FormMaker.TextLabel = FormMaker.BaseElement.extend({
 
 FormMaker.Text = FormMaker.BaseElement.extend({
 	
-	initialize : function(){
+	initialize : function(options){
+        FormMaker.Text.__super__.initialize.apply(this,arguments);
 		console.log('Text init');
 		this.m_template = Handlebars.compile($("#__text").html());
 	}
@@ -85,15 +85,17 @@ FormMaker.Text = FormMaker.BaseElement.extend({
 
 FormMaker.Button = FormMaker.BaseElement.extend({
 	
-	initialize : function(){
-		console.log('Button init');
+	initialize : function(options){
+		FormMaker.Button.__super__.initialize.apply(this,arguments);
+        console.log('Button init');
 		this.m_template = Handlebars.compile($("#__button").html());
 	}
 });
 
 FormMaker.Checkbox = FormMaker.BaseElement.extend({
 	
-	initialize : function(){
+	initialize : function(options){
+        FormMaker.Checkbox.__super__.initialize.apply(this,arguments);
 		console.log('Checkbox init');
 		this.m_template = Handlebars.compile($("#__checkbox").html());
 	}
@@ -101,7 +103,8 @@ FormMaker.Checkbox = FormMaker.BaseElement.extend({
 
 FormMaker.Radio = FormMaker.BaseElement.extend({
 	
-	initialize : function(){
+	initialize : function(options){
+        FormMaker.Radio.__super__.initialize.apply(this,arguments);
 		console.log('Radio init');
 		this.m_template = Handlebars.compile($("#__radiobox").html());
 	}
@@ -109,7 +112,8 @@ FormMaker.Radio = FormMaker.BaseElement.extend({
 
 FormMaker.Combo = FormMaker.BaseElement.extend({
 	
-	initialize : function(){
+	initialize : function(options){
+        FormMaker.Combo.__super__.initialize.apply(this,arguments);
 		console.log('Combo init');
 		this.m_template = Handlebars.compile($("#__combo").html());
 	}
@@ -117,7 +121,8 @@ FormMaker.Combo = FormMaker.BaseElement.extend({
 
 FormMaker.TextArea = FormMaker.BaseElement.extend({
 	
-	initialize : function(){
+	initialize : function(options){
+        FormMaker.TextArea.__super__.initialize.apply(this,arguments);
 		console.log('TextArea init');
 		this.m_template = Handlebars.compile($("#__textarea").html());
 	}
@@ -127,7 +132,8 @@ FormMaker.Image = FormMaker.BaseElement.extend({
 	
     m_ImagePreview : null,
     m_ImageUploadBtn : null,
-	initialize : function(){
+	initialize : function(options){
+        FormMaker.Image.__super__.initialize.apply(this,arguments);
 		console.log('Image init');
 		this.m_template = Handlebars.compile($("#__image").html());
 	},
@@ -156,7 +162,8 @@ FormMaker.Image = FormMaker.BaseElement.extend({
 FormMaker.Date = FormMaker.BaseElement.extend({
 	datePicker : null,
 	
-	initialize : function(){
+	initialize : function(options){
+        FormMaker.Date.__super__.initialize.apply(this,arguments);
 		console.log('Date init');
 		this.m_template = Handlebars.compile($("#__date").html());
 		

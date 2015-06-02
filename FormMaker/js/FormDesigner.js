@@ -3,7 +3,8 @@
         Models : {},
         Events : {
             "PropertyChange" : "propChange",
-            "ElementClick" : "elementClick"
+            "ElementClick" : "elementClick",
+            "ValueChange" : "valueChange"
         }
         
     }; 

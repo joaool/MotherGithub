@@ -70,11 +70,13 @@ FormDesigner.Views.ElementHolder = Backbone.View.extend({
         if ($(droppedObject).hasClass("dropped")) return;
         var cname = $(droppedObject).attr("cname")
         var element = this.model.getElement(cname);
+        element = jQuery.extend(true,{},element);
         var id = this.getNextId();
         element.id = id;
         element.cname = cname;
-        var obj = new FormMaker[element.element]({el : "#"+target.id});
+        var obj = new FormMaker[element.element]({el : "#"+target.id,model : element});
         this.listenTo(obj, FormDesigner.Events.ElementClick,this.onElementClick.bind(this));
+        this.listenTo(obj, FormDesigner.Events.ValueChange,this.onValueChange.bind(this));
         obj.loadData(element);
         obj.render();
         this.droppedElements[id] = obj;
@@ -83,16 +85,18 @@ FormDesigner.Views.ElementHolder = Backbone.View.extend({
 		this.propertiesPanel.setElementProperties(element);
         $("body").css("cursor","default");
 	},
-    onElementClick: function(cname){
-        var element = this.model.getElement(cname);
-        this.propertiesPanel.setElementProperties(element);
+    onValueChange: function(data){
+        this.propertiesPanel.setElementProperties(data);  
+    },
+    onElementClick: function(data){
+        this.propertiesPanel.setElementProperties(data);
     },
     getNextId : function(){
         return "Element" + (++this.elementCount);
     },
     onPropertyChange: function(data){
-        var element = this.droppedElements[data.id];
-        element.update(data);
+        var elementView = this.droppedElements[data.id];
+        elementView.update(data);
         
     }
 });

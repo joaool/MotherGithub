@@ -27,5 +27,18 @@ FormDesigner.Models.DesignerModel = Backbone.Model.extend({
     },
     getElement: function(cname){
         return this.get("elems")[cname];
+    },
+    update: function(data){
+        var element = this.getElementById(data.id);
+        element[data.property] = data.value;
+    },
+    getElementById: function(id){
+        var elements = resp["elements"];
+        for(var i=0;i<elements.length;i++){
+            if (elements[i].id == id){
+                return elements[i];
+            }
+        }
+        return {};
     }
 });
