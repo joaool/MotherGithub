@@ -665,10 +665,12 @@
 			},
 			updateEntityBySingular: function(xSingular,xOptions) {//updates an existing entity. It can uodate the entity key "singular"
 				//Ex: updateEntityBySingular("client",{singular:"client",plural:"clients",description:"company that buys from us"});
+				var def = $.Deferred();
 				var oEntity=null;
 				var oEntityUpdate = null;
 				var xRet = false;
 				if(this.entities[xSingular]){//xSingular exists in dictionary
+					var eCN = this.getCEntity(xSingular);
 					oEntity = this.entities[xSingular];
 					oEntityUpdate = _.extend(oEntity, xOptions);
 					if(oEntityUpdate.singular!= xSingular){
@@ -677,12 +679,17 @@
 					}else{
 						this.entities[xSingular] = oEntityUpdate;					
 					}
-					oEntity.sync = false;
-					xRet = true;
+					var entityUpdatePromise = FL.API.updateDictionaryEntityProperties(eCN,oEntityUpdate);
+					entityUpdatePromise.done(function(result){FL.common.printToConsole(">>>>> updateEntityBySingular SUCCESS count="+result+"<<<<<");return def.resolve(result);});
+					entityUpdatePromise.fail(function(err){FL.common.printToConsole(">>>>> updateEntityBySingular FAILURE <<<<< "+err);return def.reject(err);});
+					//  oEntity.sync = false;
+					// xRet = true;
 				}else{//xSingular does not exists in dictionary
-					alert("FL.dd.updateEntityBySingular Error: you tried update "+xSingular+" but it does not exists in Dictionary");
+					var err = "FL.dd.updateEntityBySingular Error: you tried update "+xSingular+" but it does not exists in Dictionary";
+					return def.reject(err);
 				}
-				return xRet;
+				// return xRet;
+				return def.promise();
 			},
 			updateEntityByCName: function(xCName,xOptions) {//updates entity with compressed name = xCName with xOptions object
 				//Ex: updateEntityByCName("02",false,{plural:"clients",description:"company that buys from us"});

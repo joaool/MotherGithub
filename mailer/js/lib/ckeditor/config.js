@@ -7,6 +7,7 @@ CKEDITOR.editorConfig = function( config ) {
 	// Define changes to default configuration here. For example:
 	// config.language = 'fr';
 	// config.uiColor = '#AADC6E';
+	config.smiley_path = 'http://framelink.co/app/mailer/js/lib/ckeditor/plugins/smiley/images/';
 	
 	// Toolbar configuration generated automatically by the editor based on config.toolbarGroups.
 	config.toolbar = [

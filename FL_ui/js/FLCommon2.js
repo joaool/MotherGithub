@@ -197,7 +197,11 @@ FL["common"] = (function(){//name space FL.common
 			},masterDetailJson);
         },
         makeModalInfo: function(message,makeModalInfoCB,stackLevel) {
-            this.makeModal2("Information","<p>"+message+"</p>",{type:"primary",button1:"Ok",button2:null},makeModalInfoCB,stackLevel);//OK
+        	if(FL.common.getBrowser() == "Xie"){
+        		alert(message);
+        	}else{
+            	this.makeModal2("Information","<p>"+message+"</p>",{type:"primary",button1:"Ok",button2:null},makeModalInfoCB,stackLevel);//OK
+            }
         },
         makeModalConfirm: function(message,btn1,btn2,makeModalConfirmCB,stackLevel) {//button 2 is the default
             this.makeModal2("Confirmation","<p>"+message+"</p>",{type:"primary",button1:btn1,button2:btn2},makeModalConfirmCB,stackLevel);//OK
@@ -947,7 +951,27 @@ FL["common"] = (function(){//name space FL.common
             console.log("width:"+w+" height:"+h);
             FL.common.printToConsole("getBase64Width before exit w="+w+" h="+h,"abc");
             return w;
-        },        
+        },
+        getBrowser: function() {
+  			var isChrome = /Chrome/.test(navigator.userAgent) && /Google Inc/.test(navigator.vendor);
+  			if(isChrome)
+  				return "chrome";
+  			var isSafari = /Safari/.test(navigator.userAgent) && /Apple Computer/.test(navigator.vendor);
+  			if(isSafari)
+  				return "safari";
+        	var browser = null;
+			var isFF = false;
+			var isOpera = false;
+  			var ua = navigator.userAgent.toLowerCase();
+			if(ua.indexOf("firefox") > -1){
+				browser = "firefox";
+			}else if(ua.indexOf("opera") > -1){
+ 				browser = "opera";
+			}else if(ua.indexOf("msie") > -1 || navigator.appVersion.indexOf('Trident/')){
+				browser = "ie";
+			}
+			return browser;
+		},
 		testFunc: function(x) {
 			alert("FL.common.test() -->"+x);
 		}

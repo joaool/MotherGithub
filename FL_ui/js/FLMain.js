@@ -69,7 +69,6 @@ var FL = FL || {};
 		FL.common.printToConsole("====------------------------------------------->next will test exist !!!"+FL.login.test,"login");
 		console.log("login:"+FL.login.test);
 
-
 		// var geoPromise = FL.emailServices.testGoogleGeo("chicago");
 		// geoPromise.done(function(){
 		// 	// FL.common.printToConsole("FLMain --> success in checkSignIn2 ");
