@@ -55,7 +55,7 @@ FormMaker.BaseElement = Backbone.View.extend({
 		
 	},
     update: function(data){
-        this.model.set(data);
+        this.model.set(data.property,data.value);
         var newElement = $.parseHTML(this.m_template(this.model.toJSON()).trim());
         this.$el.replaceWith(newElement);
         this.setElement(newElement);

@@ -78,12 +78,17 @@ FormDesigner.Views.ElementHolder = Backbone.View.extend({
 	},
     onDrop : function(target,droppedObject){
         if ($(droppedObject).hasClass("dropped")) return;
-        var cname = $(droppedObject).attr("cname")
-        var element = this.model.getElement(cname);
-        element = jQuery.extend(true,{},element);
-        var id = this.getNextId();
-        element.id = id;
-        element.cname = cname;
+        var cname = $(droppedObject).attr("cname");
+        var element = {
+            element : FormMaker.Elements.Text
+        };
+        if (cname != "new"){
+            element = this.model.getElement(cname);
+            element = jQuery.extend(true,{},element);
+            var id = this.getNextId();
+            element.id = id;
+            element.cname = cname;
+        }
         var obj = new FormMaker[element.element]({el : "#"+target.id,model : element});
         this.listenTo(obj, FormDesigner.Events.ElementClick,this.onElementClick.bind(this));
         this.listenTo(obj, FormDesigner.Events.ValueChange,this.onValueChange.bind(this));
