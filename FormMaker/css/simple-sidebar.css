@@ -21,7 +21,7 @@
 }
 
 #wrapper.toggled {
-    padding-left: 250px;
+    padding-left: 300px;
 }
 
 #sidebar-wrapper {
@@ -42,7 +42,7 @@
 }
 
 #wrapper.toggled #sidebar-wrapper {
-    width: 250px;
+    width: 300px;
 }
 
 #page-content-wrapper {
@@ -52,7 +52,7 @@
 
 #wrapper.toggled #page-content-wrapper {
     position: absolute;
-    margin-right: -250px;
+    margin-right: -300px;
 }
 
 /* Sidebar Styles */
