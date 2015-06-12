@@ -12,6 +12,8 @@ FormDesigner.Views.ElementHolder = Backbone.View.extend({
         
         this.propertiesPanel = new FormDesigner.Views.PropertyPanel({el : "#properties"});
         this.listenTo(this.propertiesPanel,FormDesigner.Events.PropertyChange,this.onPropertyChange);
+        this.listenTo(this.propertiesPanel,FormDesigner.Events.TypeChange,this.onTypeChange);
+        
         oDragNDrop = DragNDrop.getInstance();
 		oDragNDrop.setDroppableObject({droppableSelectors : [{
 											droppable : ".ui-dropppable"
@@ -33,9 +35,8 @@ FormDesigner.Views.ElementHolder = Backbone.View.extend({
     onMenuItemClick: function(e){
         if (e.currentTarget.id == "delete"){
             if (FormMaker.CurrentElement){
-                FormMaker.CurrentElement.remove()
-                delete this.droppedElements[FormMaker.CurrentElement.model.get("id")];
-                this.propertiesPanel.setElementProperties({});
+                this.removeElement(FormMaker.CurrentElement);
+                
             }
         }
     },
@@ -93,11 +94,13 @@ FormDesigner.Views.ElementHolder = Backbone.View.extend({
         this.listenTo(obj, FormDesigner.Events.ElementClick,this.onElementClick.bind(this));
         this.listenTo(obj, FormDesigner.Events.ValueChange,this.onValueChange.bind(this));
         obj.loadData(element);
+        obj.setParent("#"+target.id);
         obj.render();
         this.droppedElements[id] = obj;
         
         $(droppedObject).remove();
 		this.propertiesPanel.setElementProperties(element);
+        this.setTypeField(element);
         $("body").css("cursor","default");
 	},
     onValueChange: function(data){
@@ -105,13 +108,38 @@ FormDesigner.Views.ElementHolder = Backbone.View.extend({
     },
     onElementClick: function(data){
         this.propertiesPanel.setElementProperties(data);
+        this.setTypeField(data);
+    },
+    onTypeChange: function(data){
+        var elementView = this.droppedElements[data.id];
+        var model = elementView.getModel();
+        model.set("element", data.value);
+         
+        var obj =  new FormMaker[data.value]({el : elementView.getParentSelector(),model : model});
+        this.listenTo(obj, FormDesigner.Events.ElementClick,this.onElementClick.bind(this));
+        this.listenTo(obj, FormDesigner.Events.ValueChange,this.onValueChange.bind(this));
+        obj.loadData(model);
+        obj.render();
+        
+        this.droppedElements[data.id] = obj;
+        
+        this.removeElement(elementView)
+    },
+    setTypeField: function(data){
+        this.$("#type #Type" + data.element).prop("checked",true);  
+    },
+    removeElement: function(element){
+        element.remove()
+        delete this.droppedElements[element.model.get("id")];
+        this.propertiesPanel.setElementProperties({});
     },
     getNextId : function(){
         return "Element" + (++this.elementCount);
     },
     onPropertyChange: function(data){
         var elementView = this.droppedElements[data.id];
-        elementView.update(data);
+        if (elementView)
+            elementView.update(data);
         
     }
 });

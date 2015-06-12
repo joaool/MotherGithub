@@ -4,7 +4,8 @@
         Events : {
             "PropertyChange" : "propChange",
             "ElementClick" : "elementClick",
-            "ValueChange" : "valueChange"
+            "ValueChange" : "valueChange",
+            "TypeChange" : "typeChange"
         }
         
     }; 

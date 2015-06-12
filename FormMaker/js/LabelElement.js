@@ -10,10 +10,15 @@ FormMaker.BaseElement = Backbone.View.extend({
     btnType : null,
     label : null,
     tooltip : null,
+    parentSelector: null,
+    
 	initialize : function(options){
         this.model = new FormMaker.ElementModel(options.model);
         
 	},
+    getModel: function(){
+        return this.model;  
+    },
 	events : {
 		"focus input" : "focusIn",
 		"blur input" : "focusOut",
@@ -33,6 +38,12 @@ FormMaker.BaseElement = Backbone.View.extend({
 	loadData : function(data){
         this.model.set(data);
 	},
+    setParent : function(selector){
+        this.parentSelector = selector;  
+    },
+    getParentSelector : function(){
+        return this.parentSelector;
+    },
 	render : function(){
 		var element = $.parseHTML(this.m_template(this.model.toJSON()).trim());
         this.$el.append(element);
@@ -64,6 +75,7 @@ FormMaker.BaseElement = Backbone.View.extend({
         this.$el.on("contextmenu", this.onRightClick.bind(this));
     },
     onElementClick: function(evt){
+        console.log("Element click");
         this.trigger(FormDesigner.Events.ElementClick,this.model.toJSON());
     },
 	focusIn : function(evt){
