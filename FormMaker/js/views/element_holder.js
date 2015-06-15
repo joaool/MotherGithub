@@ -119,11 +119,11 @@ FormDesigner.Views.ElementHolder = Backbone.View.extend({
         this.listenTo(obj, FormDesigner.Events.ElementClick,this.onElementClick.bind(this));
         this.listenTo(obj, FormDesigner.Events.ValueChange,this.onValueChange.bind(this));
         obj.loadData(model);
-        obj.render();
-        
-        this.droppedElements[data.id] = obj;
+        obj.renderBefore(elementView);
         
         this.removeElement(elementView)
+        this.droppedElements[data.id] = obj;
+        
     },
     setTypeField: function(data){
         this.$("#type #Type" + data.element).prop("checked",true);  

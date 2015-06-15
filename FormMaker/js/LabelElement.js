@@ -44,6 +44,14 @@ FormMaker.BaseElement = Backbone.View.extend({
     getParentSelector : function(){
         return this.parentSelector;
     },
+    renderBefore: function(view){
+        var element = $.parseHTML(this.m_template(this.model.toJSON()).trim());
+        $(element).insertBefore(view.$el);
+        this.setElement(element);
+		this.onRender();
+        this.setElements();
+        this.$el.on("contextmenu", this.onRightClick.bind(this));
+    },
 	render : function(){
 		var element = $.parseHTML(this.m_template(this.model.toJSON()).trim());
         this.$el.append(element);
