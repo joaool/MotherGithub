@@ -12,7 +12,7 @@ MailerTemplate.Views.TitlePanel = Backbone.View.extend({
 		this.m_titleBody.show();
 		
 		this.m_styleTab = new MailerTemplate.Views.StyleTab({el : "#styletab"});
-		
+		CKEDITOR.timestamp=Math.round(Math.random()*10000);
 	},
 	
 	render : function(){

@@ -7,6 +7,7 @@ FormDesigner.Views.PropertyPanel = Backbone.View.extend({
     icon: null,
     tooltip: null,
     currentId : null,
+    type : null,
     
     initialize: function(){
         this.name = this.$("#name");
@@ -15,6 +16,7 @@ FormDesigner.Views.PropertyPanel = Backbone.View.extend({
         this.placeholder = this.$("#placeholder");
         this.icon = this.$("#icon");
         this.tooltip = this.$("#tooltip");
+        this.type = this.$("#type");
     },
     events: {
         "keyup #name" : "onNameChange",
@@ -23,6 +25,7 @@ FormDesigner.Views.PropertyPanel = Backbone.View.extend({
         "keyup #placeholder" : "onPlaceholderChange",
         "keyup #icon" : "onTconChange",
         "keyup #tooltip" : "onTooltipChange",
+        "change #type input[type='radio']" : "onTypeChange"
     },
     onNameChange : function(evt){
         var value = this.name.val();
@@ -77,6 +80,15 @@ FormDesigner.Views.PropertyPanel = Backbone.View.extend({
             id : this.currentId
         }
         this.trigger(FormDesigner.Events.PropertyChange,data);
+    },
+    onTypeChange: function(evt){
+        var type = $(evt.target).val();
+        var data = {
+            property : "type",
+            value : type,
+            id : this.currentId
+        }
+        this.trigger(FormDesigner.Events.TypeChange,data);
     },
     setElementProperties : function(element){
         this.name.val(element.name);

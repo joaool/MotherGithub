@@ -3,7 +3,9 @@
         Models : {},
         Events : {
             "PropertyChange" : "propChange",
-            "ElementClick" : "elementClick"
+            "ElementClick" : "elementClick",
+            "ValueChange" : "valueChange",
+            "TypeChange" : "typeChange"
         }
         
     }; 
@@ -20,7 +22,8 @@
             e.stopPropagation();
         });
         $(document).click(function(e){
-             $(this).find(".options").removeClass("toggled");
+            $(this).find(".options").removeClass("toggled");
+            $("#contextMenu").hide();
         });
         $("#entities li,#name li").click(function(evt){
             if ($(this).attr("value") == "new"){
@@ -31,4 +34,13 @@
             var designer = new FormDesigner.Views.MainView({el : "body"});
             designer.loadJSON(data);
         });
+
+        Array.prototype.remove = function(item){
+            if (item){
+                var index = this.indexOf(item);
+                if (index != -1)
+                    return this.slice(index,1);
+            }
+            return this;
+        }
     })

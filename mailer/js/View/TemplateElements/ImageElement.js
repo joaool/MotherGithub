@@ -50,7 +50,7 @@ MailerTemplate.Views.Image = Backbone.View.extend({
 	},
 	setStyleProperty : function(data){
 		var prop = this.m_CssStyleConnector[data.property];
-		if (prop == "imageAlign")
+		if (data.property == "imageAlign")
 		{
 			this.m_ImageElement.attr("align",data.value);	
 		}
