@@ -591,12 +591,202 @@ FL["common"] = (function(){//name space FL.common
         },
     	selectBox: function(options, onSelection) {
 			selectBox(options, onSelection);
-		},
+    		},
+        typeOf: function(xVar) {//given a variable, returns one of :  "number","string","boolean","object","array","null","undefined","date"
+            //exemple of undefined: a variable declared but never defined -->var foo; alert(foo); //undefined.
+            var xRet = typeof xVar;
+            if(xRet == "object") {
+                if (xVar instanceof Array)
+                    xRet="array";
+                if (xVar instanceof Date)
+                    xRet="date";
+                if (!xVar)
+                    xRet="null";
+            }
+            return xRet;
+        },
+        forceToString: function(xVar){//convert a variable of any type to string
+            var type = this.typeOf(xVar);
+            if(type != "string") {
+                if (type == "object" || type == "array" )
+                    xVar = JSON.stringify(xVar);
+                else if(type == "number" || type == "date" || type == "boolean")
+                    xVar = xVar.toString();
+                else if(type == "null")
+                    xVar = "NULL"
+            }    
+            return xVar;
+        },
+        formatShortLocalToISODate: function(dateTimeString,sourceFormat){//return ISO Date for a local dateTimeString "<shortdate> hh:mm <pm|am>"
+        //ex:FL.common.formatToISODate("6/25/2015 11:21 am");==>2015-06-25T10:21:00.000Z for PC with -1 hour of time zone difference
+            function z(n){return (n<10? '0' : '') + n;}
+            function p(n){
+                n = n < 10? z(n) : n;
+                return n < 100? z(n) : n;
+            }
+            if(sourceFormat == "DMY"){
+                var index = dateTimeString.indexOf(" ");
+                if(index>0){
+                    var shortDate = dateTimeString.substr(0,index);
+                    var YMD = shortDate.split("/").reverse().join("/");
+                    var tail = dateTimeString.substr(index);
+                    console.log(YMD + "---->" + tail);
+                    dateTimeString = YMD + tail;
+                }else{
+                    alert("FL.common.formatShortLocalToISODate -->"+ dateTimeString +" is a bad format for dateTimeString ")
+                }
+             }    
+            var d = new Date();
+            var difTotalMin = d.getTimezoneOffset();//timezone difference in minutes
+            var difHrs = parseInt( difTotalMin / 60);
+            var difMin = difTotalMin % 60;
+            var d = new Date(dateTimeString);
+            var isoDate = d.getUTCFullYear() + "-" + z(d.getUTCMonth()+1) + "-" + z(d.getUTCDate()) + 'T';
+            isoDate += z(d.getUTCHours()+1+difHrs) + ":" + z( d.getUTCMinutes()+ difMin)+ ":" + z(d.getUTCSeconds()) + '.';
+            isoDate+=p(d.getUTCMilliseconds())+"Z";         
+            return isoDate;
+        },
+        timeTo24: function(timeString){//converts a time string "hh:mm <pm|am>" to "hh:mm" where hh=[0-24] if formnat incorret returns null
+            //FL.common("11:00 pm") -->"23:00"
+            //FL.common("12:00 pm") -->null
+            // FL.common("13:00 pm") -->null
+            function z(n){return (n<10? '0' : '') + n;}
+            var hrs = parseInt(timeString.substr(0,2));
+            var min = parseInt(timeString.substr(3,2));
+            var amPm=timeString.substr(6,2).toLowerCase();
+            if(amPm=="pm"){
+                hrs+=12;
+            }
+            if(hrs>23 || min>59)
+                return null;
+            hrs = z(hrs);//2-->"02"  13-->"13"
+            var min = timeString.substr(3,2);
+            return hrs+":"+min;
+        },
+        toISODate: function(dateTimeString,sourceFormat){//returns ISO date from a dateTimeString "<shortdate> hh:mm <pm|am>" and a format DMY or MDY 
+        //<shortdate> may be:yyyy/mm/dd, dd/mm/yyyy or mm/dd/yyyy
+        //examples:
+        //   toISODate("6/12/2015 6:00 am","DMY") =>2015-12-06T05:00:00.000Z
+        //   toISODate("6/12/2015 6:00 am") =>2015-06-12T05:00:00.000Z
+        //      previous is the same as toISODate("6/12/2015 6:00 am","MDY")
+            var isoDate=null, shortDate=null, tail=null,time24 = null, d=null;
+            var index = dateTimeString.indexOf(" ");
+            if(sourceFormat == "DMY"){//we need to reverse shortDate to shortYMD
+                 if(index>0){
+                    shortDate = dateTimeString.substr(0,index);
+                    var shortYMD = shortDate.split("/").reverse().join("/");
+                    tail = dateTimeString.substr(index+1);
+                    time24 = this.timeTo24(tail);
+                    YMD_time = shortYMD + " "+time24;
+                    isoDate = new Date(YMD_time).toISOString();
+                }else{
+                     alert("FL.common.toISODate -->"+ dateTimeString +" is a bad format for dateTimeString ")
+                }
+            }else{//case of YMD or MDY
+                d = new Date(dateTimeString);
+                if(d != "Invalid Date"){
+                    isoDate = d.toISOString();
+                    if(index>0){
+                        shortDate = dateTimeString.substr(0,index);
+                        tail = dateTimeString.substr(index+1);
+                        time24 = this.timeTo24(tail);
+                        if(!time24)
+                            isoDate = null;
+                        else
+                            isoDate = new Date(shortDate+" "+time24).toISOString();
+                    }
+                }    
+            }    
+            return isoDate;
+        },
+        fromISODateToShortdate: function(isoDate,outFormat){//returs a dateTimeString shortdate> may be:yyyy/mm/dd, dd/mm/yyyy or mm/dd/yyyy from ISO date 
+            // if isoDate is not acceptable it will return null
+            //sourceFormat may be "YMD","MDY" or "DMY"
+            //examples:
+            //   FL.common.fromISODateToShortdate("2015-12-06T05:00:00.000Z","YMD") ==>"2015/06/12"
+            //   FL.common.fromISODateToShortdate("2015-12-06T05:00:00.000Z","MDY") ==>"12/06/2015"
+            //   FL.common.fromISODateToShortdate("2015-12-06T05:00:00.000Z","DMY") ==>"06/12/2015"
+            function z(n){return (n<10? '0' : '') + n;}
+            var shortDate = null;
+            var d = new Date(isoDate);
+            if( d=="Invalid Date" )
+                return null;
+            var y = d.getUTCFullYear();
+            var m = z(d.getUTCMonth()+1);
+            var day = z(d.getUTCDate());
+            if(outFormat =="YMD")
+                shortDate = y+"/"+m+"/"+day;
+            else if(outFormat =="MDY")
+                shortDate = m+"/"+day+"/"+y;
+            else if(outFormat =="DMY")
+                shortDate = day+"/"+m+"/"+y;
+            else
+                alert("FL.common.fromISODateToShortdate outFormat="+outFormat+" is invalid!");
+            return shortDate;                     
+        },
+        fromISODateToTime: function(isoDate){//returs a time string "hh:mm <pm|am>"" from ISO date 
+            //examples:
+            //   FL.common.fromISODateToTime("2015-12-06T05:00:00.000Z") ==>"06:00 am"
+            //   FL.common.fromISODateToTime("2015-12-06T15:45:00.000Z") ==>"04:45 pm"  
+            function z(n){return (n<10? '0' : '') + n;}
+            var d = new Date(isoDate);
+            var hrs = d.getUTCHours()+1;
+            var amPm="am";
+            if(hrs>12){
+                amPm="pm";
+                hrs-=12;
+            }
+            hrs = z(hrs);//2-->"02"  13-->"01"
+            var min = z(d.getUTCMinutes());
+            return hrs+":"+min+" "+amPm;                     
+        },
+        fromISODateToShortdateTime: function(isoDate,sourceFormat){//returs a dateTimeString "<shortdate> hh:mm <pm|am>" from ISO date 
+            //sourceFormat may be "YMD","MDY" or "DMY"
+            //examples:
+            //   FL.common.fromISODateToShortdateTime("2015-12-06T05:00:00.000Z","MDY") ==>"12/06/2015 06:00 am"
+            //   FL.common.fromISODateToShortdateTime("2015-12-06T15:45:00.000Z","DMY") ==>"06/12/2015 04:45 pm"
+            var shortDate = this.fromISODateToShortdate(isoDate,sourceFormat);
+            if(!shortDate)
+                return null;
+            return shortDate+" "+this.fromISODateToTime(isoDate);
+        },        
+        is_validShortDate: function(shortDate){//validate  xx-xx-xx or xx/xx/xx or xx.xx.xx where year can be xxxx
+            //->accepts DMY(europe), MDY(US), YMD(China - the default accepted by Date.Parse)
+            // YMD accepts "2014/12/30","2014-12-30","2014.12.30" -> rejects "14/12/30"
+            var bRet = false;
+            var reYMD = /^(19|20)\d{2}([- /.])(0[1-9]|1[012]|[1-9])\2(0[1-9]|[12][0-9]|3[01]|[1-9])$/;//Formats accepted yyyy/mm/dd or yyyy/m/d 
+            var reDMY = /^(0[1-9]|[12][0-9]|3[01]|[1-9])([- /.])(0[1-9]|1[012]|[1-9])\2(19|20)\d\d$/;//Formats accepted dd/mm/yyyy or d-m-yyyy 
+            var reMDY = /^(0[1-9]|1[012]|[1-9])([- /.])(0[1-9]|[12][0-9]|3[01]|[1-9])\2(19|20)\d\d$/;//Formats accepted mm/dd/yyyy or mm-dd-yyyy or mm.dd.yyyy format
+                //group 1 -  /^(0[1-9]|1[012]) - ^begins by  ()a group of 0 folowed by one of 1-9 =>01-09 or 1 followed by 0,1,o2 2 =>10, 11 or 12 =>02 or 11
+                //group 2 -  ([- /.]) - the char - or space or / or .
+                //group 3 -  (0[1-9]|[12][0-9]|3[01]) - the digits 01 until 09 or ( 1 or 2 followed by any of 0-9 ) or (3 followed by 0 or 1)
+                //group 4 -  \2 Backreference. It matches the contents of the n'th set of parentheses in the expression. repeats ([- /.])
+                //group 5 -  (19|20)\d\d$  19 or 20 followed by any d (digit) and d(another digit)  $ means look at the end of string while ^means look at the beginning 
+            // if( !isNaN( Date.parse(shortDate) ) ){//"24/06/2015" returns isNaN, but it is a valid date !!!!
+            //     bRet=true;
+            if(reYMD.test(shortDate)){
+                bRet=true;
+            }else if(reDMY.test(shortDate)){
+                bRet=true;               
+            }else if(reMDY.test(shortDate)){
+                bRet=true;
+            }
+            return bRet;
+        },        
         is_ValidDate: function(dateString){
-            // returns true - if dateString has an acceptable format for a date
+            // returns true - if dateString has an acceptable format for a date. Ex
+            //      ex:"March 21, 2012", "2015/06/24", "2015-06-24"
+            //      for xx-xx-xx ->accepts DMY(europe), MDY(US), YMD(China - the default accepted by Date.Parse)
             // refuse ->"Stage Paris 2014", "209999" 
-            if( isNaN( Date.parse(dateString) ) ){
-                return false;//if Date.parse does not return a number it is not a valid date for sure!!!
+            if( isNaN( Date.parse(dateString) ) ){//"24/06/2015" MDY returns isNaN, but it is a valid date !!!!
+                //it will check if it is DMY or MDY(mm/dd/yyy)
+                if(dateString.length == 10){//may be acceptable
+                    if(!this.is_validShortDate(dateString)){
+                        return false;//it was a short format but it is invalid
+                    }
+                }else{
+                    return false;//if Date.parse does not return a number it is not a valid date for sure!!!
+                }
             //but Date.parse will return a number for ..."Stage Paris 2014" or "209999" ->we must exclude these
             }
             var d = new Date(Date.parse(dateString));//always a valid date because it passed the previous test
@@ -615,33 +805,36 @@ FL["common"] = (function(){//name space FL.common
             var foundMatch = _.find(testArr, function(element){return (element == firstString); } );
             if( !_.isUndefined(foundMatch) ){
                 is_date = true;   
-            }else{//first string does not match any of test array element - now we check match with:
-                //mm-dd-yy "03-21-12" or "03/21/12"
-                //dd-mm-yy  "03/21/12 0:01"
-                //dd-mmm-yy "21-Mar-2012"
-                // var re = /^(0?[1-9]|[12][0-9]|3[01])[\/\-](0?[1-9]|1[012])[\/\-]\d{4}$/;//this regex validates for either DD/MM/YYYY or DD-MM-YYYY
-                // var re = /[0-9]{2}/[0-9]{2}/[0-9]{4}/;//99/99/1000. will pass
-                var re = /^(0[1-9]|1[012])([- /.])(0[1-9]|[12][0-9]|3[01])\2(19|20)\d\d$/;//Formats accepted mm/dd/yyyy or mm-dd-yyyy or mm.dd.yyyy format
-                //group 1 -  /^(0[1-9]|1[012]) - ^begins by  ()a group of 0 folowed by one of 1-9 =>01-09 or 1 followed by 0,1,o2 2 =>10, 11 or 12 =>02 or 11
-                //group 2 -  ([- /.]) - the char - or space or / or .
-                //group 3 -  (0[1-9]|[12][0-9]|3[01]) - the digits 01 until 09 or ( 1 or 2 followed by any of 0-9 ) or (3 followed by 0 or 1)
-                //group 4 -  \2 Backreference. It matches the contents of the n'th set of parentheses in the expression. repeats ([- /.])
-                //group 5 -  (19|20)\d\d$  19 or 20 followed by any d (digit) and d(another digit)  $ means look at the end of string while ^means look at the beginning
-                if( re.test(firstString) ){
-                    is_date = true;
+            }else{
+                if(this.is_validShortDate(dateString)){
+                        is_date = true;  
+                }else{
+                    var re = /^(0[1-9]|[12][0-9]|3[01])([- /.])(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\2(19|20)\d\d$/;//Formats accepted dd/Mar/yyyy 
+                    if( re.test(firstString) ){
+                        is_date = true;
+                    }
+                    re = /^(0[1-9]|[12][0-9]|3[01])([- /.])(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\2\d\d$/;//Formats accepted dd/Mar/yy
+                    if( re.test(firstString) ){
+                        is_date = true;
+                    }                         
                 }
-                var re = /^(0[1-9]|1[012])([- /.])(0[1-9]|[12][0-9]|3[01])\2\d\d$/;//Formats accepted mm/dd/yyyy or mm-dd-yyyy or mm.dd.yyyy format
-                if( re.test(firstString) ){
-                    is_date = true;
-                }
-                var re = /^(0[1-9]|[12][0-9]|3[01])([- /.])(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\2(19|20)\d\d$/;//Formats accepted dd/Mar/yyyy 
-                if( re.test(firstString) ){
-                    is_date = true;
-                }
-                var re = /^(0[1-9]|[12][0-9]|3[01])([- /.])(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\2\d\d$/;//Formats accepted dd/Mar/yy
-                if( re.test(firstString) ){
-                    is_date = true;
-                }                
+
+                // var re = /^(0[1-9]|1[012])([- /.])(0[1-9]|[12][0-9]|3[01])\2(19|20)\d\d$/;//Formats accepted mm/dd/yyyy or mm-dd-yyyy or mm.dd.yyyy format
+                // if( re.test(firstString) ){
+                //     is_date = true;
+                // }
+                // var re = /^(0[1-9]|1[012])([- /.])(0[1-9]|[12][0-9]|3[01])\2\d\d$/;//Formats accepted mm/dd/yyyy or mm-dd-yyyy or mm.dd.yyyy format
+                // if( re.test(firstString) ){
+                //     is_date = true;
+                // }
+                // var re = /^(0[1-9]|[12][0-9]|3[01])([- /.])(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\2(19|20)\d\d$/;//Formats accepted dd/Mar/yyyy 
+                // if( re.test(firstString) ){
+                //     is_date = true;
+                // }
+                // var re = /^(0[1-9]|[12][0-9]|3[01])([- /.])(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\2\d\d$/;//Formats accepted dd/Mar/yy
+                // if( re.test(firstString) ){
+                //     is_date = true;
+                // }                
             }
             return is_date;
         },
