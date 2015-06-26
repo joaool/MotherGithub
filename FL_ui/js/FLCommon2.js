@@ -1089,6 +1089,7 @@ FL["common"] = (function(){//name space FL.common
             var currentURL =window.location.href;
             var server = this.stringAfterLast(currentURL,"//");
             server = this.stringBeforeFirst(server,"/");
+            server = this.stringBeforeFirst(server,":");
             if (server =="localhost")
                 server = "test.framelink.co";            
             FL.common.printToConsole("FL.common.getServerName() -->"+server);
