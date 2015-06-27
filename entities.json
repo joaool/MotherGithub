@@ -1,0 +1,139 @@
+[
+  {
+    "singular": "unNamed",
+    "csingular": "50",
+    "plural": "unNameds",
+    "description": "unNamed description",
+    "sync": true,
+    "lastId": 4,
+    "L2C": {
+      "id": "51",
+      "Name": "52",
+      "color": "53",
+      "wildnessDegree": "54"
+    },
+    "C2L": {
+      "51": "id",
+      "52": "Name",
+      "53": "color",
+      "54": "wildnessDegree"
+    },
+    "attributes": [
+      {
+        "name": "id",
+        "description": "order of lines",
+        "label": "#",
+        "type": "number",
+        "typeUI": "numberbox",
+        "enumerable": null,
+        "key": true,
+        "parent": "unNamed"
+      },
+      {
+        "name": "Name",
+        "description": "description of Name",
+        "label": "Name",
+        "type": "string",
+        "typeUI": "textbox",
+        "key": false,
+        "parent": "unNamed"
+      },
+      {
+        "name": "color",
+        "description": "description of color",
+        "label": "color",
+        "type": "string",
+        "typeUI": "textbox",
+        "key": false,
+        "parent": "unNamed"
+      },
+      {
+        "name": "wildnessDegree",
+        "description": "description of wildnessDegree",
+        "label": "wildnessDegree",
+        "type": "number",
+        "typeUI": "numberbox",
+        "enumerable": null,
+        "key": false,
+        "parent": "unNamed"
+      }
+    ],
+    "relations": []
+  },
+  {
+    "singular": "_histoMail_50",
+    "csingular": "55",
+    "plural": "_histoMail_50s",
+    "description": "histoMail peer for unNamed",
+    "sync": true,
+    "lastId": 2,
+    "L2C": {
+      "id": "56",
+      "msg": "57"
+    },
+    "C2L": {
+      "56": "id",
+      "57": "msg"
+    },
+    "attributes": [
+      {
+        "name": "id",
+        "description": "_histoMail_50's id",
+        "label": "#",
+        "type": "number",
+        "enumerable": null,
+        "key": true,
+        "parent": "_histoMail_50"
+      },
+      {
+        "name": "msg",
+        "description": "_histoMail_50's msg",
+        "label": "XXX",
+        "type": "string",
+        "typeUI": "textbox",
+        "key": false,
+        "parent": "_histoMail_50"
+      }
+    ],
+    "relations": []
+  },
+  {
+    "singular": "sample",
+    "csingular": "58",
+    "plural": "samples",
+    "description": "description of sample",
+    "sync": true,
+    "lastId": 2,
+    "L2C": {
+      "id": "59",
+      "name": "5A"
+    },
+    "C2L": {
+      "59": "id",
+      "5A": "name"
+    },
+    "attributes": [
+      {
+        "name": "id",
+        "description": "order of lines",
+        "label": "id",
+        "type": "number",
+        "typeUI": "numberbox",
+        "enumerable": null,
+        "key": true,
+        "parent": "sample"
+      },
+      {
+        "name": "name",
+        "description": "name'description",
+        "label": "name",
+        "type": "string",
+        "typeUI": "textbox",
+        "enumerable": null,
+        "key": false,
+        "parent": "sample"
+      }
+    ],
+    "relations": []
+  }
+]

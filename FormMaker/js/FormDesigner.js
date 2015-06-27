@@ -30,10 +30,12 @@
                 //alert("create new dialog box");
             } 
         });
-         $.getJSON("Entities.json",function(data){
-            var designer = new FormDesigner.Views.MainView({el : "body"});
-            designer.loadJSON(data);
-        });
+        
+        var mainView = new FormDesigner.Views.MainView({el : "body"});
+        mainView.loadEntities();
+        /*$.getJSON("Entities.json",function(data){
+            //mainView.loadJSON(data);
+        });*/
 
         Array.prototype.remove = function(item){
             if (item){
