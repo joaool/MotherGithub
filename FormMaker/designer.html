@@ -53,7 +53,6 @@
     <script src="js/views/property_panel.js"></script>
     
     <!--        <script type="text/javascript" src="https://rawgithub.com/powmedia/backbone.bootstrap-modal/master/src/backbone.bootstrap-modal.js"></script>-->
-
     
 </head>
 
@@ -68,6 +67,10 @@
                     <div id="Add" class="ui-draggable" cname="new"></div>
                 </li>
             </ul>
+            <ul class="sidebar-nav fields" id="fields">
+                
+            </ul>
+<!--
             <table class="sidebar-nav" id="fields">
                 <tr>
                     <td class="ui-draggable" data-name="text" cname="1" >
@@ -104,6 +107,7 @@
 
 
             </table>
+-->
             <ul class="sidebar-nav">
                 <li class="sidebar-brand">
                     <a href=#>Properties</a>
@@ -200,11 +204,7 @@
                             <div class="selectbox" id="entities">
                                 <div class="selectedOption">Entity 1</div>
                                 <ul class="options">
-                                    <li value="new">Create new</li>
-                                    <li value="1">Entity 1</li>
-                                    <li value="2">Entity 2</li>
-                                    <li value="3">Entity 3</li>
-                                    <li value="4">Entity 4</li>
+                                    
                                 </ul>
                             </div>
                             Name :
@@ -233,6 +233,23 @@
     </div>
 
     <div id="templates" style="display:none">
+    </div>
+    <div id="entitiesTempaltes" style="display:none">
+        <script id="entityOption" type="text/x-handlebars-template"> 
+            {{#each entities}}
+                <li entity_id="{{csingular}}" class="option entity">{{description}}</li>
+            {{/each}}
+        </script>
+        <script id="fieldsOption" type="text/x-handlebars-template"> 
+            {{#each fields}}
+                <li field_id="{{@index}}"
+                    class="option field ui-draggable"
+                    data-name="{{type}}"
+                    cname="1" >
+                        <a href="" class="">{{label}}</a>
+                </li>
+            {{/each}}
+        </script>    
     </div>
     <div id="contextMenu" style="display:none">
         <ul id="menuItems" class="custom-list">

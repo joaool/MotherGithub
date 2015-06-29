@@ -16,8 +16,8 @@
             e.preventDefault();
             e.stopPropagation();
         });
-        $(".selectbox").click(function(e) {
-            $(this).find(".options").toggleClass("toggled");
+        $(".selectedOption").click(function(e) {
+            $(this).parent().find(".options").toggleClass("toggled");
             e.preventDefault();
             e.stopPropagation();
         });

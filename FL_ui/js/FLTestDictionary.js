@@ -1,6 +1,5 @@
 var FL = FL || {};
 
-
 (function() { //App is a name space.
 	var spinner=FL.common.loaderAnimationON('spinnerDiv');
 	setInterval(function(){spinner.stop();},1000);
@@ -89,5 +88,6 @@ testMockUp = function(){
 	_.each(FL.dd.t.entities.list(),function(element){display+=element.singular+"/"+element.csingular+"\n"});
 	alert("List all entities(2):\n"+display+"\nCompressed name of sub="+FL.dd.t.entities.getCName("joakim"));
 	FL.common.printToConsole("After display","login");
-	
+	if (window.entitiesLoaded)
+        window.entitiesLoaded();
 };
