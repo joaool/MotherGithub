@@ -5,46 +5,51 @@ FormDesigner.Views.ElementHolder = Backbone.View.extend({
     currentHoverElement : null,
     elementCount : 0,
     droppedElements : [],
-    
+
     initialize: function(){
-        this.dragNDropHandler = new DragNDrop();
-		this.ApplySortingEvent();
-        
         this.propertiesPanel = new FormDesigner.Views.PropertyPanel({el : "#properties"});
         this.listenTo(this.propertiesPanel,FormDesigner.Events.PropertyChange,this.onPropertyChange);
         this.listenTo(this.propertiesPanel,FormDesigner.Events.TypeChange,this.onTypeChange);
-        
+
+        this.model = new FormDesigner.Models.DesignerModel();
+        $(".menuItem").on("click",this.onMenuItemClick.bind(this))
+
+        // this.$("#fieldstemp").html((Handlebars.compile($("#tempTemplate").html()))());
+        this.bindDraggableObject();
+    },
+    bindDraggableObject : function(){
+        this.dragNDropHandler = new DragNDrop();
         oDragNDrop = DragNDrop.getInstance();
-		oDragNDrop.setDroppableObject({droppableSelectors : [{
+        oDragNDrop.setDroppableObject({droppableSelectors : [{
 											droppable : ".ui-dropppable"
 											}],
-									  });	
+									  });
         oDragNDrop.setDraggableObject({draggableSelectors : [{
 											   draggable : ".ui-draggable"
 										  }],
 										 helper : "clone",
 										 helperCss : '',
 										 revert : this.OnRevert,
-										 OnStartCallBack : this.OnStart,
-										 OnStopCallBack : this.OnStop
+										 OnStartCallBack : this.OnStart.bind(this),
+										 OnStopCallBack : this.OnStop.bind(this)
 									  });
-        
-        this.model = new FormDesigner.Models.DesignerModel();
-        $(".menuItem").on("click",this.onMenuItemClick.bind(this))
+
+        this.ApplySortingEvent();
     },
     onMenuItemClick: function(e){
         if (e.currentTarget.id == "delete"){
             if (FormMaker.CurrentElement){
                 this.removeElement(FormMaker.CurrentElement);
-                
+
             }
         }
     },
-    OnStart : function(){
-		console.log("Drag Started");	
+    OnStart : function(event, ui){
+		console.log("Drag Started");
 	},
-	OnStop : function(){
+	OnStop : function(event, ui){
 		console.log("Drop End");
+        //this.onDrop(event.target,ui.item[0]);
 	},
 	OnRevert : function(dropped){
 		console.log(dropped);
@@ -52,6 +57,8 @@ FormDesigner.Views.ElementHolder = Backbone.View.extend({
 	},
     ApplySortingEvent : function(){
 		var temp = this;
+    $( ".sortable" ).sortable();
+    $( ".sortable" ).sortable("destroy");
 		$( ".sortable" ).sortable({
 			connectWith : ".sortable",
 		 	placeholder: "ui-state-highlight",
@@ -60,7 +67,7 @@ FormDesigner.Views.ElementHolder = Backbone.View.extend({
 				temp.onDrop(event.target,ui.item[0]);
 			},
 			beforeStop : function(event, ui){
-				temp.DroppedObjectOnMove = ui.helper;	
+				temp.DroppedObjectOnMove = ui.helper;
 			}
 		});
 		$( ".sortable" ).disableSelection();
@@ -71,7 +78,7 @@ FormDesigner.Views.ElementHolder = Backbone.View.extend({
 								temp.OnHoverIn(obj.currentTarget)
 							},function(obj){});
 	},
-	
+
 	OnHoverIn : function(obj){
 		var element = this.model.getElement($(obj).attr("cname"));
         this.currentHoverElement = obj;
@@ -97,14 +104,14 @@ FormDesigner.Views.ElementHolder = Backbone.View.extend({
         obj.setParent("#"+target.id);
         obj.render();
         this.droppedElements[id] = obj;
-        
+
         $(droppedObject).remove();
 		this.propertiesPanel.setElementProperties(element);
         this.setTypeField(element);
         $("body").css("cursor","default");
 	},
     onValueChange: function(data){
-        this.propertiesPanel.setElementProperties(data);  
+        this.propertiesPanel.setElementProperties(data);
     },
     onElementClick: function(data){
         this.propertiesPanel.setElementProperties(data);
@@ -114,19 +121,19 @@ FormDesigner.Views.ElementHolder = Backbone.View.extend({
         var elementView = this.droppedElements[data.id];
         var model = elementView.getModel();
         model.set("element", data.value);
-         
+
         var obj =  new FormMaker[data.value]({el : elementView.getParentSelector(),model : model});
         this.listenTo(obj, FormDesigner.Events.ElementClick,this.onElementClick.bind(this));
         this.listenTo(obj, FormDesigner.Events.ValueChange,this.onValueChange.bind(this));
         obj.loadData(model);
         obj.renderBefore(elementView);
-        
+
         this.removeElement(elementView)
         this.droppedElements[data.id] = obj;
-        
+
     },
     setTypeField: function(data){
-        this.$("#type #Type" + data.element).prop("checked",true);  
+        this.$("#type #Type" + data.element).prop("checked",true);
     },
     removeElement: function(element){
         element.remove()
@@ -140,6 +147,6 @@ FormDesigner.Views.ElementHolder = Backbone.View.extend({
         var elementView = this.droppedElements[data.id];
         if (elementView)
             elementView.update(data);
-        
+
     }
 });

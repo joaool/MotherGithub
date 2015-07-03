@@ -14,14 +14,14 @@
     <script src="../mailer/js/lib/jquery-1.11.0.js"></script>
     <script src="../mailer/js/lib/jquery-ui-1.10.4.js"></script>
     <script src="../mailer/js/lib/jquery-ui-timepicker.js"></script>
-        
+
     <script src="../mailer/js/lib/ckeditor/ckeditor.js"></script>
     <script src="../mailer/js/lib/underscore.js"></script>
     <script src="../mailer/js/lib/backbone.js"></script>
-    
+
     <script src="../mailer/js/lib/handlebars-v1.3.0.js"></script>
     <script src="../mailer/bootstrap/js/bootstrap.min.js"></script>
-    
+
     <script src="../FL_ui/js/FLSlidePanels.js"></script>
     <script src="../FL_ui/js/bootstrap.min.js"></script>
     <script src="../FL_ui/js/bootstrap-dialog.js"></script>
@@ -35,25 +35,58 @@
     <script src="../FL_ui/flClient/ajaxBrowser.js"></script>
     <script src="../FL_ui/js/FLAPI.js"></script>
     <script src="../FL_ui/js/FLTestDictionary.js"></script>
-    
-    
+
+
     <script src="js/FormDesigner.js"></script>
     <script src="../mailer/js/DragNDrop.js"></script>
     <script src="js/common.js"></script>
     <script src="js/FormMaker.js"></script>
     <script src="js/LabelElement.js"></script>
-    
-    
+
+
     <script src="js/models/designer_model.js"></script>
     <script src="js/models/element_model.js"></script>
     <script src="js/models/entity_model.js"></script>
-    
+
     <script src="js/views/main_view.js"></script>
     <script src="js/views/element_holder.js"></script>
     <script src="js/views/property_panel.js"></script>
-    
+
     <!--        <script type="text/javascript" src="https://rawgithub.com/powmedia/backbone.bootstrap-modal/master/src/backbone.bootstrap-modal.js"></script>-->
-    
+    <!-- <script id="tempTemplate" type="text/template">
+        <tr>
+            <td class="ui-draggable" data-name="text" cname="1" >
+                <a href="" class="">Name</a>
+            </td>
+            <td class="ui-draggable" data-name="textarea" cname="2">
+                <a href="" class="">Phone number</a>
+            </td>
+        </tr>
+        <tr>
+            <td class="ui-draggable" data-name="text" cname="9">
+                <a href="" class="">Feedback</a>
+            </td>
+            <td class="ui-draggable" data-name="textarea" cname="6">
+                <a href="" class="">Female</a>
+            </td>
+        </tr>
+        <tr>
+            <td class="ui-draggable" data-name="radio" cname="5">
+                <a href="" class="">Male</a>
+            </td>
+            <td class="ui-draggable" data-name="text" cname="3">
+                <a href="" class="">Email Address</a>
+            </td>
+        </tr>
+        <tr>
+            <td class="ui-draggable" data-name="select" cname="10">
+                <a href="" class="">Profile Pic</a>
+            </td>
+            <td class="ui-draggable" data-name="number" cname="8">
+                <a href="" class=" field-number">Date</a>
+            </td>
+        </tr>
+    </script> -->
 </head>
 
 <body>
@@ -67,47 +100,17 @@
                     <div id="Add" class="ui-draggable" cname="new"></div>
                 </li>
             </ul>
-            <ul class="sidebar-nav fields" id="fields">
-                
-            </ul>
-<!--
-            <table class="sidebar-nav" id="fields">
-                <tr>
-                    <td class="ui-draggable" data-name="text" cname="1" >
-                        <a href="" class="">Name</a>
-                    </td>
-                    <td class="ui-draggable" data-name="textarea" cname="2">
-                        <a href="" class="">Phone number</a>
-                    </td>
-                </tr>
-                <tr>
-                    <td class="ui-draggable" data-name="text" cname="9">
-                        <a href="" class="">Feedback</a>
-                    </td>
-                    <td class="ui-draggable" data-name="textarea" cname="6">
-                        <a href="" class="">Female</a>
-                    </td>
-                </tr>
-                <tr>
-                    <td class="ui-draggable" data-name="radio" cname="5">
-                        <a href="" class="">Male</a>
-                    </td>
-                    <td class="ui-draggable" data-name="text" cname="3">
-                        <a href="" class="">Email Address</a>
-                    </td>
-                </tr>
-                <tr>
-                    <td class="ui-draggable" data-name="select" cname="10">
-                        <a href="" class="">Profile Pic</a>
-                    </td>
-                    <td class="ui-draggable" data-name="number" cname="8">
-                        <a href="" class=" field-number">Date</a>
-                    </td>
-                </tr>
+            <div class="scroller">
+              <table class="sidebar-nav fields" id="fields">
+
+              </table>
+            </div>
+            <!-- <table class="sidebar-nav" id="fieldstemp">
 
 
-            </table>
--->
+
+            </table> -->
+
             <ul class="sidebar-nav">
                 <li class="sidebar-brand">
                     <a href=#>Properties</a>
@@ -115,9 +118,9 @@
             </ul>
             <div id="properties">
             <div class="sidebar-nav">
-                
+
                     <a href=#>Type</a>
-                
+
             </div>
             <div id="type">
                 <label class="btn">
@@ -149,8 +152,8 @@
                 </label>
 
             </div>
-            
-            
+
+
                 <table>
                     <tr>
                         <td>Name</td>
@@ -204,7 +207,7 @@
                             <div class="selectbox" id="entities">
                                 <div class="selectedOption">Entity 1</div>
                                 <ul class="options">
-                                    
+
                                 </ul>
                             </div>
                             Name :
@@ -235,21 +238,23 @@
     <div id="templates" style="display:none">
     </div>
     <div id="entitiesTempaltes" style="display:none">
-        <script id="entityOption" type="text/x-handlebars-template"> 
+        <script id="entityOption" type="text/x-handlebars-template">
             {{#each entities}}
                 <li entity_id="{{csingular}}" class="option entity">{{description}}</li>
             {{/each}}
         </script>
-        <script id="fieldsOption" type="text/x-handlebars-template"> 
+        <script id="fieldsOption" type="text/x-handlebars-template">
             {{#each fields}}
-                <li field_id="{{@index}}"
-                    class="option field ui-draggable"
-                    data-name="{{type}}"
-                    cname="1" >
-                        <a href="" class="">{{label}}</a>
-                </li>
+                <tr>
+                  <td field_id="{{@index}}"
+                      class="option field ui-draggable"
+                      data-name="{{type}}"
+                      cname="1" >
+                          <a href="" class="">{{label}}</a>
+                  </td>
+                </tr>
             {{/each}}
-        </script>    
+        </script>
     </div>
     <div id="contextMenu" style="display:none">
         <ul id="menuItems" class="custom-list">

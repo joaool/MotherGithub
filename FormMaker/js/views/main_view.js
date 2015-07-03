@@ -31,6 +31,7 @@ FormDesigner.Views.MainView = Backbone.View.extend({
         this.$(".selectedOption").text($(evt.target).html());
         var fields = FL.dd.t.entities[entityId].fieldsList();
         this.fieldsList.html(this.fieldsTempalate({"fields" : fields}));
+        this.m_Editor.bindDraggableObject();
     },
     loadJSON: function(data){
         

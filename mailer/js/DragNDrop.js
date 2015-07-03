@@ -20,12 +20,12 @@ DragNDrop.prototype = {
 	onStopCallBack : null,
 	helperCss : "",
 	draggListener : null,
-	
+
 	setDraggableObject : function(options){
 		if (!options || !options.draggableSelectors)
 			return;
 		this.draggableSelectors = options.draggableSelectors;
-		
+
 		if (options.helper && options.helper == "clone")
 			this.helperElement = options.helper;
 		if (options.helperCss)
@@ -36,7 +36,7 @@ DragNDrop.prototype = {
 			this.onStartCallBack = options.OnStartCallBack;
 		if (options.OnStopCallBack)
 			this.onStopCallBack = options.OnStopCallBack;
-		
+
 		this.addDraggableListener();
 	},
 	addDraggableListener : function(){
@@ -44,6 +44,7 @@ DragNDrop.prototype = {
 		$.each(this.draggableSelectors,function(i,item){
 			var dragSelector = item.draggable;
 			var dropSelector = item.droppable;
+
 			$(dragSelector).draggable({
 				connectToSortable: ".sortable",
 				helper : temp.helperElement,
@@ -59,11 +60,11 @@ DragNDrop.prototype = {
 					if (temp.helperCss)
 						$(ui.helper).css(temp.helperCss);
 					if (temp.onStartCallBack)
-				  		temp.onStartCallBack();
+				  		temp.onStartCallBack(event, ui);
 				},
 				stop : function(event, ui){
 					if (temp.onStopCallBack)
-				  		temp.onStopCallBack();
+				  		temp.onStopCallBack(event, ui);
 				},
 				drag : function(event, ui){
 					if (temp.draggListener)
@@ -80,8 +81,9 @@ DragNDrop.prototype = {
 	},
 	addDroppableListener : function(){
 		var temp = this;
-		$.each(this.draggableSelectors,function(i,item){
+		$.each(this.droppableSelectors,function(i,item){
 			var dropSelector = item.droppable;
+			
 			$(dropSelector).droppable({
 			  drop: function( event, ui ) {
 				 /* element = $(ui.draggable).clone();
@@ -96,6 +98,6 @@ DragNDrop.prototype = {
 	},
 	listenToDrag : function(CallBackOnDrag){
 		this.draggListener = CallBackOnDrag;
-	
+
 	}
 }
