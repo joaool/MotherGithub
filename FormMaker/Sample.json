@@ -1,161 +1,583 @@
 {
-	"elements": [
-		{
-			"element": "Text",
-			"type": "email",
-			"leftLabel": "Your Name:",
-			"placeholder": "Please introduce your name",
-			"value": "Antonio1111",
-			"icon": "glyphicon-envelope",
-			"trigger": "change",
-			"tooltip": "This is a nice email"
-		},
-		{
-			"element": "TextLabel",
-			"type": "password",
-			"leftLabel": "Password:",
-			"placeholder": "Password",
-			"value": "Antonio444",
-			"icon": "glyphicon-lock",
-			"trigger": "change",
-			"label": "Please introduce your password:",
-			"tooltip": "This is a nice password"
-		},
-		{
-			"element": "Checkbox",
-			"chkArr": [
-				{
-					"label": "first checkbox",
-					"checked": true,
-					"onChange": null
-				},
-				{
-					"label": "checkbox two",
-					"checked": false,
-					"onChange": null
-				},
-				{
-					"label": "Like FrameLink",
-					"checked": true,
-					"onChange": null
-				},
-				{
-					"label": "a test",
-					"checked": false,
-					"onChange": null
-				}				
-			]
-		 },
-		{
-			"element": "Checkbox",
-			"chkArr": [
-				{
-					"label": "Are you ready ?",
-					"checked": false,
-					"onChange": null
-				}
-			 ]
-		 },
-		{
-			"element": "Radio",
-			"radioArr": [
-				{
-					"label": "Poor",
-					"onChange": null
-				},
-				{
-					"label": "Good",
-					"checked": true,
-					"onChange": null
-				},
-				{
-					"label": "Excellent",
-					"onChange": null
-				},
-				{
-					"label": "No idea",
-					"onChange": null
-				}
-			 ]
-		},
-		{
-			"element": "Combo",
-			"leftLabel": "Please choose a template:",
-			"tooltip": "Hi zz, please select  your template here",
-			"comboLabel": "Select One Template",
-			"onClick": "clickTest('combo')",
-			"comboArr": [
-				{
-					"label" : "first choice",
-					"value" : "firstChoice"
-				},
-				{
-					"label" : "second one",
-					"value" : "secondOne"
-				},
-				{
-					"label" : "option 3",
-					"value" : "option3"
-				}
-			],
-			"caption": "Test",
-			"btnType": "default" 
-		},
-		{
-			"element": "Button",
-			"buttonArr": [
-				{
-					"btnType": "info",
-					"label": "Press 1",
-					"onClick": "clickTest('btn1')",
-					"tooltip": "please press1"
-				},
-				{
-					"btnType": "success",
-					"label": "Joakim Almeida",
-					"onClick": "clickTest('btn2')",
-					"tooltip": "please press2"
-				},
-				{
-					"btnType": "danger",
-					"label": "Press 3",
-					"onClick": "clickTest('btn3')",
-					"tooltip": "please press3"
-				},
-				{
-					"btnType": "primary",
-					"label": "Special",
-					"onClick": "clickTest('Special')",
-					"tooltip": "please press special"
-				}
-			]
-		},
-        {
-			"element": "Date",
-			"type": "text",
-			"leftLabel": "Date",
-			"value": "5/12/2015 1:30",
-			"trigger": "change",
-			"tooltip": "Select a date.",
-            "class" : "datePicker",
-            "placeholder" : "select date"
-		},
-        {
-			"element": "TextArea",
-			"type": "textarea",
-			"leftLabel": "Enter text",
-			"value": "Sample text area text",
-			"trigger": "change",
-			"tooltip": "Enter text.",
-            "placeholder" : "enter some text."
-		},
-        {
-			"element": "Image",
-			"type": "image",
-			"leftLabel": "Select an image",
-			"source": "",
-			"trigger": "change",
-			"tooltip": "Select an image"
-		}
-	]
+    "left": [{
+        "element": "Combo",
+        "leftLabel": "LSFA",
+        "name": "LSFA",
+        "type": "text",
+        "value": ",sim",
+        "id": "Element1",
+        "fieldName": "55",
+        "entityName": "53",
+        "alignment": "left",
+        "comboArr": [{
+            "value": "",
+            "label": ""
+        }, {
+            "value": "sim",
+            "label": "sim"
+        }]
+    }, {
+        "element": "Combo",
+        "leftLabel": "label of especialidade",
+        "name": "ESPECIALIDADEx",
+        "type": "text",
+        "value": "ABERTURA / TAPAMENTO ROÇOS, ,AÇO,,ADITIVOS,AGLOMERADOS DE MÁRMORE,AJARDINAMENTOS,ALCATIFAS, VINILICO,ANDAIMES,ANDAIMES - VENDA TUBOS,APARELHOS APOIO / JUNTAS DILATAÇAO,ARRANJOS EXTERIORES,ASSENTAMENTOS E REBOCOS,ASPIRAÇÃO CENTRAL,BARREIRAS AUTOMÁTICAS,BETÃO PRÉ-MOLDADO,BETÃO PRONTO,BETONAGENS,BETONILHAS,BETONILHAS / PAV. INDUSTRIAIS,BLOCOS P/ LAJES -FORN,BLOCOS P/ LAJES FUNGIFORMES,BOMBAS,CALÇADAS - ASSENT,CALÇADAS - F/A,CALÇADAS - FORN,CALCETEIROS,CALEIRAS,CANTARIAS - ASSENTAMNETO,CANTARIAS - FORN,CANTARIAS  POLIMENTO,CANTARIAS ORNAMENTAIS,CAPTAÇÃO DE ÁGUA,CARPINTARIAS,CASAS PRÉ-FABR / CONTENTORES,CHAPA ACRILICA,CIMENTO / INERTES,CIMBRES - ESCORAMENTOS,CLARABÓIAS,COBERTURAS AUTOPORTANTES,COBERTURAS CERÂMICAS,COBERTURAS FIBROCIMEN.,COBERTURA / REVEST,COBERTURA METÁLICA,COFRAGEM / MOLDAGEM FERRO,COFRAGEM,CONDUTAS DE LIXO,CONDUTAS ,CONSTRUÇÃO CIVIL,COZINHAS,DEMOLIÇÕES,DEMOLIÇÕES ESTACAS,DEFENÇAS E CABEÇOS AMARRAÇÃO,DIVERSOS,DIVISÓRIAS,DIVISÓRIAS AMOVÍVEIS,DIVISÓRIAS/T FALSOS,DRENAGENS,DRENAGENS - FORN CALEIRAS,ELECTRODOMÉSTICOS,ELEVADORES,EMP T TEMPORÁRIO,ENSAIOS GEOTÉCNICOS,EQUIP AUDITÓRIO / ESCRITÓRIO,EQUIP DESPORTIVO,EQUIP ESTAÇÕES SERVIÇO,EQUIP INFORMÁTICO,EQUIP HIDROELÉCTRICO,EQUIP HOSPITALAR,EQUIP HOTELEIRO,EQUIP SANITÁRIO,EQUIP SANITÁRIO (PRESSALIT),EQUIP SEGURANÇA,EQUIP URBANO,ESTAÇÃO TRAT ÁGUAS,ESTANTES P/ ARMAZÉM,ESTORES,ESTORES - CAIXAS,ESTRUTURA METÁLITCA,ESTRUTURAS DE BETÃO,ESTUDO INTEGRAÇÃO PAISAGÍSTICA,ESTUQUE,ESTUQUE PROJECTADO,ETAR / ETA,FERRAGENS P/ FIXAÇÃO CANTARIAS,FERRAGENS P/ PORTAS,FUNDAÇÕES ESPECIAIS,FURAÇÃO DE LAJES,FURAÇAO DE LAJES,GEOTEXTIL / GABIÕES,GESTÃO RESIDUOS,GRAMPOS METÁLICOS FIXAÇAO,GRANITOS FORN,GRANITOS POLIMENTO,HIDROSEMENTEIRA,IMPERMEABILIZAÇÕES - APLICADOR,IMPERMEABILIZAÇÕES,INFRAESTRUTRAS TELEFÓNICAS,INST ÁGUAS / ESG / GÁS,INST ÁGUAS - ESTALEIRO,INST AR COMPRIMIDO,INST AVAC,INST AVAC / VENTILAÇ,CCTV,INST ELÉCTRICAS / TELEF,INST ELÉCTRICAS ESTALEIRO,INST ELÉCTRICAS FORNECIMENTO,INST TELEFÓNICAS RAMAL,INSTALAÇÕES GÁS,ISO/SELAGENS CORTA FOGO,ISOL POLIURETANO PROJECTADO,ISOLAMENTO,ISOLAMENTO VIBRÁTICO,JANELAS (PVC),LACAGEM,LAMINADOS,LADRILHADOR,LAJE ALIGEIRADA,LAREIRAS / RECUPERAD CALOR,LETREIROS LUMINOSOS,LEVANTAMENTO TOPOGRÁFICO,LIMPEZA FOSSAS,LIMPEZAS,LIMPEZA FACHADAS,LIMPEZA / TRATAM CANTARIAS,MADEIRAS - FORN,MANILHAS - BETÃO,MANILHAS - GRÉS,MARMORITE,MAT CONSTRUÇÃO,MATERIAL COFRAGEM / ESCORAMENTO,MESTRAGEM FECHADURAS,MOLDAGEM FERRO,MOLDES P/ LAJES,MOVIMENTO TERRAS,OBTURAÇÃO ,MUROS GABIÕES,MUROS GABIÕES - FORN.,PERFIS REMATE,PARQUET - ASSENT,PARQUET - F + A,PASSADIÇOS,PUNTPART,PAV MADEIRA - ASSENT,PAV BETUMINOSO,PAV DESPORTIVO,PAVIMENTOS FALSOS,PAVIMENTO SOBREELEVADO,PAVIMENTO VINÍLICO,PAVIMENTOS,PAVIMENTOS MADEIRA,TRESPA,PAV REVEST EPOXY,PAV RESINA - APLICADOR,PERSIANAS,PINTURAS,PINTURAS - Decapagens e Metalização,PINTURAS ESPECIAIS,PISCINAS,PLATAFORMAS ELEVATÓRIAS,PORTAS,PORTAS AUTOMÁTICAS,PORTAS CORTA FOGO,PORTAS DE SEGURANÇA,PRÉ-ESFORÇO,PRÉ-FABRICADOS,REBAIXAMENTO NÍVEL FREÁTICO,REBOCO PROJECTADO,RECLAMOS LUMINOSOS,REDE DE COMBUSTÍVEIS,REFEITÓRIOS,REFORÇOS ESTRUTURAIS,RESINAS E REPARAÇÕES,REV. PAREDES-MARMORITE,REV. PAREDES,REV. ",
+        "id": "Element3",
+        "fieldName": "57",
+        "entityName": "53",
+        "alignment": "left",
+        "comboArr": [{
+            "value": "ABERTURA / TAPAMENTO ROÇOS",
+            "label": "ABERTURA / TAPAMENTO ROÇOS"
+        }, {
+            "value": " ",
+            "label": " "
+        }, {
+            "value": "AÇO",
+            "label": "AÇO"
+        }, {
+            "value": "",
+            "label": ""
+        }, {
+            "value": "ADITIVOS",
+            "label": "ADITIVOS"
+        }, {
+            "value": "AGLOMERADOS DE MÁRMORE",
+            "label": "AGLOMERADOS DE MÁRMORE"
+        }, {
+            "value": "AJARDINAMENTOS",
+            "label": "AJARDINAMENTOS"
+        }, {
+            "value": "ALCATIFAS",
+            "label": "ALCATIFAS"
+        }, {
+            "value": " VINILICO",
+            "label": " VINILICO"
+        }, {
+            "value": "ANDAIMES",
+            "label": "ANDAIMES"
+        }, {
+            "value": "ANDAIMES - VENDA TUBOS",
+            "label": "ANDAIMES - VENDA TUBOS"
+        }, {
+            "value": "APARELHOS APOIO / JUNTAS DILATAÇAO",
+            "label": "APARELHOS APOIO / JUNTAS DILATAÇAO"
+        }, {
+            "value": "ARRANJOS EXTERIORES",
+            "label": "ARRANJOS EXTERIORES"
+        }, {
+            "value": "ASSENTAMENTOS E REBOCOS",
+            "label": "ASSENTAMENTOS E REBOCOS"
+        }, {
+            "value": "ASPIRAÇÃO CENTRAL",
+            "label": "ASPIRAÇÃO CENTRAL"
+        }, {
+            "value": "BARREIRAS AUTOMÁTICAS",
+            "label": "BARREIRAS AUTOMÁTICAS"
+        }, {
+            "value": "BETÃO PRÉ-MOLDADO",
+            "label": "BETÃO PRÉ-MOLDADO"
+        }, {
+            "value": "BETÃO PRONTO",
+            "label": "BETÃO PRONTO"
+        }, {
+            "value": "BETONAGENS",
+            "label": "BETONAGENS"
+        }, {
+            "value": "BETONILHAS",
+            "label": "BETONILHAS"
+        }, {
+            "value": "BETONILHAS / PAV. INDUSTRIAIS",
+            "label": "BETONILHAS / PAV. INDUSTRIAIS"
+        }, {
+            "value": "BLOCOS P/ LAJES -FORN",
+            "label": "BLOCOS P/ LAJES -FORN"
+        }, {
+            "value": "BLOCOS P/ LAJES FUNGIFORMES",
+            "label": "BLOCOS P/ LAJES FUNGIFORMES"
+        }, {
+            "value": "BOMBAS",
+            "label": "BOMBAS"
+        }, {
+            "value": "CALÇADAS - ASSENT",
+            "label": "CALÇADAS - ASSENT"
+        }, {
+            "value": "CALÇADAS - F/A",
+            "label": "CALÇADAS - F/A"
+        }, {
+            "value": "CALÇADAS - FORN",
+            "label": "CALÇADAS - FORN"
+        }, {
+            "value": "CALCETEIROS",
+            "label": "CALCETEIROS"
+        }, {
+            "value": "CALEIRAS",
+            "label": "CALEIRAS"
+        }, {
+            "value": "CANTARIAS - ASSENTAMNETO",
+            "label": "CANTARIAS - ASSENTAMNETO"
+        }, {
+            "value": "CANTARIAS - FORN",
+            "label": "CANTARIAS - FORN"
+        }, {
+            "value": "CANTARIAS  POLIMENTO",
+            "label": "CANTARIAS  POLIMENTO"
+        }, {
+            "value": "CANTARIAS ORNAMENTAIS",
+            "label": "CANTARIAS ORNAMENTAIS"
+        }, {
+            "value": "CAPTAÇÃO DE ÁGUA",
+            "label": "CAPTAÇÃO DE ÁGUA"
+        }, {
+            "value": "CARPINTARIAS",
+            "label": "CARPINTARIAS"
+        }, {
+            "value": "CASAS PRÉ-FABR / CONTENTORES",
+            "label": "CASAS PRÉ-FABR / CONTENTORES"
+        }, {
+            "value": "CHAPA ACRILICA",
+            "label": "CHAPA ACRILICA"
+        }, {
+            "value": "CIMENTO / INERTES",
+            "label": "CIMENTO / INERTES"
+        }, {
+            "value": "CIMBRES - ESCORAMENTOS",
+            "label": "CIMBRES - ESCORAMENTOS"
+        }, {
+            "value": "CLARABÓIAS",
+            "label": "CLARABÓIAS"
+        }, {
+            "value": "COBERTURAS AUTOPORTANTES",
+            "label": "COBERTURAS AUTOPORTANTES"
+        }, {
+            "value": "COBERTURAS CERÂMICAS",
+            "label": "COBERTURAS CERÂMICAS"
+        }, {
+            "value": "COBERTURAS FIBROCIMEN.",
+            "label": "COBERTURAS FIBROCIMEN."
+        }, {
+            "value": "COBERTURA / REVEST",
+            "label": "COBERTURA / REVEST"
+        }, {
+            "value": "COBERTURA METÁLICA",
+            "label": "COBERTURA METÁLICA"
+        }, {
+            "value": "COFRAGEM / MOLDAGEM FERRO",
+            "label": "COFRAGEM / MOLDAGEM FERRO"
+        }, {
+            "value": "COFRAGEM",
+            "label": "COFRAGEM"
+        }, {
+            "value": "CONDUTAS DE LIXO",
+            "label": "CONDUTAS DE LIXO"
+        }, {
+            "value": "CONDUTAS ",
+            "label": "CONDUTAS "
+        }, {
+            "value": "CONSTRUÇÃO CIVIL",
+            "label": "CONSTRUÇÃO CIVIL"
+        }, {
+            "value": "COZINHAS",
+            "label": "COZINHAS"
+        }, {
+            "value": "DEMOLIÇÕES",
+            "label": "DEMOLIÇÕES"
+        }, {
+            "value": "DEMOLIÇÕES ESTACAS",
+            "label": "DEMOLIÇÕES ESTACAS"
+        }, {
+            "value": "DEFENÇAS E CABEÇOS AMARRAÇÃO",
+            "label": "DEFENÇAS E CABEÇOS AMARRAÇÃO"
+        }, {
+            "value": "DIVERSOS",
+            "label": "DIVERSOS"
+        }, {
+            "value": "DIVISÓRIAS",
+            "label": "DIVISÓRIAS"
+        }, {
+            "value": "DIVISÓRIAS AMOVÍVEIS",
+            "label": "DIVISÓRIAS AMOVÍVEIS"
+        }, {
+            "value": "DIVISÓRIAS/T FALSOS",
+            "label": "DIVISÓRIAS/T FALSOS"
+        }, {
+            "value": "DRENAGENS",
+            "label": "DRENAGENS"
+        }, {
+            "value": "DRENAGENS - FORN CALEIRAS",
+            "label": "DRENAGENS - FORN CALEIRAS"
+        }, {
+            "value": "ELECTRODOMÉSTICOS",
+            "label": "ELECTRODOMÉSTICOS"
+        }, {
+            "value": "ELEVADORES",
+            "label": "ELEVADORES"
+        }, {
+            "value": "EMP T TEMPORÁRIO",
+            "label": "EMP T TEMPORÁRIO"
+        }, {
+            "value": "ENSAIOS GEOTÉCNICOS",
+            "label": "ENSAIOS GEOTÉCNICOS"
+        }, {
+            "value": "EQUIP AUDITÓRIO / ESCRITÓRIO",
+            "label": "EQUIP AUDITÓRIO / ESCRITÓRIO"
+        }, {
+            "value": "EQUIP DESPORTIVO",
+            "label": "EQUIP DESPORTIVO"
+        }, {
+            "value": "EQUIP ESTAÇÕES SERVIÇO",
+            "label": "EQUIP ESTAÇÕES SERVIÇO"
+        }, {
+            "value": "EQUIP INFORMÁTICO",
+            "label": "EQUIP INFORMÁTICO"
+        }, {
+            "value": "EQUIP HIDROELÉCTRICO",
+            "label": "EQUIP HIDROELÉCTRICO"
+        }, {
+            "value": "EQUIP HOSPITALAR",
+            "label": "EQUIP HOSPITALAR"
+        }, {
+            "value": "EQUIP HOTELEIRO",
+            "label": "EQUIP HOTELEIRO"
+        }, {
+            "value": "EQUIP SANITÁRIO",
+            "label": "EQUIP SANITÁRIO"
+        }, {
+            "value": "EQUIP SANITÁRIO (PRESSALIT)",
+            "label": "EQUIP SANITÁRIO (PRESSALIT)"
+        }, {
+            "value": "EQUIP SEGURANÇA",
+            "label": "EQUIP SEGURANÇA"
+        }, {
+            "value": "EQUIP URBANO",
+            "label": "EQUIP URBANO"
+        }, {
+            "value": "ESTAÇÃO TRAT ÁGUAS",
+            "label": "ESTAÇÃO TRAT ÁGUAS"
+        }, {
+            "value": "ESTANTES P/ ARMAZÉM",
+            "label": "ESTANTES P/ ARMAZÉM"
+        }, {
+            "value": "ESTORES",
+            "label": "ESTORES"
+        }, {
+            "value": "ESTORES - CAIXAS",
+            "label": "ESTORES - CAIXAS"
+        }, {
+            "value": "ESTRUTURA METÁLITCA",
+            "label": "ESTRUTURA METÁLITCA"
+        }, {
+            "value": "ESTRUTURAS DE BETÃO",
+            "label": "ESTRUTURAS DE BETÃO"
+        }, {
+            "value": "ESTUDO INTEGRAÇÃO PAISAGÍSTICA",
+            "label": "ESTUDO INTEGRAÇÃO PAISAGÍSTICA"
+        }, {
+            "value": "ESTUQUE",
+            "label": "ESTUQUE"
+        }, {
+            "value": "ESTUQUE PROJECTADO",
+            "label": "ESTUQUE PROJECTADO"
+        }, {
+            "value": "ETAR / ETA",
+            "label": "ETAR / ETA"
+        }, {
+            "value": "FERRAGENS P/ FIXAÇÃO CANTARIAS",
+            "label": "FERRAGENS P/ FIXAÇÃO CANTARIAS"
+        }, {
+            "value": "FERRAGENS P/ PORTAS",
+            "label": "FERRAGENS P/ PORTAS"
+        }, {
+            "value": "FUNDAÇÕES ESPECIAIS",
+            "label": "FUNDAÇÕES ESPECIAIS"
+        }, {
+            "value": "FURAÇÃO DE LAJES",
+            "label": "FURAÇÃO DE LAJES"
+        }, {
+            "value": "FURAÇAO DE LAJES",
+            "label": "FURAÇAO DE LAJES"
+        }, {
+            "value": "GEOTEXTIL / GABIÕES",
+            "label": "GEOTEXTIL / GABIÕES"
+        }, {
+            "value": "GESTÃO RESIDUOS",
+            "label": "GESTÃO RESIDUOS"
+        }, {
+            "value": "GRAMPOS METÁLICOS FIXAÇAO",
+            "label": "GRAMPOS METÁLICOS FIXAÇAO"
+        }, {
+            "value": "GRANITOS FORN",
+            "label": "GRANITOS FORN"
+        }, {
+            "value": "GRANITOS POLIMENTO",
+            "label": "GRANITOS POLIMENTO"
+        }, {
+            "value": "HIDROSEMENTEIRA",
+            "label": "HIDROSEMENTEIRA"
+        }, {
+            "value": "IMPERMEABILIZAÇÕES - APLICADOR",
+            "label": "IMPERMEABILIZAÇÕES - APLICADOR"
+        }, {
+            "value": "IMPERMEABILIZAÇÕES",
+            "label": "IMPERMEABILIZAÇÕES"
+        }, {
+            "value": "INFRAESTRUTRAS TELEFÓNICAS",
+            "label": "INFRAESTRUTRAS TELEFÓNICAS"
+        }, {
+            "value": "INST ÁGUAS / ESG / GÁS",
+            "label": "INST ÁGUAS / ESG / GÁS"
+        }, {
+            "value": "INST ÁGUAS - ESTALEIRO",
+            "label": "INST ÁGUAS - ESTALEIRO"
+        }, {
+            "value": "INST AR COMPRIMIDO",
+            "label": "INST AR COMPRIMIDO"
+        }, {
+            "value": "INST AVAC",
+            "label": "INST AVAC"
+        }, {
+            "value": "INST AVAC / VENTILAÇ",
+            "label": "INST AVAC / VENTILAÇ"
+        }, {
+            "value": "CCTV",
+            "label": "CCTV"
+        }, {
+            "value": "INST ELÉCTRICAS / TELEF",
+            "label": "INST ELÉCTRICAS / TELEF"
+        }, {
+            "value": "INST ELÉCTRICAS ESTALEIRO",
+            "label": "INST ELÉCTRICAS ESTALEIRO"
+        }, {
+            "value": "INST ELÉCTRICAS FORNECIMENTO",
+            "label": "INST ELÉCTRICAS FORNECIMENTO"
+        }, {
+            "value": "INST TELEFÓNICAS RAMAL",
+            "label": "INST TELEFÓNICAS RAMAL"
+        }, {
+            "value": "INSTALAÇÕES GÁS",
+            "label": "INSTALAÇÕES GÁS"
+        }, {
+            "value": "ISO/SELAGENS CORTA FOGO",
+            "label": "ISO/SELAGENS CORTA FOGO"
+        }, {
+            "value": "ISOL POLIURETANO PROJECTADO",
+            "label": "ISOL POLIURETANO PROJECTADO"
+        }, {
+            "value": "ISOLAMENTO",
+            "label": "ISOLAMENTO"
+        }, {
+            "value": "ISOLAMENTO VIBRÁTICO",
+            "label": "ISOLAMENTO VIBRÁTICO"
+        }, {
+            "value": "JANELAS (PVC)",
+            "label": "JANELAS (PVC)"
+        }, {
+            "value": "LACAGEM",
+            "label": "LACAGEM"
+        }, {
+            "value": "LAMINADOS",
+            "label": "LAMINADOS"
+        }, {
+            "value": "LADRILHADOR",
+            "label": "LADRILHADOR"
+        }, {
+            "value": "LAJE ALIGEIRADA",
+            "label": "LAJE ALIGEIRADA"
+        }, {
+            "value": "LAREIRAS / RECUPERAD CALOR",
+            "label": "LAREIRAS / RECUPERAD CALOR"
+        }, {
+            "value": "LETREIROS LUMINOSOS",
+            "label": "LETREIROS LUMINOSOS"
+        }, {
+            "value": "LEVANTAMENTO TOPOGRÁFICO",
+            "label": "LEVANTAMENTO TOPOGRÁFICO"
+        }, {
+            "value": "LIMPEZA FOSSAS",
+            "label": "LIMPEZA FOSSAS"
+        }, {
+            "value": "LIMPEZAS",
+            "label": "LIMPEZAS"
+        }, {
+            "value": "LIMPEZA FACHADAS",
+            "label": "LIMPEZA FACHADAS"
+        }, {
+            "value": "LIMPEZA / TRATAM CANTARIAS",
+            "label": "LIMPEZA / TRATAM CANTARIAS"
+        }, {
+            "value": "MADEIRAS - FORN",
+            "label": "MADEIRAS - FORN"
+        }, {
+            "value": "MANILHAS - BETÃO",
+            "label": "MANILHAS - BETÃO"
+        }, {
+            "value": "MANILHAS - GRÉS",
+            "label": "MANILHAS - GRÉS"
+        }, {
+            "value": "MARMORITE",
+            "label": "MARMORITE"
+        }, {
+            "value": "MAT CONSTRUÇÃO",
+            "label": "MAT CONSTRUÇÃO"
+        }, {
+            "value": "MATERIAL COFRAGEM / ESCORAMENTO",
+            "label": "MATERIAL COFRAGEM / ESCORAMENTO"
+        }, {
+            "value": "MESTRAGEM FECHADURAS",
+            "label": "MESTRAGEM FECHADURAS"
+        }, {
+            "value": "MOLDAGEM FERRO",
+            "label": "MOLDAGEM FERRO"
+        }, {
+            "value": "MOLDES P/ LAJES",
+            "label": "MOLDES P/ LAJES"
+        }, {
+            "value": "MOVIMENTO TERRAS",
+            "label": "MOVIMENTO TERRAS"
+        }, {
+            "value": "OBTURAÇÃO ",
+            "label": "OBTURAÇÃO "
+        }, {
+            "value": "MUROS GABIÕES",
+            "label": "MUROS GABIÕES"
+        }, {
+            "value": "MUROS GABIÕES - FORN.",
+            "label": "MUROS GABIÕES - FORN."
+        }, {
+            "value": "PERFIS REMATE",
+            "label": "PERFIS REMATE"
+        }, {
+            "value": "PARQUET - ASSENT",
+            "label": "PARQUET - ASSENT"
+        }, {
+            "value": "PARQUET - F + A",
+            "label": "PARQUET - F + A"
+        }, {
+            "value": "PASSADIÇOS",
+            "label": "PASSADIÇOS"
+        }, {
+            "value": "PUNTPART",
+            "label": "PUNTPART"
+        }, {
+            "value": "PAV MADEIRA - ASSENT",
+            "label": "PAV MADEIRA - ASSENT"
+        }, {
+            "value": "PAV BETUMINOSO",
+            "label": "PAV BETUMINOSO"
+        }, {
+            "value": "PAV DESPORTIVO",
+            "label": "PAV DESPORTIVO"
+        }, {
+            "value": "PAVIMENTOS FALSOS",
+            "label": "PAVIMENTOS FALSOS"
+        }, {
+            "value": "PAVIMENTO SOBREELEVADO",
+            "label": "PAVIMENTO SOBREELEVADO"
+        }, {
+            "value": "PAVIMENTO VINÍLICO",
+            "label": "PAVIMENTO VINÍLICO"
+        }, {
+            "value": "PAVIMENTOS",
+            "label": "PAVIMENTOS"
+        }, {
+            "value": "PAVIMENTOS MADEIRA",
+            "label": "PAVIMENTOS MADEIRA"
+        }, {
+            "value": "TRESPA",
+            "label": "TRESPA"
+        }, {
+            "value": "PAV REVEST EPOXY",
+            "label": "PAV REVEST EPOXY"
+        }, {
+            "value": "PAV RESINA - APLICADOR",
+            "label": "PAV RESINA - APLICADOR"
+        }, {
+            "value": "PERSIANAS",
+            "label": "PERSIANAS"
+        }, {
+            "value": "PINTURAS",
+            "label": "PINTURAS"
+        }, {
+            "value": "PINTURAS - Decapagens e Metalização",
+            "label": "PINTURAS - Decapagens e Metalização"
+        }, {
+            "value": "PINTURAS ESPECIAIS",
+            "label": "PINTURAS ESPECIAIS"
+        }, {
+            "value": "PISCINAS",
+            "label": "PISCINAS"
+        }, {
+            "value": "PLATAFORMAS ELEVATÓRIAS",
+            "label": "PLATAFORMAS ELEVATÓRIAS"
+        }, {
+            "value": "PORTAS",
+            "label": "PORTAS"
+        }, {
+            "value": "PORTAS AUTOMÁTICAS",
+            "label": "PORTAS AUTOMÁTICAS"
+        }, {
+            "value": "PORTAS CORTA FOGO",
+            "label": "PORTAS CORTA FOGO"
+        }, {
+            "value": "PORTAS DE SEGURANÇA",
+            "label": "PORTAS DE SEGURANÇA"
+        }, {
+            "value": "PRÉ-ESFORÇO",
+            "label": "PRÉ-ESFORÇO"
+        }, {
+            "value": "PRÉ-FABRICADOS",
+            "label": "PRÉ-FABRICADOS"
+        }, {
+            "value": "REBAIXAMENTO NÍVEL FREÁTICO",
+            "label": "REBAIXAMENTO NÍVEL FREÁTICO"
+        }, {
+            "value": "REBOCO PROJECTADO",
+            "label": "REBOCO PROJECTADO"
+        }, {
+            "value": "RECLAMOS LUMINOSOS",
+            "label": "RECLAMOS LUMINOSOS"
+        }, {
+            "value": "REDE DE COMBUSTÍVEIS",
+            "label": "REDE DE COMBUSTÍVEIS"
+        }, {
+            "value": "REFEITÓRIOS",
+            "label": "REFEITÓRIOS"
+        }, {
+            "value": "REFORÇOS ESTRUTURAIS",
+            "label": "REFORÇOS ESTRUTURAIS"
+        }, {
+            "value": "RESINAS E REPARAÇÕES",
+            "label": "RESINAS E REPARAÇÕES"
+        }, {
+            "value": "REV. PAREDES-MARMORITE",
+            "label": "REV. PAREDES-MARMORITE"
+        }, {
+            "value": "REV. PAREDES",
+            "label": "REV. PAREDES"
+        }, {
+            "value": "REV. ",
+            "label": "REV. "
+        }]
+    }],
+    "right": [{
+        "element": "Text",
+        "leftLabel": "COD",
+        "name": "COD",
+        "type": "number",
+        "value": "",
+        "id": "Element2",
+        "fieldName": "56",
+        "entityName": "53",
+        "alignment": "right"
+    }, {
+        "element": "Text",
+        "leftLabel": "FORNECEDOR / SUBEMPREITEIRO",
+        "name": "FORNECEDOR / SUBEMPREITEIRO",
+        "type": "text",
+        "value": "",
+        "id": "Element4",
+        "fieldName": "58",
+        "entityName": "53",
+        "alignment": "right"
+    }]
 }

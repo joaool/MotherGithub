@@ -1,4 +1,4 @@
-FormMaker.ElementModel = Backbone.Model.extend({
+ElementModel = Backbone.Model.extend({
     
     saveToDB: function(){
         FL.dd.t.entities[this.get("entityName")].

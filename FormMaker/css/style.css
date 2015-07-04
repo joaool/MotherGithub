@@ -288,3 +288,7 @@ input#value {
     height: 200PX;
     BACKGROUND-COLOR: rgb(146, 180, 224);
 }
+
+div#formRight,#formLeft {
+    border: 0px!important;
+}

@@ -1,3 +1,4 @@
+FormMaker = {};
 FormMaker = Backbone.View.extend({
 	m_lstTemplates : [],
 	initialize : function(){
@@ -7,13 +8,16 @@ FormMaker = Backbone.View.extend({
 
 	},
 	loadJSON : function(json){
-		var elements = json.elements;
-		var arrObjs = [];
+        this.addElements(json.left,"#formLeft");
+		this.addElements(json.right,"#formRight");
+	},
+    addElements: function(elements,divId){
+        var arrObjs = [];
 		$.each(elements,(function(i,item){
 			console.log("--># "+i+" - elementToDisplay="+item.element+" value="+item.value);
 			if (FormMaker[item.element])
 			{
-				var obj = new FormMaker[item.element]({el : "body"});
+				var obj = new FormMaker[item.element]({el : divId});
 				obj.loadData(item);
 				arrObjs.push(obj);
 			}
@@ -25,8 +29,14 @@ FormMaker = Backbone.View.extend({
 		$.each(arrObjs,function(i,item){
 			item.render();
 		});
-	}
+    }
 });
+FormMaker.Events = {
+    "PropertyChange" : "propChange",
+    "ElementClick" : "elementClick",
+    "ValueChange" : "valueChange",
+    "TypeChange" : "typeChange"
+}
 
 FormMaker.Elements = {
 	Label : "TextLabel",

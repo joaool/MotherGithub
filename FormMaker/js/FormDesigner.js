@@ -7,7 +7,6 @@
             "ValueChange" : "valueChange",
             "TypeChange" : "typeChange"
         }
-        
     }; 
     $(document).ready(function(){
         $("#templates").load("Template.html");

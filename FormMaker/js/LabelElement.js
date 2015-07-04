@@ -13,7 +13,7 @@ FormMaker.BaseElement = Backbone.View.extend({
     parentSelector: null,
     
 	initialize : function(options){
-        this.model = new FormMaker.ElementModel(options.model);
+        this.model = new ElementModel(options.model);
         
 	},
     getModel: function(){
@@ -84,7 +84,7 @@ FormMaker.BaseElement = Backbone.View.extend({
     },
     onElementClick: function(evt){
         console.log("Element click");
-        this.trigger(FormDesigner.Events.ElementClick,this.model.toJSON());
+        this.trigger(FormMaker.Events.ElementClick,this.model.toJSON());
     },
 	focusIn : function(evt){
 		console.log("Focus In");
@@ -95,7 +95,7 @@ FormMaker.BaseElement = Backbone.View.extend({
 	valueChange : function(evt){
 		console.log("value change");
         this.model.set("value",this.value.val());
-        this.trigger(FormDesigner.Events.ValueChange,this.model.toJSON());
+        this.trigger(FormMaker.Events.ValueChange,this.model.toJSON());
 	}, 
 });
 FormMaker.TextLabel = FormMaker.BaseElement.extend({

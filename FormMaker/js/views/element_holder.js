@@ -6,15 +6,17 @@ FormDesigner.Views.ElementHolder = Backbone.View.extend({
     elementCount : 0,
     droppedElements : [],
     entityLoaded : null,
+    modelsCollection : null,
     
     initialize: function(){
         this.propertiesPanel = new FormDesigner.Views.PropertyPanel({el : "#properties"});
-        this.listenTo(this.propertiesPanel,FormDesigner.Events.PropertyChange,this.onPropertyChange);
-        this.listenTo(this.propertiesPanel,FormDesigner.Events.TypeChange,this.onTypeChange);
+        this.listenTo(this.propertiesPanel,FormMaker.Events.PropertyChange,this.onPropertyChange);
+        this.listenTo(this.propertiesPanel,FormMaker.Events.TypeChange,this.onTypeChange);
 
         this.model = new FormDesigner.Models.DesignerModel();
         $(".menuItem").on("click",this.onMenuItemClick.bind(this))
 
+        this.modelsCollection = new Elements();
         // this.$("#fieldstemp").html((Handlebars.compile($("#tempTemplate").html()))());
         this.bindDraggableObject();
     },
@@ -69,9 +71,12 @@ FormDesigner.Views.ElementHolder = Backbone.View.extend({
 			},
 			beforeStop : function(event, ui){
 				temp.DroppedObjectOnMove = ui.helper;
-			}
+			},
+            update: function(event, ui){
+                console.log("change");
+            }
 		});
-		$( ".sortable" ).disableSelection();
+		//$( ".sortable" ).disableSelection();
 	},
     ApplyHoverEvent : function(){
 		var temp = this;
@@ -96,6 +101,7 @@ FormDesigner.Views.ElementHolder = Backbone.View.extend({
         var description = $(droppedObject).data("description");
         var id = this.getNextId();
         var fieldName = FL.dd.t.entities[this.entityLoaded.csingular].getFieldCName(name);
+        var alignment = target.id == "designerCol1" ? "left" : "right";
         
         var element = {
             "element" : elementType || FormMaker.Elements.Text,
@@ -114,16 +120,21 @@ FormDesigner.Views.ElementHolder = Backbone.View.extend({
             element.cname = cname;
         }
         element.entityName = this.entityLoaded.csingular;
+        element.alignment = alignment;
         
-        var obj = new FormMaker[element.element]({el : "#"+target.id,model : element});
-        this.listenTo(obj, FormDesigner.Events.ElementClick,this.onElementClick.bind(this));
-        this.listenTo(obj, FormDesigner.Events.ValueChange,this.onValueChange.bind(this));
-        obj.loadData(element);
-        obj.setParent("#"+target.id);
-        obj.render();
-        this.droppedElements[id] = obj;
-
+        this.addElement(id,element);
         $(droppedObject).remove();
+    },
+    addElement: function(id,element){
+        var obj = new FormMaker[element.element]({el : "#"+id,model : element});
+        this.listenTo(obj, FormMaker.Events.ElementClick,this.onElementClick.bind(this));
+        this.listenTo(obj, FormMaker.Events.ValueChange,this.onValueChange.bind(this));
+        obj.loadData(element);
+        obj.setParent("#"+id);
+        obj.render();
+        this.droppedElements[element.id] = obj;
+        this.modelsCollection.set(obj.getModel(),{remove:false});
+        
 		this.propertiesPanel.setElementProperties(element);
         this.setTypeField(element);
         $("body").css("cursor","default");
@@ -142,13 +153,14 @@ FormDesigner.Views.ElementHolder = Backbone.View.extend({
         model.set("element", data.value);
 
         var obj =  new FormMaker[data.value]({el : elementView.getParentSelector(),model : model});
-        this.listenTo(obj, FormDesigner.Events.ElementClick,this.onElementClick.bind(this));
-        this.listenTo(obj, FormDesigner.Events.ValueChange,this.onValueChange.bind(this));
+        this.listenTo(obj, FormMaker.Events.ElementClick,this.onElementClick.bind(this));
+        this.listenTo(obj, FormMaker.Events.ValueChange,this.onValueChange.bind(this));
         obj.loadData(model.toJSON());
         obj.renderBefore(elementView);
 
         this.removeElement(elementView)
         this.droppedElements[data.id] = obj;
+        this.modelsCollection.set(obj.getModel(),{remove:false});
         this.propertiesPanel.setElementProperties(model.toJSON());
     },
     setTypeField: function(data){
@@ -157,6 +169,7 @@ FormDesigner.Views.ElementHolder = Backbone.View.extend({
     removeElement: function(element){
         element.remove()
         delete this.droppedElements[element.model.get("id")];
+        this.modelsCollection.remove(element.model);
         this.propertiesPanel.setElementProperties({});
     },
     getNextId : function(){
@@ -166,17 +179,37 @@ FormDesigner.Views.ElementHolder = Backbone.View.extend({
         var elementView = this.droppedElements[data.id];
         if (elementView)
             elementView.update(data);
-
+        this.modelsCollection.set(elementView.getModel(),{remove:false});
     },
     save: function(){
-        for (item in this.droppedElements) {
-            if (this.droppedElements.hasOwnProperty(item)) {
-                var model = this.droppedElements[item].getModel();
-                model.saveToDB();
-            }
-        };
+        this.modelsCollection.saveToDB();
+        var left = this.modelsCollection.where({"alignment" : "left"})
+                    .reduce(function(prev,curr){
+                        prev.push(curr.toJSON());
+                        return prev;
+                    },[]);
+        var right = this.modelsCollection.where({"alignment" : "right"})
+                    .reduce(function(prev,curr){
+                        prev.push(curr.toJSON());
+                        return prev;
+                    },[]);
+        var form = {
+            "left" : left, 
+            "right" : right
+        }
+        return form;
     },
     setEntity: function(entity){
         this.entityLoaded = entity;
+    },
+    loadJson: function(data){
+        var leftElements = data.left;
+        var rightElements = data.right;
+        $.each(leftElements,(function(i,element){
+            this.addElement("designerCol1",element);
+        }).bind(this));
+        $.each(rightElements,(function(i,element){
+            this.addElement("designerCol2",element);
+        }).bind(this))
     }
 });

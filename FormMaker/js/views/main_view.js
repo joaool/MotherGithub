@@ -17,7 +17,16 @@ FormDesigner.Views.MainView = Backbone.View.extend({
     },
     events: {
         "click .option.entity" : "onEntityClick",
-        "click #save" : "saveBtnClick"
+        "click #save" : "saveBtnClick",
+        "click #load" : "loadJson"
+    },
+    loadJson: function(){
+        $.getJSON("Sample.json",(function(data){
+            this.addJsonData(data);
+        }).bind(this));
+    },
+    addJsonData: function(data){
+        this.m_Editor.loadJson(data);  
     },
     setEntityModel: function(entityModel){
         this.entityModel = entityModel
@@ -36,7 +45,10 @@ FormDesigner.Views.MainView = Backbone.View.extend({
         this.m_Editor.bindDraggableObject();
     },
     saveBtnClick: function(){
-        this.m_Editor.save();  
+        
+        var formData = this.m_Editor.save();  
+        window.formData = formData;
+        window.open("formMaker.html","_blank");
     },
     loadJSON: function(data){
         
