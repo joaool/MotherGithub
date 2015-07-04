@@ -16,7 +16,8 @@ FormDesigner.Views.MainView = Backbone.View.extend({
         
     },
     events: {
-        "click .option.entity" : "onEntityClick"
+        "click .option.entity" : "onEntityClick",
+        "click #save" : "saveBtnClick"
     },
     setEntityModel: function(entityModel){
         this.entityModel = entityModel
@@ -31,7 +32,11 @@ FormDesigner.Views.MainView = Backbone.View.extend({
         this.$(".selectedOption").text($(evt.target).html());
         var fields = FL.dd.t.entities[entityId].fieldsList();
         this.fieldsList.html(this.fieldsTempalate({"fields" : fields}));
+        this.m_Editor.setEntity(FL.dd.t.entities[entityId]);
         this.m_Editor.bindDraggableObject();
+    },
+    saveBtnClick: function(){
+        this.m_Editor.save();  
     },
     loadJSON: function(data){
         

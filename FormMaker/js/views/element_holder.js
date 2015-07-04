@@ -5,7 +5,8 @@ FormDesigner.Views.ElementHolder = Backbone.View.extend({
     currentHoverElement : null,
     elementCount : 0,
     droppedElements : [],
-
+    entityLoaded : null,
+    
     initialize: function(){
         this.propertiesPanel = new FormDesigner.Views.PropertyPanel({el : "#properties"});
         this.listenTo(this.propertiesPanel,FormDesigner.Events.PropertyChange,this.onPropertyChange);
@@ -94,14 +95,16 @@ FormDesigner.Views.ElementHolder = Backbone.View.extend({
         var dropDownEnum = $(droppedObject).data("enum");
         var description = $(droppedObject).data("description");
         var id = this.getNextId();
-            
+        var fieldName = FL.dd.t.entities[this.entityLoaded.csingular].getFieldCName(name);
+        
         var element = {
             "element" : elementType || FormMaker.Elements.Text,
             "leftLabel" : leftLabel,
             "name" : name,
             "type" : inputType,
             "value" : dropDownEnum,
-            "id" : id
+            "id" : id,
+            "fieldName" : fieldName
         };
         if (cname){
             element = this.model.getElement(cname);
@@ -110,6 +113,8 @@ FormDesigner.Views.ElementHolder = Backbone.View.extend({
             element.id = id;
             element.cname = cname;
         }
+        element.entityName = this.entityLoaded.csingular;
+        
         var obj = new FormMaker[element.element]({el : "#"+target.id,model : element});
         this.listenTo(obj, FormDesigner.Events.ElementClick,this.onElementClick.bind(this));
         this.listenTo(obj, FormDesigner.Events.ValueChange,this.onValueChange.bind(this));
@@ -162,5 +167,16 @@ FormDesigner.Views.ElementHolder = Backbone.View.extend({
         if (elementView)
             elementView.update(data);
 
+    },
+    save: function(){
+        for (item in this.droppedElements) {
+            if (this.droppedElements.hasOwnProperty(item)) {
+                var model = this.droppedElements[item].getModel();
+                model.saveToDB();
+            }
+        };
+    },
+    setEntity: function(entity){
+        this.entityLoaded = entity;
     }
 });
