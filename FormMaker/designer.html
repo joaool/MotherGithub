@@ -248,8 +248,13 @@
                 <tr>
                   <td field_id="{{@index}}"
                       class="option field ui-draggable"
-                      data-name="{{type}}"
-                      cname="1" >
+                      data-input-type="{{type}}"
+                      data-type="{{typeUI}}"
+                      data-label="{{label}}"
+                      data-name="{{name}}"
+                      data-enum="{{#arrayToString enumerable}}{{/arrayToString}}"
+                      data-description="{{description}}"
+                      cname="{{cname}}">
                           <a href="" class="">{{label}}</a>
                   </td>
                 </tr>

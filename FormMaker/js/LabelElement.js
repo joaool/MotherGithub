@@ -149,7 +149,28 @@ FormMaker.Combo = FormMaker.BaseElement.extend({
         FormMaker.Combo.__super__.initialize.apply(this,arguments);
 		console.log('Combo init');
 		this.m_template = Handlebars.compile($("#__combo").html());
-	}
+	},
+    update: function(data){
+        var comboArr = data.value.split(",").map(function(ele){
+            return { "value" : ele, "label" : ele};
+        });
+        this.model.set("comboArr",comboArr);
+        FormMaker.Combo.__super__.update.apply(this,arguments);
+    },
+    render: function(){
+        var comboArr = this.model.get("value").split(",").map(function(ele){
+            return { "value" : ele, "label" : ele};
+        });
+        this.model.set("comboArr",comboArr);
+        FormMaker.Combo.__super__.render.apply(this,arguments);
+    },
+    renderBefore: function(){
+        var comboArr = this.model.get("value").split(",").map(function(ele){
+            return { "value" : ele, "label" : ele};
+        });
+        this.model.set("comboArr",comboArr);
+        FormMaker.Combo.__super__.renderBefore.apply(this,arguments);
+    }
 });
 
 FormMaker.TextArea = FormMaker.BaseElement.extend({

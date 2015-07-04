@@ -1,10 +1,10 @@
-FormMaker = Backbone.View.extend({	
+FormMaker = Backbone.View.extend({
 	m_lstTemplates : [],
 	initialize : function(){
 		// $.each(FormMaker.Elements,function(i,item){
 		// 	this.m_lstTemplate = _.template("#"+item);
 		// });
-		
+
 	},
 	loadJSON : function(json){
 		var elements = json.elements;
@@ -35,7 +35,21 @@ FormMaker.Elements = {
 	Checkbox : "Checkbox",
 	Radio : "Radio",
 	Combo : "Combo",
-    Date : "Date",
+	Date : "Date",
     TextArea : "TextArea",
     Image : "Image"
-	};
+};
+
+FormMaker.DBElements = {
+    numberbox : "Text",
+    textbox : "Text",
+    combobox : "Combo",
+    email : "Text",
+    emailbox : "Text"
+}
+
+FormMaker.DBType = {
+    number : "number",
+    string : "text",
+    text : "text"
+}

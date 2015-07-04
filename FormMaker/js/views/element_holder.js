@@ -87,10 +87,23 @@ FormDesigner.Views.ElementHolder = Backbone.View.extend({
     onDrop : function(target,droppedObject){
         if ($(droppedObject).hasClass("dropped")) return;
         var cname = $(droppedObject).attr("cname");
+        var elementType =  FormMaker.DBElements[$(droppedObject).data("type")];
+        var inputType = FormMaker.DBType[$(droppedObject).data("input-type")];
+        var leftLabel = $(droppedObject).data("label");
+        var name = $(droppedObject).data("name");
+        var dropDownEnum = $(droppedObject).data("enum");
+        var description = $(droppedObject).data("description");
+        var id = this.getNextId();
+            
         var element = {
-            element : FormMaker.Elements.Text
+            "element" : elementType || FormMaker.Elements.Text,
+            "leftLabel" : leftLabel,
+            "name" : name,
+            "type" : inputType,
+            "value" : dropDownEnum,
+            "id" : id
         };
-        if (cname != "new"){
+        if (cname){
             element = this.model.getElement(cname);
             element = jQuery.extend(true,{},element);
             var id = this.getNextId();
@@ -119,18 +132,19 @@ FormDesigner.Views.ElementHolder = Backbone.View.extend({
     },
     onTypeChange: function(data){
         var elementView = this.droppedElements[data.id];
+        if (!elementView) return;
         var model = elementView.getModel();
         model.set("element", data.value);
 
         var obj =  new FormMaker[data.value]({el : elementView.getParentSelector(),model : model});
         this.listenTo(obj, FormDesigner.Events.ElementClick,this.onElementClick.bind(this));
         this.listenTo(obj, FormDesigner.Events.ValueChange,this.onValueChange.bind(this));
-        obj.loadData(model);
+        obj.loadData(model.toJSON());
         obj.renderBefore(elementView);
 
         this.removeElement(elementView)
         this.droppedElements[data.id] = obj;
-
+        this.propertiesPanel.setElementProperties(model.toJSON());
     },
     setTypeField: function(data){
         this.$("#type #Type" + data.element).prop("checked",true);

@@ -25,7 +25,7 @@
 </script>
 <script id="__button" type="text/x-handlebars-template"> 
 	<div class="pull-right dropped" style="padding:5px 5px 5px;" id="{{id}}"  cname={{cname}}>
-        <button type="button" class="btn btn-{{btnType}} {{buttonHide}}" onclick="{{onClick}}" data-toggle="tooltip" data-placement="top" title="{{tooltip}}" >{{label}}</button>
+        <button type="button" class="btn btn-{{btnType}} {{buttonHide}}" onclick="{{onClick}}" data-toggle="tooltip" data-placement="top" title="{{tooltip}}" value="{{value}}">{{leftLabel}}</button>
 	</div>
 </script>
 <script id="__checkbox" type="text/x-handlebars-template"> 
@@ -41,16 +41,11 @@
 <script id="__combo" type="text/x-handlebars-template">    
 	<div class="input-group dropped" style="line-height:0px;padding:5px 5px 5px" id="{{id}}" cname={{cname}}>
 		<span class="input-group-addon" id="leftLabel">{{leftLabel}}</span>
-		<div class="btn-group">
-			<button type="button" class="btn btn-{{btnType}} dropdown-toggle" data-toggle="dropdown">
-				<span data-bind="label" data-toggle="tooltip" data-placement="top" title="{{tooltip}}" >{{comboLabel}}</span>&nbsp;<span class="caret"></span>
-			</button> 
-			<ul id="Items" class="dropdown-menu" value="{{value}}" id="value">
-				{{#each comboArr}}
-					<li><a href="#">{{label}}</a></li>
-				 {{/each}} 
-			</ul>
-		</div>
+		<select class="form-control" title="{{tooltip}}" value="{{value}}">
+            {{#each comboArr}}
+                <option value="{{value}}">{{label}} </option>
+            {{/each}}
+        </select>
 	</div>    
 </script>
 <script id="__date" type="text/x-handlebars-template">
