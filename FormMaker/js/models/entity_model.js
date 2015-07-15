@@ -3,6 +3,18 @@ FormDesigner.Models.EntityModel = Backbone.Model.extend({
         window.entitiesLoaded = this.entitiesLoaded.bind(this);
     },
     loadEntities: function(){
+        var fl = new flMain();//only place where this must exist !!!!
+		FL.fl = fl; //new flMain();
+		fl.serverName(FL.common.getServerName());
+		//---------------------load Default application
+		loginObject = {email:"kartik@fl.com",password:"123"};
+		var self = this;
+        var loadDefaultAppPromise = FL.API.loadDefaultApp(loginObject)
+        .then(function(menuData,homeHTML){
+            FL.dd.init_t();
+            self.entitiesLoaded();
+            return;
+        },function(err){alert("ERROR ->"+err.code+" - "+err.message);return;});
     },
     entitiesLoaded: function(){
         var entities = FL.dd.t.entities.list();

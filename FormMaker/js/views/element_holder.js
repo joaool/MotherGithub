@@ -72,9 +72,15 @@ FormDesigner.Views.ElementHolder = Backbone.View.extend({
 			beforeStop : function(event, ui){
 				temp.DroppedObjectOnMove = ui.helper;
 			},
-            update: function(event, ui){
-                console.log("change");
-            }
+            update: (function(event, ui){
+                var droppedObject = ui.item[0];
+                var alignment = event.target.id == "designerCol1" ? "left" : "right";
+                var cname = $(droppedObject).attr("id");
+                if (cname){
+                    var element = this.modelsCollection.where({"id" : cname})[0];
+                    element.set("alignment", alignment);
+                }
+            }).bind(this)
 		});
 		//$( ".sortable" ).disableSelection();
 	},
@@ -122,7 +128,7 @@ FormDesigner.Views.ElementHolder = Backbone.View.extend({
         element.entityName = this.entityLoaded.csingular;
         element.alignment = alignment;
         
-        this.addElement(id,element);
+        this.addElement(target.id,element);
         $(droppedObject).remove();
     },
     addElement: function(id,element){
@@ -185,12 +191,14 @@ FormDesigner.Views.ElementHolder = Backbone.View.extend({
         this.modelsCollection.saveToDB();
         var left = this.modelsCollection.where({"alignment" : "left"})
                     .reduce(function(prev,curr){
-                        prev.push(curr.toJSON());
+                        var json = curr.toJSON();
+                        prev.push(json);
                         return prev;
                     },[]);
         var right = this.modelsCollection.where({"alignment" : "right"})
                     .reduce(function(prev,curr){
-                        prev.push(curr.toJSON());
+                        var json = curr.toJSON();
+                        prev.push(json);
                         return prev;
                     },[]);
         var form = {

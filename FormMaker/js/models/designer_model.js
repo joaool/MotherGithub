@@ -12,6 +12,7 @@ FormDesigner.Models.DesignerModel = Backbone.Model.extend({
             success: this.onSuccess.bind(this),
             error:this.onError.bind(this)
         });
+        
     },
     onSuccess: function(obj,resp){
         var elements = resp["elements"];
