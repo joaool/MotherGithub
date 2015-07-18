@@ -1,0 +1,17 @@
+//for a single record array will have 1 record. if no recrords array will be []
+[
+    {
+        "5G": "Kartik Patel",
+        "5H": "Anand",
+        "5I": "Anand",
+        "5J": "katk.1989@gmail.com",
+        "5K": "1234567890"
+    },
+    {
+        "5G": "Joal",
+        "5H": "Portugual",
+        "5I": "Portugual",
+        "5J": "joal@gmail.com",
+        "5K": "1234567890"
+    }
+]

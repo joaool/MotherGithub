@@ -3,6 +3,9 @@ FormDesigner.Models.EntityModel = Backbone.Model.extend({
         window.entitiesLoaded = this.entitiesLoaded.bind(this);
     },
     loadEntities: function(){
+        this.connectToFLAPI(this.entitiesLoaded.bind(this));
+    },
+    connectToFLAPI: function(callback){
         var fl = new flMain();//only place where this must exist !!!!
 		FL.fl = fl; //new flMain();
 		fl.serverName(FL.common.getServerName());
@@ -12,7 +15,7 @@ FormDesigner.Models.EntityModel = Backbone.Model.extend({
         var loadDefaultAppPromise = FL.API.loadDefaultApp(loginObject)
         .then(function(menuData,homeHTML){
             FL.dd.init_t();
-            self.entitiesLoaded();
+            callback();
             return;
         },function(err){alert("ERROR ->"+err.code+" - "+err.message);return;});
     },

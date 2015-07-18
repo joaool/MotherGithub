@@ -192,16 +192,27 @@ FormDesigner.Views.ElementHolder = Backbone.View.extend({
         var left = this.modelsCollection.where({"alignment" : "left"})
                     .reduce(function(prev,curr){
                         var json = curr.toJSON();
-                        prev.push(json);
+                        var jsonToSave = {
+                            fCN : json.fieldName,
+                            leftLabel : json.leftLabel,
+                            alignment : json.alignment
+                        };
+                        prev.push(jsonToSave);
                         return prev;
                     },[]);
         var right = this.modelsCollection.where({"alignment" : "right"})
                     .reduce(function(prev,curr){
                         var json = curr.toJSON();
-                        prev.push(json);
+                        var jsonToSave = {
+                            fCN : json.fieldName,
+                            leftLabel : json.leftLabel,
+                            alignment : json.alignment
+                        };
+                        prev.push(jsonToSave);
                         return prev;
                     },[]);
         var form = {
+            "eCN" : this.entityLoaded.csingular,
             "left" : left, 
             "right" : right
         }

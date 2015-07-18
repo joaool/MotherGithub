@@ -47,7 +47,8 @@
     <script src="js/models/designer_model.js"></script>
     <script src="js/models/element_model.js"></script>
     <script src="js/models/entity_model.js"></script>
-
+    <script src="js/models/form_maker_model.js"></script>
+    
     <script src="js/collections/elements.js"></script>
     
     <script src="js/views/main_view.js"></script>
@@ -262,6 +263,16 @@
                   </td>
                 </tr>
             {{/each}}
+        </script>
+        <script id="preFormMakerDialog" type="text/x-handlebars-template">
+            <div>
+                Select a record :
+                <select class="form-control">
+                    {{#each options}}
+                        <option value="{{value}}">{{name}}</option>
+                    {{/each}}
+                </select>
+            </div>
         </script>
     </div>
     <div id="contextMenu" style="display:none">
