@@ -51,8 +51,14 @@
 			//				NOTE: type "enumerable" is invalid for server. "enumerable" will be send as type="string" to server
 			//			enumerable - an array of enumerables or null (if key type != "enumerable")
 			//			typeUI -type of widget that is used with the field (Nico's field "9")
-			//				textbox, numberbox, textarea, checkbox, datetextbox, combobox, picture, emailbox, phonebox, urlbox
+			//				textbox, integerbox, numberbox, percentbox, currencybox, areabox, emailbox, phonebox, datetimebox, combobox,
+			//					checkbox, urlbox, lookupbox -->TBI imagebox, geoBox
+			//			mask - applicable to textbox, integerbox, numberbox, percentbox and currencybox - null for other typeUI
+			//			specialTypeDef - Special type definition . ex of specialtype is typeUI=="lookup" 
+			//				if typeUI == "lookup" =>specialTypeDef="{eCN:<entity compressed name>, fCN:<field compressed name>}"
 			//			key - boolean. True means the attribute is the  key field of the entity . (only one allowed)
+			//	NEW TBD fieldPrefix - to be used only in search - for the time being it is fCN
+			//	NEW TBD Repeatable  - ex: [‘albert@monaco.mo’ ,’toto@totoi.mo’] true/false
 			//			
 			//          NOTE: to access the field compressed name use L2C() at entity level.
 			//
@@ -569,10 +575,14 @@
 									var xLabel=xArr[i].label;
 									var xType=xArr[i].type;
 									var xTypeUI=xArr[i].typeUI;
+									var xMask=xArr[i].mask;
+									var xSpecialTypeDef=xArr[i].specialTypeDef;
+									if(FL.common.typeOf(xSpecialTypeDef) == "object")
+										xSpecialTypeDef = JSON.stringify(xSpecialTypeDef);
 									var xKey=xArr[i].key;
 									var xEnumerable=xArr[i].enumerable;
 									// FL.common.printToConsole("-----> attribute["+i+"]="+xName+"/"+xDescr+"/"+xCName+",key="+xKey+",type="+xType);
-									FL.common.printToConsole("-----> attribute["+i+"]="+xName+"/"+xDescr+"/"+xCName+",label="+xLabel+",key="+xKey+",type="+xType+",typeUI="+xTypeUI,"dump");
+									FL.common.printToConsole("-----> attribute["+i+"]="+xName+"/"+xDescr+"/"+xCName+",label="+xLabel+",key="+xKey+",type="+xType+",typeUI="+xTypeUI+",mask="+xMask+",specialTypeDef="+xSpecialTypeDef,"dump");
 									if(xEnumerable) {
 										for (var j=0;j<xEnumerable.length;j++){
 											FL.common.printToConsole("------------> enumerable["+j+"]="+xEnumerable[j],"dump");
@@ -665,6 +675,7 @@
 			},
 			updateEntityBySingular: function(xSingular,xOptions) {//updates an existing entity. It can uodate the entity key "singular"
 				//Ex: updateEntityBySingular("client",{singular:"client",plural:"clients",description:"company that buys from us"});
+				//This method updates the server dictionary !!!! - it needs a working connection
 				var def = $.Deferred();
 				var oEntity=null;
 				var oEntityUpdate = null;
@@ -743,7 +754,10 @@
 				// xDescription - attribute description (Nico's "4")
 				// xLabel - attribute label (Nico's "K")
 				// xType - attribute data type (Nico's "M") - possible datatypes:string, integer, number, boolean, date, or json 
-				// xTypeUI - widget to use for UI (Nico's "9") - possible datatypes:textbox, numberbox, textarea, checkbox, datetextbox, combobox, picture 
+				// xTypeUI - widget to use for UI (Nico's "9") - possible values: textbox, integerbox, numberbox, percentbox, currencybox,
+				//		 areabox, emailbox, phonebox, datetimebox, combobox, checkbox, urlbox, lookupbox -->TBI imagebox, geoBox
+				// xMask - not a paramenter but inserted in dict as null - format mask applicable to textbox, integerbox, numberbox, percentbox and currencybox
+				// xSpecialTypeDef - not a paramenter but inserted in dict as null - Special type definition . ex of specialtype is typeUI=="lookup" 
 				// arrEnumerable -  an array of enumerables or null  (Nico's "N")
 				// key - optional default = false - it is only true for standard attribute "id"
 				
@@ -766,6 +780,8 @@
 				//oEntity={singular:"Client",plural:"clients",description:"Company to send invoices",lastId:0,L2C:{},C2L:{},attributes:[]};
 				//checks if attribute already exists. If it exists updates, otherwise create it !!!
 				//console.clear();
+				var xMask = null;
+				var xSpecialTypeDef = null;
 				var oEntity = this.entities[xSingular];
 				if(oEntity){
 					var xIndex = attributeIndex(xSingular,xAttribute);
@@ -775,7 +791,7 @@
 						//({name:"address",description:"address to send invoices",label:"Address",type:"string",enumerable:null,key:false});
 						if( (xType != "string") && (xTypeUI != "combobox"))
 							arrEnumerable = null;
-						oEntity.attributes.push({name:xAttribute,description:xDescription,label:xLabel,type:xType,typeUI:xTypeUI,enumerable:arrEnumerable,key:false});
+						oEntity.attributes.push({name:xAttribute, description:xDescription, label:xLabel, type:xType, typeUI:xTypeUI, mask:xMask, specialTypeDef:xSpecialTypeDef, enumerable:arrEnumerable, key:false});
 						oEntity.L2C[xAttribute] = sComp;//Logical to Compressed
 						oEntity.C2L[sComp] = xAttribute;//Compressed to Logical
 						// oEntity.lastId = nId;
@@ -799,9 +815,80 @@
 					//Err.alert("dDictionary.addAttribute",(new Error)," you tried to add attribute "+xAttribute+" to a non existing entity "+xSingular);
 				}
 			},
+			upsertAttribute: function(xSingular,xAttribute,options){// upserts attribute in table with logical name = sSingular
+				// xSingular - Entity name (singular) to add attribute
+				// xAttribute - attribute name (Nico's "3")
+				// options is an object {} with properties:
+				// 		description - attribute description (Nico's "4")
+				// 		label - attribute label (Nico's "K")
+				// 		type - attribute data type (Nico's "M") - possible datatypes:string, json or geoLocalization
+				// 		typeUI - widget to use for UI (Nico's "9") - possible values: textbox, integerbox, numberbox, percentbox, currencybox,
+				//		    areabox, emailbox, phonebox, datetimebox, combobox, checkbox, urlbox, lookupbox -->TBI imagebox, geoBox
+				// 		mask - format mask applicable to textbox, integerbox, numberbox, percentbox and currencybox
+				// 		specialTypeDef - Special type definition. If typeUI=="lookup" =>specialTypeDef="<eCN>" entity compressed name of lookup entity
+				// 		enumerable - arrEnumerable -  an array of enumerables or null  (Nico's "N")
+				// 		key - optional default = false - it is only true for standard attribute "id"
+				//
+				// if Type != "enumerable" => ArrEnumerable will be forced to null.		
+				
+
+				// if xAttribute already exists it is updated with xDescription, xLabel, xType, xTypeUI, arrEnumerable (xKey will not be changed)
+				// if xAttribute does not exist it is created with xDescription, xType and xKey forced to false
+				// if xTypeUI is different from "combobox" arrEnumerable is forced to false
+				//		
+				// NOTE on xKey - the only attribute that has xKey=true is always created or removed when the entity is created or removed
+				//    To update the name and description of the key attribute of a just created attribute:
+				//		dDictionary.createEntity("Client","clients","Individual or Company to whom we may send invoices");//singular, plural, description
+				//		dDictionary.renameAttribute("Client","id","name");//renaming the key attribute
+				//		dDictionary.addAttribute("Client","name","client's id","Name","string","textbox",null);
+				//		
+				//		If we are updating a key attribute we force the type to "number" independently of the xType parameter
+				//	
+				// NOTE: type is mandatory and must be one of: string, integer, number, Boolean, date, or json (this will be Nico's "M") 
+				//oEntity={singular:"Client",plural:"clients",description:"Company to send invoices",lastId:0,L2C:{},C2L:{},attributes:[]};
+				//checks if attribute already exists. If it exists updates, otherwise create it !!!
+				//console.clear();
+				var propsToUse = {name:xAttribute, description:null, label:"", type:"string", typeUI:"textbox", mask:null, specialTypeDef:null, enumerable:null, key:false};
+				_.extend(propsToUse,options);
+				// enforcements -------
+				if(propsToUse.type != "string"  && propsToUse.typeUI != "combobox")
+					propsToUse.enumerable == null;
+				if(propsToUse.typeUI != "textbox"  && propsToUse.typeUI != "integerbox" && propsToUse.typeUI != "numberbox" && propsToUse.typeUI != "percentbox"  && propsToUse.typeUI != "currencybox" )
+					propsToUse.mask == null;
+				if(propsToUse.typeUI != "lookupbox" )
+					propsToUse.specialTypeDef == null;
+				// -------------------
+				var oEntity = this.entities[xSingular];
+				if(oEntity){
+					var xIndex = attributeIndex(xSingular,xAttribute);
+					if(xIndex<0){//if it does not exists creates it
+						var nId = oEntity.lastId++;
+						var sComp = getCompressed(nId++);//we must go to Nico's server !!!!!!!!!!!!!
+						oEntity.attributes.push(propsToUse);
+						oEntity.L2C[xAttribute] = sComp;//Logical to Compressed
+						oEntity.C2L[sComp] = xAttribute;//Compressed to Logical
+						// oEntity.lastId = nId;
+					}else{//updates the existing attribute - if xKey is true (it will continue to be true)
+						oEntity.attributes[xIndex].description = propsToUse.description;
+						oEntity.attributes[xIndex].label = propsToUse.label;
+						if(oEntity.attributes[xIndex].key)//if we are updating a key attribute we force the type to "number"
+							propsToUse.type="number";
+						oEntity.attributes[xIndex].type = propsToUse.type;
+						oEntity.attributes[xIndex].typeUI = propsToUse.typeUI;
+						oEntity.attributes[xIndex].mask = propsToUse.mask;
+						oEntity.attributes[xIndex].specialTypeDef = propsToUse.specialTypeDef;
+						oEntity.attributes[xIndex].enumerable = arrEnumerable;
+						//oEntity.attributes[xIndex].key=xKey;
+					}
+					oEntity.sync = false;
+					//dDictionary.save(xSingular,oEntity);
+				}else{
+					alert("FL.dd.upsertAttribute Error: you tried to add attribute "+xAttribute+" to a non existing entity "+xSingular);
+				}
+			},	
 			getEntityAttribute: function(xSingular,xAttribute) {
 				// for entity xSingular and attribute with name=xAttribute returns:
-				//	  {name:xName,description:xDescription,label:xLabel,type:xType,typeUI:xTypeUI,enumerable:xEnumerable}
+				//	  {name:xName,description:xDescription,label:xLabel,type:xType,typeUI:xTypeUI,mask:xMask, specialTypeDef:xSpecialTypeDef, enumerable:xEnumerable}
 				//returns null if entity or attribute does not exist
 				var oAttributes = null;
 				var oEntity = this.entities[xSingular];
@@ -1115,6 +1202,8 @@
 							el["type"] = element.type;
 							el["enumerable"] = element.enumerable;
 							el["typeUI"] = element.typeUI;
+							el["mask"] = element.mask;
+							el["specialTypeDef"] = element.specialTypeDef;
 							// ----
 							xRetArr.push(el);
 						}
@@ -1142,13 +1231,21 @@
 				}	
 			},
 			userTypes: {///the opposite of userType() -->for a single userType returns type and typeUI. Ex FL.dd.userTypes.email =>{type:"string",typeUI:"emailbox"}
-				"number":{type:"number",typeUI:"numberbox"},
-				"text"  :{type:"string",typeUI:"textbox"},//"textbox" is hard coded in FLgrid2.js --> dataRowAnalisys(rows,percent) for most basic type
-				"textarea":{type:"string",typeUI:"textarea"},
+				"text"  :{type:"string",typeUI:"textbox"},
+				"integer":{type:"string",typeUI:"integerbox"},
+				"number":{type:"string",typeUI:"numberbox"},
+				"percent":{type:"string",typeUI:"percentbox"},
+				"currency":{type:"string",typeUI:"currencybox"},
+				"text upper"  :{type:"string",typeUI:"textUpperbox"},//"textbox" is hard coded in FLgrid2.js --> dataRowAnalisys(rows,percent) for most basic type
+				"text area":{type:"string",typeUI:"areabox"},
 				"email" :{type:"string",typeUI:"emailbox"},
 				"phone" :{type:"string",typeUI:"phonebox"},
-				"date" :{type:"date",typeUI:"datebox"},
-				"combo list":{type:"string",typeUI:"combobox"}
+				"date" :{type:"string",typeUI:"datetimebox"},//to prevent crash
+				"datetime" :{type:"string",typeUI:"datetimebox"},
+				"combo list":{type:"string",typeUI:"combobox"},
+				"check":{type:"string",typeUI:"checkbox"},
+				"url":{type:"string",typeUI:"urlbox"},
+				"lookup":{type:"string",typeUI:"lookupbox"},
 			},
 			arrOfUserTypesForDropdown: function(){//returns an array of objects with keys value and text, mandatory for dropdowns.
 				//	var arrOfObj=[{value:1,text:"number",something:"abc"},{value:2,text:"text",something:"abc"},{value:3,text:"email",something:"abc"},{value:4,text:"phone",something:"abc"},{value:5,text:"enumerable",something:"abc"},{value:6,text:"date",something:"abc"}];
@@ -1164,7 +1261,23 @@
 				// for a pair type,typeUI returns a single userType
 				var userType = null;
 				if(attributesElement.type == "string"){//type is one of: string, integer, number, boolean, date, or json (Nico's field "M")
-					var typeUIConverterInsideString = {"textbox":"text","textarea":"textarea","emailbox":"email","email":"email","phonebox":"phone","combobox":"combo list"};
+					var typeUIConverterInsideString = {
+						"textbox":"text",
+						"integerbox":"integer",
+						"numberbox":"number",
+						"percentbox":"percent",
+						"currencybox":"currency",
+						"textUpperbox":"text upper",
+						"areabox":"text area",
+						"emailbox":"email",
+						"email":"email",
+						"phonebox":"phone",
+						"datetimebox":"datetime",
+						"combobox":"combo list",
+						"checkbox":"check",
+						"urlbox":"url",
+						"lookupbox":"lookup",
+					};
 					userType = typeUIConverterInsideString[attributesElement.typeUI];
 				}else{
 					userType = attributesElement.type;
@@ -1341,6 +1454,8 @@
 							element["setField"] = function(options){//options:(name,description,label,type,typeUI,enumerable)
 								var entityName = this.parent;
 								var fieldName = this.name;
+								FL.common.printToConsole("--> saves -->FL.dd.t.entities[" + value.csingular + "].fields[" + fCN + "].setField(" + JSON.stringify(options) + ")","dd");
+
 								var promise = FL.dd.updateAttribute(entityName,fieldName,options);
 								promise.done(function(dataArray){
 									FL.dd.init_t();//update changes to FL.dd.t.entities
@@ -1368,10 +1483,12 @@
 						properties["fieldsList"] = function(){
 							var fieldsListArr=[];
 							var oEntity = FL.dd.entities[this.singular];
+							var L2C = oEntity.L2C;
 							if(oEntity){//if entity exists
 								_.each(oEntity.attributes, function(element, index){
 									if(element.name != "id"){
 										var el = {};
+										el["fCN"] = L2C[element.name];
 										el["name"] = element.name;
 										el["description"] = element.description;
 										el["label"] = element.label;
@@ -1379,10 +1496,12 @@
 										el["type"] = element.type;
 										el["enumerable"] = element.enumerable;
 										el["typeUI"] = element.typeUI;
+										el["mask"] = element.mask;
+										el["specialTypeDef"] = element.specialTypeDef;
 										// ----
 										fieldsListArr.push(el);
 									}
-								});
+								},this);
 							}else{
 								return null;
 							}
@@ -1390,15 +1509,27 @@
 						};
 						properties["addField"] = function(name,description,label,type,typeUI,arrEnumerable){//if it exists update it otherwise a new is created
 							FL.dd.addAttribute(this.singular,name,description,label,type,typeUI,arrEnumerable);
+							// FL.dd.upsertAttribute(this.singular,name,options);
+							//   options = {description:description,label:label,type:type, typeUI:typeUI,mask:mask,specialTypeDef:specialTypeDef,enumerable:arrEnumerable}
 							FL.dd.init_t();//update changes to FL.dd.t.entities
 						};																			
-						properties["XgetCName"] = function(fieldName){//if field name does not exist returns null
-							var entityName = "sub";//this.singular;
+						properties["getCName"] = function(fieldName){//if field name does not exist returns null
+							// var entityName = "sub";//this.singular;
+							var entityName = value.singular;
 							return FL.dd.getFieldCompressedName(entityName,fieldName);//returns null if entity name does not exist
 						};	
 						z[value.csingular] = properties;
-						// z["disp"] = function(x){return "hello "+x;};
-						// _.extend(z[value.csingular],{disp:function(x){return "hello "+x;});
+						// this makes available: (code from bottom to top)
+						//   FL.dd.t.entities[<eCN>].getCName(fieldName)
+						//   FL.dd.t.entities[<eCN>].addField(name,description,label,type,typeUI,arrEnumerable)
+						//   FL.dd.t.entities[<eCN>].fieldsList()				
+						//   FL.dd.t.entities[<eCN>].getFieldCName(fieldName)
+						//   FL.dd.t.entities[<eCN>].set(options)
+
+						//   FL.dd.t.entities[<eCN>].fields[<fCN>]
+						//   FL.dd.t.entities[<eCN>].fields[<fCN>].parent  =>the logical name of <ecN>
+						//   FL.dd.t.entities[<eCN>].fields[<fCN>].disp(x)  =>test returning "hello"+x
+						//   FL.dd.t.entities[<eCN>].fields[<fCN>].setField(options) ->saves option in local and server
 					}	
 				});
 				z["add"] = function(singular,description){
@@ -1411,7 +1542,7 @@
 					// newEntry[eCN] = {singular:oEntity.singular,csingular:oEntity.csingular,plural:oEntity.plural,description:oEntity.description,sync:oEntity.sync};
 					// _.extend(FL.dd.t.entities,newEntry);
 				};
-				z["dumpToConsole"] = function(singular,description){
+				z["dumpToConsole"] = function(){
 					FL.dd.displayEntities();
 				};
 				z["list"] = function(){
@@ -1429,7 +1560,12 @@
 					if(FL.dd.entities[entityName])
 						return FL.dd.entities[entityName].csingular;
 					return null;//oEntity; //gives undefined
-				};												
+				};
+				// z has all  FL.dd.t.entities[<eCN>]. methods and data and
+				//		FL.dd.t.entities.getName(entityName)
+				//		FL.dd.t.entities.list()
+				//		FL.dd.t.entities.dumpToConsole()
+				//		FL.dd.t.entities.add(singular,description)
 				return z;
 			},
 			// entity:{

@@ -60,14 +60,30 @@ var FL = FL || {};
 	setInterval(function(){spinner.stop();},1000);
 	$(document).ready(function() {
 		FL.API.debug = false;
-		FL.API.debugFiltersToShow = ["API","checkServerCall","abc","apigee","login","xdump","dd"];//note that "dump" is a reserved word for FL.dd.displayEntities()
+		FL.API.debugFiltersToShow = ["API","util","checkServerCall","abc","apigee","login","dump","dd"];//note that "dump" is a reserved word for FL.dd.displayEntities()
 		FL.API.fl.setTraceClient(2);
+		alert("JOJO_NICO5");
+		//function createArrayIterator(arr) {
+		//	//let index = 0;
+		//	let index = 0;
+		//	return {
+		//		[Symbol.iterator]() {  // protocol: iterable
+		//		return this; // an iterator!
+		//	},
+		//	next() {  // protocol: iterator
+		//		return { done: true };
+		//	}
+		//}
+		//}
+
 
 		FL.common.printToConsole("joakimX1X1","abc");
 		FL.common.printToConsole("manel","cde");
 		FL.common.printToConsole("joakim2 "+FL.login.test,"abc");
 		FL.common.printToConsole("====------------------------------------------->next will test exist !!!"+FL.login.test,"login");
 		console.log("login:"+FL.login.test);
+
+		FL.common.setApplicationSettingsFromSystem();
 
 		// var geoPromise = FL.emailServices.testGoogleGeo("chicago");
 		// geoPromise.done(function(){
@@ -121,6 +137,16 @@ var FL = FL || {};
 		FL.common.clearSpaceBelowMenus();
 
 		FL.common.printToConsole("FLMain.js begin inside document.ready");
+ 		
+		// $('#_freeSlots').append("<input type='text' id='_tempSlot' val='12345'>");////create a temporary slot in the dom under _freeSlots
+		// $("#_tempSlot").val("98765");
+		// $("#_tempSlot").inputmask({
+		// 	"mask":"99-AA-999",
+		// });
+		// 	alert("ZXZXZXZ -->"+$("#_tempSlot").val());
+
+
+
 		var fullUrl = window.location.href;
 		if(fullUrl){//gets domain from url string ->http://localhost/pdojo/MotherGithub/test_menu13.html?d=myDomain1#
 			//ex. http://www.framelink.co/app?d=myDomain1 Nico's definition
