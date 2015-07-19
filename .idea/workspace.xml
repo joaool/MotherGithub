@@ -2,135 +2,10 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="860d104d-dcc9-43ff-ba08-eee258c09f52" name="Default" comment="">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/mailer/js/DragNDrop-compiled.js.map" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/mailer/js/DragNDrop-compiled.js" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/FL_ui/js/FLAPI-compiled.js.map" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/FL_ui/js/FLAPI-compiled.js" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/FL_ui/js/FLCommon2-compiled.js.map" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/FL_ui/js/FLCommon2-compiled.js" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/FL_ui/js/FLGrid2-compiled.js.map" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/FL_ui/js/FLGrid2-compiled.js" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/FL_ui/js/FLLoadCss2-compiled.js.map" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/FL_ui/js/FLLoadCss2-compiled.js" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/FL_ui/js/FLMain-compiled.js.map" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/FL_ui/js/FLMain-compiled.js" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/FL_ui/js/FLTestDictionary-compiled.js.map" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/FL_ui/js/FLTestDictionary-compiled.js" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/FL_ui/js/FLbackgrid2-compiled.js.map" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/FL_ui/js/FLbackgrid2-compiled.js" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/FL_ui/js/FLdd2-compiled.js.map" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/FL_ui/js/FLdd2-compiled.js" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/FL_ui/js/FLemailServices2-compiled.js.map" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/FL_ui/js/FLemailServices2-compiled.js" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/FL_ui/js/FLlogin2-compiled.js.map" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/FL_ui/js/FLlogin2-compiled.js" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/FL_ui/js/FLmenulinks2-compiled.js.map" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/FL_ui/js/FLmenulinks2-compiled.js" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/pageEditor/FLpage_editor-compiled.js.map" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/pageEditor/FLpage_editor-compiled.js" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/FormMaker/js/FormDesigner-compiled.js.map" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/FormMaker/js/FormDesigner-compiled.js" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/FormMaker/js/FormMaker-compiled.js.map" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/FormMaker/js/FormMaker-compiled.js" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/libraries/Generated_files.xml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/mailer/js/View/TemplateElements/ImageElement-compiled-compiled.js.map" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/mailer/js/View/TemplateElements/ImageElement-compiled-compiled.js" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/mailer/js/View/TemplateElements/ImageElement-compiled.js.map" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/mailer/js/View/TemplateElements/ImageElement-compiled.js" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/FormMaker/js/LabelElement-compiled.js.map" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/FormMaker/js/LabelElement-compiled.js" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/mailer/js/MailerTemplate-compiled.js.map" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/mailer/js/MailerTemplate-compiled.js" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/mailer/js/View/MainView-compiled.js.map" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/mailer/js/View/MainView-compiled.js" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/mailer/js/View/PageDesign-compiled.js.map" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/mailer/js/View/PageDesign-compiled.js" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/mailer/js/View/PropertyPanels/StyleTab-compiled-compiled.js.map" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/mailer/js/View/PropertyPanels/StyleTab-compiled-compiled.js" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/mailer/js/View/PropertyPanels/StyleTab-compiled.js.map" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/mailer/js/View/PropertyPanels/StyleTab-compiled.js" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/mailer/js/View/PropertyPanels/TitlePanel-compiled-compiled.js.map" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/mailer/js/View/PropertyPanels/TitlePanel-compiled-compiled.js" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/mailer/js/View/PropertyPanels/TitlePanel-compiled.js.map" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/mailer/js/View/PropertyPanels/TitlePanel-compiled.js" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/FL_ui/js/accounting.min-compiled.js.map" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/FL_ui/js/accounting.min-compiled.js" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/FL_ui/js/autocomplete-cell-compiled.js.map" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/FL_ui/js/autocomplete-cell-compiled.js" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/FL_ui/js/awesomplete-compiled.js.map" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/FL_ui/js/awesomplete-compiled.js" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/FL_ui/js/awesomplete.min-compiled.js.map" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/FL_ui/js/awesomplete.min-compiled.js" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/FL_ui/js/backgrid-text-cell-compiled.js.map" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/FL_ui/js/backgrid-text-cell-compiled.js" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/FL_ui/js/backgrid-text-cell.min-compiled.js.map" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/FL_ui/js/backgrid-text-cell.min-compiled.js" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/FL_ui/js/bootstrap-datetimepicker-compiled.js.map" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/FL_ui/js/bootstrap-datetimepicker-compiled.js" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/FL_ui/js/bootstrap-select.min-compiled.js.map" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/FL_ui/js/bootstrap-select.min-compiled.js" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/FormMaker/js/common-compiled.js.map" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/FormMaker/js/common-compiled.js" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/mailer/js/lib/ckeditor/config-compiled-compiled.js.map" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/mailer/js/lib/ckeditor/config-compiled-compiled.js" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/mailer/js/lib/ckeditor/config-compiled.js.map" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/mailer/js/lib/ckeditor/config-compiled.js" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/FormMaker/js/models/designer_model-compiled-compiled.js.map" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/FormMaker/js/models/designer_model-compiled-compiled.js" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/FormMaker/js/models/designer_model-compiled.js.map" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/FormMaker/js/models/designer_model-compiled.js" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/FL_ui/js/dropzone-compiled.js.map" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/FL_ui/js/dropzone-compiled.js" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/FormMaker/js/views/element_holder-compiled.js.map" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/FormMaker/js/views/element_holder-compiled.js" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/FormMaker/js/models/element_model-compiled.js.map" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/FormMaker/js/models/element_model-compiled.js" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/FormMaker/js/collections/elements-compiled.js.map" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/FormMaker/js/collections/elements-compiled.js" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/FormMaker/js/models/entity_model-compiled.js.map" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/FormMaker/js/models/entity_model-compiled.js" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/FormMaker/js/models/form_maker_model-compiled.js.map" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/FormMaker/js/models/form_maker_model-compiled.js" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/FL_ui/js/index-compiled.js.map" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/FL_ui/js/index-compiled.js" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/FL_ui/js/jquery-ui-1.10.4-compiled.js.map" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/FL_ui/js/jquery-ui-1.10.4-compiled.js" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/mailer/js/lib/jquery-ui-timepicker-compiled-compiled.js.map" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/mailer/js/lib/jquery-ui-timepicker-compiled-compiled.js" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/FL_ui/js/jquery-ui-timepicker-compiled.js.map" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/mailer/js/lib/jquery-ui-timepicker-compiled.js.map" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/FL_ui/js/jquery-ui-timepicker-compiled.js" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/mailer/js/lib/jquery-ui-timepicker-compiled.js" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/FL_ui/js/jquery.bind-first-0.2.3.min-compiled.js.map" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/FL_ui/js/jquery.bind-first-0.2.3.min-compiled.js" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/FL_ui/js/jquery.inputmask-multi-compiled.js.map" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/FL_ui/js/jquery.inputmask-multi-compiled.js" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/FL_ui/js/jquery.inputmask1_2_2-compiled.js.map" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/FL_ui/js/jquery.inputmask1_2_2-compiled.js" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/FL_ui/js/jquery.mask-compiled.js.map" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/FL_ui/js/jquery.mask-compiled.js" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/FL_ui/js/jquery.mask.min-compiled.js.map" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/FL_ui/js/jquery.mask.min-compiled.js" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/FL_ui/js/jquery.ui.widget-compiled.js.map" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/FL_ui/js/jquery.ui.widget-compiled.js" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/FormMaker/js/views/main_view-compiled.js.map" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/FormMaker/js/views/main_view-compiled.js" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/FL_ui/js/tests/unit/menu-login-compiled-compiled.js.map" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/FL_ui/js/tests/unit/menu-login-compiled-compiled.js" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/FL_ui/js/tests/unit/menu-login-compiled.js.map" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/FL_ui/js/tests/unit/menu-login-compiled.js" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/FL_ui/js/mockjax-compiled.js.map" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/FL_ui/js/mockjax-compiled.js" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/FormMaker/js/views/property_panel-compiled.js.map" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/FormMaker/js/views/property_panel-compiled.js" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/mailer/js/lib/ckeditor/plugins/smiley/dialogs/smiley-compiled-compiled.js.map" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/mailer/js/lib/ckeditor/plugins/smiley/dialogs/smiley-compiled-compiled.js" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/mailer/js/lib/ckeditor/plugins/smiley/dialogs/smiley-compiled.js.map" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/mailer/js/lib/ckeditor/plugins/smiley/dialogs/smiley-compiled.js" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/FL_ui/js/utils2-compiled.js.map" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/FL_ui/js/utils2-compiled.js" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/FL_ui/js/FLMain-compiled.js.map" afterPath="$PROJECT_DIR$/FL_ui/js/FLMain-compiled.js.map" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/FL_ui/js/FLMain-compiled.js" afterPath="$PROJECT_DIR$/FL_ui/js/FLMain-compiled.js" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/FL_ui/js/FLMain.js" afterPath="$PROJECT_DIR$/FL_ui/js/FLMain.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
     </list>
     <ignored path="MotherGithub.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -164,8 +39,8 @@
       <file leaf-file-name="FLMain.js" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/FL_ui/js/FLMain.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.58429563">
-              <caret line="64" column="24" selection-start-line="64" selection-start-column="24" selection-end-line="64" selection-end-column="24" />
+            <state vertical-scroll-proportion="0.38333333">
+              <caret line="64" column="25" selection-start-line="64" selection-start-column="25" selection-end-line="64" selection-end-column="25" />
               <folding />
             </state>
           </provider>
@@ -174,6 +49,11 @@
     </leaf>
   </component>
   <component name="Git.Settings">
+    <option name="PREVIOUS_COMMIT_AUTHORS">
+      <list>
+        <option value="Joaool" />
+      </list>
+    </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="IdeDocumentHistory">
@@ -305,17 +185,25 @@
       <option name="number" value="Default" />
       <updated>1437308988262</updated>
     </task>
+    <task id="LOCAL-00001" summary="test nico 7">
+      <created>1437310880957</created>
+      <option name="number" value="00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1437310880957</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
     <servers />
   </component>
   <component name="ToolWindowManager">
     <frame x="7" y="13" width="1431" height="820" extended-state="0" />
-    <editor active="false" />
+    <editor active="true" />
     <layout>
       <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.24982053" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
+      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="Application Servers" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Version Control" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.32994187" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32994187" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
@@ -341,6 +229,10 @@
   <component name="VcsContentAnnotationSettings">
     <option name="myLimit" value="2678400000" />
   </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="test nico 7" />
+    <option name="LAST_COMMIT_MESSAGE" value="test nico 7" />
+  </component>
   <component name="XDebuggerManager">
     <breakpoint-manager />
     <watches-manager />
@@ -364,8 +256,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/FL_ui/js/FLMain.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.58429563">
-          <caret line="64" column="24" selection-start-line="64" selection-start-column="24" selection-end-line="64" selection-end-column="24" />
+        <state vertical-scroll-proportion="0.38333333">
+          <caret line="64" column="25" selection-start-line="64" selection-start-column="25" selection-end-line="64" selection-end-column="25" />
           <folding />
         </state>
       </provider>
