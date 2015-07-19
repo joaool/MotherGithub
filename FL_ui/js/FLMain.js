@@ -62,7 +62,7 @@ var FL = FL || {};
 		FL.API.debug = false;
 		FL.API.debugFiltersToShow = ["API","util","checkServerCall","abc","apigee","login","dump","dd"];//note that "dump" is a reserved word for FL.dd.displayEntities()
 		FL.API.fl.setTraceClient(2);
-		alert("JOJO_NICO8");
+
 		//function createArrayIterator(arr) {
 		//	//let index = 0;
 		//	let index = 0;
@@ -75,7 +75,6 @@ var FL = FL || {};
 		//	}
 		//}
 		//}
-
 
 		FL.common.printToConsole("joakimX1X1","abc");
 		FL.common.printToConsole("manel","cde");
