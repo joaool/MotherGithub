@@ -225,9 +225,9 @@
 							var enumStr = "";
 							if(enumArr)
 								enumStr = enumArr.join(",");
-							var masterDetailListItems = { master:{list:enumStr} };
-							var enumOptions = {type:"primary", icon:"th-list", button1:"Cancel", button2:"Confirm select list"};
 							if(selectedType == "combo list"){
+								var masterDetailListItems = { master:{list:enumStr} };
+								var enumOptions = {type:"primary", icon:"th-list", button1:"Cancel", button2:"Confirm select list"};
 								FL.common.editMasterDetail("A2",title,"_getComboList",masterDetailListItems,enumOptions,function(result){
 									if(result){
 										// alert("The list is ->"+masterDetailListItems.master.list);
@@ -235,7 +235,32 @@
 										csvStore.setEnumerableForAttribute(oldAttribute,listOfValuesStr.split(","));
 									}
 								});
-							}
+							};
+							if(selectedType == "lookup"){
+								FL.dd.init_t();//to init the temporary subsystem
+								FL.dd.t.entities.dumpToConsole();
+								var currentECN = FL.dd.getCEntity(entityName);
+								var currentFCN = FL.dd.t.entities[currentECN].getCName(currentAttribute);
+								var lookupObj = FL.dd.t.entities[currentECN].fields[currentFCN].specialTypeDef;
+								var lookupTypeStr = "Invalid format";
+								if(FL.common.typeOf(lookupObj) == "object"){
+									lookupTypeStr = lookupObj.eCN + "." + lookupObj.fCN //loojupObj format is {eCN:<entity compressed name>, fCN:<field compressed name>}
+								}
+								var masterDetailListItems = { master:{special:lookupTypeStr} };
+								var enumOptions = {type:"primary", icon:"th-list", button1:"Cancel", button2:"Confirm lookup data"};
+								FL.common.editMasterDetail("A2",title,"_getLookupTableAndField",masterDetailListItems,enumOptions,function(result){
+									if(result){
+										// alert("The list is ->"+masterDetailListItems.master.list);
+										var specialTypeDef = masterDetailListItems.master.special;
+										//save into the data dictionary
+										var specialDefArr= specialTypeDef.split(",");
+										var specialObj={eCN:specialDefArr[0], fCN:specialDefArr[1]};
+										FL.dd.t.entities[currentECN].fields[currentFCN].setField({specialTypeDef:specialObj});
+										var z = 32;
+									}
+
+								});
+							}							
 							// alert("The selection was "+selectedType);
 						}
 					}
@@ -258,7 +283,7 @@
 						elObj["description"] = masterDetailItems.detail[index].description.trim();
 						elObj["label"] = masterDetailItems.detail[index].attribute.trim();
 						var userType = masterDetailItems.detail[index].userType.trim();//the item collected in the form combo
-						var userTypeObj = FL.dd.userTypes[userType];//returns type and typeUI corresponding to that serType
+						var userTypeObj = FL.dd.userTypes[userType];//returns type and typeUI corresponding to that userType
 						elObj["type"] = userTypeObj.type;
 						if(elObj["type"] != attributesArrNoId[index].type)
 							changedTypeArr.push( [ attributesArrNoId[index].name, attributesArrNoId[index].type, elObj["type"] ] );//oldName,oldType,newType
@@ -837,7 +862,60 @@
 			promise.fail(function(){
 				alert("checkDuplicateEmission ->ERROR !!!");
 			});
-		};				
+		};
+		var getLookupInGrid = function(oLayout) {//
+			var lookupObj = null
+			FL.dd.init_t();//to init the temporary subsystem
+			_.each(oLayout.format, function(element) {//each element of oLayout.format array is like {fCN:"50","1st Column",width:20,nestingArr:[]}
+				var field = FL.dd.t.entities[oLayout.baseTable].fields[element.fCN];
+				if(field.typeUI=="lookupbox")
+					lookupObj = field.specialTypeDef;//{eCN:<entity compressed name>, fCN:<field compressed name>}
+			});
+			return lookupObj;
+		};
+		var mountGridFromColumnsArr = function(columnsArr,eCN) {//
+			// alert("mountGridFromColumnsArr ->" + JSON.stringify(columnsArr));
+			// return;
+			var entityName = FL.dd.getEntityByCName(eCN);
+			FL.common.printToConsole("New &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&& entity="+entityName);
+			FL.common.printToConsole("show columnsArr="+JSON.stringify(columnsArr));
+			// FL.common.spin(false);
+			// spinner.stop();
+			FL.common.clearSpaceBelowMenus();
+			$("#addGrid").show();
+			$("#addGrid").html(" Add Row");
+			$('#_editGrid').off('click');
+			$("#_editGrid").click(function(){
+				editGrid(entityName);
+			});				
+			$("#_editGrid").show();
+			// var eCN = FL.dd.getCEntity(entityName);//to remove later when we change entityName by eCN
+			var emailAttributeName = FL.dd.firstEmailAttribute(eCN);
+			if(emailAttributeName) {
+				$('#_newsletter').off('click');
+				$("#_newsletter").click(function(){
+					var templatePromise=FL.API.createTemplates_ifNotExisting();
+					templatePromise.done(function(){
+						// alert("FLGrid2 l1143 grid = "+grid);
+						prepareNewsletterEmission(entityName,grid,emailAttributeName);
+						return;
+					});
+					templatePromise.fail(function(err){
+						alert("FLmenulinks2.js set3ButtonsAndGrid ->FAILURE with createTemplates_ifNotExisting err="+err);
+						return;
+					});
+				});
+				$('#_newsletter').show();
+				$('#_newsletterMC').off('click');
+				$("#_newsletterMC").click(function(){
+					prepareNewsletterMCEmission(entityName);
+				});							
+				$('#_newsletterMC').show();
+				$("#_newsletterMC").html(" MC");
+			}
+			var grid = utils.mountGridInCsvStore(columnsArr);//mount backbone views and operates grid -	
+			FL.API.serverCallBlocked = false;
+		};		
 		var internalTest = function(x) {//
 			alert("grid internalTest() -->"+x);
 		};
@@ -850,13 +928,6 @@
 			csvFileDelimiter: null,
 			csvEncoding: null,
 			createGrid: function() {//call with menu key "uri": "javascript:FL.grid.createGrid()"
-				// FL.common.makeModalInfo("Create Grid to be implemented soon");
-				// var isIE = /*@cc_on!@*/false || !!document.documentMode;
-				// var isFirefox = typeof InstallTrigger !== 'undefined';   // Firefox 1.0+
-				// if(isIE)
-				// 	// alert("createGrid - you are using Internet Explorer");
-				// if(isFirefox)
-				// 	// alert("createGrid - you are using Firefox");
 				var masterDetailItems = {
 					master:{entityName:"sample",headerString:""},
 					detail:{} //format is array with {attribute:<attribute name>,description:<attr description>,statement;<phrase>}
@@ -1340,46 +1411,29 @@
 						csvStore.store(data);//data is an array of objects [{},{},....{}] where id field is mandatory inside {}
 						var z=csvStore.csvRows;//only for debugging
 						FL.common.printToConsole("show csvStore="+JSON.stringify(csvStore.csvRows));
-						var columnsArr = utils.backGridColumnsExtractedFromDictionary(entityName);//extracts attributes from dictionary and prepares columns object for backgrid
-						FL.common.printToConsole("New &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&& entity="+entityName);
-						FL.common.printToConsole("show columnsArr="+JSON.stringify(columnsArr));
-						// FL.common.spin(false);
-						spinner.stop();
-						FL.common.clearSpaceBelowMenus();
-						$("#addGrid").show();
-						$("#addGrid").html(" Add Row");
-						$('#_editGrid').off('click');
-						$("#_editGrid").click(function(){
-							editGrid(entityName);
-						});				
-						$("#_editGrid").show();
+
 						var eCN = FL.dd.getCEntity(entityName);//to remove later when we change entityName by eCN
-						var emailAttributeName = FL.dd.firstEmailAttribute(eCN);
-						if(emailAttributeName) {
-						// if( FL.dd.isEntityWithTypeUI(entityName,"emailbox") || FL.dd.isEntityWithTypeUI(entityName,"email") ){//the newsletter option only appears to entities that have an email
-							$('#_newsletter').off('click');
-							$("#_newsletter").click(function(){
-								var templatePromise=FL.API.createTemplates_ifNotExisting();
-								templatePromise.done(function(){
-									// alert("FLGrid2 l1143 grid = "+grid);
-									prepareNewsletterEmission(entityName,grid,emailAttributeName);
-									return;
-								});
-								templatePromise.fail(function(err){
-									alert("FLmenulinks2.js set3ButtonsAndGrid ->FAILURE with createTemplates_ifNotExisting err="+err);
-									return;
-								});
-							});
-							$('#_newsletter').show();
-							$('#_newsletterMC').off('click');
-							$("#_newsletterMC").click(function(){
-								prepareNewsletterMCEmission(entityName);
-							});							
-							$('#_newsletterMC').show();
-							$("#_newsletterMC").html(" MC");
-						}	
-						var grid = utils.mountGridInCsvStore(columnsArr);//mount backbone views and operates grid -	
-						FL.API.serverCallBlocked = false;
+						var gridLayout = FL.bg.getGridDefaultLayout(eCN);
+						//gridLayout={baseTable:"5M",format:[{fCN:"50",label:"1st Column",width:20,nestingArr:[]},{fCN:"5P",label:"2st Column",width:30,nestingArr:[]},
+						//			{fCN:"5Q",label:"3st Column",width:10,nestingArr:[]}] }
+						var lookupObj = getLookupInGrid(gridLayout);
+						if(lookupObj){
+							console.log("1367 Lookup !");				
+							var eCN = lookupObj.eCN; //"6A";//field.specialTypeDef.eCN;
+							var openPromise = FL.API.openTable(eCN);
+							openPromise.done(function(dataArray){
+								FL.common.printToConsole(">>>>>displayDefaultGrid openTable SUCCESS <<<<< ","API");
+								spinner.stop();
+								var columnsArr = FL.bg.setupGridColumnsArr(gridLayout,dataArray);
+								mountGridFromColumnsArr(columnsArr,eCN);							
+							});	
+							openPromise.fail(function(err){FL.common.printToConsole(">>>>>displayDefaultGrid openTable FAILURE <<<<<"+err,"API");def.reject(err);});
+						}else{
+							console.log("1369 no lookup !");
+							spinner.stop();
+							var columnsArr = FL.bg.setupGridColumnsArr(gridLayout);
+							mountGridFromColumnsArr(columnsArr,eCN);
+						};
 					});
 					promise.fail(function(err){
 						FL.API.serverCallBlocked = false;

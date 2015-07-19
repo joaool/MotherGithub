@@ -1346,7 +1346,10 @@
 					FL.common.printToConsole(">>>>> isUserExist SUCCESS <<<<< exist="+exists,"API");
 					return def.resolve(exists);
 				});
-				isUserExistPromise.fail(function(err){FL.common.printToConsole(">>>>> isUserExist FAILURE <<<<<","API"); return def.reject(err);});
+				isUserExistPromise.fail(function(err){
+					FL.common.printToConsole(">>>>> isUserExist FAILURE <<<<<","API"); 
+					return def.reject(err);
+				});
 				return def.promise();
 			},		
 			temporaryRebuildsLocalDictionaryFromServer: function(entities){
@@ -1414,7 +1417,7 @@
 			},			
 			updateDictionaryAttribute: function(fCN,oAttribute){//works with FL.dd.updateAttribute to update attribute to server
 				var def = $.Deferred();
-				var attrJSON = {"_id":fCN,"name_3":oAttribute.name, "description_4":oAttribute.description, 'label_K': oAttribute.label,'typeUI_9':oAttribute.typeUI, 'type_M': oAttribute.type, 'enumerable_N':oAttribute.enumerable, 'Nico_O':false };
+				var attrJSON = {"_id":fCN,"name_3":oAttribute.name, "description_4":oAttribute.description, 'label_K': oAttribute.label,'typeUI_9':oAttribute.typeUI, 'type_M': oAttribute.type, 'enumerable_N':oAttribute.enumerable, 'Nico_P':[oAttribute.specialTypeDef], 'Nico_O':false };
 				var fieldUpdatePromise=_fieldUpdate(attrJSON);
 				fieldUpdatePromise.done(function(result){FL.common.printToConsole(">>>>> updateDictionaryAttribute SUCCESS <<<<<");return def.resolve(result);});
 				fieldUpdatePromise.fail(function(err){FL.common.printToConsole(">>>>> updateDictionaryAttribute FAILURE <<<<< "+err);return def.reject(err);});
@@ -1694,6 +1697,39 @@
 				}	
 				return def.promise();
 			},
+			addRecordsToTableByCN: function(eCN,recordsArray,withId) {//add one or several records to existing table
+				// eCN - Entity compressed name
+				// recordsArray - array where each element is a JSON with pairs fCN:<content to insert>
+				//   ex:[{"51":125,"52":"abc"},....]
+ 
+				//the same as addRecordsToTable() but by compressed name
+				//assumes a login to an application exists and entitName exists in local and is in sync
+				//recordsArray [{"number":12,"code":"abc"},....]
+
+				//withId flag (default = false) if true all _id will be forced in the add.
+				FL.common.printToConsole("....................................>beginning addRecordsToTable....with appToken="+JSON.stringify(FL.login.appToken));
+				var def = $.Deferred();
+				if(_.isUndefined(withId) )
+					var withId = false;
+				var ecn = eCN;//FL.dd.getCEntity(entityName);
+				var entityName = FL.dd.getEntityByCName(ecn);
+				if(ecn === null){
+					FL.common.printToConsole("........FL.API.addRecordsToTable() table="+entityName+ " not in local dict !");
+					return def.reject("addRecordsToTable <table="+entityName+ "> does not exist in local dict !");//
+				}else{//the table exists in local dict but may be unsynchronized
+					var oEntity = FL.dd.entities[entityName];	
+					if(!oEntity.sync){//table exists in local dict but is not in sync with server	
+						FL.common.printToConsole("........FL.API.addRecordsToTable() <table="+entityName+ "> exists in local dict but is not in sync");
+						return def.reject("addRecordsToTable <table="+entityName+ "> not in sync !");//
+					}else{//table exists and is in sync
+						FL.common.printToConsole("........FL.API.addRecordsToTable() table="+entityName+ " is ok. We will insert!");
+						var arrToSend = convertRecordsTo_arrToSend(entityName,recordsArray,withId);		
+						insertPromise = _insert(ecn,arrToSend);
+						insertPromise.then(function(data){return def.resolve(data);},function(err){return def.reject(err);});
+					}
+				}	
+				return def.promise();
+			},			
 			updateRecordToTable: function(entityName,record) {//update a single record to existing table
 				//assumes a login to an application exists and entitName exists in local and is in sync
 				//record is a JSON containing a _id key {"_id":12345,"id":1,"code":"abc"}
@@ -1798,6 +1834,59 @@
 				loadTable.fail(function(err){FL.common.printToConsole(">>>>> loadTable FAILURE <<<<<"+err);def.reject(err);});
 				return def.promise();
 			},
+			xloadTableByCN:[
+                {eCN:"6A", _id:"1",fCN:"51"},
+                {eCN:"6A", _id:"1",fCN:"51"},
+                {eCN:"6A", _id:"1",fCN:"51"},
+			],
+			loadTableByCN: function(eCN) {//returns the full content of a table from server 
+				// format:
+				//    [{"_id":1,"d":{"53":"line 1 content of field1","54":"line 1 content of field2"},"v":0},
+				//  	{"_id":2,"d":{"53":"line 2 content of field1","54":"line 2 content of field2"},"v":0}...,]
+				//
+				//assumes a login to an application exists
+				FL.common.printToConsole("....................................>beginning loadTableByCN....with appToken="+JSON.stringify(FL.login.appToken));
+				var def = $.Deferred();
+				// var eCN = FL.dd.getCEntity(entityName);
+				var loadTable=_findAll(eCN);
+				//fd.findAll(eCN, {"query":{}}, function(err, data){..})
+				loadTable.done(function(dataArray){
+					FL.common.printToConsole(">>>>> loadTableByCN SUCCESS <<<<< ");
+					def.resolve(dataArray);
+				});
+				loadTable.fail(function(err){FL.common.printToConsole(">>>>> loadTableByCN FAILURE <<<<<"+err);def.reject(err);});
+				return def.promise();
+			},
+			openTable: function(eCN){
+				// use openTable("50").id("1") - returns {"53":"line 1 content of field1","54":"line 1 content of field2"}
+				// use openTable("50").id("1")["53"] - returns "line 1 content of field1"
+				// use openTable("50").search({"63":"jojo"}).read["63"]
+
+				FL.common.printToConsole("....................................>beginning loadTableByCN....with appToken="+JSON.stringify(FL.login.appToken));
+				var def = $.Deferred();
+				var loadPromise=this.loadTableByCN(eCN);
+				loadPromise.done(function(dataArray){
+					//dataArray format--> [{"_id":1,"d":{"53":"line 1 content of field1","54":"line 1 content of field2"},"v":0},...]
+					FL.common.printToConsole(">>>>> openTable SUCCESS <<<<< ","API");
+					// var tableOBj = {
+					// 	id: function(id){
+					// 		alert("openTable[<>].id()"+id);
+					// 		return def.resolve(dataArray[id]);
+					// 	},
+					// 	search: function(searchObj){//searchObj 
+					// 		format
+					// 		// equality condition { <fCN>: <value> } to select all documents that contain the <fCN> with the specified <value>
+					// 		// or condition { <fCN>:$in: [ <value1>,<value2>] } } to select all documents that contain the <fCN> with values <value1> or <value2>
+					// 		alert("openTable[<>].search()"+JSON.stringify(searchObj));
+					// 		return def.resolve();
+					// 	},						
+					// };
+					def.resolve(dataArray);
+				});
+				loadPromise.fail(function(err){FL.common.printToConsole(">>>>> openTable FAILURE <<<<<"+err);def.reject(err);});
+
+				return def.promise();		
+			},		
 			loadTableId: function(entityName,field2) {//returns only the _id field and optionally a second field from server
 				//assumes a login to an application exists
 				FL.common.printToConsole("....................................>beginning loadTableId....with appToken="+JSON.stringify(FL.login.appToken));

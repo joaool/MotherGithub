@@ -8,6 +8,8 @@
 	// b="B";
 	// var a = (typeof a === 'undefined') ? b : a;//if a is defined returns "A" otherwise returns the content of b
 	// alert("zzz="+a);//sets "B"
+
+
 	FL = (typeof FL === 'undefined') ? {} : FL;
 	FL["links"] = (function(){//name space FL.dd
 		var internalTest = function ( x) { //returns a 2 bytes string from number 
@@ -114,20 +116,108 @@
 			}else{
 				// alert("_histoMail for "+entityName+" does not exist! we need to create it");
 				promise = FL.API.createTableHistoMails_ifNotExisting(entityName)
-				.then(function(){
-					// this.setSync(FL.dd.histoMailPeer(entityName),true);
-					// set3ButtonsAndGrid(entityName);
-					FL.grid.displayDefaultGrid(entityName);//loads from server and display buttons and Grid
-					return;}
+					.then(function(){
+						// this.setSync(FL.dd.histoMailPeer(entityName),true);
+						// set3ButtonsAndGrid(entityName);
+						FL.grid.displayDefaultGrid(entityName);//loads from server and display buttons and Grid
+						return;}
 					,function(err){alert("FL.links.DefaultGridWithNewsLetterAndEditButtons ERROR: cannot create histoMail peer for " + entityName + " - "+err); return;});
 				// set3ButtonsAndGrid(entityName);//displays addGrid, newletter and editGrid buttons (with clicks prepared) and displays grid
 			}
-		};		
+		};
 		return{
 			abc: "abc",
 			test: function(x) {//call with menu key "uri": "javascript:FL.links.test('JOJO')"
 				internalTest(x);
 				alert("Fl.link.test(x) x="+x);
+			},
+			appSettings: function() {//call with menu key "uri": "javascript:FL.grid.createGrid()"
+				var masterDetailItems = {
+					master:{radixpoint_options:FL.common.appsettings.radixpoint, thousandsSeparator_options:FL.common.appsettings.thousandsSeparator, decimals:FL.common.appsettings.decimals, dateformat_options:FL.common.appsettings.dateformat, currency_options:FL.common.appsettings.currency},
+					detail:{} //format is array with {attribute:<attribute name>,description:<attr description>,statement;<phrase>}
+				};
+				var options = {
+					type:"primary",
+					icon:"book",
+					button1:"Cancel",
+					button2:"Change Settings",
+					dropdown:{
+						"_editAppSettings_radixpoint_options":{
+							arr:[ {value:1,text:". point (used in US)",op:"."}, {value:2,text:", comma (used in Europe)",op:","}],
+							default:FL.common.appsettings.radixpoint,
+							onSelect:function(objSelected){
+								$("#_editAppSettings_radixpoint").text(objSelected.op);
+								// FL.common.appsettings.radixpoint = objSelected.op;
+							}
+						},
+						"_editAppSettings_thousandsSeparator_options":{
+							arr:[ {value:1,text:", comma (used in US)",op:","}, {value:2,text:". point (used in Europe)",op:"."}, {value:3,text:" space (used in France)",op:"space"}],
+							default:FL.common.appsettings.thousandsSeparator,
+							onSelect:function(objSelected){
+								$("#_editAppSettings_thousandsSeparator").text(objSelected.op);
+								// FL.common.appsettings.radixpoint = objSelected.op;
+							}
+						},						
+						"_editAppSettings_dateformat_options":{
+							arr:[ {value:1,text:"YMD (used in China)",op:"YMD"}, {value:2,text:"MDY (used in US)",op:"MDY"}, {value:3,text:"DMY (used in Europe)",op:"DMY"}],
+							default:FL.common.appsettings.dateformat,
+							onSelect:function(objSelected){
+								$("#_editAppSettings_dateformat").text(objSelected.op);
+								// FL.common.appsettings.dateformat = objSelected.op;
+							}
+						},
+						"_editAppSettings_currency_options":{
+							arr:[ {value:1,text:"$ (Dollar)",op:"$"}, {value:2,text:"€ (Euro)",op:"€"}, {value:3,text:"Kr (Krona)",op:"Kr "},
+								{value:4,text:"Kz (Kwanza)",op:"Kz "}, {value:5,text:"MT (Metical)",op:"MT "}, {value:6,text:"R$ (Real)",op:"R$ "},
+								{value:7,text:"元 (Renmimbi)",op:"元"}, {value:7,text:"₹ (Rupee)",op:"₹"}, {value:8,text:"Rs (Rupee)",op:"Rs "},
+								{value:8,text:"¥ (Yen)",op:"¥"} ],
+							default:FL.common.appsettings.currency,
+							onSelect:function(objSelected){
+								$("#_editAppSettings_currency").text(objSelected.op);
+								// FL.common.appsettings.currency = objSelected.op;
+							}
+						},
+					}
+				};
+				// document.getElementById('_editAppSettings_dateformat').options[2].selected = true;
+				FL.common.editMasterDetail("B"," Edit application settings","_editAppSettingsTemplate",masterDetailItems,options,function(result){
+					if(result){//user choosed create
+						var radixpoint = $("#_editAppSettings_radixpoint").text();
+						var thousandsSeparator = $("#_editAppSettings_thousandsSeparator").text();
+						var decimals = $("#_editAppSettings_decimals").val();
+						var dateformat = $("#_editAppSettings_dateformat").text();//comming from dropdown
+						var currency = $("#_editAppSettings_currency").text();
+						// alert("Title:"+entityName+"-->"+headerString);
+						if(thousandsSeparator === "" )
+							FL.common.makeModalInfo("Empty information => no changes in application setting");
+						else{
+							radixpoint = radixpoint.trim();
+							thousandsSeparator = thousandsSeparator.trim();
+							FL.common.appsettings.radixpoint = radixpoint;
+							FL.common.appsettings.thousandsSeparator = thousandsSeparator.trim();
+				           	if(radixpoint == "." && thousandsSeparator ==".") //clash =>force distinction
+				                FL.common.appsettings.thousandsSeparator = ",";
+				            if(radixpoint == "," && thousandsSeparator ==",") //clash =>force distinction
+				                FL.common.appsettings.thousandsSeparator = ".";
+							FL.common.appsettings.decimals = decimals;
+							FL.common.appsettings.dateformat = dateformat;
+							FL.common.appsettings.currency = currency;
+							// now we should save this to framelink database
+						}
+					}else{
+						// alert("Create Grid canceled");
+						FL.common.makeModalInfo("No changes in application settings");
+					}
+				});
+			},
+			appSettingsForceButton: function(){
+				// FL.common.setApplicationSettingsFromSystem();
+				var browserSettings = FL.common.getLocaleSettings();
+				$("#_editAppSettings_radixpoint").text(browserSettings.radix);
+				$("#_editAppSettings_thousandsSeparator").text(browserSettings.thousands);
+				$("#_editAppSettings_decimals").val(2);
+				$("#_editAppSettings_dateformat").text(browserSettings.ymdFormat);
+				$("#_editAppSettings_currency").text(browserSettings.currency);
 			},
 			pageEditor: function(xPage) {//call with menu key "uri": "javascript:FL.links.pageEditor('home')"
 				var loginStr = localStorage.login;// Retrieve format {email:x1,password:x3,domain:x4};
