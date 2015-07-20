@@ -982,6 +982,14 @@ FL["common"] = (function(){//name space FL.common
                 is_date = true;
             return is_date;
         },
+        is_jsonString:function(str){
+            try {
+                JSON.parse(str);
+            } catch (e) {
+                return false;
+            }
+            return true;
+        },
         is_enumerableArr: function(arrOfRowValues,percent){//returns true arrOfRowValues can colapse to less than percent with unique values
             //normally arrOfRowValues is a sample of the whole array, only to decide if it is enumerable or not
             var is_enumerable = false;

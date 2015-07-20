@@ -691,8 +691,14 @@
 						this.entities[xSingular] = oEntityUpdate;					
 					}
 					var entityUpdatePromise = FL.API.updateDictionaryEntityProperties(eCN,oEntityUpdate);
-					entityUpdatePromise.done(function(result){FL.common.printToConsole(">>>>> updateEntityBySingular SUCCESS count="+result+"<<<<<");return def.resolve(result);});
-					entityUpdatePromise.fail(function(err){FL.common.printToConsole(">>>>> updateEntityBySingular FAILURE <<<<< "+err);return def.reject(err);});
+					entityUpdatePromise.done(function(result){
+						FL.common.printToConsole(">>>>> updateEntityBySingular SUCCESS count="+result+"<<<<<");
+						return def.resolve(result);
+					});
+					entityUpdatePromise.fail(function(err){
+						FL.common.printToConsole(">>>>> updateEntityBySingular FAILURE <<<<< "+err);
+						return def.reject(err);
+					});
 					//  oEntity.sync = false;
 					// xRet = true;
 				}else{//xSingular does not exists in dictionary
@@ -920,9 +926,10 @@
 							oEntity.L2C[oAttributes.name] = compressedAttr;
 						}
 						oEntity.attributes[xIndex] = _.omit(oAttributes,"oldname","singular");
-						var fCN = oEntity.L2C[oAttributes.name];
+						//var fCN = oEntity.L2C[oAttributes.name];
+						var eCN = oEntity.csingular;
 						//send to server
-						var promise = FL.API.updateDictionaryAttribute(fCN,oAttributes);
+						var promise = FL.API.updateDictionaryAttribute(eCN,oAttributes);
 						promise.done(function(result){
 							oEntity.sync = true;
 							return def.resolve(result);
@@ -1459,6 +1466,7 @@
 								var promise = FL.dd.updateAttribute(entityName,fieldName,options);
 								promise.done(function(dataArray){
 									FL.dd.init_t();//update changes to FL.dd.t.entities
+									FL.API.serverCallBlocked = false;
 									return;
 								});
 								promise.fail(function(err){

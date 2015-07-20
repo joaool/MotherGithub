@@ -476,7 +476,7 @@
 			// var fa = FL.login.token.fa;//new fl.app();
 			var fField = new fl.field();
 			var field_id = obj._id;
-			fField.update({"query":{"_id":field_id},"update":{"3":obj.name_3,"4":obj.description_4,"K":obj.label_K,"M":obj.type_M,"9":obj.typeUI_9,"N":obj.enumerable_N,"O":obj.Nico_O }}, function (err, data){
+			fField.update({"query":{"_id":field_id},"update":{"3":obj.name_3,"4":obj.description_4,"K":obj.label_K,"M":obj.type_M,"9":obj.typeUI_9,"N":obj.enumerable_N,"O":obj.Nico_O, "P":obj.Nico_P }}, function (err, data){
 				FL.common.printToConsole("............................._fieldUpdate....");
 				// err = "abc";
 				if(err){
@@ -1417,7 +1417,8 @@
 			},			
 			updateDictionaryAttribute: function(fCN,oAttribute){//works with FL.dd.updateAttribute to update attribute to server
 				var def = $.Deferred();
-				var attrJSON = {"_id":fCN,"name_3":oAttribute.name, "description_4":oAttribute.description, 'label_K': oAttribute.label,'typeUI_9':oAttribute.typeUI, 'type_M': oAttribute.type, 'enumerable_N':oAttribute.enumerable, 'Nico_P':[oAttribute.specialTypeDef], 'Nico_O':false };
+				var attrJSON = {"_id":fCN,"name_3":oAttribute.name, "description_4":oAttribute.description, 'label_K': oAttribute.label,'typeUI_9':oAttribute.typeUI, 'type_M': oAttribute.type, 'enumerable_N':oAttribute.enumerable,'Nico_O':false, 'Nico_P':oAttribute.specialTypeDef};
+				//var attrJSON = {"_id":fCN,"name_3":oAttribute.name, "description_4":oAttribute.description, 'label_K': oAttribute.label,'typeUI_9':oAttribute.typeUI, 'type_M': oAttribute.type, 'enumerable_N':oAttribute.enumerable,'Nico_O':false };
 				var fieldUpdatePromise=_fieldUpdate(attrJSON);
 				fieldUpdatePromise.done(function(result){FL.common.printToConsole(">>>>> updateDictionaryAttribute SUCCESS <<<<<");return def.resolve(result);});
 				fieldUpdatePromise.fail(function(err){FL.common.printToConsole(">>>>> updateDictionaryAttribute FAILURE <<<<< "+err);return def.reject(err);});

@@ -389,7 +389,7 @@ return !thiz.is_ValidDate(element); //a non empty element that is not a date -
 //This returns a date for string "Stage Paris 2014" or "2013-02-31" or "209999"
 //return moment(element).isValid() // using moment() =>refuses "2013-02-31" but accepts "Stage Paris 2014" and accepts "209999"
 }else {emptyCounter++;}return false;});if(emptyCounter == arrOfRowValues.length){ //all elements are empty
-is_date = false;}else if(_.isUndefined(failElement))is_date = true;return is_date;},is_enumerableArr:function is_enumerableArr(arrOfRowValues,percent){ //returns true arrOfRowValues can colapse to less than percent with unique values
+is_date = false;}else if(_.isUndefined(failElement))is_date = true;return is_date;},is_jsonString:function is_jsonString(str){try{JSON.parse(str);}catch(e) {return false;}return true;},is_enumerableArr:function is_enumerableArr(arrOfRowValues,percent){ //returns true arrOfRowValues can colapse to less than percent with unique values
 //normally arrOfRowValues is a sample of the whole array, only to decide if it is enumerable or not
 var is_enumerable=false;var numOfSampleRows=arrOfRowValues.length;var uniqueObj=this.extractUniqueFromArray(arrOfRowValues); //returns {empties:no_of empties,uniqueArr:uniqueArr}
 var columnPercent=(uniqueObj.uniqueArr.length - (uniqueObj.empties == 0?0:1)) / (numOfSampleRows - uniqueObj.empties);if(columnPercent < percent)is_enumerable = true;return is_enumerable;},extractUniqueFromArray:function extractUniqueFromArray(arr){ //returns object with {empties:no_of empties,uniqueArr:uniqueArr}
