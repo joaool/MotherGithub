@@ -2,23 +2,6 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="860d104d-dcc9-43ff-ba08-eee258c09f52" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/FL_ui/js/FLAPI-compiled.js.map" afterPath="$PROJECT_DIR$/FL_ui/js/FLAPI-compiled.js.map" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/FL_ui/js/FLAPI-compiled.js" afterPath="$PROJECT_DIR$/FL_ui/js/FLAPI-compiled.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/FL_ui/js/FLAPI.js" afterPath="$PROJECT_DIR$/FL_ui/js/FLAPI.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/FL_ui/js/FLCommon2-compiled.js.map" afterPath="$PROJECT_DIR$/FL_ui/js/FLCommon2-compiled.js.map" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/FL_ui/js/FLCommon2-compiled.js" afterPath="$PROJECT_DIR$/FL_ui/js/FLCommon2-compiled.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/FL_ui/js/FLCommon2.js" afterPath="$PROJECT_DIR$/FL_ui/js/FLCommon2.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/FL_ui/js/FLGrid2-compiled.js.map" afterPath="$PROJECT_DIR$/FL_ui/js/FLGrid2-compiled.js.map" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/FL_ui/js/FLGrid2-compiled.js" afterPath="$PROJECT_DIR$/FL_ui/js/FLGrid2-compiled.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/FL_ui/js/FLGrid2.js" afterPath="$PROJECT_DIR$/FL_ui/js/FLGrid2.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/FL_ui/js/FLMain-compiled.js.map" afterPath="$PROJECT_DIR$/FL_ui/js/FLMain-compiled.js.map" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/FL_ui/js/FLMain-compiled.js" afterPath="$PROJECT_DIR$/FL_ui/js/FLMain-compiled.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/FL_ui/js/FLMain.js" afterPath="$PROJECT_DIR$/FL_ui/js/FLMain.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/FL_ui/js/FLdd2-compiled.js.map" afterPath="$PROJECT_DIR$/FL_ui/js/FLdd2-compiled.js.map" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/FL_ui/js/FLdd2-compiled.js" afterPath="$PROJECT_DIR$/FL_ui/js/FLdd2-compiled.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/FL_ui/js/FLdd2.js" afterPath="$PROJECT_DIR$/FL_ui/js/FLdd2.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/libraries/Generated_files.xml" afterPath="$PROJECT_DIR$/.idea/libraries/Generated_files.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/FL_ui/js/memoryCsv.js" afterPath="$PROJECT_DIR$/FL_ui/js/memoryCsv.js" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
     </list>
     <ignored path="MotherGithub.iws" />
@@ -102,8 +85,8 @@
           <file leaf-file-name="FLAPI.js" pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/FL_ui/js/FLAPI.js">
               <provider selected="true" editor-type-id="text-editor">
-                <state vertical-scroll-proportion="0.3315508">
-                  <caret line="752" column="8" selection-start-line="752" selection-start-column="8" selection-end-line="752" selection-end-column="8" />
+                <state vertical-scroll-proportion="0.87700534">
+                  <caret line="764" column="39" selection-start-line="764" selection-start-column="39" selection-end-line="764" selection-end-column="39" />
                   <folding />
                 </state>
               </provider>
@@ -380,12 +363,18 @@
       <option name="project" value="LOCAL" />
       <updated>1437314371727</updated>
     </task>
-    <option name="localTasksCounter" value="4" />
+    <task id="LOCAL-00004" summary="version 13.45  lookup not saved in framelink database">
+      <created>1437421217158</created>
+      <option name="number" value="00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1437421217158</updated>
+    </task>
+    <option name="localTasksCounter" value="5" />
     <servers />
   </component>
   <component name="ToolWindowManager">
     <frame x="5" y="0" width="2830" height="860" extended-state="0" />
-    <editor active="false" />
+    <editor active="true" />
     <layout>
       <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.124641836" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
@@ -397,7 +386,7 @@
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.098137535" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
-      <window_info id="Debug" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.40796703" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.40796703" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="SLIDING" type="SLIDING" visible="false" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
@@ -422,7 +411,8 @@
     <MESSAGE value="test nico 7" />
     <MESSAGE value="test nico 8" />
     <MESSAGE value="version 13.45 without lookup" />
-    <option name="LAST_COMMIT_MESSAGE" value="version 13.45 without lookup" />
+    <MESSAGE value="version 13.45  lookup not saved in framelink database" />
+    <option name="LAST_COMMIT_MESSAGE" value="version 13.45  lookup not saved in framelink database" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -461,11 +451,6 @@
           <url>file://$PROJECT_DIR$/FL_ui/js/FLGrid2.js</url>
           <line>439</line>
           <option name="timeStamp" value="27" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="javascript">
-          <url>file://$PROJECT_DIR$/FL_ui/js/FLAPI.js</url>
-          <line>752</line>
-          <option name="timeStamp" value="32" />
         </line-breakpoint>
       </breakpoints>
       <breakpoints-dialog>
@@ -662,8 +647,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/FL_ui/js/FLAPI.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.3315508">
-          <caret line="752" column="8" selection-start-line="752" selection-start-column="8" selection-end-line="752" selection-end-column="8" />
+        <state vertical-scroll-proportion="0.87700534">
+          <caret line="764" column="39" selection-start-line="764" selection-start-column="39" selection-end-line="764" selection-end-column="39" />
           <folding />
         </state>
       </provider>
