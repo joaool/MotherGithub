@@ -2,7 +2,6 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="860d104d-dcc9-43ff-ba08-eee258c09f52" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/index.html" afterPath="$PROJECT_DIR$/index.html" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
     </list>
     <ignored path="MotherGithub.iws" />
@@ -86,8 +85,8 @@
           <file leaf-file-name="FLAPI.js" pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/FL_ui/js/FLAPI.js">
               <provider selected="true" editor-type-id="text-editor">
-                <state vertical-scroll-proportion="0.28960395">
-                  <caret line="751" column="92" selection-start-line="751" selection-start-column="92" selection-end-line="751" selection-end-column="92" />
+                <state vertical-scroll-proportion="0.7965261">
+                  <caret line="763" column="36" selection-start-line="763" selection-start-column="36" selection-end-line="763" selection-end-column="36" />
                   <folding />
                 </state>
               </provider>
@@ -156,7 +155,7 @@
           <file leaf-file-name="FLAPI.js" pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/FL_ui/js/FLAPI.js">
               <provider selected="true" editor-type-id="text-editor">
-                <state vertical-scroll-proportion="0.16831683">
+                <state vertical-scroll-proportion="0.16873449">
                   <caret line="1423" column="44" selection-start-line="1423" selection-start-column="44" selection-end-line="1423" selection-end-column="44" />
                   <folding />
                 </state>
@@ -370,7 +369,13 @@
       <option name="project" value="LOCAL" />
       <updated>1437421345841</updated>
     </task>
-    <option name="localTasksCounter" value="6" />
+    <task id="LOCAL-00006" summary="version 13.46  lookup uncompleted">
+      <created>1437463229280</created>
+      <option name="number" value="00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1437463229280</updated>
+    </task>
+    <option name="localTasksCounter" value="7" />
     <servers />
   </component>
   <component name="ToolWindowManager">
@@ -379,6 +384,7 @@
     <layout>
       <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.124641836" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
+      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="Application Servers" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32994187" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
@@ -386,9 +392,8 @@
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.098137535" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
-      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.4074074" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.40796703" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
-      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="SLIDING" type="SLIDING" visible="false" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
@@ -413,7 +418,8 @@
     <MESSAGE value="test nico 8" />
     <MESSAGE value="version 13.45 without lookup" />
     <MESSAGE value="version 13.45  lookup not saved in framelink database" />
-    <option name="LAST_COMMIT_MESSAGE" value="version 13.45  lookup not saved in framelink database" />
+    <MESSAGE value="version 13.46  lookup uncompleted" />
+    <option name="LAST_COMMIT_MESSAGE" value="version 13.46  lookup uncompleted" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -754,8 +760,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/FL_ui/js/FLAPI.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.28960395">
-          <caret line="751" column="92" selection-start-line="751" selection-start-column="92" selection-end-line="751" selection-end-column="92" />
+        <state vertical-scroll-proportion="0.7965261">
+          <caret line="763" column="36" selection-start-line="763" selection-start-column="36" selection-end-line="763" selection-end-column="36" />
           <folding />
         </state>
       </provider>
