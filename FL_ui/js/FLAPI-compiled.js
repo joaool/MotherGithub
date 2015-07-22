@@ -1,7 +1,7 @@
 // jQuery(document).ready(function($){
 /**
-	* data dictionary UI methods 
-	*/ // FL = FL || {}; //gives undefined if FL is undefined 
+ * data dictionary UI methods
+ */ // FL = FL || {}; //gives undefined if FL is undefined 
 // FL = {};
 // // a="A";
 // b="B";
@@ -217,8 +217,8 @@ success = FL.dd.createEntity(entities[i].d["3"],entities[i].d["4"]); //singular,
 oEntity = FL.dd.entities[entities[i].d["3"]];oEntity.plural = entities[i].d["E"];oEntity.csingular = entities[i]._id; // FL.common.printToConsole("--- *** fields *** ---");
 for(var fieldIndex=0;fieldIndex < entities[i].fields.length;fieldIndex++) { //boucle fields
 // FL.common.printToConsole("--->field fCN=" + entities[i].fields[fieldIndex]._id + " fieldName=" + entities[i].fields[fieldIndex].d["3"] );
-FL.dd.addAttribute(entities[i].d["3"],entities[i].fields[fieldIndex].d["3"],entities[i].fields[fieldIndex].d["4"],entities[i].fields[fieldIndex].d["K"],entities[i].fields[fieldIndex].d["M"],entities[i].fields[fieldIndex].d["9"],entities[i].fields[fieldIndex].d["N"]); //("order","shipped","expedition status","Shipped","boolean",null)
-//addAttribute uses a local compressed name. Now we have to force the field compressed name comming from server								
+//{"_id":fCN,"name_3":oAttribute.name, "description_4":oAttribute.description, 'label_K': oAttribute.label,'typeUI_9':oAttribute.typeUI, 'type_M': oAttribute.type, 'enumerable_N':oAttribute.enumerable,'Nico_O':false, 'Nico_P':oAttribute.specialTypeDef};
+FL.dd.addAttribute(entities[i].d["3"],entities[i].fields[fieldIndex].d["3"],entities[i].fields[fieldIndex].d["4"],entities[i].fields[fieldIndex].d["K"],entities[i].fields[fieldIndex].d["M"],entities[i].fields[fieldIndex].d["9"],entities[i].fields[fieldIndex].d["N"],null,entities[i].fields[fieldIndex].d["P"]); //addAttribute uses a local compressed name. Now we have to force the field compressed name comming from server								
 FL.dd.setFieldCompressedName(entities[i].d["3"],entities[i].fields[fieldIndex].d["3"],entities[i].fields[fieldIndex]._id);} // FL.common.printToConsole("--- *** relations *** ---");
 var rCN=null;var relationName=null;var withEntityCN=null;var side=null;var verb=null;var cardinality=null;var semantic=null;var storedHere=null;var relation=null;oEntity.relations = [];for(var relationIndex=0;relationIndex < entities[i].relations.length;relationIndex++) { //boucle relations
 // FL.common.printToConsole("--->relation  rCN=" + entities[i].relations[relationIndex]._id );

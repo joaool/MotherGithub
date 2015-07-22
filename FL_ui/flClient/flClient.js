@@ -46,7 +46,7 @@ TODO
             // mandatory fields for insert, with minimum count
             {'1':1, '3':1, '4':1, 'K':1, 'M':1, '9':1},
             // updatable -1 means forgot everything in the array
-            {'3':0, '4':0, 'K':0, 'M':0, 'N':-1, 'O':1, '9':0, 'P':0},  // optionsname has to be added here
+            {'3':0, '4':0, 'K':0, 'M':0, 'N':0, 'O':1, '9':0, 'P':0},  // optionsname has to be added here
             // default projection
             {'_id':1, '1':1, '3':1, '4':1, 'K':1, 'M':1, 'N':1, 'O':1, '9':1, 'P':1}  // also used in entity.js
         ],
@@ -1191,11 +1191,11 @@ TODO
             return v;
         })
         //console.dir(rslt);
-        for(var k in rslt){
-            //console.log(k +':'+ rslt[k] + ' == ' + sysParam[ind][1][k]);
-            if(sysParam[ind][1][k]== undefined)
-                return false;
-        }
+        //for(var k in rslt){
+        //    //console.log(k +':'+ rslt[k] + ' == ' + sysParam[ind][1][k]);
+        //    if(sysParam[ind][1][k]== undefined)
+        //        return false;
+        //}
         return true;
     }
     function getDefaultProjection(ind)

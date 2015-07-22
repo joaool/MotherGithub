@@ -328,15 +328,19 @@ FL["grid"] = (function () {//name space FL.grid
                             FL.dd.t.entities.dumpToConsole();
                             var currentECN = FL.dd.getCEntity(entityName);
                             var currentFCN = FL.dd.t.entities[currentECN].getCName(currentAttribute);
-                            var lookupStr = FL.dd.t.entities[currentECN].fields[currentFCN].specialTypeDef;
+                            var lookupArr = FL.dd.t.entities[currentECN].fields[currentFCN].specialTypeDef;
                             var lookupTypeStr = "Invalid format";
-                            if (lookupStr) {
-                                if (FL.common.is_jsonString(lookupStr)) {
-                                    var lookupObj = JSON.parse(lookupStr);
-                                    lookupTypeStr = lookupObj.eCN + "," + lookupObj.fCN //loojupObj format is {eCN:<entity compressed name>, fCN:<field compressed name>}
+                            if (lookupArr) {
+                                if (FL.common.typeOf(lookupArr) == "array") {
+                                    var lookupObj = lookupArr[0];
+                                    if (FL.common.typeOf(lookupObj) == "object") {
+                                        lookupTypeStr = lookupObj.eCN + "," + lookupObj.fCN;//loojupObj format is {eCN:<entity compressed name>, fCN:<field compressed name>}
+                                    }
                                 }
-                            };
-                        };
+                            }
+                            ;
+                        }
+                        ;
                         var masterDetailListItems = {master: {special: lookupTypeStr}};
                         var enumOptions = {
                             type: "primary",
@@ -349,9 +353,11 @@ FL["grid"] = (function () {//name space FL.grid
                                 // alert("The list is ->"+masterDetailListItems.master.list);
                                 var specialTypeDef = masterDetailListItems.master.special;
                                 //save into the data dictionary
-                                var specialDefArr = specialTypeDef.split(",");
-                                var specialObj = {eCN: specialDefArr[0], fCN: specialDefArr[1]};
-                                FL.dd.t.entities[currentECN].fields[currentFCN].setField({specialTypeDef: JSON.stringify(specialObj)});
+                                var specialDefTemporaryArr = specialTypeDef.split(",");
+                                var specialObj = {eCN: specialDefTemporaryArr[0], fCN: specialDefTemporaryArr[1]};
+                                var specialArr = [];
+                                specialArr.push(specialObj);
+                                FL.dd.t.entities[currentECN].fields[currentFCN].setField({specialTypeDef: specialArr});
                                 var z = 32;
                             }
 
@@ -990,8 +996,12 @@ FL["grid"] = (function () {//name space FL.grid
         FL.dd.init_t();//to init the temporary subsystem
         _.each(oLayout.format, function (element) {//each element of oLayout.format array is like {fCN:"50","1st Column",width:20,nestingArr:[]}
             var field = FL.dd.t.entities[oLayout.baseTable].fields[element.fCN];
-            if (field.typeUI == "lookupbox")
-                lookupObj = field.specialTypeDef;//{eCN:<entity compressed name>, fCN:<field compressed name>}
+            if (field.typeUI == "lookupbox") {
+                var lookupArr = field.specialTypeDef;//{eCN:<entity compressed name>, fCN:<field compressed name>}
+                if (FL.common.typeOf(lookupArr) == "array") {
+                    lookupObj = lookupArr[0];//{eCN:<entity compressed name>, fCN:<field compressed name>}
+                }
+            }
         });
         return lookupObj;
     };
@@ -1547,10 +1557,9 @@ FL["grid"] = (function () {//name space FL.grid
                         var gridLayout = FL.bg.getGridDefaultLayout(eCN);
                         //gridLayout={baseTable:"5M",format:[{fCN:"50",label:"1st Column",width:20,nestingArr:[]},{fCN:"5P",label:"2st Column",width:30,nestingArr:[]},
                         //			{fCN:"5Q",label:"3st Column",width:10,nestingArr:[]}] }
-                        var lookupStr = getLookupInGrid(gridLayout);
-                        if (lookupStr) {
+                        var lookupObj = getLookupInGrid(gridLayout);
+                        if (lookupObj) {
                             console.log("1367 Lookup !");
-                            var lookupObj = JSON.parse(lookupStr);
                             var lookupECN = lookupObj.eCN; //"6A";//field.specialTypeDef.eCN;
                             var openPromise = FL.API.openTable(lookupECN);
                             openPromise.done(function (dataArray) {
