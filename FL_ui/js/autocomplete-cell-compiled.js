@@ -45,6 +45,7 @@
         events: {},
         initialize: function initialize(options) {
             Backgrid.InputCellEditor.prototype.initialize.apply(this, arguments);
+            //var lookupObj = AutocompleteCellEditor.prototype.lookupObj;
             this.autocompleteUrl = options.column.get("autocompleteUrl");
             if (this.autocompleteUrl[this.autocompleteUrl.length] != "/") this.autocompleteUrl += "/";
             this.minTermLength = options.column.get("minTermLength");

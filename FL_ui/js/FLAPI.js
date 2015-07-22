@@ -808,7 +808,7 @@ FL["API"] = (function () {//name space FL.API
             for (var fieldIndex = 0; fieldIndex < entities[i].fields.length; fieldIndex++) {//boucle fields
                 // FL.common.printToConsole("--->field fCN=" + entities[i].fields[fieldIndex]._id + " fieldName=" + entities[i].fields[fieldIndex].d["3"] );
                 //{"_id":fCN,"name_3":oAttribute.name, "description_4":oAttribute.description, 'label_K': oAttribute.label,'typeUI_9':oAttribute.typeUI, 'type_M': oAttribute.type, 'enumerable_N':oAttribute.enumerable,'Nico_O':false, 'Nico_P':oAttribute.specialTypeDef};
-                FL.dd.addAttribute(entities[i].d["3"], entities[i].fields[fieldIndex].d["3"], entities[i].fields[fieldIndex].d["4"], entities[i].fields[fieldIndex].d["K"], entities[i].fields[fieldIndex].d["M"], entities[i].fields[fieldIndex].d["9"], entities[i].fields[fieldIndex].d["N"],null,entities[i].fields[fieldIndex].d["P"]);
+                FL.dd.addAttribute(entities[i].d["3"], entities[i].fields[fieldIndex].d["3"], entities[i].fields[fieldIndex].d["4"], entities[i].fields[fieldIndex].d["K"], entities[i].fields[fieldIndex].d["M"], entities[i].fields[fieldIndex].d["9"], entities[i].fields[fieldIndex].d["N"], null, entities[i].fields[fieldIndex].d["P"]);
                 //addAttribute uses a local compressed name. Now we have to force the field compressed name comming from server								
                 FL.dd.setFieldCompressedName(entities[i].d["3"], entities[i].fields[fieldIndex].d["3"], entities[i].fields[fieldIndex]._id);
             }
@@ -2105,26 +2105,34 @@ FL["API"] = (function () {//name space FL.API
             loadPromise.done(function (dataArray) {
                 //dataArray format--> [{"_id":1,"d":{"53":"line 1 content of field1","54":"line 1 content of field2"},"v":0},...]
                 FL.common.printToConsole(">>>>> openTable SUCCESS <<<<< ", "API");
-                // var tableOBj = {
-                // 	id: function(id){
-                // 		alert("openTable[<>].id()"+id);
-                // 		return def.resolve(dataArray[id]);
-                // 	},
-                // 	search: function(searchObj){//searchObj 
-                // 		format
-                // 		// equality condition { <fCN>: <value> } to select all documents that contain the <fCN> with the specified <value>
-                // 		// or condition { <fCN>:$in: [ <value1>,<value2>] } } to select all documents that contain the <fCN> with values <value1> or <value2>
-                // 		alert("openTable[<>].search()"+JSON.stringify(searchObj));
-                // 		return def.resolve();
-                // 	},						
-                // };
-                def.resolve(dataArray);
+                var tableObj = {
+                    getId: function (id) {//returns the record with _id=id
+                        //example FL.API.openTable("6A").getId("55a3ab0a3906b70f79d02bf4") => JSON with all fCN:content
+                        //example FL.API.openTable("6A").getId("55a3ab0a3906b70f79d02bf4")["6C"]=>"Microsoft"
+                        var recordEl = _.find(this.data, function (element) {
+                            return element._id == id;
+                        });
+                        if (_.isUndefined(recordEl)) {
+                            recordEl = null;
+                        }
+                        return recordEl.d;//returns a JSON with {fCN1:<content1>,fCN2:<content2>,...fCNn:<contentn>]
+                    },
+                    getColumn: function (fCN) {//returns an array with the content of fCN of each record
+                         //var colArr = _.pluck(this.data, fCN);//cannot be used because of d.fCN
+                        var colArr = [];
+                        _.each(this.data, function(element){
+                            colArr.push(element.d[fCN]);
+                          });
+                        return colArr;
+                    },
+                    data: dataArray
+                };
+                 def.resolve(tableObj);
             });
             loadPromise.fail(function (err) {
                 FL.common.printToConsole(">>>>> openTable FAILURE <<<<<" + err);
                 def.reject(err);
             });
-
             return def.promise();
         },
         loadTableId: function (entityName, field2) {//returns only the _id field and optionally a second field from server
@@ -2158,7 +2166,8 @@ FL["API"] = (function () {//name space FL.API
                 def.reject(err);
             });
             return def.promise();
-        },
+        }
+        ,
         syncLocalStoreToServer: function () {//saves menu,style and font to server, retrieving them from localStore
             var def = $.Deferred();
             var lastMenuStr = localStorage.storedMenu
@@ -2183,7 +2192,8 @@ FL["API"] = (function () {//name space FL.API
             // 	// alert("FLMenu2.js saveMenuToLocalAndServer called FL.server.saveMainMenu with style="+lastStyleStr+ " font="+lastFontFamilyStr);
             // });
             return def.promise();
-        },
+        }
+        ,
         XcreateHistoMails_ifNotExisting: function () {//checks if histoMails exist. If not creates it
             var eCN = FL.dd.getCEntity("_histoMail");
             // eCN = 23;
@@ -2208,7 +2218,8 @@ FL["API"] = (function () {//name space FL.API
                 def.resolve();//it exists already
             }
             return def.promise();
-        },
+        }
+        ,
         createTableHistoMails_ifNotExisting: function (entityName) {// createHistoMails_ifNotExisting: function(entityName) {//creates "_histoMail_<eCN>" where eCN is the Entity Compressed name of entityName
             //Note: entityName must exist
             var def = $.Deferred();
@@ -2239,7 +2250,8 @@ FL["API"] = (function () {//name space FL.API
                 }
             }
             return def.promise();
-        },
+        }
+        ,
         createTemplates_ifNotExisting: function () {//checks if templates exist. If not creates it
             var eCN = FL.dd.getCEntity("_templates");
             // eCN = 23;
@@ -2264,7 +2276,8 @@ FL["API"] = (function () {//name space FL.API
                 def.resolve();//it exists already
             }
             return def.promise();
-        },
+        }
+        ,
         mailRecipientsOfTemplate: function (entityName, templateName) {//for list entityName and templateName returns all emails received in Webhook
             //assumes a login to an application exists
             FL.common.printToConsole("....................................>beginning mailRecipientsOfTemplate....with appToken=" + JSON.stringify(FL.login.appToken));
@@ -2302,7 +2315,8 @@ FL["API"] = (function () {//name space FL.API
                 def.reject(err);
             });
             return def.promise();
-        },
+        }
+        ,
         upsertByKey: function (keyFieldValue, entityName, record) {
             //upsert record for <keyField>=<keyFieldValue> in table entityName
             //record is a JSON that may contain _id key ex: {"_id":12345,"id":1,"code":"abc"}
@@ -2314,13 +2328,13 @@ FL["API"] = (function () {//name space FL.API
                 return def.reject("upsertByKey table=" + entityName + " does not exist in local dict !");
             } else {//the table exists in local dict but may be unsynchronized
                 var oEntity = FL.dd.entities[entityName];
-                if (!oEntity.sync) {//table exists in local dict but is not in sync with server	
+                if (!oEntity.sync) {//table exists in local dict but is not in sync with server
                     FL.common.printToConsole("........FL.API.upsertByKey() table=" + entityName + " exists in local dict but is not in sync");
                     return def.reject("upsertByKey table=" + entityName + " not in sync");//
                 } else {//table exists and is in sync
                     FL.common.printToConsole("........FL.API.upsertByKey() table=" + entityName + " is ok. We will upsert!");
                     // var _id = record["_id"];//it can be null or existing
-                    var recordWithFCN = convertOneRecordTo_arrToSend(entityName, record);//returns {"d":{"51":"cli1","52":"Lx","53":"Pt"}} 
+                    var recordWithFCN = convertOneRecordTo_arrToSend(entityName, record);//returns {"d":{"51":"cli1","52":"Lx","53":"Pt"}}
                     var upsertPromise = this.upsertByKeyOnECN(keyFieldValue, eCN, recordWithFCN.d);
                     upsertPromise.done(function () {
                         FL.common.printToConsole(">>>>> FL.API.upsertByKey() upsertPromise SUCCESS <<<<< record updated!");
@@ -2333,7 +2347,8 @@ FL["API"] = (function () {//name space FL.API
                 }
             }
             return def.promise();
-        },
+        }
+        ,
         upsertByKeyOnECN: function (keyFieldValue, eCN, recordWithFCN) {//upsert for <keyField>=<keyFieldValue>for list entityName and templateName returns all emails received in Webhook
             //if _id exists =>direct update
             //upsert record with field compressed names  for <fCNkey>=<keyFieldValue> in table with compressed name eCN
@@ -2351,7 +2366,8 @@ FL["API"] = (function () {//name space FL.API
                     return def.reject("upsertByKeyOnECN with _id unable to insert err=" + err);
                 });
             return def.promise();
-        },
+        }
+        ,
         mandrillRejectListForSender: function (senderEmail) {//get reject list from mandrill only for sender=sender
             FL.common.printToConsole("....................................>beginning mandrillRejectListForSender....with appToken=" + JSON.stringify(FL.login.appToken));
             var def = $.Deferred();
@@ -2364,7 +2380,8 @@ FL["API"] = (function () {//name space FL.API
                     return def.reject("mandrillRejectListForSender FAILURE err=" + err);
                 });
             return def.promise();
-        },
+        }
+        ,
         mandrillDeleteFromReject: function (arrayOfEmails) {//get reject list from mandrill only for sender=sender
             FL.common.printToConsole("....................................>beginning mandrillDeleteFromReject....with appToken=" + JSON.stringify(FL.login.appToken));
             var def = $.Deferred();
@@ -2377,7 +2394,8 @@ FL["API"] = (function () {//name space FL.API
                     return def.reject("mandrillDeleteFromReject FAILURE err=" + err);
                 });
             return def.promise();
-        },
+        }
+        ,
         customTable: function (entityProps) {
             // Ex FL.API.customTable({singular:"shipment"});
             //uses --> FL.dd.createEntity("sales rep","employee responsable for sales");
@@ -2427,7 +2445,8 @@ FL["API"] = (function () {//name space FL.API
             // def.reject();//to test
             return def.promise();
             // alert("FL.server.test() -->"+x);
-        },
+        }
+        ,
         getFLContextFromBrowserLocationBar: function () {//to be used at the entry point of independent applications
             //reads the browser adress bar to get the connection string then connects to the default application
             var def = $.Deferred();
@@ -2439,7 +2458,7 @@ FL["API"] = (function () {//name space FL.API
                 var connectionString = FL.common.getTag(fullUrl, "connectionString", "#");
                 if (connectionString) {
                     connectionString = FL.common.enc(connectionString, -1);
-                    var loginObject = JSON.parse(connectionString);//ex {"email":"toto114@toto.com","userName":"","password":"123"}				
+                    var loginObject = JSON.parse(connectionString);//ex {"email":"toto114@toto.com","userName":"","password":"123"}
 
                     var fl = new flMain();//only place where this must exist !!!!
                     FL.fl = fl;
@@ -2464,16 +2483,21 @@ FL["API"] = (function () {//name space FL.API
                 }
             }
             return def.promise();
-        },
+        }
+        ,
         nicoTestDuplicateIds: function (arrToTest) {
             return nicoTestDuplicateIds(arrToTest);
-        },
+        }
+        ,
         nicoTestDuplicateIds: function (arrToTest) {
             return nicoTestDuplicateIds(arrToTest);
-        },
+        }
+        ,
         testFunc: function (x) {
             alert("FL.server.test() -->" + x);
         }
-    };
-})();
+    }
+        ;
+})
+();
 // });

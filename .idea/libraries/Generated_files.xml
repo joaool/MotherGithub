@@ -2,10 +2,12 @@
   <library name="Generated files" type="javaScript">
     <properties>
       <sourceFilesUrls>
+        <item url="file://$PROJECT_DIR$/FL_ui/js/FLbackgrid2-compiled.js" />
         <item url="file://$PROJECT_DIR$/mailer/js/lib/ckeditor/config-compiled-compiled.js" />
         <item url="file://$PROJECT_DIR$/mailer/js/View/PropertyPanels/TitlePanel-compiled-compiled.js" />
         <item url="file://$PROJECT_DIR$/mailer/js/View/PropertyPanels/StyleTab-compiled-compiled.js" />
         <item url="file://$PROJECT_DIR$/mailer/js/View/TemplateElements/ImageElement-compiled-compiled.js" />
+        <item url="file://$PROJECT_DIR$/FL_ui/js/autocomplete-cell-compiled.js" />
         <item url="file://$PROJECT_DIR$/mailer/js/lib/ckeditor/plugins/smiley/dialogs/smiley-compiled-compiled.js" />
         <item url="file://$PROJECT_DIR$/FL_ui/js/FLCommon2-compiled.js" />
         <item url="file://$PROJECT_DIR$/FL_ui/js/FLdd2-compiled.js" />
@@ -16,14 +18,17 @@
         <item url="file://$PROJECT_DIR$/mailer/js/lib/jquery-ui-timepicker-compiled-compiled.js" />
         <item url="file://$PROJECT_DIR$/FL_ui/flClient/flClient-compiled.js" />
         <item url="file://$PROJECT_DIR$/FL_ui/js/FLGrid2-compiled.js" />
+        <item url="file://$PROJECT_DIR$/FL_ui/js/xautocomplete-cell-compiled.js" />
         <item url="file://$PROJECT_DIR$/FL_ui/js/tests/unit/menu-login-compiled-compiled.js" />
       </sourceFilesUrls>
     </properties>
     <CLASSES>
+      <root url="file://$PROJECT_DIR$/FL_ui/js/FLbackgrid2-compiled.js" />
       <root url="file://$PROJECT_DIR$/mailer/js/lib/ckeditor/config-compiled-compiled.js" />
       <root url="file://$PROJECT_DIR$/mailer/js/View/PropertyPanels/TitlePanel-compiled-compiled.js" />
       <root url="file://$PROJECT_DIR$/mailer/js/View/PropertyPanels/StyleTab-compiled-compiled.js" />
       <root url="file://$PROJECT_DIR$/mailer/js/View/TemplateElements/ImageElement-compiled-compiled.js" />
+      <root url="file://$PROJECT_DIR$/FL_ui/js/autocomplete-cell-compiled.js" />
       <root url="file://$PROJECT_DIR$/mailer/js/lib/ckeditor/plugins/smiley/dialogs/smiley-compiled-compiled.js" />
       <root url="file://$PROJECT_DIR$/FL_ui/js/FLCommon2-compiled.js" />
       <root url="file://$PROJECT_DIR$/FL_ui/js/FLdd2-compiled.js" />
@@ -34,6 +39,7 @@
       <root url="file://$PROJECT_DIR$/mailer/js/lib/jquery-ui-timepicker-compiled-compiled.js" />
       <root url="file://$PROJECT_DIR$/FL_ui/flClient/flClient-compiled.js" />
       <root url="file://$PROJECT_DIR$/FL_ui/js/FLGrid2-compiled.js" />
+      <root url="file://$PROJECT_DIR$/FL_ui/js/xautocomplete-cell-compiled.js" />
       <root url="file://$PROJECT_DIR$/FL_ui/js/tests/unit/menu-login-compiled-compiled.js" />
     </CLASSES>
     <SOURCES />

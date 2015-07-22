@@ -1562,10 +1562,10 @@ FL["grid"] = (function () {//name space FL.grid
                             console.log("1367 Lookup !");
                             var lookupECN = lookupObj.eCN; //"6A";//field.specialTypeDef.eCN;
                             var openPromise = FL.API.openTable(lookupECN);
-                            openPromise.done(function (dataArray) {
+                            openPromise.done(function (lookupTableObj) {
                                 FL.common.printToConsole(">>>>>displayDefaultGrid openTable SUCCESS <<<<< ", "API");
                                 spinner.stop();
-                                var columnsArr = FL.bg.setupGridColumnsArr(gridLayout, dataArray);
+                                var columnsArr = FL.bg.setupGridColumnsArr(gridLayout, lookupTableObj);
                                 mountGridFromColumnsArr(columnsArr, eCN);
                             });
                             openPromise.fail(function (err) {

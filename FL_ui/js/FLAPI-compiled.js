@@ -556,20 +556,13 @@ loadTable.done(function(dataArray){FL.common.printToConsole(">>>>> loadTableByCN
 // use openTable("50").id("1")["53"] - returns "line 1 content of field1"
 // use openTable("50").search({"63":"jojo"}).read["63"]
 FL.common.printToConsole("....................................>beginning loadTableByCN....with appToken=" + JSON.stringify(FL.login.appToken));var def=$.Deferred();var loadPromise=this.loadTableByCN(eCN);loadPromise.done(function(dataArray){ //dataArray format--> [{"_id":1,"d":{"53":"line 1 content of field1","54":"line 1 content of field2"},"v":0},...]
-FL.common.printToConsole(">>>>> openTable SUCCESS <<<<< ","API"); // var tableOBj = {
-// 	id: function(id){
-// 		alert("openTable[<>].id()"+id);
-// 		return def.resolve(dataArray[id]);
-// 	},
-// 	search: function(searchObj){//searchObj 
-// 		format
-// 		// equality condition { <fCN>: <value> } to select all documents that contain the <fCN> with the specified <value>
-// 		// or condition { <fCN>:$in: [ <value1>,<value2>] } } to select all documents that contain the <fCN> with values <value1> or <value2>
-// 		alert("openTable[<>].search()"+JSON.stringify(searchObj));
-// 		return def.resolve();
-// 	},						
-// };
-def.resolve(dataArray);});loadPromise.fail(function(err){FL.common.printToConsole(">>>>> openTable FAILURE <<<<<" + err);def.reject(err);});return def.promise();},loadTableId:function loadTableId(entityName,field2){ //returns only the _id field and optionally a second field from server
+FL.common.printToConsole(">>>>> openTable SUCCESS <<<<< ","API");var tableObj={getId:function getId(id){ //returns the record with _id=id
+//example FL.API.openTable("6A").getId("55a3ab0a3906b70f79d02bf4") => JSON with all fCN:content
+//example FL.API.openTable("6A").getId("55a3ab0a3906b70f79d02bf4")["6C"]=>"Microsoft"
+var recordEl=_.find(this.data,function(element){return element._id == id;});if(_.isUndefined(recordEl)){recordEl = null;}return recordEl.d; //returns a JSON with {fCN1:<content1>,fCN2:<content2>,...fCNn:<contentn>]
+},getColumn:function getColumn(fCN){ //returns an array with the content of fCN of each record
+//var colArr = _.pluck(this.data, fCN);//cannot be used because of d.fCN
+var colArr=[];_.each(this.data,function(element){colArr.push(element.d[fCN]);});return colArr;},data:dataArray};def.resolve(tableObj);});loadPromise.fail(function(err){FL.common.printToConsole(">>>>> openTable FAILURE <<<<<" + err);def.reject(err);});return def.promise();},loadTableId:function loadTableId(entityName,field2){ //returns only the _id field and optionally a second field from server
 //assumes a login to an application exists
 FL.common.printToConsole("....................................>beginning loadTableId....with appToken=" + JSON.stringify(FL.login.appToken));var def=$.Deferred();var ecn=FL.dd.getCEntity(entityName);if(!ecn){alert("Error in FL.API.loadTableId the table <<" + entityName + ">> not in local dictiionary!");return def.reject("Error in FL.API.loadTableId the table <<" + entityName + ">> not in local dictiionary!");}var projections={"_id":1};if(field2){var fCN=FL.dd.getFieldCompressedName(entityName,field2);projections[fCN] = 1;} // var loadTableId=_findAll(ecn,{},{"_id":1});
 var loadTableId=_findAll(ecn,{},projections);loadTableId.done(function(dataArray){FL.common.printToConsole(">>>>> loadTableId SUCCESS <<<<< "); //dataArray has a format: [{"_id":1,"d":{"53":"line 1 content of field1","54":"line 1 content of field2"},"v":0},
@@ -618,11 +611,11 @@ mailRecipientsTable.done(function(data){FL.common.printToConsole(">>>>> mailReci
 var xObj=element.d[fCN];return xObj.email;});def.resolve(recipientsArray);});mailRecipientsTable.fail(function(err){FL.common.printToConsole(">>>>> mailRecipientsOfTemplate FAILURE <<<<<" + err);def.reject(err);});return def.promise();},upsertByKey:function upsertByKey(keyFieldValue,entityName,record){ //upsert record for <keyField>=<keyFieldValue> in table entityName
 //record is a JSON that may contain _id key ex: {"_id":12345,"id":1,"code":"abc"}
 FL.common.printToConsole("....................................>beginning upsertByKey....with appToken=" + JSON.stringify(FL.login.appToken));var def=$.Deferred();var eCN=FL.dd.getCEntity(entityName);if(eCN === null){FL.common.printToConsole("........FL.API.upsertByKey() table=" + entityName + " not in local dict !");return def.reject("upsertByKey table=" + entityName + " does not exist in local dict !");}else { //the table exists in local dict but may be unsynchronized
-var oEntity=FL.dd.entities[entityName];if(!oEntity.sync){ //table exists in local dict but is not in sync with server	
+var oEntity=FL.dd.entities[entityName];if(!oEntity.sync){ //table exists in local dict but is not in sync with server
 FL.common.printToConsole("........FL.API.upsertByKey() table=" + entityName + " exists in local dict but is not in sync");return def.reject("upsertByKey table=" + entityName + " not in sync"); //
 }else { //table exists and is in sync
 FL.common.printToConsole("........FL.API.upsertByKey() table=" + entityName + " is ok. We will upsert!"); // var _id = record["_id"];//it can be null or existing
-var recordWithFCN=convertOneRecordTo_arrToSend(entityName,record); //returns {"d":{"51":"cli1","52":"Lx","53":"Pt"}} 
+var recordWithFCN=convertOneRecordTo_arrToSend(entityName,record); //returns {"d":{"51":"cli1","52":"Lx","53":"Pt"}}
 var upsertPromise=this.upsertByKeyOnECN(keyFieldValue,eCN,recordWithFCN.d);upsertPromise.done(function(){FL.common.printToConsole(">>>>> FL.API.upsertByKey() upsertPromise SUCCESS <<<<< record updated!");return def.resolve();});upsertPromise.fail(function(err){FL.common.printToConsole(">>>>> FL.API.upsertByKey() upsertPromise FAILURE <<<<<" + err);return def.reject(err);});}}return def.promise();},upsertByKeyOnECN:function upsertByKeyOnECN(keyFieldValue,eCN,recordWithFCN){ //upsert for <keyField>=<keyFieldValue>for list entityName and templateName returns all emails received in Webhook
 //if _id exists =>direct update
 //upsert record with field compressed names  for <fCNkey>=<keyFieldValue> in table with compressed name eCN
@@ -652,7 +645,7 @@ return def.promise(); // alert("FL.server.test() -->"+x);
 },getFLContextFromBrowserLocationBar:function getFLContextFromBrowserLocationBar(){ //to be used at the entry point of independent applications
 //reads the browser adress bar to get the connection string then connects to the default application
 var def=$.Deferred();if(FL.API.isConnected()){ // alert("getFLContextFromBrowserLocationBar --> independent app already connected !!! how is this possible ?");
-def.reject("getFLContextFromBrowserLocationBar --> independent app already connected !!! how is this possible ?");}else {var fullUrl=window.location.href;var connectionString=FL.common.getTag(fullUrl,"connectionString","#");if(connectionString){connectionString = FL.common.enc(connectionString,-1);var loginObject=JSON.parse(connectionString); //ex {"email":"toto114@toto.com","userName":"","password":"123"}				
+def.reject("getFLContextFromBrowserLocationBar --> independent app already connected !!! how is this possible ?");}else {var fullUrl=window.location.href;var connectionString=FL.common.getTag(fullUrl,"connectionString","#");if(connectionString){connectionString = FL.common.enc(connectionString,-1);var loginObject=JSON.parse(connectionString); //ex {"email":"toto114@toto.com","userName":"","password":"123"}
 var fl=new flMain(); //only place where this must exist !!!!
 FL.fl = fl;fl.serverName(FL.common.getServerName());var spinner=FL.common.loaderAnimationON("spinnerDiv");var connectionPromise=FL.API.connectUserToDefaultApp(loginObject.email,loginObject.password) // .then(function(){return appSetup(loginObject);})
 .then(function(){spinner.stop();FL.common.printToConsole(">>>>> getFLContextFromBrowserLocationBar -> SUCCESS connecting to default app !<<<<< ");FL.common.printToConsole("after connection->" + JSON.stringify(FL.login.token));def.resolve();},function(err){spinner.stop();FL.common.printToConsole(">>>>> getFLContextFromBrowserLocationBar FAILURE <<<<<" + err);def.reject(err);});}else {alert("getFrameLinkContext --> No connectionString available !!!");return;}}return def.promise();},nicoTestDuplicateIds:function nicoTestDuplicateIds(arrToTest){return _nicoTestDuplicateIds(arrToTest);},nicoTestDuplicateIds:function nicoTestDuplicateIds(arrToTest){return _nicoTestDuplicateIds(arrToTest);},testFunc:function testFunc(x){alert("FL.server.test() -->" + x);}};})(); // });

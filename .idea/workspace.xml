@@ -1,18 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="860d104d-dcc9-43ff-ba08-eee258c09f52" name="Default" comment="">
+    <list default="true" id="860d104d-dcc9-43ff-ba08-eee258c09f52" name="Default" comment="version 13.46 specialTypeDef - edition complete - Works with server">
+      <change type="DELETED" beforePath="C:\src\MotherGithub\FL_ui\js\autocomplete-cell.js" afterPath="" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/FL_ui/js/FLAPI-compiled.js.map" afterPath="$PROJECT_DIR$/FL_ui/js/FLAPI-compiled.js.map" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/FL_ui/js/FLAPI-compiled.js" afterPath="$PROJECT_DIR$/FL_ui/js/FLAPI-compiled.js" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/FL_ui/js/FLAPI.js" afterPath="$PROJECT_DIR$/FL_ui/js/FLAPI.js" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/FL_ui/js/FLGrid2-compiled.js.map" afterPath="$PROJECT_DIR$/FL_ui/js/FLGrid2-compiled.js.map" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/FL_ui/js/FLGrid2-compiled.js" afterPath="$PROJECT_DIR$/FL_ui/js/FLGrid2-compiled.js" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/FL_ui/js/FLGrid2.js" afterPath="$PROJECT_DIR$/FL_ui/js/FLGrid2.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/FL_ui/js/FLbackgrid2-compiled.js.map" afterPath="$PROJECT_DIR$/FL_ui/js/FLbackgrid2-compiled.js.map" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/FL_ui/js/FLbackgrid2-compiled.js" afterPath="$PROJECT_DIR$/FL_ui/js/FLbackgrid2-compiled.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/FL_ui/js/FLbackgrid2.js" afterPath="$PROJECT_DIR$/FL_ui/js/FLbackgrid2.js" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/FL_ui/js/FLdd2-compiled.js.map" afterPath="$PROJECT_DIR$/FL_ui/js/FLdd2-compiled.js.map" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/FL_ui/js/FLdd2-compiled.js" afterPath="$PROJECT_DIR$/FL_ui/js/FLdd2-compiled.js" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/FL_ui/js/FLdd2.js" afterPath="$PROJECT_DIR$/FL_ui/js/FLdd2.js" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/libraries/Generated_files.xml" afterPath="$PROJECT_DIR$/.idea/libraries/Generated_files.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/FL_ui/flClient/flClient.js" afterPath="$PROJECT_DIR$/FL_ui/flClient/flClient.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/FL_ui/js/autocomplete-cell-compiled.js.map" afterPath="$PROJECT_DIR$/FL_ui/js/autocomplete-cell-compiled.js.map" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/FL_ui/js/autocomplete-cell-compiled.js" afterPath="$PROJECT_DIR$/FL_ui/js/autocomplete-cell-compiled.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/index.html" afterPath="$PROJECT_DIR$/index.html" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
     </list>
     <ignored path="MotherGithub.iws" />
@@ -36,11 +42,11 @@
     <splitter split-orientation="horizontal" split-proportion="0.4511517">
       <split-first>
         <leaf>
-          <file leaf-file-name="index.html" pinned="false" current-in-tab="true">
+          <file leaf-file-name="index.html" pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/index.html">
               <provider selected="true" editor-type-id="text-editor">
-                <state vertical-scroll-proportion="0.0">
-                  <caret line="5" column="24" selection-start-line="5" selection-start-column="24" selection-end-line="5" selection-end-column="24" />
+                <state vertical-scroll-proportion="-6.9636364">
+                  <caret line="158" column="68" selection-start-line="158" selection-start-column="68" selection-end-line="158" selection-end-column="68" />
                   <folding />
                 </state>
               </provider>
@@ -59,8 +65,8 @@
           <file leaf-file-name="FLGrid2.js" pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/FL_ui/js/FLGrid2.js">
               <provider selected="true" editor-type-id="text-editor">
-                <state vertical-scroll-proportion="0.0">
-                  <caret line="359" column="32" selection-start-line="359" selection-start-column="32" selection-end-line="359" selection-end-column="32" />
+                <state vertical-scroll-proportion="-12.379311">
+                  <caret line="1567" column="64" selection-start-line="1567" selection-start-column="55" selection-end-line="1567" selection-end-column="64" />
                   <folding />
                 </state>
               </provider>
@@ -69,8 +75,8 @@
           <file leaf-file-name="FLmenulinks2.js" pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/FL_ui/js/FLmenulinks2.js">
               <provider selected="true" editor-type-id="text-editor">
-                <state vertical-scroll-proportion="0.0">
-                  <caret line="268" column="0" selection-start-line="268" selection-start-column="0" selection-end-line="268" selection-end-column="0" />
+                <state vertical-scroll-proportion="-7.6896553">
+                  <caret line="340" column="86" selection-start-line="340" selection-start-column="83" selection-end-line="340" selection-end-column="86" />
                   <folding>
                     <marker date="1437308906658" expanded="true" signature="19131:19148" placeholder="..." />
                     <marker date="1437308906658" expanded="true" signature="19257:19274" placeholder="..." />
@@ -109,11 +115,11 @@
               </provider>
             </entry>
           </file>
-          <file leaf-file-name="FLbackgrid2.js" pinned="false" current-in-tab="false">
+          <file leaf-file-name="FLbackgrid2.js" pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/FL_ui/js/FLbackgrid2.js">
               <provider selected="true" editor-type-id="text-editor">
-                <state vertical-scroll-proportion="0.0">
-                  <caret line="0" column="35" selection-start-line="0" selection-start-column="35" selection-end-line="0" selection-end-column="35" />
+                <state vertical-scroll-proportion="0.7830424">
+                  <caret line="451" column="89" selection-start-line="451" selection-start-column="89" selection-end-line="451" selection-end-column="89" />
                   <folding />
                 </state>
               </provider>
@@ -123,17 +129,7 @@
             <entry file="file://$PROJECT_DIR$/FL_ui/js/FLAPI.js">
               <provider selected="true" editor-type-id="text-editor">
                 <state vertical-scroll-proportion="0.0">
-                  <caret line="510" column="14" selection-start-line="510" selection-start-column="14" selection-end-line="510" selection-end-column="14" />
-                  <folding />
-                </state>
-              </provider>
-            </entry>
-          </file>
-          <file leaf-file-name="flClient.js" pinned="false" current-in-tab="false">
-            <entry file="file://$PROJECT_DIR$/FL_ui/flClient/flClient.js">
-              <provider selected="true" editor-type-id="text-editor">
-                <state vertical-scroll-proportion="0.0">
-                  <caret line="1080" column="0" selection-start-line="1080" selection-start-column="0" selection-end-line="1080" selection-end-column="0" />
+                  <caret line="2120" column="97" selection-start-line="2120" selection-start-column="97" selection-end-line="2120" selection-end-column="97" />
                   <folding />
                 </state>
               </provider>
@@ -143,7 +139,7 @@
             <entry file="file://$PROJECT_DIR$/FL_ui/js/FLdd2.js">
               <provider selected="true" editor-type-id="text-editor">
                 <state vertical-scroll-proportion="0.0">
-                  <caret line="1546" column="0" selection-start-line="1546" selection-start-column="0" selection-end-line="1546" selection-end-column="0" />
+                  <caret line="56" column="4" selection-start-line="56" selection-start-column="4" selection-end-line="56" selection-end-column="4" />
                   <folding />
                 </state>
               </provider>
@@ -153,11 +149,11 @@
       </split-first>
       <split-second>
         <leaf>
-          <file leaf-file-name="FLbackgrid2.js" pinned="false" current-in-tab="false">
+          <file leaf-file-name="FLbackgrid2.js" pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/FL_ui/js/FLbackgrid2.js">
               <provider selected="true" editor-type-id="text-editor">
-                <state vertical-scroll-proportion="0.0">
-                  <caret line="0" column="35" selection-start-line="0" selection-start-column="35" selection-end-line="0" selection-end-column="35" />
+                <state vertical-scroll-proportion="0.33333334">
+                  <caret line="438" column="105" selection-start-line="438" selection-start-column="105" selection-end-line="438" selection-end-column="105" />
                   <folding />
                 </state>
               </provider>
@@ -167,7 +163,7 @@
             <entry file="file://$PROJECT_DIR$/FL_ui/js/FLGrid2.js">
               <provider selected="true" editor-type-id="text-editor">
                 <state vertical-scroll-proportion="0.0">
-                  <caret line="359" column="32" selection-start-line="359" selection-start-column="32" selection-end-line="359" selection-end-column="32" />
+                  <caret line="1567" column="32" selection-start-line="1567" selection-start-column="32" selection-end-line="1567" selection-end-column="32" />
                   <folding />
                 </state>
               </provider>
@@ -183,21 +179,11 @@
               </provider>
             </entry>
           </file>
-          <file leaf-file-name="DHTML.js" pinned="false" current-in-tab="false">
-            <entry file="jar://$APPLICATION_HOME_DIR$/plugins/JavaScriptLanguage/lib/JavaScriptLanguage.jar!/com/intellij/lang/javascript/index/predefined/DHTML.js">
-              <provider selected="true" editor-type-id="text-editor">
-                <state vertical-scroll-proportion="0.0">
-                  <caret line="17" column="17" selection-start-line="17" selection-start-column="17" selection-end-line="17" selection-end-column="17" />
-                  <folding />
-                </state>
-              </provider>
-            </entry>
-          </file>
-          <file leaf-file-name="FLAPI.js" pinned="false" current-in-tab="true">
+          <file leaf-file-name="FLAPI.js" pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/FL_ui/js/FLAPI.js">
               <provider selected="true" editor-type-id="text-editor">
-                <state vertical-scroll-proportion="1.3502994">
-                  <caret line="1557" column="38" selection-start-line="1557" selection-start-column="38" selection-end-line="1557" selection-end-column="38" />
+                <state vertical-scroll-proportion="-3.8275862">
+                  <caret line="2125" column="0" selection-start-line="2125" selection-start-column="0" selection-end-line="2125" selection-end-column="0" />
                   <folding />
                 </state>
               </provider>
@@ -208,16 +194,6 @@
               <provider selected="true" editor-type-id="text-editor">
                 <state vertical-scroll-proportion="0.0">
                   <caret line="3292" column="8" selection-start-line="3292" selection-start-column="8" selection-end-line="3292" selection-end-column="8" />
-                  <folding />
-                </state>
-              </provider>
-            </entry>
-          </file>
-          <file leaf-file-name="memoryCsv.js" pinned="false" current-in-tab="false">
-            <entry file="file://$PROJECT_DIR$/FL_ui/js/memoryCsv.js">
-              <provider selected="true" editor-type-id="text-editor">
-                <state vertical-scroll-proportion="0.0">
-                  <caret line="131" column="5" selection-start-line="131" selection-start-column="5" selection-end-line="131" selection-end-column="5" />
                   <folding />
                 </state>
               </provider>
@@ -245,6 +221,16 @@
               </provider>
             </entry>
           </file>
+          <file leaf-file-name="memoryCsv.js" pinned="false" current-in-tab="false">
+            <entry file="file://$PROJECT_DIR$/FL_ui/js/memoryCsv.js">
+              <provider selected="true" editor-type-id="text-editor">
+                <state vertical-scroll-proportion="-3.8275862">
+                  <caret line="46" column="90" selection-start-line="46" selection-start-column="6" selection-end-line="46" selection-end-column="90" />
+                  <folding />
+                </state>
+              </provider>
+            </entry>
+          </file>
         </leaf>
       </split-second>
     </splitter>
@@ -263,11 +249,13 @@
         <option value="$PROJECT_DIR$/FL_ui/js/FLMain.js" />
         <option value="$PROJECT_DIR$/FL_ui/js/memoryCsv.js" />
         <option value="$PROJECT_DIR$/FL_ui/js/FLCommon2.js" />
-        <option value="$PROJECT_DIR$/index.html" />
-        <option value="$PROJECT_DIR$/FL_ui/js/FLAPI.js" />
-        <option value="$PROJECT_DIR$/FL_ui/js/FLGrid2.js" />
         <option value="$PROJECT_DIR$/FL_ui/flClient/flClient.js" />
         <option value="$PROJECT_DIR$/FL_ui/js/FLdd2.js" />
+        <option value="$PROJECT_DIR$/FL_ui/js/FLAPI.js" />
+        <option value="$PROJECT_DIR$/FL_ui/js/FLGrid2.js" />
+        <option value="$PROJECT_DIR$/FL_ui/js/autocomplete-cell.js" />
+        <option value="$PROJECT_DIR$/index.html" />
+        <option value="$PROJECT_DIR$/FL_ui/js/FLbackgrid2.js" />
       </list>
     </option>
   </component>
@@ -423,7 +411,13 @@
       <option name="project" value="LOCAL" />
       <updated>1437463288976</updated>
     </task>
-    <option name="localTasksCounter" value="8" />
+    <task id="LOCAL-00008" summary="version 13.46 specialTypeDef - edition complete - Works with server">
+      <created>1437555935480</created>
+      <option name="number" value="00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1437555935480</updated>
+    </task>
+    <option name="localTasksCounter" value="9" />
     <servers />
   </component>
   <component name="ToolWindowManager">
@@ -432,16 +426,16 @@
     <layout>
       <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.124641836" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
+      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="Application Servers" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32994187" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32967034" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
-      <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.08503037" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.10110754" sideWeight="0.49315068" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
-      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.46364883" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.10110754" sideWeight="0.5068493" order="2" side_tool="true" content_ui="tabs" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.4107143" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
-      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="SLIDING" type="SLIDING" visible="false" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
@@ -467,7 +461,8 @@
     <MESSAGE value="version 13.45 without lookup" />
     <MESSAGE value="version 13.45  lookup not saved in framelink database" />
     <MESSAGE value="version 13.46  lookup uncompleted" />
-    <option name="LAST_COMMIT_MESSAGE" value="version 13.46  lookup uncompleted" />
+    <MESSAGE value="version 13.46 specialTypeDef - edition complete - Works with server" />
+    <option name="LAST_COMMIT_MESSAGE" value="version 13.46 specialTypeDef - edition complete - Works with server" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -512,11 +507,16 @@
           <line>1196</line>
           <option name="timeStamp" value="66" />
         </line-breakpoint>
+        <line-breakpoint enabled="true" type="javascript">
+          <url>file://$PROJECT_DIR$/FL_ui/js/FLbackgrid2.js</url>
+          <line>439</line>
+          <option name="timeStamp" value="79" />
+        </line-breakpoint>
       </breakpoints>
       <breakpoints-dialog>
         <breakpoints-dialog />
       </breakpoints-dialog>
-      <option name="time" value="69" />
+      <option name="time" value="81" />
     </breakpoint-manager>
     <watches-manager>
       <configuration name="JavascriptDebugType">
@@ -767,6 +767,7 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
         </state>
       </provider>
     </entry>
@@ -790,6 +791,7 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
         </state>
       </provider>
     </entry>
@@ -813,6 +815,7 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
         </state>
       </provider>
     </entry>
@@ -820,6 +823,7 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
         </state>
       </provider>
     </entry>
@@ -831,26 +835,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/FL_ui/js/FLbackgrid2.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="0" column="35" selection-start-line="0" selection-start-column="35" selection-end-line="0" selection-end-column="35" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/FL_ui/js/FLMain.js">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
           <caret line="65" column="8" selection-start-line="65" selection-start-column="8" selection-end-line="65" selection-end-column="8" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/FL_ui/js/memoryCsv.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="131" column="5" selection-start-line="131" selection-start-column="5" selection-end-line="131" selection-end-column="5" />
           <folding />
         </state>
       </provider>
@@ -865,21 +853,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/FL_ui/js/FLlogin2.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="590" column="67" selection-start-line="590" selection-start-column="42" selection-end-line="590" selection-end-column="67" />
-          <folding>
-            <marker date="1437308906649" expanded="true" signature="6171:6230" placeholder="..." />
-            <marker date="1437308906649" expanded="true" signature="6419:6479" placeholder="..." />
-            <marker date="1437308906649" expanded="true" signature="6565:6582" placeholder="..." />
-            <marker date="1437308906649" expanded="true" signature="7289:7348" placeholder="..." />
-            <marker date="1437308906649" expanded="true" signature="7615:7675" placeholder="..." />
-            <marker date="1437308906649" expanded="true" signature="7770:7787" placeholder="..." />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/FL_ui/js/jquery-1.11.1.js">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
@@ -888,10 +861,74 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/FL_ui/js/FLmenulinks2.js">
+    <entry file="file://$PROJECT_DIR$/FL_ui/flClient/flClient.js">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
-          <caret line="268" column="0" selection-start-line="268" selection-start-column="0" selection-end-line="268" selection-end-column="0" />
+          <caret line="1080" column="0" selection-start-line="1080" selection-start-column="0" selection-end-line="1080" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/FL_ui/js/FLdd2.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="56" column="4" selection-start-line="56" selection-start-column="4" selection-end-line="56" selection-end-column="4" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/FL_ui/js/memoryCsv.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="-3.8275862">
+          <caret line="46" column="90" selection-start-line="46" selection-start-column="6" selection-end-line="46" selection-end-column="90" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/FL_ui/js/FLAPI.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="2120" column="97" selection-start-line="2120" selection-start-column="97" selection-end-line="2120" selection-end-column="97" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://$APPLICATION_HOME_DIR$/plugins/JavaScriptLanguage/lib/JavaScriptLanguage.jar!/com/intellij/lang/javascript/index/predefined/EcmaScript6.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="19" column="7" selection-start-line="19" selection-start-column="7" selection-end-line="19" selection-end-column="7" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://$APPLICATION_HOME_DIR$/plugins/JavaScriptLanguage/lib/JavaScriptLanguage.jar!/com/intellij/lang/javascript/index/predefined/DHTML.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.3314917">
+          <caret line="23" column="17" selection-start-line="23" selection-start-column="17" selection-end-line="23" selection-end-column="17" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/FL_ui/js/underscore.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="114" column="56" selection-start-line="114" selection-start-column="56" selection-end-line="114" selection-end-column="56" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://$APPLICATION_HOME_DIR$/plugins/JavaScriptLanguage/lib/JavaScriptLanguage.jar!/com/intellij/lang/javascript/index/predefined/EcmaScript5.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.3756906">
+          <caret line="8" column="7" selection-start-line="8" selection-start-column="7" selection-end-line="8" selection-end-column="7" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/FL_ui/js/FLmenulinks2.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="-7.6896553">
+          <caret line="340" column="86" selection-start-line="340" selection-start-column="83" selection-end-line="340" selection-end-column="86" />
           <folding>
             <marker date="1437308906658" expanded="true" signature="19131:19148" placeholder="..." />
             <marker date="1437308906658" expanded="true" signature="19257:19274" placeholder="..." />
@@ -912,58 +949,41 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/FL_ui/js/underscore.js">
+    <entry file="file://$PROJECT_DIR$/index.html">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="114" column="56" selection-start-line="114" selection-start-column="56" selection-end-line="114" selection-end-column="56" />
+        <state vertical-scroll-proportion="-6.9636364">
+          <caret line="158" column="68" selection-start-line="158" selection-start-column="68" selection-end-line="158" selection-end-column="68" />
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="jar://$APPLICATION_HOME_DIR$/plugins/JavaScriptLanguage/lib/JavaScriptLanguage.jar!/com/intellij/lang/javascript/index/predefined/DHTML.js">
+    <entry file="file://$PROJECT_DIR$/FL_ui/js/FLlogin2.js">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
-          <caret line="17" column="17" selection-start-line="17" selection-start-column="17" selection-end-line="17" selection-end-column="17" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/FL_ui/flClient/flClient.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="1080" column="0" selection-start-line="1080" selection-start-column="0" selection-end-line="1080" selection-end-column="0" />
-          <folding />
+          <caret line="590" column="67" selection-start-line="590" selection-start-column="42" selection-end-line="590" selection-end-column="67" />
+          <folding>
+            <marker date="1437308906649" expanded="true" signature="6171:6230" placeholder="..." />
+            <marker date="1437308906649" expanded="true" signature="6419:6479" placeholder="..." />
+            <marker date="1437308906649" expanded="true" signature="6565:6582" placeholder="..." />
+            <marker date="1437308906649" expanded="true" signature="7289:7348" placeholder="..." />
+            <marker date="1437308906649" expanded="true" signature="7615:7675" placeholder="..." />
+            <marker date="1437308906649" expanded="true" signature="7770:7787" placeholder="..." />
+          </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/FL_ui/js/FLGrid2.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="359" column="32" selection-start-line="359" selection-start-column="32" selection-end-line="359" selection-end-column="32" />
+        <state vertical-scroll-proportion="-12.379311">
+          <caret line="1567" column="64" selection-start-line="1567" selection-start-column="55" selection-end-line="1567" selection-end-column="64" />
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/FL_ui/js/FLdd2.js">
+    <entry file="file://$PROJECT_DIR$/FL_ui/js/FLbackgrid2.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="1546" column="0" selection-start-line="1546" selection-start-column="0" selection-end-line="1546" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/FL_ui/js/FLAPI.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="510" column="14" selection-start-line="510" selection-start-column="14" selection-end-line="510" selection-end-column="14" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/index.html">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="5" column="24" selection-start-line="5" selection-start-column="24" selection-end-line="5" selection-end-column="24" />
+        <state vertical-scroll-proportion="0.7830424">
+          <caret line="451" column="89" selection-start-line="451" selection-start-column="89" selection-end-line="451" selection-end-column="89" />
           <folding />
         </state>
       </provider>
