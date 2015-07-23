@@ -96,7 +96,10 @@ FormMaker.BaseElement = Backbone.View.extend({
 		console.log("value change");
         this.model.set("value",this.value.val());
         this.trigger(FormMaker.Events.ValueChange,this.model.toJSON());
-	}, 
+	},
+    getValue : function(){
+        return this.model.get("value") || "";
+    }
 });
 FormMaker.TextLabel = FormMaker.BaseElement.extend({
 	

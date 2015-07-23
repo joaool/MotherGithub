@@ -7,24 +7,27 @@
 			console.log("templates loaded");
             if (window.opener != null){
                 var formData = window.opener.formData;
-                formMaker.loadJSON(formData);       
+                     
+                $.getJSON("defaultjson.json",function(data){
+                    formMaker.loadValues(data);
+                    formMaker.loadJSON(formData);  
+                });
              }
 		}
 		$("#templates").load("Template.html",OnTemplatesLoaded);
         
-        var formMaker = new FormMaker();
+        var formMaker = new FormMaker({el : "body"});
 		
 		$("#makeForm").click(function(evt){
 			$.getJSON("Sample.json",function(data){
 				formMaker.loadJSON(data);
 			});
 		});
-        
+
         Handlebars.registerHelper('arrayToString', function(array, options) {
             if (array && typeof array == "object" && array.length >0){
                 return array.toString();
             }
-            
             return array;
         });
 	});
