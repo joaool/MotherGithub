@@ -4,38 +4,48 @@ var FL = FL || {};
 $.mockjax({
     url: '/names/*',
     type: 'GET',
-    responseTime: 750,
+    responseTime: 250,
     response: function (body) {
         var searchTerm = body.url.split('/')[2];
+        var lookupObj = FL.common.generalBufferArr[0];
+        //var fCN = FL.common.generalBufferArr[1];
+        //alert("mockjax  ***********************************  specialTypeDef=" + JSON.stringify(lookupObj.getColumn(fCN) + "\n lookupFCN=" + fCN));
+        var optionsArr = lookupObj.getColumn();//extract the default column - set in FL.grid.displayDefaultGrid inside openTable promise
+        var optionsArrOfObj = _.map(optionsArr, function (el) {
+            return {name: el};
+        });
         this.status = 200;
-        this.responseText = JSON.stringify(_.filter([
-            {
-                name: "Franz"
-            },
-            {
-                name: "Theodore"
-            },
-            {
-                name: "Matilda"
-            },
-            {
-                name: "Roosevelt"
-            },
-            {
-                name: "Ferdinand"
-            },
-            {
-                name: "Dillon"
-            },
-            {
-                name: "Sheila"
-            },
-            {
-                name: "Francine"
-            }
-        ], function (obj) {
+        this.responseText = JSON.stringify(_.filter(optionsArrOfObj, function (obj) {
             return obj.name.toLowerCase().indexOf(searchTerm.toLowerCase()) != -1;
         }));
+        //this.responseText = JSON.stringify(_.filter([
+        //    {
+        //        name: "Franz"
+        //    },
+        //    {
+        //        name: "Theodore"
+        //    },
+        //    {
+        //        name: "Matilda"
+        //    },
+        //    {
+        //        name: "Roosevelt"
+        //    },
+        //    {
+        //        name: "Ferdinand"
+        //    },
+        //    {
+        //        name: "Dillon"
+        //    },
+        //    {
+        //        name: "Sheila"
+        //    },
+        //    {
+        //        name: "Francine"
+        //    }
+        //], function (obj) {
+        //    return obj.name.toLowerCase().indexOf(searchTerm.toLowerCase()) != -1;
+        //}));
     }
 });
 FL["bg"] = (function () {//name space FL.common
@@ -438,8 +448,12 @@ FL["bg"] = (function () {//name space FL.common
             Backgrid.InputCellEditor.prototype.initialize.apply(this, arguments);
             //http://stackoverflow.com/questions/16907825/how-to-implement-sublime-text-like-fuzzy-search
             var lookupObj = AutocompleteCellEditor.prototype.lookupObj;
-            if(lookupObj)
-                alert("AutocompleteCellEditor @@@@@@@@@=" + JSON.stringify(lookupObj.data));
+            var lookupFCN = AutocompleteCellEditor.prototype.lookupFCN;
+            //if (lookupObj)
+            //    alert("AutocompleteCellEditor @@@@@@@@@=" + JSON.stringify(lookupObj.data));
+            FL.common.loadGeneralBufferBegin(lookupObj);//necessary to pass lookupObj to mockjax
+            FL.common.loadGeneralBufferNext(lookupFCN);//necessary to pass fCN to mockjax
+
             this.autocompleteUrl = options.column.get("autocompleteUrl");
             if (this.autocompleteUrl[this.autocompleteUrl.length] != '/') this.autocompleteUrl += '/';
             this.minTermLength = options.column.get("minTermLength");
@@ -535,12 +549,20 @@ FL["bg"] = (function () {//name space FL.common
             return this;
         }
     });
-    var cellType = function (typeUI, enumerable, lookupObj) {
-        //type string is converted to "StringCell" and a corresponding class in the Backgrid package namespace
+    var cellType = function (field, lookupObj) {//returns a set of objects that will complete the column definition for backgrid - used by FL.bg.colDef()
+        // field - an object with all data dictionary properties of the current field
+        //      uses field.typeUI, field.enumerable, field.specialTypeDef (only for typeUI="lookupbox")
+        // lookupObj - an object with property data, (and methods) applicable to typeUI="lookupbox" - - if not lookupbox =>enumerable = null
+        //
         // Possible typeUI:     “textbox”,”textUpperbox”,"numberbox","currencybox","integerbox","percentbox", "urlbox", ”areabox”, ”combobox”, ”checkbox”,
         //                      “phonebox”, “datetimebox”,"emailbox","lookupbox"
         // enumerable - an array with the dropdown field options applicable to typeUI="combobox" - if not combobox =>enumerable = null
-        // lookupObj - an object with property data, (and methods) applicable to typeUI="lookupbox" - - if not lookupbox =>enumerable = null
+        var typeUI = field.typeUI;
+        var enumerable = field.enumerable;
+        if (typeUI == "lookupbox") {
+            //---> not necessary var fCN = field.specialTypeDef[0].fCN;
+            //alert("cellType entry ***********************************  specialTypeDef=" + JSON.stringify(lookupObj.getColumn() + "\n lookupObj.defaultFCN=" + lookupObj.defaultFCN));
+        }
         if (typeUI == "textbox")
             typeUI = "string";
         else if (typeUI == "datebox")
@@ -775,14 +797,8 @@ FL["bg"] = (function () {//name space FL.common
                 retObj["cell"] = EmailCell;
                 retObj["formatter"] = formatterObj;
             } else if (typeUI == "lookupbox") {
-                // var lookupCell = Backgrid.Extension.AutocompleteCell.extend({
-                // 	render: function(){
-                // 		console.log("lookup render-->"+this.$el.val());
-                // 		return this;
-                // 	}
-                // )};
-                //NumberCellEditor.prototype.decimals = decimals;
                 AutocompleteCellEditor.prototype.lookupObj = lookupObj;
+                AutocompleteCellEditor.prototype.lookupFCN = field.specialTypeDef[0].fCN;
                 var formatterObj = _.extend({}, Backgrid.CellFormatter.prototype, {
                     fromRaw: function (rawValue) {
                         console.log("fromRaw------------------>" + rawValue);
@@ -809,7 +825,7 @@ FL["bg"] = (function () {//name space FL.common
                 retObj["cell"] = autocompleteCell;
                 // retObj["cell"] = lookupCell;// Backgrid.Extension.AutocompleteCell;
                 retObj["autocompleteUrl"] = "/names";
-                retObj["minTermLength"] = 3;
+                retObj["minTermLength"] = 1;
                 retObj["labelProperty"] = "name";
                 retObj["formatter"] = formatterObj;
             } else if (typeUI == "urllbox") {
@@ -846,7 +862,7 @@ FL["bg"] = (function () {//name space FL.common
                 resizeable: true,
                 orderable: true
             };
-            _.extend(retObj, cellType(field.typeUI, field.enumerable,lookupObj));
+            _.extend(retObj, cellType(field, lookupObj));
             return retObj;
         },
         getGridDefaultLayout: function (eCN) {//returns an object {baseTable:eCN,format:[array of objects defining each column]}
@@ -898,13 +914,8 @@ FL["bg"] = (function () {//name space FL.common
                 //var arrElObj = FL.bg.colDef(name,element.label,element.nestingArr,element.width,typeUI,enumerable);
                 var field = FL.dd.t.entities[oLayout.baseTable].fields[element.fCN];
                 if (field.typeUI == "lookupbox") {
-                    //alert("setupGridColumnsArr  !!! ->" + JSON.stringify(field) + "\n gridDefinition ->" + JSON.stringify(gridDefinition));
-                    //alert("setupGridColumnsArr  specialTypeDef=" + JSON.stringify(field.specialTypeDef));
-                    var fCN = field.specialTypeDef[0].fCN;
-                    alert("setupGridColumnsArr  ***********************************  specialTypeDef=" + JSON.stringify(lookupObj.getColumn(fCN)));
-
-                    //FL.API.openTable("6A")
-
+                    //var fCN = field.specialTypeDef[0].fCN;
+                    //alert("setupGridColumnsArr  ***********************************  specialTypeDef=" + JSON.stringify(lookupObj.getColumn() + "\n lookupObj.defaultFCN=" + lookupObj.defaultFCN));
                 }
                 var arrElObj = FL.bg.colDef(gridDefinition, field, lookupObj);
                 arrElObj = _.omit(arrElObj, ["nesting", "orderable", "resizeable", "width"]);//temporary while these propoerties are inactive

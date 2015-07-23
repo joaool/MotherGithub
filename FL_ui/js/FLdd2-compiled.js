@@ -52,7 +52,7 @@
 //				textbox, integerbox, numberbox, percentbox, currencybox, areabox, emailbox, phonebox, datetimebox, combobox,
 //					checkbox, urlbox, lookupbox -->TBI imagebox, geoBox
 //			mask - applicable to textbox, integerbox, numberbox, percentbox and currencybox - null for other typeUI
-//			specialTypeDef - Special type definition - A JSON. Ex of specialtype is typeUI=="lookup" (Nico's field "P" - stored as an array of JSON -  element 0 is for lookup specialTypeDef)
+//			specialTypeDef - Special type definition - An array. Ex of specialtype is typeUI=="lookup" (Nico's field "P" - stored as an array of JSON -  element 0 is for lookup specialTypeDef)
 //				if typeUI == "lookup" =>specialTypeDef="{eCN:<entity compressed name>, fCN:<field compressed name>}"
 //			key - boolean. True means the attribute is the  key field of the entity . (only one allowed)
 //	NEW TBD fieldPrefix - to be used only in search - for the time being it is fCN

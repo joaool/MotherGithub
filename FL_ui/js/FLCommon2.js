@@ -204,6 +204,14 @@ FL["common"] = (function(){//name space FL.common
             //     "Brazilian Real":"R$ 999999999/99"
             // }
         },
+        generalBufferArr: [],// to be used  and dispose after use - use to read, but never use to load =>always use FL.common.loadGeneralBufferBegin for the 1st one and FL.common.loadGeneralBufferNext for all others
+        loadGeneralBufferBegin:function(load){
+            this.generalBufferArr = [];
+            this.generalBufferArr.push(load);
+        },
+        loadGeneralBufferNext:function(load){
+             this.generalBufferArr.push(load);
+        },
         currencyToStringNumber: function(currencyStr){
             //converts a currency string ex "€ 12345,67" to a string representing a number ex:"12345.67" using appsettings
             //  "kr. 9.734.123,45" =>"9734123.45", "Din. 1,235.45"=>"1235.45"

@@ -2119,13 +2119,19 @@ FL["API"] = (function () {//name space FL.API
                     },
                     getColumn: function (fCN) {//returns an array with the content of fCN of each record
                          //var colArr = _.pluck(this.data, fCN);//cannot be used because of d.fCN
+                        if(!fCN)
+                            fCN = this.defaultFCN;//if argument is missing default is used
                         var colArr = [];
                         _.each(this.data, function(element){
                             colArr.push(element.d[fCN]);
                           });
                         return colArr;
                     },
-                    data: dataArray
+                    setDefaultFCN: function(fCN){
+                        this.defaultFCN = fCN;
+                    },
+                    data: dataArray,
+                    defaultFCN:null
                 };
                  def.resolve(tableObj);
             });

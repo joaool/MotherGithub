@@ -86,7 +86,8 @@ decimals:2,currency:'$' // currencies:{
 //     "€":"€ 9999999999/99",
 //     "Brazilian Real":"R$ 999999999/99"
 // }
-},currencyToStringNumber:function currencyToStringNumber(currencyStr){ //converts a currency string ex "€ 12345,67" to a string representing a number ex:"12345.67" using appsettings
+},generalBufferArr:[], // to be used  and dispose after use - use to read, but never use to load =>always use FL.common.loadGeneralBufferBegin for the 1st one and FL.common.loadGeneralBufferNext for all others
+loadGeneralBufferBegin:function loadGeneralBufferBegin(load){this.generalBufferArr = [];this.generalBufferArr.push(load);},loadGeneralBufferNext:function loadGeneralBufferNext(load){this.generalBufferArr.push(load);},currencyToStringNumber:function currencyToStringNumber(currencyStr){ //converts a currency string ex "€ 12345,67" to a string representing a number ex:"12345.67" using appsettings
 //  "kr. 9.734.123,45" =>"9734123.45", "Din. 1,235.45"=>"1235.45"
 var radixpoint=this.appsettings.radixpoint;var thousandsSeparator=this.appsettings.thousandsSeparator;var regexSep='\\' + thousandsSeparator;var reSep=new RegExp(regexSep,'g');var regex='[^0-9\\' + radixpoint + ']+'; //exclude all chars except numbers and radix
 var re=new RegExp(regex,'g');var strNumber=currencyStr.replace(re,''); // if(radixpoint == ",")
