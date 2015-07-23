@@ -57,9 +57,9 @@ testMockUp = function(){
 	var entity ="sub";
 	var eCN = FL.dd.t.entities.getCName(entity);
 	FL.dd.t.entities[eCN].addField("joakim","dummy field joakim","Joakim'label","text","textbox");
-	var display=null;
-	_.each(FL.dd.t.entities[eCN].fieldsList(),function(element){display+=element.name+":::"+element.label+":::"+element.typeUI+"\n"});
-	alert("For entity "+entity+" list all fields:\n"+display);
+	var display='';
+	_.each(FL.dd.t.entities[eCN].fieldsList(),function(element){display+=element.fCN+":::"+element.name+":::"+element.label+":::"+element.typeUI+"\n"});
+	alert("For entity "+entity+" list all fields (fCN:::name:::label:::typeUI):\n"+display);
 
 	var field = "ESPECIALIDADE";
 	var fCN = FL.dd.t.entities[eCN].getFieldCName(field);

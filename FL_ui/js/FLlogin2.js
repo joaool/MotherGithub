@@ -393,6 +393,10 @@ jQuery(document).ready(function($){
 										"uri":"javascript:FL.links.editStylesAndFonts()"
 									},
 									{
+										"title" : "Application Settings",//0
+										"uri":"javascript:FL.links.appSettings()"
+									},									
+									{
 										"title" : "Home Page",//0
 										"uri":"javascript:FL.links.pageEditor('home')"
 									},

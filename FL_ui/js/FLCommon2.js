@@ -4,6 +4,45 @@
 	http://stackoverflow.com/questions/950087/how-to-include-a-javascript-file-in-another-javascript-file
 */
 var FL = FL || {};
+Number.prototype.toFormattedString = function (decimals) {
+    //converts a number into a string with a specific number of decimals with the radixpoint and thousandSeparator from appsettings
+    // decimals - optional parameter - if specied defines the number of decimals in the formatted string
+    //   ex: x=12345.67 =>x.toFormattedString() -->"12.245,67" with radixpoint="," and thousandSeparator="."
+    //   ex: x=12345.668987 =>x.toFormattedString(2) -->"12.245,67" with radixpoint="," and thousandSeparator="."
+    if(isNaN(this))
+        return null;
+    var radixpoint = FL.common.appsettings.radixpoint;
+    var thousandsSeparator=FL.common.appsettings.thousandsSeparator;
+    var num = this;
+    if(decimals || decimals === 0)
+        num = this.toFixed(decimals);
+    var strNumber = num.toString();
+    function format(num){
+        var n = num.toString(), p = n.indexOf('.');
+        return n.replace(/\d(?=(?:\d{3})+(?:\.|$))/g, function($0, i){
+            return p<0 || i<p ? ($0+',') : $0;
+        });
+    }
+    var intNum = Math.floor(num);
+    var intStr=format(intNum);
+    var tail=FL.common.getTail(strNumber,".");
+    if(thousandsSeparator==".")
+        intStr=intStr.replace(/,/g,'.');
+     if(thousandsSeparator=="space")
+        intStr=intStr.replace(/,/g,' ');
+    if(tail.length == 0)
+        radixpoint="";//to give a formated integer result
+    var retStr = intStr + radixpoint + tail;
+    return retStr;
+};
+String.prototype.pad = function(l, s, t){
+    // l -length amount of characters that the string must have
+    // s - substring string that will be concatenated
+    // t - type specifies the side where the concatenation will happen, where: 0 = left, 1 = right and 2 = both sides   
+    return s || (s = " "), (l -= this.length) > 0 ? (s = new Array(Math.ceil(l / s.length)
+        + 1).join(s)).substr(0, t = !t ? l : t == 1 ? 0 : Math.ceil(l / 2))
+        + this + s.substr(0, l - t) : this;
+};
 FL["common"] = (function(){//name space FL.common
 	var loadCSS = function(fileCss) {
 		var cssLink = $("<link rel='stylesheet' type='text/css' href='FL_ui/css/"+fileCss+"'>");
@@ -153,6 +192,66 @@ FL["common"] = (function(){//name space FL.common
          return before + htmlIn + after;
     };
 	return{
+        appsettings: {
+            dateformat:"DMY",
+            radixpoint:".",
+            thousandsSeparator:",",//if separator is space - use "space" ->Number.toFormattedString() recognizes space=>" "
+            decimals:2,
+            currency:"$"
+            // currencies:{
+            //     "USD":"$999999999/99", 
+            //     "€":"€ 9999999999/99",
+            //     "Brazilian Real":"R$ 999999999/99"
+            // }
+        },
+        generalBufferArr: [],// to be used  and dispose after use - use to read, but never use to load =>always use FL.common.loadGeneralBufferBegin for the 1st one and FL.common.loadGeneralBufferNext for all others
+        loadGeneralBufferBegin:function(load){
+            this.generalBufferArr = [];
+            this.generalBufferArr.push(load);
+        },
+        loadGeneralBufferNext:function(load){
+             this.generalBufferArr.push(load);
+        },
+        currencyToStringNumber: function(currencyStr){
+            //converts a currency string ex "€ 12345,67" to a string representing a number ex:"12345.67" using appsettings
+            //  "kr. 9.734.123,45" =>"9734123.45", "Din. 1,235.45"=>"1235.45"
+            var radixpoint = this.appsettings.radixpoint;
+            var thousandsSeparator=this.appsettings.thousandsSeparator;
+            var regexSep = "\\" + thousandsSeparator;
+            var reSep = new RegExp(regexSep ,"g");
+            var regex = "[^0-9\\" + radixpoint +"]+";//exclude all chars except numbers and radix
+            var re = new RegExp(regex ,"g");
+            var strNumber = currencyStr.replace(re,"");
+            // if(radixpoint == ",")
+            //     strNumber=strNumber.replace(/,/g,'.');
+            var regexSetRadix = radixpoint;
+            var reSetRadix = new RegExp(regexSetRadix ,"g");
+            strNumber=strNumber.replace(regexSetRadix,'.');
+ 
+            if(strNumber.indexOf( radixpoint) !=  strNumber.lastIndexOf( radixpoint) )
+                strNumber = strNumber.substr(0,strNumber.indexOf( radixpoint))+ strNumber.substr(strNumber.indexOf( radixpoint)+1);
+            return strNumber;
+        },
+        formatStringNumberWithMask: function(strNumber,mask){
+            //converts a string number ex"12345.67" into a currency string ex "€ 12345,67" using appsettings
+            //  "9734123.45"=>"kr. 9.734.123,45" , "1235.45"=>"Din. 1,235.45"
+            //var mask = "99-AAA-999";
+            var radixpoint = this.appsettings.radixpoint;
+            var thousandsSeparator=this.appsettings.thousandsSeparator;
+            if(radixpoint == ",")
+                strNumber=strNumber.replace(/\./g,',');
+            $('#_freeSlots').append("<input type='text' id='_tempSlot' val='" +strNumber+"'>");////create a temporary slot in the dom under _freeSlots
+            $("<input type='text' id='_tempSlot' val='" +strNumber+"'>");//create a temporary slot in the dom
+            $("#_tempSlot").val(strNumber); 
+            $("#_tempSlot").inputmask({
+                "mask":mask,
+                greedy: false
+            });
+            var retStr = $("#_tempSlot").val();
+            // alert("input="+strNumber+" -->"+retStr);
+            $("#_tempSlot").remove();//remove temporary slot from dom
+            return retStr;
+        },            
         editMasterDetail: function(id,title,templateName,masterDetailJson,options,editMasterDetailCB) {
 			// returns masterDetailJson with new values collected from modal dialog  with title and templateName - options like makeModa()
 			//  EXEMPLE OF FORMAT FOR masterDetailJson:
@@ -501,6 +600,16 @@ FL["common"] = (function(){//name space FL.common
 				n = 0;
 			return Array(n+1).join(str);
 		},
+        getTail: function(strNumber,radixpoint){//returns the decimal part of a string representing a number.
+            //radixpoint is the decimal separator. If missing uses the appsettings radixpoint
+            if(!radixpoint)
+                var radixpoint = FL.common.appsettings.radixpoint;//if radixpoint is missing uses the appsettings radixpoint
+            var tail = "";
+            var posDecimal = strNumber.indexOf(radixpoint);
+            if(posDecimal>0)
+                tail = strNumber.substr(posDecimal+1);
+            return tail;
+        },
         validateEmail: function(email) {
             var re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
             return re.test(email);
@@ -605,6 +714,14 @@ FL["common"] = (function(){//name space FL.common
             }
             return xRet;
         },
+        is_phone: function(phone) {//validates formatted phone number 
+            //http://stackoverflow.com/questions/4338267/validate-phone-number-with-javascript - we ignore format and validate numeric content only          
+            var phoneRe = /^[2-9]\d{2}[2-9]\d{2}\d{4}/;//^begins by one of [2-9] folowed by {2} occurences of any d (digit),folowed by one [2-9] and follwed by 6 digits
+            var digits = phone.replace(/\D/g, "");//Do a global search for non-digit characters and removes them
+            if(digits.length>12)
+                return false;
+            return (digits.match(phoneRe) !== null);            
+        },      
         forceToString: function(xVar){//convert a variable of any type to string
             var type = this.typeOf(xVar);
             if(type != "string") {
@@ -873,6 +990,14 @@ FL["common"] = (function(){//name space FL.common
                 is_date = true;
             return is_date;
         },
+        is_jsonString:function(str){
+            try {
+                JSON.parse(str);
+            } catch (e) {
+                return false;
+            }
+            return true;
+        },
         is_enumerableArr: function(arrOfRowValues,percent){//returns true arrOfRowValues can colapse to less than percent with unique values
             //normally arrOfRowValues is a sample of the whole array, only to decide if it is enumerable or not
             var is_enumerable = false;
@@ -1089,7 +1214,8 @@ FL["common"] = (function(){//name space FL.common
             var currentURL =window.location.href;
             var server = this.stringAfterLast(currentURL,"//");
             server = this.stringBeforeFirst(server,"/");
-            server = this.stringBeforeFirst(server,":");
+            if(server.indexOf(":")>0)
+                server = this.stringBeforeFirst(server,":");
             if (server =="localhost")
                 server = "test.framelink.co";            
             FL.common.printToConsole("FL.common.getServerName() -->"+server);
@@ -1166,6 +1292,245 @@ FL["common"] = (function(){//name space FL.common
 			}
 			return browser;
 		},
+        getDecimalSeparator: function() {//http://stackoverflow.com/questions/1074660/with-a-browser-how-do-i-know-which-decimal-separator-does-the-client-use
+            var n = 1.1;
+            n = n.toLocaleString().substring(1, 2);
+            return n;
+        },
+        getLocaleSettings: function() {//http://stackoverflow.com/questions/2388115/get-locale-short-date-format-using-javascript
+            var formats = {
+               "ar-SA" : {mask:"dd/MM/yy", ymdFormat:"DMY", radix:",", thousands:".", currency:"$"},
+               "bg-BG" : {mask:"dd.M.yyyy", ymdFormat:"DMY", radix:".", thousands:",", currency:"лв"},
+               "ca-ES" : {mask:"dd/MM/yyyy", ymdFormat:"DMY", radix:",", thousands:".", currency:"€"},
+               "zh-TW" : {mask:"yyyy/M/d", ymdFormat:"YMD", radix:".", thousands:",", currency:"NT$"},
+               "cs-CZ" : {mask:"d.M.yyyy", ymdFormat:"DMY", radix:".", thousands:"space", currency:"Kč"},
+               "da-DK" : {mask:"dd-MM-yyyy", ymdFormat:"DMY", radix:",", thousands:".", currency:"$"},
+               "de-DE" : {mask:"dd.MM.yyyy", ymdFormat:"DMY", radix:",", thousands:".", currency:"€"},
+               "el-GR" : {mask:"d/M/yyyy", ymdFormat:"DMY", radix:",", thousands:".", currency:"€"},
+               "en-US" : {mask:"M/d/yyyy", ymdFormat:"MDY", radix:".", thousands:",", currency:"$"},
+               "fi-FI" : {mask:"d.M.yyyy", ymdFormat:"DMY", radix:",", thousands:".", currency:"€"},
+               "fr-FR" : {mask:"dd/MM/yyyy", ymdFormat:"DMY", radix:",", thousands:"space", currency:"€"},
+               "he-IL" : {mask:"dd/MM/yyyy", ymdFormat:"DMY", radix:".", thousands:",", currency:"₪ "},
+               "hu-HU" : {mask:"yyyy. MM. dd.", ymdFormat:"YMD", radix:".", thousands:",", currency:"Ft "},
+               "is-IS" : {mask:"d.M.yyyy", ymdFormat:"DMY", radix:",", thousands:".", currency:"$"},
+               "it-IT" : {mask:"dd/MM/yyyy", ymdFormat:"DMY", radix:",", thousands:".", currency:"€"},
+               "ja-JP" : {mask:"yyyy/MM/dd", ymdFormat:"YMD", radix:".", thousands:",", currency:"¥"},
+               "ko-KR" : {mask:"yyyy-MM-dd", ymdFormat:"YMD", radix:",", thousands:".", currency:"$"},//------------------ok
+               "nl-NL" : {mask:"d-M-yyyy", ymdFormat:"DMY", radix:",", thousands:".", currency:"€"},
+               "nb-NO" : {mask:"dd.MM.yyyy", ymdFormat:"DMY", radix:",", thousands:".", currency:"$"},
+               "pl-PL" : {mask:"yyyy-MM-dd", ymdFormat:"YMD", radix:",", thousands:"space", currency:"zł "},
+               "pt-BR" : {mask:"d/M/yyyy", ymdFormat:"DMY", radix:".", thousands:",", currency:"R$ "},
+               "ro-RO" : {mask:"dd.MM.yyyy", ymdFormat:"DMY", radix:",", thousands:".", currency:"$"},
+               "ru-RU" : {mask:"dd.MM.yyyy", ymdFormat:"DMY", radix:",", thousands:".", currency:"₽"},
+               "hr-HR" : {mask:"d.M.yyyy", ymdFormat:"DMY", radix:",", thousands:".", currency:"$"},
+               "sk-SK" : {mask:"d. M. yyyy", ymdFormat:"DMY", radix:",", thousands:".", currency:"€"},
+               "sq-AL" : {mask:"yyyy-MM-dd", ymdFormat:"YMD", radix:",", thousands:".", currency:"$"},
+               "sv-SE" : {mask:"yyyy-MM-dd", ymdFormat:"YMD", radix:",", thousands:".", currency:"kr "},
+               "th-TH" : {mask:"d/M/yyyy", ymdFormat:"DMY", radix:",", thousands:".", currency:"$"},
+               "tr-TR" : {mask:"dd.MM.yyyy", ymdFormat:"DMY", radix:",", thousands:".", currency:"$"},
+               "ur-PK" : {mask:"dd/MM/yyyy", ymdFormat:"DMY", radix:",", thousands:".", currency:"$"},
+               "id-ID" : {mask:"dd/MM/yyyy", ymdFormat:"DMY", radix:",", thousands:".", currency:"$"},
+               "uk-UA" : {mask:"dd.MM.yyyy", ymdFormat:"DMY", radix:",", thousands:".", currency:"$"},
+               "be-BY" : {mask:"dd.MM.yyyy", ymdFormat:"DMY", radix:",", thousands:".", currency:"$"},
+               "sl-SI" : {mask:"d.M.yyyy", ymdFormat:"DMY", radix:",", thousands:".", currency:"€"},
+               "et-EE" : {mask:"d.MM.yyyy", ymdFormat:"DMY", radix:",", thousands:".", currency:"$"},
+               "lv-LV" : {mask:"yyyy.MM.dd.", ymdFormat:"YMD", radix:",", thousands:".", currency:"€"},
+               "lt-LT" : {mask:"yyyy.MM.dd", ymdFormat:"YMD", radix:",", thousands:".", currency:"€"},//-------------------------ok
+               "fa-IR" : {mask:"MM/dd/yyyy", ymdFormat:"MDY", radix:",", thousands:".", currency:"$"},
+               "vi-VN" : {mask:"dd/MM/yyyy", ymdFormat:"DMY", radix:",", thousands:".", currency:"$"},
+               "hy-AM" : {mask:"dd.MM.yyyy", ymdFormat:"DMY", radix:",", thousands:".", currency:"$"},
+               "az-Latn-AZ" : {mask:"dd.MM.yyyy", ymdFormat:"DMY", radix:",", thousands:".", currency:"$"},
+               "eu-ES" : {mask:"yyyy/MM/dd", ymdFormat:"YMD", radix:",", thousands:".", currency:"€"},
+               "mk-MK" : {mask:"dd.MM.yyyy", ymdFormat:"DMY", radix:",", thousands:".", currency:"$"},
+               "af-ZA" : {mask:"yyyy/MM/dd", ymdFormat:"YMD", radix:",", thousands:".", currency:"$"},
+               "ka-GE" : {mask:"dd.MM.yyyy", ymdFormat:"DMY", radix:",", thousands:".", currency:"$"},
+               "fo-FO" : {mask:"dd-MM-yyyy", ymdFormat:"DMY", radix:",", thousands:".", currency:"$"},
+               "hi-IN" : {mask:"dd-MM-yyyy", ymdFormat:"DMY", radix:",", thousands:".", currency:"$"},
+               "ms-MY" : {mask:"dd/MM/yyyy", ymdFormat:"DMY", radix:",", thousands:".", currency:"$"},
+               "kk-KZ" : {mask:"dd.MM.yyyy", ymdFormat:"DMY", radix:",", thousands:".", currency:"$"},
+               "ky-KG" : {mask:"dd.MM.yy", ymdFormat:"DMY", radix:",", thousands:".", currency:"$"},
+               "sw-KE" : {mask:"M/d/yyyy", ymdFormat:"MDY", radix:",", thousands:".", currency:"$"},
+               "uz-Latn-UZ" : {mask:"dd/MM yyyy", ymdFormat:"DMY", radix:",", thousands:".", currency:"$"},
+               "tt-RU" : {mask:"dd.MM.yyyy", ymdFormat:"DMY", radix:",", thousands:".", currency:"$"},
+               "pa-IN" : {mask:"dd-MM-yy", ymdFormat:"DMY", radix:".", thousands:",", currency:"Rs. "},
+               "gu-IN" : {mask:"dd-MM-yy", ymdFormat:"DMY", radix:",", thousands:".", currency:"$"},
+               "ta-IN" : {mask:"dd-MM-yyyy", ymdFormat:"DMY", radix:",", thousands:".", currency:"$"},
+               "te-IN" : {mask:"dd-MM-yy", ymdFormat:"DMY", radix:",", thousands:".", currency:"$"},
+               "kn-IN" : {mask:"dd-MM-yy", ymdFormat:"DMY", radix:",", thousands:".", currency:"$"},
+               "mr-IN" : {mask:"dd-MM-yyyy", ymdFormat:"DMY", radix:",", thousands:".", currency:"$"},
+               "sa-IN" : {mask:"dd-MM-yyyy", ymdFormat:"DMY", radix:",", thousands:".", currency:"$"},
+               "mn-MN" : {mask:"yy.MM.dd", ymdFormat:"YMD", radix:",", thousands:".", currency:"$"},
+               "gl-ES" : {mask:"dd/MM/yy", ymdFormat:"DMY", radix:",", thousands:".", currency:"€"},
+               "kok-IN" : {mask:"dd-MM-yyyy", ymdFormat:"DMY", radix:",", thousands:".", currency:"$"},
+               "syr-SY" : {mask:"dd/MM/yyyy", ymdFormat:"DMY", radix:",", thousands:".", currency:"$"},
+               "dv-MV" : {mask:"dd/MM/yy", ymdFormat:"DMY", radix:",", thousands:".", currency:"$"},
+               "ar-IQ" : {mask:"dd/MM/yyyy", ymdFormat:"DMY", radix:",", thousands:".", currency:"$"},
+               "zh-CN" : {mask:"yyyy/M/d", ymdFormat:"YMD", radix:".", thousands:",", currency:"¥"},//--------------------------ok
+               "de-CH" : {mask:"dd.MM.yyyy", ymdFormat:"DMY", radix:".", thousands:",", currency:"CHF "},
+               "en-GB" : {mask:"dd/MM/yyyy", ymdFormat:"DMY", radix:".", thousands:",", currency:"£"},
+               "es-MX" : {mask:"dd/MM/yyyy", ymdFormat:"DMY", radix:".", thousands:",", currency:"Mex$ "},
+               "fr-BE" : {mask:"d/MM/yyyy", ymdFormat:"DMY", radix:",", thousands:".", currency:"€"},
+               "it-CH" : {mask:"dd.MM.yyyy", ymdFormat:"DMY", radix:".", thousands:",", currency:"CHF "},
+               "nl-BE" : {mask:"d/MM/yyyy", ymdFormat:"DMY", radix:",", thousands:".", currency:"€"},
+               "nn-NO" : {mask:"dd.MM.yyyy", ymdFormat:"DMY", radix:",", thousands:".", currency:"$"},
+               "pt-PT" : {mask:"dd-MM-yyyy", ymdFormat:"DMY", radix:",", thousands:".", currency:"€"},
+               "sr-Latn-CS" : {mask:"d.M.yyyy", ymdFormat:"DMY", radix:",", thousands:".", currency:"$"},
+               "sv-FI" : {mask:"d.M.yyyy", ymdFormat:"DMY", radix:",", thousands:".", currency:"$"},
+               "az-Cyrl-AZ" : {mask:"dd.MM.yyyy", ymdFormat:"DMY", radix:",", thousands:".", currency:"$"},
+               "ms-BN" : {mask:"dd/MM/yyyy", ymdFormat:"DMY", radix:",", thousands:".", currency:"$"},
+               "uz-Cyrl-UZ" : {mask:"dd.MM.yyyy", ymdFormat:"DMY", radix:",", thousands:".", currency:"$"},
+               "ar-EG" : {mask:"dd/MM/yyyy", ymdFormat:"DMY", radix:",", thousands:".", currency:"$"},
+               "zh-HK" : {mask:"d/M/yyyy", ymdFormat:"DMY", radix:".", thousands:",", currency:"HK$ "},
+               "de-AT" : {mask:"dd.MM.yyyy", ymdFormat:"DMY", radix:",", thousands:".", currency:"€"},
+               "en-AU" : {mask:"d/MM/yyyy", ymdFormat:"DMY", radix:".", thousands:",", currency:"A$ "},
+               "es-ES" : {mask:"dd/MM/yyyy", ymdFormat:"DMY", radix:",", thousands:".", currency:"$"},
+               "fr-CA" : {mask:"yyyy-MM-dd", ymdFormat:"YMD", radix:",", thousands:"space", currency:"$"},
+               "sr-Cyrl-CS" : {mask:"d.M.yyyy", ymdFormat:"DMY", radix:",", thousands:".", currency:"$"},
+               "ar-LY" : {mask:"dd/MM/yyyy", ymdFormat:"DMY", radix:",", thousands:".", currency:"$"},
+               "zh-SG" : {mask:"d/M/yyyy", ymdFormat:"DMY", radix:".", thousands:",", currency:"S$"},
+               "de-LU" : {mask:"dd.MM.yyyy", ymdFormat:"DMY", radix:",", thousands:".", currency:"€"},
+               "en-CA" : {mask:"dd/MM/yyyy", ymdFormat:"DMY", radix:".", thousands:",", currency:"C$ "},
+               "es-GT" : {mask:"dd/MM/yyyy", ymdFormat:"DMY", radix:",", thousands:".", currency:"$"},
+               "fr-CH" : {mask:"dd.MM.yyyy", ymdFormat:"DMY", radix:".", thousands:",", currency:"CHF "},
+               "ar-DZ" : {mask:"dd-MM-yyyy", ymdFormat:"DMY", radix:",", thousands:".", currency:"$"},
+               "zh-MO" : {mask:"d/M/yyyy", ymdFormat:"DMY", radix:".", thousands:",", currency:"$"},
+               "de-LI" : {mask:"dd.MM.yyyy", ymdFormat:"DMY", radix:",", thousands:".", currency:"€"},
+               "en-NZ" : {mask:"d/MM/yyyy", ymdFormat:"DMY", radix:",", thousands:".", currency:"$"},
+               "es-CR" : {mask:"dd/MM/yyyy", ymdFormat:"DMY", radix:",", thousands:".", currency:"$"},
+               "fr-LU" : {mask:"dd/MM/yyyy", ymdFormat:"DMY", radix:",", thousands:".", currency:"$"},
+               "ar-MA" : {mask:"dd-MM-yyyy", ymdFormat:"DMY", radix:",", thousands:".", currency:"$"},
+               "en-IE" : {mask:"dd/MM/yyyy", ymdFormat:"DMY", radix:",", thousands:".", currency:"€"},//-----------------------------ok
+               "es-PA" : {mask:"MM/dd/yyyy", ymdFormat:"MDY", radix:",", thousands:".", currency:"$"},
+               "fr-MC" : {mask:"dd/MM/yyyy", ymdFormat:"DMY", radix:",", thousands:".", currency:"$"},
+               "ar-TN" : {mask:"dd-MM-yyyy", ymdFormat:"DMY", radix:",", thousands:".", currency:"$"},
+               "en-ZA" : {mask:"yyyy/MM/dd", ymdFormat:"YMD", radix:",", thousands:".", currency:"$"},
+               "es-DO" : {mask:"dd/MM/yyyy", ymdFormat:"DMY", radix:",", thousands:".", currency:"$"},
+               "ar-OM" : {mask:"dd/MM/yyyy", ymdFormat:"DMY", radix:",", thousands:".", currency:"$"},
+               "en-JM" : {mask:"dd/MM/yyyy", ymdFormat:"DMY", radix:",", thousands:".", currency:"$"},
+               "es-VE" : {mask:"dd/MM/yyyy", ymdFormat:"DMY", radix:",", thousands:".", currency:"$"},
+               "ar-YE" : {mask:"dd/MM/yyyy", ymdFormat:"DMY", radix:",", thousands:".", currency:"$"},
+               "en-029" : {mask:"MM/dd/yyyy", ymdFormat:"MDY", radix:",", thousands:".", currency:"$"},
+               "es-CO" : {mask:"dd/MM/yyyy", ymdFormat:"DMY", radix:",", thousands:".", currency:"$"},
+               "ar-SY" : {mask:"dd/MM/yyyy", ymdFormat:"DMY", radix:",", thousands:".", currency:"$"},
+               "en-BZ" : {mask:"dd/MM/yyyy", ymdFormat:"DMY", radix:",", thousands:".", currency:"$"},
+               "es-PE" : {mask:"dd/MM/yyyy", ymdFormat:"DMY", radix:".", thousands:",", currency:"S/."},
+               "ar-JO" : {mask:"dd/MM/yyyy", ymdFormat:"DMY", radix:",", thousands:".", currency:"$"},
+               "en-TT" : {mask:"dd/MM/yyyy", ymdFormat:"DMY", radix:",", thousands:".", currency:"$"},
+               "es-AR" : {mask:"dd/MM/yyyy", ymdFormat:"DMY", radix:",", thousands:".", currency:"$"},
+               "ar-LB" : {mask:"dd/MM/yyyy", ymdFormat:"DMY", radix:",", thousands:".", currency:"$"},
+               "en-ZW" : {mask:"M/d/yyyy", ymdFormat:"MDY", radix:",", thousands:".", currency:"$"},
+               "es-EC" : {mask:"dd/MM/yyyy", ymdFormat:"DMY", radix:",", thousands:".", currency:"$"},
+               "ar-KW" : {mask:"dd/MM/yyyy", ymdFormat:"DMY", radix:",", thousands:".", currency:"$"},
+               "en-PH" : {mask:"M/d/yyyy", ymdFormat:"MDY", radix:".", thousands:",", currency:"₱"},
+               "es-CL" : {mask:"dd-MM-yyyy", ymdFormat:"DMY", radix:",", thousands:".", currency:"$"},
+               "ar-AE" : {mask:"dd/MM/yyyy", ymdFormat:"DMY", radix:",", thousands:".", currency:"$"},
+               "es-UY" : {mask:"dd/MM/yyyy", ymdFormat:"DMY", radix:",", thousands:".", currency:"$"},
+               "ar-BH" : {mask:"dd/MM/yyyy", ymdFormat:"DMY", radix:",", thousands:".", currency:"$"},
+               "es-PY" : {mask:"dd/MM/yyyy", ymdFormat:"DMY", radix:",", thousands:".", currency:"$"},
+               "ar-QA" : {mask:"dd/MM/yyyy", ymdFormat:"DMY", radix:",", thousands:".", currency:"$"},
+               "es-BO" : {mask:"dd/MM/yyyy", ymdFormat:"DMY", radix:",", thousands:".", currency:"$"},
+               "es-SV" : {mask:"dd/MM/yyyy", ymdFormat:"DMY", radix:",", thousands:".", currency:"$"},
+               "es-HN" : {mask:"dd/MM/yyyy", ymdFormat:"DMY", radix:",", thousands:".", currency:"$"},
+               "es-NI" : {mask:"dd/MM/yyyy", ymdFormat:"DMY", radix:",", thousands:".", currency:"$"},
+               "es-PR" : {mask:"dd/MM/yyyy", ymdFormat:"DMY", radix:",", thousands:".", currency:"$"},
+               "am-ET" : {mask:"d/M/yyyy", ymdFormat:"DMY", radix:",", thousands:".", currency:"$"},//--------------------------ok
+               "tzm-Latn-DZ" : {mask:"dd-MM-yyyy", ymdFormat:"DMY", radix:",", thousands:".", currency:"$"},
+               "iu-Latn-CA" : {mask:"d/MM/yyyy", ymdFormat:"DMY", radix:",", thousands:".", currency:"$"},
+               "sma-NO" : {mask:"dd.MM.yyyy", ymdFormat:"DMY", radix:",", thousands:".", currency:"$"},
+               "mn-Mong-CN" : {mask:"yyyy/M/d", ymdFormat:"YMD", radix:",", thousands:".", currency:"$"},
+               "gd-GB" : {mask:"dd/MM/yyyy", ymdFormat:"DMY", radix:",", thousands:".", currency:"€"},
+               "en-MY" : {mask:"d/M/yyyy", ymdFormat:"DMY", radix:",", thousands:".", currency:"$"},
+               "prs-AF" : {mask:"dd/MM/yy", ymdFormat:"DMY", radix:",", thousands:".", currency:"$"},
+               "bn-BD" : {mask:"dd-MM-yy", ymdFormat:"DMY", radix:",", thousands:".", currency:"$"},
+               "wo-SN" : {mask:"dd/MM/yyyy", ymdFormat:"DMY", radix:",", thousands:".", currency:"$"},
+               "rw-RW" : {mask:"M/d/yyyy", ymdFormat:"MDY", radix:",", thousands:".", currency:"$"},
+               "qut-GT" : {mask:"dd/MM/yyyy", ymdFormat:"DMY", radix:",", thousands:".", currency:"$"},
+               "sah-RU" : {mask:"MM.dd.yyyy", ymdFormat:"MDY", radix:",", thousands:".", currency:"$"},
+               "gsw-FR" : {mask:"dd/MM/yyyy", ymdFormat:"DMY", radix:",", thousands:".", currency:"$"},
+               "co-FR" : {mask:"dd/MM/yyyy", ymdFormat:"DMY", radix:",", thousands:".", currency:"$"},
+               "oc-FR" : {mask:"dd/MM/yyyy", ymdFormat:"DMY", radix:",", thousands:".", currency:"$"},
+               "mi-NZ" : {mask:"dd/MM/yyyy", ymdFormat:"DMY", radix:",", thousands:".", currency:"$"},
+               "ga-IE" : {mask:"dd/MM/yyyy", ymdFormat:"DMY", radix:",", thousands:".", currency:"€"},
+               "se-SE" : {mask:"yyyy-MM-dd", ymdFormat:"YMD", radix:",", thousands:".", currency:"$"},
+               "br-FR" : {mask:"dd/MM/yyyy", ymdFormat:"DMY", radix:",", thousands:".", currency:"€"},
+               "smn-FI" : {mask:"d.M.yyyy", ymdFormat:"DMY", radix:",", thousands:".", currency:"$"},
+               "moh-CA" : {mask:"M/d/yyyy", ymdFormat:"MDY", radix:",", thousands:".", currency:"$"},
+               "arn-CL" : {mask:"dd-MM-yyyy", ymdFormat:"DMY", radix:",", thousands:".", currency:"$"},
+               "ii-CN" : {mask:"yyyy/M/d", ymdFormat:"YMD", radix:",", thousands:".", currency:"$"},//--------------------------ok
+               "dsb-DE" : {mask:"d. M. yyyy", ymdFormat:"DMY", radix:",", thousands:".", currency:"$"},
+               "ig-NG" : {mask:"d/M/yyyy", ymdFormat:"DMY", radix:",", thousands:".", currency:"$"},
+               "kl-GL" : {mask:"dd-MM-yyyy", ymdFormat:"DMY", radix:",", thousands:".", currency:"$"},
+               "lb-LU" : {mask:"dd/MM/yyyy", ymdFormat:"DMY", radix:",", thousands:".", currency:"€"},
+               "ba-RU" : {mask:"dd.MM.yy", ymdFormat:"DMY", radix:",", thousands:".", currency:"$"},
+               "nso-ZA" : {mask:"yyyy/MM/dd", ymdFormat:"YMD", radix:",", thousands:".", currency:"$"},
+               "quz-BO" : {mask:"dd/MM/yyyy", ymdFormat:"DMY", radix:",", thousands:".", currency:"$"},
+               "yo-NG" : {mask:"d/M/yyyy", ymdFormat:"DMY", radix:",", thousands:".", currency:"$"},
+               "ha-Latn-NG" : {mask:"d/M/yyyy", ymdFormat:"DMY", radix:",", thousands:".", currency:"$"},
+               "fil-PH" : {mask:"M/d/yyyy", ymdFormat:"MDY", radix:".", thousands:",", currency:"₱"},
+               "ps-AF" : {mask:"dd/MM/yy", ymdFormat:"DMY", radix:",", thousands:".", currency:"$"},
+               "fy-NL" : {mask:"d-M-yyyy", ymdFormat:"DMY", radix:",", thousands:".", currency:"$"},
+               "ne-NP" : {mask:"M/d/yyyy", ymdFormat:"MDY", radix:",", thousands:".", currency:"$"},
+               "se-NO" : {mask:"dd.MM.yyyy", ymdFormat:"DMY", radix:",", thousands:".", currency:"$"},
+               "iu-Cans-CA" : {mask:"d/M/yyyy", ymdFormat:"DMY", radix:",", thousands:".", currency:"$"},
+               "sr-Latn-RS" : {mask:"d.M.yyyy", ymdFormat:"DMY", radix:",", thousands:".", currency:"$"},
+               "si-LK" : {mask:"yyyy-MM-dd", ymdFormat:"YMD", radix:",", thousands:".", currency:"$"},
+               "sr-Cyrl-RS" : {mask:"d.M.yyyy", ymdFormat:"DMY", radix:",", thousands:".", currency:"$"},
+               "lo-LA" : {mask:"dd/MM/yyyy", ymdFormat:"DMY", radix:",", thousands:".", currency:"$"},
+               "km-KH" : {mask:"yyyy-MM-dd", ymdFormat:"YMD", radix:",", thousands:".", currency:"$"},
+               "cy-GB" : {mask:"dd/MM/yyyy", ymdFormat:"DMY", radix:",", thousands:".", currency:"$"},
+               "bo-CN" : {mask:"yyyy/M/d", ymdFormat:"YMD", radix:",", thousands:".", currency:"$"},
+               "sms-FI" : {mask:"d.M.yyyy", ymdFormat:"DMY", radix:",", thousands:".", currency:"$"},
+               "as-IN" : {mask:"dd-MM-yyyy", ymdFormat:"DMY", radix:",", thousands:".", currency:"$"},
+               "ml-IN" : {mask:"dd-MM-yy", ymdFormat:"DMY", radix:",", thousands:".", currency:"$"},
+               "en-IN" : {mask:"dd-MM-yyyy", ymdFormat:"DMY", radix:",", thousands:".", currency:"$"},
+               "or-IN" : {mask:"dd-MM-yy", ymdFormat:"DMY", radix:",", thousands:".", currency:"$"},
+               "bn-IN" : {mask:"dd-MM-yy", ymdFormat:"DMY", radix:",", thousands:".", currency:"$"},
+               "tk-TM" : {mask:"dd.MM.yy", ymdFormat:"DMY", radix:",", thousands:".", currency:"$"},
+               "bs-Latn-BA" : {mask:"d.M.yyyy", ymdFormat:"DMY", radix:",", thousands:".", currency:"$"},
+               "mt-MT" : {mask:"dd/MM/yyyy", ymdFormat:"DMY", radix:",", thousands:".", currency:"€"},
+               "sr-Cyrl-ME" : {mask:"d.M.yyyy", ymdFormat:"DMY", radix:",", thousands:".", currency:"$"},
+               "se-FI" : {mask:"d.M.yyyy", ymdFormat:"DMY", radix:",", thousands:".", currency:"$"},//------------------------------ok
+               "zu-ZA" : {mask:"yyyy/MM/dd", ymdFormat:"YMD", radix:",", thousands:".", currency:"$"},
+               "xh-ZA" : {mask:"yyyy/MM/dd", ymdFormat:"YMD", radix:",", thousands:".", currency:"$"},
+               "tn-ZA" : {mask:"yyyy/MM/dd", ymdFormat:"YMD", radix:",", thousands:".", currency:"$"},
+               "hsb-DE" : {mask:"d. M. yyyy", ymdFormat:"DMY", radix:",", thousands:".", currency:"$"},
+               "bs-Cyrl-BA" : {mask:"d.M.yyyy", ymdFormat:"DMY", radix:",", thousands:".", currency:"$"},
+               "tg-Cyrl-TJ" : {mask:"dd.MM.yy", ymdFormat:"DMY", radix:",", thousands:".", currency:"$"},
+               "sr-Latn-BA" : {mask:"d.M.yyyy", ymdFormat:"DMY", radix:",", thousands:".", currency:"$"},
+               "smj-NO" : {mask:"dd.MM.yyyy", ymdFormat:"DMY", radix:",", thousands:".", currency:"$"},
+               "rm-CH" : {mask:"dd/MM/yyyy", ymdFormat:"DMY", radix:",", thousands:".", currency:"$"},
+               "smj-SE" : {mask:"yyyy-MM-dd", ymdFormat:"YMD", radix:",", thousands:".", currency:"$"},
+               "quz-EC" : {mask:"dd/MM/yyyy", ymdFormat:"DMY", radix:",", thousands:".", currency:"$"},
+               "quz-PE" : {mask:"dd/MM/yyyy", ymdFormat:"DMY", radix:".", thousands:",", currency:"S/. "},
+               "hr-BA" : {mask:"d.M.yyyy.", ymdFormat:"DMY", radix:",", thousands:".", currency:"$"},
+               "sr-Latn-ME" : {mask:"d.M.yyyy", ymdFormat:"DMY", radix:",", thousands:".", currency:"$"},
+               "sma-SE" : {mask:"yyyy-MM-dd", ymdFormat:"YMD", radix:",", thousands:".", currency:"$"},
+               "en-SG" : {mask:"d/M/yyyy", ymdFormat:"DMY", radix:",", thousands:".", currency:"$"},
+               "ug-CN" : {mask:"yyyy-M-d", ymdFormat:"YMD", radix:",", thousands:".", currency:"$"},
+               "sr-Cyrl-BA" : {mask:"d.M.yyyy", ymdFormat:"DMY", radix:",", thousands:".", currency:"$"},
+               "es-US" : {mask:"M/d/yyyy", ymdFormat:"MDY", radix:",", thousands:".", currency:"$"},
+            };
+            var locCode = formats[navigator.language];//https://www.microsoft.com/resources/msdn/goglobal/default.mspx
+            // locCode = formats["hu-HU"];
+            // locCode = formats["es-MX"];
+            // locCode = formats["fr-FR"];
+            // locCode = formats["he-IL"];
+            // locCode = formats["en-US"];
+            // locCode = formats["pl-PL"];
+            var formatMask = locCode || {mask:"yyyy-MM-dd", ymdFormat:"YMD",radix:".", thousands:",", currency:"$"};//'dd/MM/yyyy';
+            return formatMask;
+        },
+        setApplicationSettingsFromSystem: function() {
+            this.appsettings.radixpoint = this.getLocaleSettings().radix; //this.getDecimalSeparator();//":";
+            thousandsSeparator = this.getLocaleSettings().thousands;
+            if(this.appsettings.radixpoint == "." && thousandsSeparator ==".") //clash =>force distinction
+                thousandsSeparator = ",";
+            if(this.appsettings.radixpoint == "," && thousandsSeparator ==",") //clash =>force distinction
+                thousandsSeparator = ".";
+            this.appsettings.thousandsSeparator = thousandsSeparator;
+            this.appsettings.dateformat = this.getLocaleSettings().ymdFormat;
+            this.appsettings.currency = this.getLocaleSettings().currency;
+        },
 		testFunc: function(x) {
 			alert("FL.common.test() -->"+x);
 		}

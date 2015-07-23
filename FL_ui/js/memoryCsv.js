@@ -129,7 +129,7 @@ window.csvStore = {
         this.setAttributesArr(newAttributesArr);
         return loseInfo;
     },
-    is_dictionaryUpdateLoseInformation: function(changedTypeArr){//transform the store content according to newAttributesArr and changedNamesArr and  changedTypeArr
+    Xis_dictionaryUpdateLoseInformation: function(changedTypeArr){//transform the store content according to newAttributesArr and changedNamesArr and  changedTypeArr
         //similar to transformStoreTo but nothing is changed ->Returns true if dictionary change will impact entity loosing info. False otherwise
         var loseInfo = false;
             _.each(changedTypeArr, function(element){

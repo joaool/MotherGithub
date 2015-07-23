@@ -3,7 +3,7 @@
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width">
-	<title>version 13.44</title>
+	<title>version 13.47</title>
 	<!--
 		testApigee
 	-->
@@ -72,17 +72,29 @@ mixpanel.init("19ada1cb259cc3272c67085eb1bf03fc");</script><!-- end Mixpanel -->
 
     <link href="FL_ui/css/bootstrap-dialog.css" rel="stylesheet" type="text/css" />
     <script src="FL_ui/js/bootstrap-dialog.js"></script>
+    
+    <link rel="stylesheet" href="FL_ui/css/jquery-ui-1.10.4.custom.min.css"/>
+	<link href="FL_ui/css/jquery-ui-timepicker.css" rel="stylesheet" type="text/css" />
+	<!--<link rel="stylesheet" href="FL_ui/css/intlTelInput.css" />-->
 
 	<link href="FL_ui/css/backgrid.css" rel="stylesheet">    
 	<link href="FL_ui/css/backgrid-paginator.css" rel="stylesheet">    
 	<link href="FL_ui/css/backgrid-select-all.min.css" rel="stylesheet">    
-	<link href="FL_ui/css/backgrid-filter.min.css" rel="stylesheet">    
+	<link href="FL_ui/css/backgrid-filter.min.css" rel="stylesheet">
+	<link href="FL_ui/css/backgrid-text-cell.css" rel="stylesheet">
+
+
+	
+	<!--  awesomplete CSS -->
+	<link rel="stylesheet" href="https://leaverou.github.io/prism/themes/prism.css" />
+	<link rel="stylesheet" href="FL_ui/css/awesomplete.css" />
+	<!--<link rel="stylesheet" href="FL_ui/css/style.css" />-->
 
 	<script src="FL_ui/js/spin.min.js"></script>
 	<script src="FL_ui/js/FLMenu2.js"></script>
 	<!--<script src="FL_ui/js/FLLoadCss2.js"></script>-->
-	<script src="FL_ui/js/FLlogin2.js"></script>
 	<script src="FL_ui/js/FLCommon2.js"></script>
+	<script src="FL_ui/js/FLlogin2.js"></script>
 	<script src="FL_ui/js/FLGrid2.js"></script>
 	<script src="FL_ui/js/FLServices2.js"></script>
 
@@ -107,6 +119,19 @@ mixpanel.init("19ada1cb259cc3272c67085eb1bf03fc");</script><!-- end Mixpanel -->
 	<!-- <script src="js/jquery-1.11.1.min.js"></script> -->
 	<!-- <script src="FL_ui/js/backbone-min.js"></script> -->
 	<script src="FL_ui/js/backbone.js"></script>
+
+	<script src="FL_ui/js/jquery-ui-1.10.4.js"></script>
+    <script src="FL_ui/js/jquery-ui-timepicker.js"></script>
+
+    <!-- backgrid phone widget -->
+    <script src="FL_ui/js/jquery.bind-first-0.2.3.min.js" ></script>
+    <script src="FL_ui/js/jquery.inputmask1_2_2.js"></script>
+	<script src="FL_ui/js/jquery.inputmask-multi.js"></script>
+    
+    <!-- number and currency masks -->
+    <script src="FL_ui/js/accounting.min.js"></script>
+    <script src="FL_ui/js/jquery.mask.min.js"></script>
+
 	<!-- <script src="js/bootstrap.min.js"></script> -->
 	<!-- necessary for backgrid  -->
 	<script src="FL_ui/js/backbone.paginator.js"></script>
@@ -114,9 +139,18 @@ mixpanel.init("19ada1cb259cc3272c67085eb1bf03fc");</script><!-- end Mixpanel -->
 	<script src="FL_ui/js/backgrid-paginator.js"></script>
 	<script src="FL_ui/js/backgrid-select-all.min.js"></script>
 	<script src="FL_ui/js/backgrid-filter.min.js"></script>
+	<script src="FL_ui/js/backgrid-text-cell.js"></script>
+
+    <!--  searchbox awesomplete  -->
+    <!--<script src="FL_ui/js/awesomplete.js"></script>-->
+    <!--<script src="FL_ui/js/index.js"></script>-->
+    <!--<script type='text/javascript' src='FL_ui/js/autocomplete-cell.js'></script>-->
+    <script type='text/javascript' src='FL_ui/js/mockjax.js'></script>
 
 	<script src="FL_ui/js/moment.js"></script>
 	<script src="FL_ui/js/backgrid-moment-cell.js"></script>
+	<!--<script src="FL_ui/js/bootstrap-datetimepicker.js"></script>-->
+
 	<!-- <link rel="stylesheet" href="//code.jquery.com/ui/1.11.3/themes/smoothness/jquery-ui.css"> -->
 
 
@@ -131,14 +165,18 @@ mixpanel.init("19ada1cb259cc3272c67085eb1bf03fc");</script><!-- end Mixpanel -->
 	<script src="FL_ui/js/FLSlidePanels.js"></script> <!-- TO BE REMOVED SOON -->           
 	<script src="FL_ui/js/memoryCsv.js"></script>  
 	<script src="FL_ui/js/bootstrap-filestyle.js"> </script> 
+	<!--<script src="FL_ui/js/bootstrap-select.min.js"> </script> -->
 	<!-- <script src="FL_ui/js/async.js"> </script> -->
 	<script src="FL_ui/js/mandrill.js"> </script> 	
 	<script src="FL_ui/flClient/flClient.js"></script>
 	<script src="FL_ui/flClient/ajaxBrowser.js"></script>
 	<script src="FL_ui/js/FLServer.js"></script> <!-- TO BE REMOVED SOON has offline TBR-->  
-	<script src="FL_ui/js/phoneparser.js"></script>
+	<!--<script src="FL_ui/js/phoneparser.js"></script>-->
 
 	<script src="FL_ui/js/FLAPI.js"></script>
+	<script src="FL_ui/js/FLbackgrid2.js"></script>
+	<!--<script  src="https://www.google.com/jsapi" type="text/javascript"></script>-->
+
 	<!-- <script src="FL_ui/js/objectid.js"></script> -->
 
     <script type="text/javascript" src="https://js.stripe.com/v2/"></script> 
@@ -274,8 +312,7 @@ mixpanel.init("19ada1cb259cc3272c67085eb1bf03fc");</script><!-- end Mixpanel -->
 	  margin: 0 auto 30px;
 	  max-height: 145px;
 	}
-	/* Footer
-	-------------------------------------------------- */
+	/* Footer 	-------------------------------------------------- */	
 	.footer {
 	  text-align: center;
 	  padding: 30px 0;
@@ -459,7 +496,17 @@ mixpanel.init("19ada1cb259cc3272c67085eb1bf03fc");</script><!-- end Mixpanel -->
 	}
 	.removeAllImages {
 	    cursor:pointer;
-	}    
+	}
+	.ui-datepicker{ 
+		font-size: 80%;
+		background:#DADADA;
+ 		border: 1px solid black;/*general border */
+    	color: black;	/* weekdays color*/
+ 	}
+	.ui-datepicker-header{
+	    background: black;
+ 		border: 1px solid black;/*border around header*/
+	}
     /*
 	.datepicker thead {  
 	    background-color: #f7f7f7;  
@@ -602,7 +649,21 @@ mixpanel.init("19ada1cb259cc3272c67085eb1bf03fc");</script><!-- end Mixpanel -->
 		    	</div>
 			</form>
 		</div>
-	</script>	
+	</script>
+	<script id="_getLookupTableAndField" type="text/template"> 
+		<div class="getComboList" style="margin-top:0px;">
+			<form id="form__getLookupTableAndField" novalidate="novalidate">
+				<div class="row">
+					<div class="col-xs-12" >
+						<div class="input-group" style="line-height:0px;">
+							<input type="text" class="form-control" id="_getLookupTableAndField_special" placeholder="eCN,fCN" value="<%= masterDetailItems.master.special %>" name="list" data-parsley-trigger="change" required >
+							<span class="input-group-addon"><span class="glyphicon glyphicon-th-list"></span></span>
+					    </div>
+				    </div>
+		    	</div>
+			</form>
+		</div>
+	</script>		
 	<script id="getStartedTemplate" type="text/template"> 
 		<div class="getStartedExample" style="margin-top:0px;">
 			<form id="form_getStartedTemplate" novalidate="novalidate">
@@ -644,6 +705,59 @@ mixpanel.init("19ada1cb259cc3272c67085eb1bf03fc");</script><!-- end Mixpanel -->
 			</form>
 		</div>
 	</script>
+	<script id="_editAppSettingsTemplate" type="text/template"> 
+		<div class="_editAppSettingsExample" style="margin-top:0px;">
+			<form id="form__editAppSettingsTemplate" novalidate="novalidate">
+			<legend>Please edit your application parameters:</legend>
+				<div class="row">
+					<div class="col-xs-12" >
+						<div class="input-group" style="line-height:0px;">
+							<span class="input-group-addon">Press to automaticaly choose browser settings  ------->:</span>
+							<button type="submit" class="btn btn-primary"  onclick="FL.links.appSettingsForceButton()">Reset to browser settings</button>
+						</div>	
+						<div class="input-group" style="line-height:0px;">
+							<span class="input-group-addon">Decimal separator:</span>
+							<div class="btn-group">
+								<a class="btn btn-default dropdown-toggle" data-toggle="dropdown" id="_editAppSettings_radixpoint" href="#"> <span class="caret"></span></a>
+								<ul id="_editAppSettings_radixpoint_options" class="dropdown-menu"></ul>
+							</div>
+							<span class="input-group-addon"><span class="glyphicon glyphicon-ok"></span></span>
+						</div>					    
+						<div class="input-group" style="line-height:0px;">
+							<span class="input-group-addon">Thousands separator:</span>
+							<div class="btn-group">
+								<a class="btn btn-default dropdown-toggle" data-toggle="dropdown" id="_editAppSettings_thousandsSeparator" href="#"> <span class="caret"></span></a>
+								<ul id="_editAppSettings_thousandsSeparator_options" class="dropdown-menu"></ul>
+							</div>
+							<span class="input-group-addon"><span class="glyphicon glyphicon-ok"></span></span>
+					    </div>
+						<div class="input-group" style="line-height:0px;">
+							<span class="input-group-addon">Default Decimals:</span>
+							<input type="number" class="form-control" id="_editAppSettings_decimals" placeholder="ex:2 (decimals to appear after decimal separator)" value="<%= masterDetailItems.master.decimals %>" data-parsley-trigger="change">
+							<span class="input-group-addon"><span class="glyphicon glyphicon-ok"></span></span>
+					    </div>
+						<div class="input-group" style="line-height:0px;">
+							<span class="input-group-addon">Date Format:</span>
+							<div class="btn-group">
+								<a class="btn btn-default dropdown-toggle" data-toggle="dropdown" id="_editAppSettings_dateformat" href="#"> <span class="caret"></span></a>
+								<ul id="_editAppSettings_dateformat_options" class="dropdown-menu"></ul>
+							</div>
+							<span class="input-group-addon"><span class="glyphicon glyphicon-ok"></span></span>
+						</div>					    
+						<div class="input-group" style="line-height:0px;">
+							<span class="input-group-addon">Default Currency:</span>
+							<div class="btn-group">
+								<a class="btn btn-default dropdown-toggle" data-toggle="dropdown" id="_editAppSettings_currency" href="#"> <span class="caret"></span></a>
+								<ul id="_editAppSettings_currency_options" class="dropdown-menu"></ul>
+							</div>
+							<span class="input-group-addon"><span class="glyphicon glyphicon-ok"></span></span>
+						</div>
+						
+				    </div>
+		    	</div>
+			</form>
+		</div>
+	</script>	
 	<script id="_importCSV" type="text/template"> 
 		<div class="_importCSV" style="margin-top:0px;">
 			<form id="form__importCSV" novalidate="novalidate">
@@ -905,6 +1019,9 @@ mixpanel.init("19ada1cb259cc3272c67085eb1bf03fc");</script><!-- end Mixpanel -->
 			<i  class="glyphicon glyphicon-trash" style="font-size: 0.9em;color:white;"></i>
   		</a>
 	</script>
+	<script id="phoneInputTemplate" type="text/template"> 
+		<input type="tel" id="phoneInput"  placeholder="example">
+	</script>	
 	<div class="masthead">
 		<div class="wrap push">
 			<div id="_login">
@@ -1052,4 +1169,5 @@ mixpanel.init("19ada1cb259cc3272c67085eb1bf03fc");</script><!-- end Mixpanel -->
 	// </script>
 	-->	
 </body>
+<div id="_freeSlots"><div>
 </html>

@@ -175,33 +175,6 @@ window.utils = {
         var re =/^(?:(?:https?|ftp):\/\/)(?:\S+(?::\S*)?@)?(?:(?!10(?:\.\d{1,3}){3})(?!127(?:\.\d{1,3}){3})(?!169\.254(?:\.\d{1,3}){2})(?!192\.168(?:\.\d{1,3}){2})(?!172\.(?:1[6-9]|2\d|3[0-1])(?:\.\d{1,3}){2})(?:[1-9]\d?|1\d\d|2[01]\d|22[0-3])(?:\.(?:1?\d{1,2}|2[0-4]\d|25[0-5])){2}(?:\.(?:[1-9]\d?|1\d\d|2[0-4]\d|25[0-4]))|(?:(?:[a-z\u00a1-\uffff0-9]+-?)*[a-z\u00a1-\uffff0-9]+)(?:\.(?:[a-z\u00a1-\uffff0-9]+-?)*[a-z\u00a1-\uffff0-9]+)*(?:\.(?:[a-z\u00a1-\uffff]{2,})))(?::\d{2,5})?(?:\/[^\s]*)?$/i;
         return re.test(url);
     },
-    is_phone: function(phone) {//validates numbers without format
-        //format NANP North American Numbering Plan is (123) 456-7890 or 123-456-7890 -  three-digit area code, a three-digit central office code, and a four-digit station number
-        //    in NANP the format is NXX NXX XXXX where N is [2-9] and X is [0-9]
-        // E164 is an unambiguous, internationally recognized standard for telephone numbers 
-        //      A telephone number can have a maximum of 15 digits
-        //      The first part of the telephone number is the country code
-        //      The second part is the national destination code (NDC)
-        //      The last part is the subscriber number (SN)
-        //      The NDC and SN together are collectively called the national (significant) number
-        // E164 It’s also commonly used for telephony based services such as SMS providers
-        // The E.164 standard might be great for storage, but terrible for two things. 
-        //      First, virtually no one would type or read out their number in that format. 
-        //      Second, it’s hopeless in terms of its readability. 
-        //  http://www.sitepoint.com/working-phone-numbers-javascript/
-        //  http://jackocnr.com/intl-tel-input.html
-        //  http://www.phoneformat.com/  (290K minified !!!)   for a number and a country retrieves Local, International, E164, Mobile dialing and is valid or not
-        
-        // var re = /^(\()?\d{3}(\))?(-|\s)?\d{3}(-|\s)\d{4}$/;
-        //return re.test(phone);
-        var is = false;
-        if(phone.charAt(0)=="+")
-            phone = phone.substr(1);
-        var phoneObj=parsePhone(phone);//https://github.com/Gilshallem/phoneparser (68 Kb)
-        if(phoneObj)
-            is=true;
-        return is;
-    },
     typeOf: function(xVar) {//returns one of :  "number","string","boolean","object","array","null","undefined","date"
         //exemple of undefined: a variable declared but never defined -->var foo; alert(foo); //undefined.
         var xRet = typeof xVar;
@@ -227,7 +200,7 @@ window.utils = {
                 subtype="email";
             else if(this.is_url(xVar))
                 subtype="url";
-            else if(this.is_phone(xVar))
+            else if(FL.common.is_phone(xVar))
                 subtype="phone";
         }
         return subtype;
@@ -259,7 +232,7 @@ window.utils = {
         });
         return entityName;
     },
-    backGridColumnsExtractedFromDictionary: function(entityName){//prepares a columns object for backgrid
+    xbackGridColumnsExtractedFromDictionary: function(entityName){//prepares a columns object for backgrid
         //first column has a delete button, second a non editable  id then the others       
         var oEntity = FL.dd.getEntityBySingular(entityName);
         // alert("backGridColumnsExtractedFromDictionary ->"+JSON.stringify(oEntity.attributes));
@@ -331,6 +304,29 @@ window.utils = {
             },
             onOk: function(e) {},
         });
+        DateTimePickerCellEditor = Backgrid.InputCellEditor.extend({
+            events: {},
+            initialize:function(){
+                Backgrid.InputCellEditor.prototype.initialize.apply(this, arguments);
+                var input = this;
+                $(this.el).datetimepicker({
+                    format: false,
+                    useCurrent:true
+                }).on('dp.show', function(e) {//necessary to convert 
+                    FL.common.printToConsole("show calendar !!!","util");
+                    var z=  e.target.value;
+                    FL.common.printToConsole("--->"+z,"util");
+                    // alert("dp.show");
+                    $(this.el).data("DateTimePicker").setMinDate(e.date);
+                }).on('dp.hide', function(e) {
+                    e.preventDefault();
+                    var command = new Backgrid.Command({});
+                    input.model.set(input.column.get("name"), e.date.format('YYYY-MM-DD'));
+                    input.model.trigger("backgrid:edited", input.model, input.column, command);
+                    command = input = null;
+                });
+            }
+        });
         MyDatePickerCellEditor = Backgrid.InputCellEditor.extend({
             events:{},
             initialize:function(){
@@ -383,28 +379,80 @@ window.utils = {
                 var z=32;
             },
         });
-        DateCell =Backgrid.Extension.MomentCell.extend({
-            //1) all cell contents will be text
-            // 2) all cell contents will be exactly the (formatted) corresponding model attribute
-            //http://stackoverflow.com/questions/18781358/how-do-i-add-a-datepicker-for-a-backgrid-cell       
-            modelFormat: "YYYY/M/D",//"YYYY-MMM-DD" gives error
-            // You can specify the locales of the model and display formats too
-            // displayLang: "zh-tw",
-            displayFormat: "YYYY-MMM-DD",
-            editor: MyDatePickerCellEditor,
-            render: function () {
-                var dateValue = this.model.get(this.column.get("name"));
-                if( dateValue === "" || dateValue == "Invalid Date"){//if it is a new line dateValue = "" =>the default is today
-                    dateValue = new Date();
-                }
-                var formatedValue = this.formatter.fromRaw(dateValue.toISOString());
-                FL.common.printToConsole("render----->"+dateValue + " formated->"+formatedValue);
-                this.$el.html(formatedValue);
-                this.delegateEvents();
-                return this;
+        DateCell =Backgrid.Cell.extend({editor: DateTimePickerCellEditor});
+        // DateCell =Backgrid.Cell.extend({
+        //     editor: DateTimePickerCellEditor,
+        //     render: function () {
+        //         var colContent = this.model.get(this.column.get("name"));
+        //         var formatedValue = this.formatter.fromRaw(colContent);
+        //         FL.common.printToConsole("render----->"+colContent + " formated->"+formatedValue,"util");
+        //         this.$el.html(colContent);
+        //         this.delegateEvents();
+        //         return this;
+        //     }
+        // });
+        var jqDateTimePickerCellEditor = Backgrid.InputCellEditor.extend({
+            //http://stackoverflow.com/questions/30115158/check-if-backgrid-cell-was-edited
+            events : {
+                "change .datePicker" : "onDatePickerValueChange"
+            },            
+            initialize:function(){
+                Backgrid.InputCellEditor.prototype.initialize.apply(this, arguments);
+                var input = this;
+                $(this.el).datetimepicker({
+                    timeFormat: "hh:mm tt",
+                    controlType: 'select',
+                    oneLine: true,
+                    onClose: function(dateText,inst) {//an event belonging to the widget
+                      alert("close !!!");
+                    },
+                    onSelect: function(selectedDateTime){
+                        alert("select");
+                        // startDateTextBox.datetimepicker('option', 'maxDate', endDateTextBox.datetimepicker('getDate') );
+                    }
+                });
+            },
+            onDatePickerValueChange : function(){
+                alert("jqDateTimePickerCellEditor CHANGE !!!");
+            },
+            onRender: function(){
+                $(this.el).datetimepicker({
+                    timeFormat: "hh:mm tt",
+                    controlType: 'select',
+                    oneLine: true,
+                });
             }
         });
-
+        var jqPhoneCellEditor = Backgrid.InputCellEditor.extend({
+            //https://github.com/Bluefieldscom/intl-tel-input
+            tagName:"div",
+            //el:'#phoneInput',
+            initialize:function(){
+                Backgrid.InputCellEditor.prototype.initialize.apply(this, arguments);
+                // var input = this;
+                //if view’s el,tagName, className, id or attributes properties are'nt specified, then this.el is an empty div.
+                // The view.$el it’s a cached jQuery object of the view’s element (view.el). 
+                //<input type="tel" id="demo" placeholder="">
+                //$("#demo").intlTelInput();
+                // $(this.el).empty();
+                // $(this.el).append($('#phoneInputTemplate').html());
+                // $(this.el).intlTelInput({//http://www.jqueryscript.net/form/jQuery-International-Telephone-Input-With-Flags-Dial-Codes.html
+                var template = $("#phoneInputTemplate").html();
+                $(this.el).html(template);
+                $('#phoneInput').intlTelInput({//http://www.jqueryscript.net/form/jQuery-International-Telephone-Input-With-Flags-Dial-Codes.html
+                    autoPlaceholder: true,
+                    preferredCountries: [ "us", "gb" ]
+                 });
+            },
+            render: function(){
+                //$(this.el).intlTelInput({
+                $('#phoneInput').intlTelInput({
+                    autoPlaceholder: true,
+                    preferredCountries: [ "us", "gb" ]
+                });
+            }   
+        });
+         // var DateCell = "string";
         var BooleanCell = Backgrid.BooleanCell.extend({
             //http://stackoverflow.com/questions/28368744/avoid-clicking-twice-to-begin-editing-boolean-checkbox-cell-in-backgrid/28420049#28420049
             editor: Backgrid.BooleanCellEditor.extend({
@@ -423,8 +471,14 @@ window.utils = {
                 }
             })
         });
+
+
         var EmailCell = Backgrid.EmailCell.extend({
             className: "email-cell",
+            validate: function(newval){
+                alert("inside email validate with "+newval+" !!!");
+                return true;
+            },
             render: function () {
                 this.$el.empty();
                 var formattedValue = this.formatter.fromRaw(this.model.get(this.column.get("name")));
@@ -456,7 +510,7 @@ window.utils = {
         // });
         // var oEntity = FL.dd.getEntity(entityName);
         _.each(arrOfColumns, function(element,index){
-            FL.common.printToConsole("utils2 backGridColumnsFromArray defaultEntityColumns *********************--->"+element.name);
+            FL.common.printToConsole("utils2 backGridColumnsFromArray defaultEntityColumns *********************--->"+element.name,"util");
             var column = {};
             column["name"] = element.name;
             if( element.name=="id" ) {
@@ -487,7 +541,7 @@ window.utils = {
                     column["cell"] = "integer";//An integer cell is a number cell that displays humanized integers
                 }else if(element.type=="date"){
                     column["cell"] = DateCell;//MyDatePickerCell;
-                }else if(element.type=="url"){
+                 }else if(element.type=="url"){
                     column["cell"] = "url";
                 }else{
                     column["cell"] = "string";
@@ -603,60 +657,11 @@ window.utils = {
             collection: csvPageableCollection // the collection subclass that supports pagination
         });
         csvPageableCollection.on('backgrid:selected', function(model, selected) {
-            FL.common.printToConsole("model--->"+model);
+            FL.common.printToConsole("model--->"+model,"util");
             // $(".backgrid").before("<p style='padding-top:30px;float:right;margin-right:800px'>abcde</p>");
         });
         $("#_belowMenus").show();
         this.placeGridButtonsInDOM(csvSetCollection,csvPageableCollection,grid);
-                // $("#csvcontent").empty();
-                // $('#addGrid').off('click');
-                // $("#addGrid").click(function () {
-                //     csvStore.addOneEmptyRow();
-                //     var lastKeyInStore = csvStore.getNextId() - 1; //get the highest key in csvStore.csvRows
-                //     var CsvElementModel = Backbone.Model.extend({});
-
-                //     newRow = csvStore.csvRows[lastKeyInStore];
-                //     var csvLine = new CsvElementModel(newRow);
-
-                //     csvSetCollection.add(newRow);//grid without paginator - collection does not have a save method
-                //     csvPageableCollection.getLastPage();//we force lastKeyInStorePage display !!! - remove this line if no paginator
-                //     csvPageableCollection.add(newRow);//the new model was inserted in the collection <--- necessary for paginator - - remove this line if no paginator
-
-                //     csvLine.sync("create",newRow);
-
-                //     grid.insertRow(csvLine);
-                // });
-                // $('#_delete').off('click');
-                // $("#_delete").click(function () {
-                //      var selectedModels = grid.getSelectedModels();
-                //     if(selectedModels.length > 0 ){
-                //         var preStr = selectedModels.length + " row";
-                //         if (selectedModels.length > 1)
-                //             preStr +="s";
-                //         FL.common.makeModalConfirm(  preStr + " will be deleted. Do you confirm ?","No, cancel delete","Yes delete",function(result){
-                //             if(result){
-                //                 _.each(selectedModels, function (model) {
-                //                     model.destroy();
-                //                 });                       
-                //                 FL.common.makeModalInfo(  preStr + " were deleted....");
-                //             }else{
-                //                 FL.common.makeModalInfo("Nothing was deleted !!!");
-                //             }
-                //         });
-                //     }else{
-                //         FL.common.makeModalInfo("No selected rows. To delete one or more rows, click the left column checkbox.");
-                //     }
-
-                // });    
-                // // $("#_unSelect").click(function () {
-                // //     alert("Unselection !!!");
-                // //     // grid.clearSelectedModels();
-                // // });
-                // // $(clientSideFilter.el).css({float: "right", margin: "20px"});
-                // // $('<p style="padding-top:30px;float:right;margin-right:800px">abc</p>').insertBefore(".backgrid");
-                // // $(".backgrid").before("<p style='padding-top:30px;float:right;margin-right:800px'>abcde</p>");
-                // // $("#_select").insertBefore($(".backgrid"));
-
         $("#grid").prepend(clientSideFilter.render().el);
         $("#grid").append(grid.render().$el);
         // $(".backgrid").before("<p style='padding-top:30px;float:right;margin-right:800px'>abcde</p>");

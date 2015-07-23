@@ -1,3 +1,9 @@
+QUnit.extend(QUnit, {//QUnit extension to support inArray
+    inArray: function (actual, expectedValues, message) {
+        var xOk = ( JSON.stringify(actual.sort()) === JSON.stringify(expectedValues.sort()) );
+        ok(xOk, message);
+    }
+});
 $(function () {
   module("menu-login");
 
@@ -365,6 +371,7 @@ $(function () {
   //     ok($("#totalToRepay").length != 0, "total amount to repay output button element exists");
   // });
   test("util2 tests", function () {
+
     //typeOf
     var xVar = "abc";
     var success = utils.typeOf(xVar);
@@ -417,13 +424,278 @@ $(function () {
     success = utils.typeUIOf(xVar);
     ok(success == "phone" , "utils.typeUIOf('351219244558') -->'valid phone'");//13
 
-    xVar = "951219244558";
+    xVar = "3512192445582";
     success = utils.typeUIOf(xVar);
     ok(success === null , "utils.typeUIOf('951219244558') -->'invalid phone'");//14
 
   });
   test("FL.common tests", function () {
-    //typeOf
+    FL.common.appsettings.radixpoint = ",";
+    FL.common.appsettings.thousandsSeparator = "."; 
+
+    //----------------------- tail()
+    var xVar = "12345.567"; 
+    var result = FL.common.getTail(xVar,".");
+    ok(result == "567" , "FL.common.getTail('" + xVar + "','.') -->'" + result + "' with defined radixpoint='.')");//1
+    var result = FL.common.getTail(xVar);
+    ok(result == "" , "FL.common.getTail('" + xVar + "') -->'" + result + "' with undefined radixpoint --> appsettings.radixpoint=',')");//1
+    var xVar = "12345,567"; 
+    var result = FL.common.getTail(xVar);
+    ok(result == "567" , "FL.common.getTail('" + xVar + "') -->'"  + result + "' with undefined radixpoint --> appsettings.radixpoint=',')");//1
+    var xVar = "12345"; 
+    var result = FL.common.getTail(xVar);
+    ok(result == "" , "FL.common.getTail('" + xVar + "') -->'"  + result + "' with undefined radixpoint --> appsettings.radixpoint=',')");//1
+
+
+    //----------------------- Number.toFormattedString()
+    FL.common.appsettings.radixpoint = ",";
+    FL.common.appsettings.thousandsSeparator = ".";   
+    var x = 12345.567;
+    var result = x.toFormattedString();
+    ok(result == "12.345,567" , "Numeric x="+ x +"   x.toFormattedString() -->'" + result + "' with radixpoint=',' thousandsSeparator='.')");//1
+
+    x = 123456789;
+    var result = x.toFormattedString();
+    ok(result == "123.456.789" , "Numeric x="+ x +"   x.toFormattedString() -->'" + result + "' with radixpoint=',' thousandsSeparator='.')");//1
+
+    x = 12345.6789;
+    var decimals = 2;
+    var result = x.toFormattedString(decimals);
+    ok(result == "12.345,68" , "Numeric x="+ x +"   x.toFormattedString('" + decimals + "') -->'" + result + "' with radixpoint=',' thousandsSeparator='.')");//1
+
+    x = 12345.4789;
+    var decimals = 0;
+    var result = x.toFormattedString(decimals);
+    ok(result == "12.345" , "Numeric x="+ x +"   x.toFormattedString('" + decimals + "') -->'" + result + "' with radixpoint=',' thousandsSeparator='.')");//1
+
+    x = 12345.5789;
+    var decimals = 0;
+    var result = x.toFormattedString(decimals);
+    ok(result == "12.346" , "Numeric x="+ x +"   x.toFormattedString('" + decimals + "') -->'" + result + "' with radixpoint=',' thousandsSeparator='.')");//1
+
+
+    FL.common.appsettings.radixpoint = ".";
+    FL.common.appsettings.thousandsSeparator = ",";   
+    x = 12345.567;
+    var result = x.toFormattedString();
+    ok(result == "12,345.567" , "Numeric x="+ x +"   x.toFormattedString() -->'" + result + "' with radixpoint='.' thousandsSeparator=',')");//1
+
+    x = 123456789;
+    var result = x.toFormattedString();
+    ok(result == "123,456,789" , "Numeric x="+ x +"   x.toFormattedString() -->'" + result + "' with radixpoint='.' thousandsSeparator=',')");//1
+
+    x = -123456789;
+    var result = x.toFormattedString();
+    ok(result == "-123,456,789" , "Numeric x="+ x +"   x.toFormattedString() -->'" + result + "' with radixpoint='.' thousandsSeparator=',')");//1
+
+    x = +123456789;
+    var result = x.toFormattedString();
+    ok(result == "123,456,789" , "Numeric x="+ x +"   x.toFormattedString() -->'" + result + "' with radixpoint='.' thousandsSeparator=',')");//1
+
+    x = 12345.6789;
+    var decimals = 3;
+    var result = x.toFormattedString(decimals);
+    ok(result == "12,345.679" , "Numeric x="+ x +"   x.toFormattedString('" + decimals + "') -->'" + result + "' with radixpoint='.' thousandsSeparator=',')");//1
+
+    x = 12345.6789;
+    var decimals = 0;
+    var result = x.toFormattedString(decimals);
+    ok(result == "12,346" , "Numeric x="+ x +"   x.toFormattedString('" + decimals + "') -->'" + result + "' with radixpoint='.' thousandsSeparator=',')");//1
+
+
+    var x = Number("12A23");
+    var result = x.toFormattedString();
+    ok(result === null, "Numeric x="+ x +"   x.toFormattedString(" + x + ") -->'" + result + "' with radixpoint='.' thousandsSeparator=',')");//1
+    
+    //----------------------- String.pad()
+    var xVar = "567";
+    var result = xVar.pad(5,"0",1);//string to have length=5, add "0" to the right side (1)
+    ok(result == "56700" , "String ('" + xVar+ "').pad(5,'0',1) -->'" + result + " string to have length=5, add '0' to the right side (1))");//1
+    var result = xVar.pad(5,"0",0);//string to have length=5, add "0" to the left side (0)
+    ok(result == "00567" , "String ('" + xVar+ "').pad(5,'0',0) -->'" + result + " string to have length=5, add '0' to the left side (0))");//1
+    var result = xVar.pad(5,"0",2);//string to have length=5, add "0" to the left side (0)
+    ok(result == "05670" , "String ('" + xVar+ "').pad(5,'0',2) -->'" + result + " string to have length=5, add '0' to both sides (2))");//1
+    var result = xVar.pad(6,"0",2);//string to have length=8, add "0" to the left side (0)
+    ok(result == "005670" , "String ('" + xVar+ "').pad(6,'0',2) -->'" + result + " string to have length=6, add '0' to both sides (2))");//1
+    var result = xVar.pad(2,"0",2);//string to have length=8, add "0" to the left side (0)
+    ok(result == "567" , "String ('" + xVar+ "').pad(2,'0',2) -->'" + result + " string to have length=2, add '0' to both sides (2))");//1
+
+
+    //----------------------- timeTo24()
+    var xVar = "11:00 pm";
+    var xRet = FL.common.timeTo24(xVar);
+    ok(xRet == "23:00" , "timeTo24('"+xVar+"')  -->"+xRet);
+
+    xVar = "11:43 am"; xRet = FL.common.timeTo24(xVar);
+    ok(xRet == "11:43" , "timeTo24('"+xVar+"')  -->"+xRet);
+    
+    xVar = "00:00 am"; xRet = FL.common.timeTo24(xVar);
+    ok(xRet == "00:00" , "timeTo24('"+xVar+"')  -->"+xRet);
+
+
+    xVar = "12:00 pm"; xRet = FL.common.timeTo24(xVar);
+    ok(xRet === null , "timeTo24('"+xVar+"')  -->"+xRet+" Bad Input Format");
+   
+    xVar = "13:00 pm"; xRet = FL.common.timeTo24(xVar);
+    ok(xRet === null , "timeTo24('"+xVar+"')  -->"+xRet+" Bad Input Format");
+
+
+    //----------------------- formatShortLocalToISODate()
+    var isoDate = FL.common.formatShortLocalToISODate("2015/6/25 11:21 am");//YMD
+    ok(isoDate == "2015-06-25T10:21:00.000Z" , "YMD am formatShortLocalToISODate returns 2015-06-25T10:21:00.000Z");//1
+
+    var isoDate = FL.common.formatShortLocalToISODate("6/25/2015 11:21 am");//MDY
+    ok(isoDate == "2015-06-25T10:21:00.000Z" , "MDY am formatShortLocalToISODate returns 2015-06-25T10:21:00.000Z");//1
+
+    var isoDate = FL.common.formatShortLocalToISODate("6/12/2015 03:21 pm");//MDY
+    ok(isoDate == "2015-06-12T14:21:00.000Z" , "MDY pm formatShortLocalToISODate returns 2015-06-12T14:2100.000Z");//1
+    
+    var isoDate = FL.common.formatShortLocalToISODate("6/12/2015 03:21 pm","DMY");//DMY
+    ok(isoDate == "2015-12-06T15:21:00.000Z" , "DMY pm formatShortLocalToISODate returns 2015-12-06T15:2100.000Z - The returned value is not a constant, because of the practice of using Daylight Saving Time.");//1
+
+    //----------------------- toISODate()
+    var xVar = "2015/06/12";//YMD(China)
+    var isoDate = FL.common.toISODate(xVar);
+    ok(isoDate === FL.common.formatShortLocalToISODate(xVar) , "FL.common.toISODate('2015/06/12') ISO -->"+isoDate);//10
+
+    var xVar = "2015/06/12 07:00 pm";//YMD(China)
+    var isoDate = FL.common.toISODate(xVar);
+    ok(isoDate === FL.common.formatShortLocalToISODate(xVar) , "YMD FL.common.toISODate('2015/06/12 07:00 pm') ISO -->"+isoDate);//1
+
+    var xVar = "2015/06/01 12:00 am";//YMD
+    var isoDate = FL.common.toISODate(xVar,"YMD");
+    ok(isoDate == "2015-06-01T11:00:00.000Z" , "DMY FL.common.toISODate('"+xVar+"','DMY') ISO -->"+isoDate+" assuming 1 h of timezone diff");//1
+
+    var xVar = "2015/06/01 12:00 pm";//YMD
+    var isoDate = FL.common.toISODate(xVar,"YMD");
+    ok(isoDate === null, "DMY FL.common.toISODate('"+xVar+"','DMY') ISO -->null because 12:00 pm is a bad format");//1
+    
+    var xVar = "2015/06/01 00:30 am";//YMD
+    var isoDate = FL.common.toISODate(xVar,"YMD");
+    ok(isoDate == "2015-05-31T23:30:00.000Z" , "DMY FL.common.toISODate('"+xVar+"','DMY') ISO -->"+isoDate+" assuming 1 h of timezone diff");//1
+
+    var xVar = "06/12/2015 07:00 pm";//MDY
+    var isoDate = FL.common.toISODate(xVar);
+    ok(isoDate === FL.common.formatShortLocalToISODate(xVar) , "MDY FL.common.toISODate('"+xVar+"') ISO -->"+isoDate);//1
+
+    var xVar = "06/12/2015 07:00 pm";//DMY
+    var isoDate = FL.common.toISODate(xVar,"DMY");
+    ok(isoDate === FL.common.formatShortLocalToISODate(xVar,"DMY") , "DMY FL.common.toISODate('"+xVar+"','DMY') ISO -->"+isoDate);//1
+
+
+    //----------------------- fromISODateToShortdate()
+    var xVar = "2015-12-06T05:00:00.000Z";
+    var shortDate = FL.common.fromISODateToShortdate(xVar,"YMD");
+    ok(shortDate == "2015/12/06", "YMD FL.common.fromISODateToShortdate('"+xVar+"','YMD') -->"+shortDate);//
+
+    var shortDate = FL.common.fromISODateToShortdate(xVar,"MDY");
+    ok(shortDate == "12/06/2015", "YMD FL.common.fromISODateToShortdate('"+xVar+"','YMD') -->"+shortDate);//
+
+    var shortDate = FL.common.fromISODateToShortdate(xVar,"DMY");
+    ok(shortDate == "06/12/2015", "YMD FL.common.fromISODateToShortdate('"+xVar+"','YMD') -->"+shortDate);//
+
+    var shortDate = FL.common.fromISODateToShortdate("2015-12-06X05:00:00.000Z","DMY");
+    ok(shortDate == null, "if isoDate was a wrong format ('2015-12-06X05:00:00.000Z'), FL.common.fromISODateToShortdate() returns null ");//
+
+    var shortDate = FL.common.fromISODateToShortdate("2015-12-06T05:00:00.000X","DMY");
+    ok(shortDate == null, "if isoDate was a wrong format ('2015-12-06T05:00:00.000X'), FL.common.fromISODateToShortdate() returns null ");//
+
+    var shortDate = FL.common.fromISODateToShortdate("2015-12-06T25:00:00.000Z","DMY");
+    ok(shortDate == null, "if isoDate was a wrong format ('2015-12-06T25:00:00.000Z'), FL.common.fromISODateToShortdate() returns null ");//
+
+    var shortDate = FL.common.fromISODateToShortdate("2015-12-06T05:61:00.000Z","DMY");
+    ok(shortDate == null, "if isoDate was a wrong format ('2015-12-06T05:61:00.000Z'), FL.common.fromISODateToShortdate() returns null ");//
+
+    var shortDate = FL.common.fromISODateToShortdate("2015-12-06T05:01:61.000Z","DMY");
+    ok(shortDate == null, "if isoDate was a wrong format ('2015-12-06T05:01:61.000Z'), FL.common.fromISODateToShortdate() returns null ");//
+
+    var shortDate = FL.common.fromISODateToShortdate("2015-12-06T05:01:01-000Z","DMY");
+    ok(shortDate == null, "if isoDate was a wrong format ('2015-12-06T05:01:01-000Z'), FL.common.fromISODateToShortdate() returns null ");//
+
+    var shortDate = FL.common.fromISODateToShortdate("2015-13-06T05:01:01-000Z","DMY");
+    ok(shortDate == null, "if isoDate was a wrong format ('2015-13-06T05:01:01-000Z'), FL.common.fromISODateToShortdate() returns null ");//
+
+    var shortDate = FL.common.fromISODateToShortdate("2015-12-06T05:01","DMY");
+    ok(shortDate == "06/12/2015", "if isoDate was a shorter format ('2015-12-06T05:01'), FL.common.fromISODateToShortdate() returns 06/12/2015 OK! ");//
+
+    //----------------------- fromISODateToTime()
+    var xVar = "2015-12-06T05:00:00.000Z";
+    var time = FL.common.fromISODateToTime(xVar);
+    ok(time == "06:00 am", "YMD FL.common.fromISODateToTime('"+xVar+") -->"+time+ "-->assumes 1 hr timezone difference");//
+ 
+    var xVar = "2015-12-06T15:45:00.000Z";
+    var time = FL.common.fromISODateToTime(xVar);
+    ok(time == "04:45 pm", "YMD FL.common.fromISODateToTime('"+xVar+"') -->"+time+ "-->assumes 1 hr timezone difference");//
+
+    //----------------------- fromISODateToShortdateTime()
+    var xVar = "2015-12-06T05:00:00.000Z";
+    var shortDatetime = FL.common.fromISODateToShortdateTime(xVar,"MDY");
+    ok(shortDatetime == "12/06/2015 06:00 am", "YMD FL.common.fromISODateToShortdateTime('"+xVar+"','MDY') -->"+shortDatetime+ "-->assumes 1 hr timezone difference");//
+
+    var xVar = "2015-12-06T15:45:00.000Z";
+    var shortDatetime = FL.common.fromISODateToShortdateTime(xVar,"DMY");
+    ok(shortDatetime == "06/12/2015 04:45 pm", "YMD FL.common.fromISODateToShortdateTime('"+xVar+"','DMY') -->"+shortDatetime+ "-->assumes 1 hr timezone difference");//
+
+    var xVar = "2015-12-006T15:45:00.000Z";
+    var shortDatetime = FL.common.fromISODateToShortdateTime(xVar,"DMY");
+    ok(shortDatetime === null, "if isoDate was a wrong format, FL.common.fromISODateToShortdateTime() returns null ");//
+
+    var d = new Date();
+    var xVar = d.toISOString();
+    var shortDatetime = FL.common.fromISODateToShortdateTime(xVar,"DMY");
+    ok(shortDatetime == shortDatetime, "YMD FL.common.fromISODateToShortdateTime('"+xVar+"','DMY') -->"+shortDatetime+ "-->Shows time NOW this passes allways...");//
+
+
+    //----------------------- is_validShortDate()
+    var xVar = "2015/06/2";//YMD(China)
+    var success = FL.common.is_validShortDate(xVar);
+    ok(success === true , "FL.common.is_validShortDate('2015/06/2') YMD -->'true'");//1
+    
+    var xVar = "2015-06-2";//YMD(China)
+    var success = FL.common.is_validShortDate(xVar);
+    ok(success === true , "FL.common.is_validShortDate('2015-06-2') YMD -->'true'");//1
+
+    var xVar = "2015.06.2";//YMD(China)
+    var success = FL.common.is_validShortDate(xVar);
+    ok(success === true , "FL.common.is_validShortDate('2015.06.2') YMD -->'true'");//1
+    
+    var xVar = "15.06.2";//YMD(China)
+    var success = FL.common.is_validShortDate(xVar);
+    ok(success === false , "FL.common.is_validShortDate('15.06.2') YMD -->'unacceptable'");//1
+
+    var xVar = "2015.6.2";//YMD(China)
+    var success = FL.common.is_validShortDate(xVar);
+    ok(success === true , "FL.common.is_validShortDate('2015.6.2') YMD -->'true'");//1
+
+    var xVar = "2015 6 2";//YMD(China)
+    var success = FL.common.is_validShortDate(xVar);
+    ok(success === true , "FL.common.is_validShortDate('2015 6 2') YMD -->'true'");//1
+
+    var xVar = "3/12/2015";//DMY(Europe)
+    var success = FL.common.is_validShortDate(xVar);
+    ok(success === true , "FL.common.is_validShortDate('3/12/2015') DMY -->'true'");//1
+
+    var xVar = "30/12/2015";//DMY(Europe)
+    var success = FL.common.is_validShortDate(xVar);
+    ok(success === true , "FL.common.is_validShortDate('30/12/2015') DMY -->'true'");//1
+
+    var xVar = "30/12/15";//DMY(Europe)
+    var success = FL.common.is_validShortDate(xVar);
+    ok(success === false , "FL.common.is_validShortDate('30/12/15') DMY -->'unacceptable'");//1
+
+    var xVar = "3/3/2015";//DMY(Europe)
+    var success = FL.common.is_validShortDate(xVar);
+    ok(success === true , "FL.common.is_validShortDate('3/3/2015') DMY -->'true'");//1
+
+
+    var xVar = "12/30/2015";//MDY(US)
+    var success = FL.common.is_validShortDate(xVar);
+    ok(success === true , "FL.common.is_validShortDate('12/30/2015') MDY -->'true'");//1
+
+    var xVar = "12/3/2015";//MDY(US)
+    var success = FL.common.is_validShortDate(xVar);
+    ok(success === true , "FL.common.is_validShortDate('12/3/2015') MDY -->'true'");//1
+
 
     var xVar = "March 21, 2012";
     var success = FL.common.is_ValidDate(xVar);
@@ -443,7 +715,7 @@ $(function () {
 
     var xVar = "Thursday Mar 21 2012"; //this date is a Wednesday !!!!
     var success = FL.common.is_ValidDate(xVar);
-    ok(success === false , "FL.common.is_ValidDate('Thursday Mar 21 2012') -->'false'");//5
+    ok(success === false , "FL.common.is_ValidDate('Thursday Mar 21 2012') -->'false because this date is a Wednesday'");//5
 
     var xVar = "Wed Mar 21 2012";
     var success = FL.common.is_ValidDate(xVar);
@@ -459,7 +731,7 @@ $(function () {
 
     xVar = "03-21-12";
     success = FL.common.is_ValidDate(xVar);
-    ok(success === true , "FL.common.is_ValidDate('03-21-12') -->'true'");//9
+    ok(success === false , "FL.common.is_ValidDate('03-21-12') -->'false year must be complete'");//9
 
     xVar = "03-21-2012";
     success = FL.common.is_ValidDate(xVar);
@@ -473,9 +745,9 @@ $(function () {
     success = FL.common.is_ValidDate(xVar);
     ok(success === true , "FL.common.is_ValidDate('03/21/2012') -->'true'");//12
 
-    xVar = "21/03/2012";//this is read has month/day/year
+    xVar = "21/03/2012";//this is read has month/day/year----ç->MUST BE OK !!!  DMY(europe)
     success = FL.common.is_ValidDate(xVar);
-    ok(success === false , "FL.common.is_ValidDate('21/03/2012') -->'false'");//13
+    ok(success === true , "FL.common.is_ValidDate('21/03/2012') -->'DMY europe true'");//13
 
     xVar = "21-Mar-2012";
     success = FL.common.is_ValidDate(xVar);
@@ -487,7 +759,7 @@ $(function () {
 
     xVar = "03 21 2012";
     success = FL.common.is_ValidDate(xVar);
-    ok(success === false , "FL.common.is_ValidDate('03 21 2012') -->'false'");//16
+    ok(success === true , "FL.common.is_ValidDate('03 21 2012') -->'true MDY'");//16
 
     xVar = "Stage Paris 2014";
     success = FL.common.is_ValidDate(xVar);
@@ -500,9 +772,9 @@ $(function () {
 
     var arrOfRowValues = [
            "March 21, 2012",
-           "03-21-12",
+           "03-21-2012",
             //var d = Date.parse("15-21-12");//NaN
-           "03/21/12 0:01",
+           "03/21/2012",
            "21-Mar-2012"
     ];
     var success = FL.common.is_dateArrInStringFormat(arrOfRowValues);
@@ -511,7 +783,7 @@ $(function () {
            "March 21, 2012",
            "03-21-12",
            "15-21-12",//ofending value
-           "03/21/12 0:01",
+           "03/21/2012",
            "21-Mar-2012"
     ];    
     success = FL.common.is_dateArrInStringFormat(arrOfRowValues);
@@ -525,6 +797,60 @@ $(function () {
     ];    
     success = FL.common.is_dateArrInStringFormat(arrOfRowValues);
     ok(success === false , "FL.common.is_dateArrInStringFormat('array of spaces and empty values') -->'false'" );//21
+
+
+    //------------------- currencyToStringNumber
+    FL.common.appsettings.radixpoint = ",";
+    xVar ="€ 12345,67";
+    var result =  FL.common.currencyToStringNumber(xVar);
+    ok(result == "12345.67" , "FL.common.currencyToStringNumber('"+xVar+"') -->radixpoint=','-->"+result+"'" );//67
+    xVar ="kr. 9.734.123,45";
+    result =  FL.common.currencyToStringNumber(xVar);
+    ok(result == "9734123.45" , "FL.common.currencyToStringNumber('"+xVar+"') -->radixpoint=','-->"+result+"'" );
+    xVar ="9.734.123,45 kr.";
+    result =  FL.common.currencyToStringNumber(xVar);
+    ok(result == "9734123.45" , "FL.common.currencyToStringNumber('"+xVar+"') -->radixpoint=','-->"+result+"'" );
+
+    FL.common.appsettings.radixpoint = ":";
+    xVar ="€ 12345:67";
+    var result =  FL.common.currencyToStringNumber(xVar);
+    ok(result == "12345.67" , "FL.common.currencyToStringNumber('"+xVar+"') -->radixpoint=':'-->"+result+"'" );//67
+
+    FL.common.appsettings.radixpoint = ":";
+    FL.common.appsettings.thousandsSeparator = "."; 
+    xVar ="€ 12345:67";
+    var result =  FL.common.currencyToStringNumber(xVar);
+    ok(result == "12345.67" , "FL.common.currencyToStringNumber('"+xVar+"') -->radixpoint=':'-->"+result+"'" );//67
+
+    xVar ="€ 12.345:67";
+    var result =  FL.common.currencyToStringNumber(xVar);
+    ok(result == "12345.67" , "FL.common.currencyToStringNumber('"+xVar+"') -->radixpoint=':'-->"+result+"'" );//67
+
+    FL.common.appsettings.thousandsSeparator = "_"; 
+    xVar ="€ 12_345:67";
+    var result =  FL.common.currencyToStringNumber(xVar);
+    ok(result == "12345.67" , "FL.common.currencyToStringNumber('"+xVar+"') -->radixpoint=':'-->"+result+"'" );//67
+
+
+    FL.common.appsettings.radixpoint = ".";
+    xVar ="Din. 1,235.45";
+    result =  FL.common.currencyToStringNumber(xVar);
+    ok(result == "1235.45" , "FL.common.currencyToStringNumber('"+xVar+"') -->radixpoint='.'-->"+result+"'" );
+    xVar ="1,235.45 Din";
+    result =  FL.common.currencyToStringNumber(xVar);
+    ok(result == "1235.45" , "FL.common.currencyToStringNumber('"+xVar+"') -->radixpoint='.'-->"+result+"'" );
+
+    FL.common.appsettings.radixpoint = ",";
+    // FL.common.formatStringNumberWithMask needs a pre-existent dom div with id="_freeSlots" .this was created in index.html under qunit-fixture
+    xVar ="1234.56";
+    result =  FL.common.formatStringNumberWithMask(xVar,"99-AAA-999");
+    ok(result == "12-AAA-345" , "FL.common.formatStringNumberWithMask('"+xVar+"') -->radixpoint='.'-->"+result+"'" );
+
+    result =  FL.common.formatStringNumberWithMask(xVar,"999-HELLO-999-OK");
+    ok(result == "123-HELLO-456-OK" , "FL.common.formatStringNumberWithMask('"+xVar+"') -->radixpoint='.'-->"+result+"'" );
+
+    result =  FL.common.formatStringNumberWithMask(xVar,"99999-HELLO-999-OK");
+    ok(result == "12345-HELLO-6__-OK" , "FL.common.formatStringNumberWithMask('"+xVar+"') -->radixpoint='.'-->"+result+"'" );
 
     success = FL.common.isNumberSep('4,294,967,295.00',',');
     ok(success === true , "FL.common.isNumberSep('4,294,967,295.00', ',') -->'true'" );//22
@@ -740,20 +1066,23 @@ $(function () {
     ok(actual.description == "client's product request", "description is correct for 2nd entity");
     ok(actual.plural == "orders", "plural is orders");
 
-    success = FL.dd.updateEntityBySingular("client",{plural:"customers",description:"frequent buyer"});
-    ok(success === true , "updateEntityBySingular operation successfull for client" );//10
+    // updateEntityBySingular - updates the server dictionary !!!! - it needs a working connection
+    //success = FL.dd.updateEntityBySingular("client",{plural:"customers",description:"frequent buyer"});
+    //ok(success === true , "updateEntityBySingular operation successfull for client" );//10
+
     actual = FL.dd.entities["client"];
     ok(actual.csingular == "2ls", "Compressed code for first entity = '2ls'");
-    ok(actual.description == "frequent buyer", "description was updated correctely");
-    ok(actual.plural == "customers", "plural has changed to customers");
+    // ok(actual.description == "frequent buyer", "description was updated correctely");
+    // ok(actual.plural == "customers", "plural has changed to customers");
 
-    success = FL.dd.updateEntityBySingular("client",{singular:"customer", plural:"customers",description:"frequent buyer"});
-    actual = FL.dd.entities["customer"];
-    ok(success === true && actual.singular == "customer", "updateEntityBySingular SUCCESS changing entity singular FROM client TO customer" );//14
+    // updateEntityBySingular - updates the server dictionary !!!! - it needs a working connection
+    // success = FL.dd.updateEntityBySingular("client",{singular:"customer", plural:"customers",description:"frequent buyer"});
+    // actual = FL.dd.entities["customer"];
+    // ok(success === true && actual.singular == "customer", "updateEntityBySingular SUCCESS changing entity singular FROM client TO customer" );//14
 
-    success = FL.dd.updateEntityBySingular("customer",{singular:"client", plural:"customers",description:"frequent buyer"});
-    actual = FL.dd.entities["client"];
-    ok(success === true && actual.singular == "client" , "updateEntityBySingular SUCCESS changing entity singular FROM customer TO client" );//15
+    // success = FL.dd.updateEntityBySingular("customer",{singular:"client", plural:"customers",description:"frequent buyer"});
+    // actual = FL.dd.entities["client"];
+    // ok(success === true && actual.singular == "client" , "updateEntityBySingular SUCCESS changing entity singular FROM customer TO client" );//15
 
     success = FL.dd.updateEntityByCName("2ls",{plural:"clients",description:"very frequent buyer"});
     ok(success === true , "updateEntityByCName operation successfull for client" );
@@ -835,6 +1164,35 @@ $(function () {
     FL.dd.addAttribute("sales_rep","phone","sales_rep's phone","Rep Phone","number","numberbox",null);
     FL.dd.addAttribute("sales_rep","eMail","sales_rep's eMail","Rep eMail","string","emailbox",null);
 
+    FL.dd.upsertAttribute("client","pointer to sales Rep",{
+      label:"sales rep",
+      typeUI:"lookupbox",
+      specialTypeDef:"2lT" //for lookup this means the compressed name of the foreigner table
+    });
+    FL.dd.displayEntities();
+    
+    //------------ test FL.dd.t.xxx 
+    FL.dd.init_t();
+    var listAll = FL.dd.t.entities.list();
+    var list = [];
+    _.each(listAll,function(element){list.push(element.singular)});
+    //assert.deepEqual( obj, { foo: "bar" }, "Two objects can be the same in value" );
+    QUnit.inArray(list, ["order","client","client1","sales_rep"], 'FL.dd.t.entities.list() returned singular '+JSON.stringify(list) + " -------------------------------------------------------------------------------------------------------------------------------------- FL.dd.t.entities.list() ");
+    // ok(list == "12345.67" , "FL.common.currencyToStringNumber('"+xVar+"') -->radixpoint=','-->"+result+"'" );//67
+    list = [];
+    _.each(listAll,function(element){list.push(element.csingular)});
+    QUnit.inArray(list, ["2lS","2ls","2lt","2lT"], 'FL.dd.t.entities.list() returned csingular '+JSON.stringify(list) );
+    ok(FL.dd.t.entities["2ls"].singular == "client" , "FL.dd.t.entities['2ls'].singular == 'client'");
+    xVar = FL.dd.t.entities["2ls"].plural;
+    ok(FL.dd.t.entities["2ls"].plural == "clients" , "FL.dd.t.entities['2ls'].plural == 'clients'");
+    ok(FL.dd.t.entities["2ls"].csingular == "2ls" , "FL.dd.t.entities['2ls'].csingular == '2ls'");
+    ok(FL.dd.t.entities["2ls"].description == "very frequent buyer" , "FL.dd.t.entities['2ls'].description == 'very frequent buyer'");
+
+    FL.dd.t.entities["2ls"].set({description:"company we may invoice"})
+    ok(FL.dd.t.entities["2ls"].description == "company we may invoice" , "FL.dd.t.entities['2ls'].set({description:'company we may invoice'})");
+      //alert("JujuXXYY");
+
+
     FL.dd.addRelation("client","order","has","N",0,true,"En");//
     FL.dd.addRelation("client","sales_rep","is managed by ","1",0,true,"En");
     FL.dd.addRelation("sales_rep","client","is responsable by complaints of ","N",0,true,"En");
@@ -843,7 +1201,7 @@ $(function () {
     FL.common.printToConsole("------- after ---------------");
     FL.dd.displayEntities();
     actual = FL.dd.relationsOf("sales_rep");
-    ok(actual[0].rCN === "02", "first relation from FL.dd.relationsOf('sales_rep') has rCN=='02'");//32+4
+    ok(actual[0].rCN === "02", "first relation from FL.dd.relationsOf('sales_rep') has rCN=='02'"+ " -------------------------------------------------------------------------------------------------------------------------------------- FL.dd.relationsOf() ");
     ok(actual[0].semantic === "sales_rep manages many clients", "first relation from FL.dd.relationsOf('sales_rep') has semantic 'sales_rep manages many clients'");//33
     ok(actual[1].rCN === "03", "first relation from FL.dd.relationsOf('sales_rep') has rCN=='03'");//34
     ok(actual[1].semantic === "sales_rep is responsable by complaints of  many clients", "first relation from FL.dd.relationsOf('sales_rep') has semantic 'sales_rep is responsable by complaints of  many clients'");//35
