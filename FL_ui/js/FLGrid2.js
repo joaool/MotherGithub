@@ -305,20 +305,25 @@ FL["grid"] = (function () {//name space FL.grid
                         var title = " Define possible values for " + currentAttribute;
                         var enumArr = csvStore.getEnumerableFromAttribute(oldAttribute);
                         var enumStr = "";
+                        var zMasterDetail = {};
+                        var masterDetailListItems = {};
                         if (enumArr)
                             enumStr = enumArr.join(",");
                         if (selectedType == "combo list") {
-                            var masterDetailListItems = {master: {list: enumStr}};
+                            //masterDetailListItems = {master: {list: enumStr}};
+                            //zMmasterDetail = {master: {list: enumStr}};
+                            zMasterDetail["master"] = {list: enumStr};
                             var enumOptions = {
                                 type: "primary",
                                 icon: "th-list",
                                 button1: "Cancel",
                                 button2: "Confirm select list"
                             };
-                            FL.common.editMasterDetail("A2", title, "_getComboList", masterDetailListItems, enumOptions, function (result) {
+                            //FL.common.editMasterDetail("A2", title, "_getComboList", masterDetailListItems, enumOptions, function (result) {
+                            FL.common.editMasterDetail("A2", title, "_getComboList", zMasterDetail, enumOptions, function (result) {
                                 if (result) {
                                     // alert("The list is ->"+masterDetailListItems.master.list);
-                                    var listOfValuesStr = masterDetailListItems.master.list;
+                                    var listOfValuesStr = zMasterDetail.master.list;
                                     csvStore.setEnumerableForAttribute(oldAttribute, listOfValuesStr.split(","));
                                 }
                             });
@@ -337,31 +342,29 @@ FL["grid"] = (function () {//name space FL.grid
                                         lookupTypeStr = lookupObj.eCN + "," + lookupObj.fCN;//loojupObj format is {eCN:<entity compressed name>, fCN:<field compressed name>}
                                     }
                                 }
-                            }
-                            ;
-                        }
-                        ;
-                        var masterDetailListItems = {master: {special: lookupTypeStr}};
-                        var enumOptions = {
-                            type: "primary",
-                            icon: "th-list",
-                            button1: "Cancel",
-                            button2: "Confirm lookup data"
-                        };
-                        FL.common.editMasterDetail("A2", title, "_getLookupTableAndField", masterDetailListItems, enumOptions, function (result) {
-                            if (result) {
-                                // alert("The list is ->"+masterDetailListItems.master.list);
-                                var specialTypeDef = masterDetailListItems.master.special;
-                                //save into the data dictionary
-                                var specialDefTemporaryArr = specialTypeDef.split(",");
-                                var specialObj = {eCN: specialDefTemporaryArr[0], fCN: specialDefTemporaryArr[1]};
-                                var specialArr = [];
-                                specialArr.push(specialObj);
-                                FL.dd.t.entities[currentECN].fields[currentFCN].setField({specialTypeDef: specialArr});
-                                var z = 32;
-                            }
+                            };
+                            var masterDetailListItems = {master: {special: lookupTypeStr}};
+                            var enumOptions = {
+                                type: "primary",
+                                icon: "th-list",
+                                button1: "Cancel",
+                                button2: "Confirm lookup data"
+                            };
+                            FL.common.editMasterDetail("A2", title, "_getLookupTableAndField", masterDetailListItems, enumOptions, function (result) {
+                                if (result) {
+                                    // alert("The list is ->"+masterDetailListItems.master.list);
+                                    var specialTypeDef = masterDetailListItems.master.special;
+                                    //save into the data dictionary
+                                    var specialDefTemporaryArr = specialTypeDef.split(",");
+                                    var specialObj = {eCN: specialDefTemporaryArr[0], fCN: specialDefTemporaryArr[1]};
+                                    var specialArr = [];
+                                    specialArr.push(specialObj);
+                                    FL.dd.t.entities[currentECN].fields[currentFCN].setField({specialTypeDef: specialArr});
+                                    var z = 32;
+                                }
 
-                        });
+                            });
+                        };
                     }
                     // alert("The selection was "+selectedType);
                 }
