@@ -302,7 +302,8 @@ FL["grid"] = (function () {//name space FL.grid
                         var oldAttribute = masterDetailItems.detail[line].attribute;
                         var currentAttribute = $("#_dictEditEntityTemplate__f" + (line + 1) + "_attribute").val();//"_dictEditEntityTemplate__f4_userType_options"
                         // var title = " Define possible values for "+masterDetailItems.detail[line].attribute;
-                        var title = " Define possible values for " + currentAttribute;
+                        var listTitle = " Define possible values for " + currentAttribute;
+                        var lookupTitle = " Define lookup Table/Field for " + currentAttribute;
                         var enumArr = csvStore.getEnumerableFromAttribute(oldAttribute);
                         var enumStr = "";
                         var zMasterDetail = {};
@@ -319,8 +320,7 @@ FL["grid"] = (function () {//name space FL.grid
                                 button1: "Cancel",
                                 button2: "Confirm select list"
                             };
-                            //FL.common.editMasterDetail("A2", title, "_getComboList", masterDetailListItems, enumOptions, function (result) {
-                            FL.common.editMasterDetail("A2", title, "_getComboList", zMasterDetail, enumOptions, function (result) {
+                            FL.common.editMasterDetail("A2", listTitle, "_getComboList", zMasterDetail, enumOptions, function (result) {
                                 if (result) {
                                     // alert("The list is ->"+masterDetailListItems.master.list);
                                     var listOfValuesStr = zMasterDetail.master.list;
@@ -335,36 +335,98 @@ FL["grid"] = (function () {//name space FL.grid
                             var currentFCN = FL.dd.t.entities[currentECN].getCName(currentAttribute);
                             var lookupArr = FL.dd.t.entities[currentECN].fields[currentFCN].specialTypeDef;
                             var lookupTypeStr = "Invalid format";
+                            var lookupTableName = "No table";
+                            var lookupFieldName = "No field";
+                            var lookupTableOptionsObj = []
+                            _.each(FL.dd.t.entities.list(), function (element, index) {
+                                lookupTableOptionsObj.push({value: index, text: element.singular})
+                            });
+                            var lookupFieldOptionsObj = []
                             if (lookupArr) {
                                 if (FL.common.typeOf(lookupArr) == "array") {
                                     var lookupObj = lookupArr[0];
                                     if (FL.common.typeOf(lookupObj) == "object") {
+                                        lookupTableName = FL.dd.getEntityByCName(lookupObj.eCN);
+                                        lookupFieldName = FL.dd.t.entities[lookupObj.eCN].fields[lookupObj.fCN].name;
                                         lookupTypeStr = lookupObj.eCN + "," + lookupObj.fCN;//loojupObj format is {eCN:<entity compressed name>, fCN:<field compressed name>}
                                     }
                                 }
+                            }
+                            var masterDetailListItems = {
+                                master: {
+                                    table_options: lookupTableName,
+                                    field_options: lookupFieldName
+                                }
                             };
-                            var masterDetailListItems = {master: {special: lookupTypeStr}};
-                            var enumOptions = {
+                            var options = {
                                 type: "primary",
                                 icon: "th-list",
                                 button1: "Cancel",
-                                button2: "Confirm lookup data"
+                                button2: "Confirm lookup data",
+                                dropdown: {
+                                    "_getLookupTableAndField2_table_options": {
+                                        arr: lookupTableOptionsObj,//[{value: 0, text: "op a", op: "A"}, {value: 1, text: "op b", op: "B"}],
+                                        default: lookupTableName,
+                                        onSelect: function (selected) {
+                                            alert("Table choice was " + selected.text);
+                                            var eCN = FL.dd.getCEntity(selected.text);
+                                            lookupFieldOptionsObj = []
+                                            _.each(FL.dd.t.entities[eCN].fieldsList(), function (element, index) {
+                                                lookupFieldOptionsObj.push({value: index, text: element.name})
+                                            });
+                                            alert("Table " + selected.text + " has fields:" + JSON.stringify(lookupFieldOptionsObj));
+                                            //FL.common.selectBox({boxId:"_getLookupTableAndField2_field_options",boxCurrent:"zzz",boxArr:lookupFieldOptionsObj},)
+                                            //FL.common.setDropdown({boxId: "_getLookupTableAndField2_field_options",boxCurrent: "zzz",boxArr: lookupFieldOptionsObj});
+                                            FL.common.selectBox({
+                                                boxId: "_getLookupTableAndField2_field_options",
+                                                boxCurrent: "zzz",
+                                                boxArr: lookupFieldOptionsObj
+                                            }, this._getLookupTableAndField2_field_options.onSelect);
+                                            //--------------------- test
+                                            //var dropdownId = "_getLookupTableAndField2_field_options";
+                                            //var $dropDownSelect = $("#" + dropdownId);
+                                            //var defaultValue = "Select a field from ";
+                                            //var optionsArr = lookupFieldOptionsObj;
+                                            //$dropDownSelect.parents('.btn-group').find('.dropdown-toggle').html(defaultValue + ' <span class="caret"></span>');//shows current value
+                                            //$dropDownSelect.empty();//removes the child elements of #styleSet.
+                                            //_.each(optionsArr, function (element) {
+                                            //    var id = dropdownId + "_" + element.text;
+                                            //    $dropDownSelect.append("<li id='" + id + "'><a href='#'>" + element.text + "</a></li>");
+                                            //});
+                                            //-------------------
+                                            var z = 32;
+                                            //FL.common.loadGeneralBufferBegin(lookupFieldOptionsObj);
+                                        },
+                                    },
+                                    "_getLookupTableAndField2_field_options": {
+                                        arr: [{value: 0, text: "f 1", op: "1"}, {value: 1, text: "f2", op: "2"}],
+                                        default: lookupFieldName,
+                                        //preField:function(){
+                                        //    var lookupFieldOptionsObj = FL.common.generalBufferArr[0];
+                                        //    return lookupFieldOptionsObj;
+                                        //    //return [{value:0,text:"Funfunfa"},{value:1,text:"jojo"}];
+                                        //},
+                                        onSelect: function (selected) {
+                                            alert("Field choice was " + selected.op)
+                                        }
+                                    }
+                                }
                             };
-                            FL.common.editMasterDetail("A2", title, "_getLookupTableAndField", masterDetailListItems, enumOptions, function (result) {
+                            FL.common.editMasterDetail("A2", lookupTitle, "_getLookupTableAndField2", masterDetailListItems, options, function (result) {
                                 if (result) {
-                                    // alert("The list is ->"+masterDetailListItems.master.list);
-                                    var specialTypeDef = masterDetailListItems.master.special;
-                                    //save into the data dictionary
-                                    var specialDefTemporaryArr = specialTypeDef.split(",");
-                                    var specialObj = {eCN: specialDefTemporaryArr[0], fCN: specialDefTemporaryArr[1]};
-                                    var specialArr = [];
-                                    specialArr.push(specialObj);
-                                    FL.dd.t.entities[currentECN].fields[currentFCN].setField({specialTypeDef: specialArr});
-                                    var z = 32;
+                                    alert("The list is ->" + JSON.stringify(masterDetailListItems));
+                                    //var specialTypeDef = masterDetailListItems.master.special;
+                                    ////save into the data dictionary
+                                    //var specialDefTemporaryArr = specialTypeDef.split(",");
+                                    //var specialObj = {eCN: specialDefTemporaryArr[0], fCN: specialDefTemporaryArr[1]};
+                                    //var specialArr = [];
+                                    //specialArr.push(specialObj);
+                                    //FL.dd.t.entities[currentECN].fields[currentFCN].setField({specialTypeDef: specialArr});
+                                    //var z = 32;
                                 }
 
                             });
-                        };
+                        }
                     }
                     // alert("The selection was "+selectedType);
                 }
