@@ -375,13 +375,28 @@ FL["grid"] = (function () {//name space FL.grid
                                                 lookupFieldOptionsObj.push({value: index, text: element.name})
                                             });
                                             alert("Table " + selected.text + " has fields:" + JSON.stringify(lookupFieldOptionsObj));
+                                            //FL.common.loadGeneralBufferBegin(eCN);
+                                            //FL.common.loadGeneralBufferNext(lookupFieldOptionsObj);
+                                            FL.common.setParametersTo("_field", {
+                                                eCN: eCN,
+                                                alternativeOptions: lookupFieldOptionsObj
+                                            });
+                                            //this.refreshField();
                                             //FL.common.selectBox({boxId:"_getLookupTableAndField2_field_options",boxCurrent:"zzz",boxArr:lookupFieldOptionsObj},)
-                                            //FL.common.setDropdown({boxId: "_getLookupTableAndField2_field_options",boxCurrent: "zzz",boxArr: lookupFieldOptionsObj});
-                                            FL.common.selectBox({
-                                                boxId: "_getLookupTableAndField2_field_options",
-                                                boxCurrent: "zzz",
-                                                boxArr: lookupFieldOptionsObj
-                                            }, this._getLookupTableAndField2_field_options.onSelect);
+                                            //FL.common.setDropdown({boxId: "_getLookupTableAndField2_field_options",boxCurrent: select.text,boxArr: lookupFieldOptionsObj});
+                                            //var z= this.parent._getLookupTableAndField2_field_options.onSelect();
+                                            var zz = 32;
+                                            //FL.common.setDropdown({
+                                            //    boxId: "_getLookupTableAndField2_field_options",
+                                            //    boxCurrent: "Please choose a field",
+                                            //    boxArr: lookupFieldOptionsObj
+                                            //});
+
+                                            //FL.common.selectBox({
+                                            //    boxId: "_getLookupTableAndField2_field_options",
+                                            //    boxCurrent: "zzz",
+                                            //    boxArr: lookupFieldOptionsObj
+                                            //}, this.parent._getLookupTableAndField2_field_options.onSelect);
                                             //--------------------- test
                                             //var dropdownId = "_getLookupTableAndField2_field_options";
                                             //var $dropDownSelect = $("#" + dropdownId);
@@ -407,8 +422,16 @@ FL["grid"] = (function () {//name space FL.grid
                                         //    //return [{value:0,text:"Funfunfa"},{value:1,text:"jojo"}];
                                         //},
                                         onSelect: function (selected) {
-                                            alert("Field choice was " + selected.op)
+                                            //console.log("Field choice was " + selected.op);
+                                            //var eCN = FL.common.generalBufferArr[0];
+                                            var param = FL.common.getParametersFrom("_field");
+
+                                            alert("Field choice was eCN=" + param.eCN + " the rest=" + JSON.stringify(param.alternativeOptions));
+                                            return 23;
                                         }
+                                    },
+                                    refreshField:function(){
+                                        slert("I am refreshing...");
                                     }
                                 }
                             };
@@ -1124,6 +1147,47 @@ FL["grid"] = (function () {//name space FL.grid
         csvFile: null,
         csvFileDelimiter: null,
         csvEncoding: null,
+        xxxx: function (boxId) {
+            var optionsArr = null;
+            var fieldName = "field";
+            var boxCurrent = "Please Choose";
+            var buffer = FL.common.generalParametersObj["_" + fieldName];
+            if (buffer) {
+                optionsArr = FL.common.generalParametersObj["_" + fieldName].alternativeOptions;
+                var $dropDownSelect = $("#" + boxId);
+                //$dropDownSelect.parents('.btn-group').find('.dropdown-toggle').html(boxCurrent + ' <span class="caret"></span>');//shows current value
+                ////... and we load the select box with the current available values
+
+                //$dropDownSelect.empty();//removes the child elements of the dropdown.
+                _.each(optionsArr, function (element) {
+                    var id = boxId + "_" + element.text;
+                    console.log("--->" + id);
+                    $dropDownSelect.append("<li id='" + id + "'><a href='#'>" + element.text + "</a></li>");
+                });
+
+                $("#" + boxId + " li a").click(function () {
+                    var detailLine = -1; //assumes master
+                    var detailLineStr = FL.common.stringAfterLast(boxId, "__f");//"_dictEditEntityTemplate__f4_userType_options"
+                    if (detailLineStr) {
+                        detailLineStr = FL.common.stringBeforeFirst(detailLineStr, "_");//"4_userType_options" =>"4"
+                        detailLine = parseInt(detailLineStr, 10) - 1;//to convert to base 0
+                    }
+                    var selText = $(this).text();
+                    var list = $("#" + boxId + " li a");
+                    var index = list.index(this);
+
+                    var elObj = optionsArr[index]; //exchanged by test
+
+
+                    $dropDownSelect.parents('.btn-group').find('.dropdown-toggle').html(selText + ' <span class="caret"></span>');
+                    // onSelection(selText);//runs the callback function
+                    onSelection(elObj, detailLine);//runs the callback function with the element object as argument and the detail line (-1 =>master)
+                });
+
+            }
+            console.log("FL.gridxxxx() -->" + boxId);
+            return true;
+        },
         createGrid: function () {//call with menu key "uri": "javascript:FL.grid.createGrid()"
             var masterDetailItems = {
                 master: {entityName: "sample", headerString: ""},
@@ -1169,10 +1233,12 @@ FL["grid"] = (function () {//name space FL.grid
                     FL.common.makeModalInfo("Create Grid canceled");
                 }
             });
-        },
+        }
+        ,
         adjustRowsToAttributes: function (rows, arrOfAttributes) {
             adjustRowsToAttributes(rows, arrOfAttributes);
-        },
+        }
+        ,
         verifyPapaFields: function (metaFieldsArr) {
             //Ex  metaFieldsArr has :{aborted: false, cursor: 322587, delimiter: ",",fields: Array[52],linebreak: "↵",truncated: false}
             //This is the place to add some inteligence in evaluation of CSV files.
@@ -1228,7 +1294,8 @@ FL["grid"] = (function () {//name space FL.grid
                 comma_repetitions: comma_repetitions,
                 semi_colon_repetitions: semi_colon_repetitions
             };
-        },
+        }
+        ,
         validateCSV: function (fileObj) {//this is called directly from template id="_importCSV" ->onchange="FL.grid.validateCSV(this.files)"
             // if there is an error FL.grid.csvFile will be null. No error => FL.grid.csvFile = csvFile
             // all this does is to leave a message in FL.grid.csvFile after verifing possible CSV errors !!!!
@@ -1284,7 +1351,8 @@ FL["grid"] = (function () {//name space FL.grid
                     }
                 });
             }
-        },
+        }
+        ,
         importGrid: function () {//call with menu key "uri": "javascript:FL.grid.importGrid()" in Settings
             // The real treatment to the csvFile is done here  - FL.grid.importGrid() -  using FL.grid.csvFile prepared in FL.grid.validateCSV()
             var masterDetailItems = {
@@ -1325,7 +1393,8 @@ FL["grid"] = (function () {//name space FL.grid
                     alert("Create Grid canceled");
                 }
             });
-        },
+        }
+        ,
         csvToStore: function (rows) {//rows is an array of JSON [{},{}...{}]; each JSON  has a key/value = attribute/content
             //feeds the csvStore (memoryCsv.js)  with rows injecting id column and converting other column names to lower case
             var csvrows = [];
@@ -1341,7 +1410,8 @@ FL["grid"] = (function () {//name space FL.grid
                 csvrows.push(element2);
             });
             csvStore.store(csvrows);
-        },
+        }
+        ,
         insertDefaultGridMenu: function (singular, plural) {// Adds a menu with title <plural> and content displayDefaultGrid(<singular>)
             // cursor over menu position <plural> will show: javascript:FL.links.setDefaultGrid('<singular>')
             // if singular has spaces, they will be changed by "_"
@@ -1359,7 +1429,8 @@ FL["grid"] = (function () {//name space FL.grid
             saveTablePromise.fail(function (err) {
                 alert("FLGrid2.js --> insertDefaultGridMenu FAILURE !!! err=" + err);
             });
-        },
+        }
+        ,
         storeCurrentCSVToServerAndInsertMenu: function (entityName, insertMenu) { //(entityName,plural) Adds a menu with title <plural> and content displayDefaultGrid(<singular>)
             // entityName- Name of entity that will be stored
             // insertMenu - true=> create new menu false=>no menu will be created
@@ -1402,7 +1473,8 @@ FL["grid"] = (function () {//name space FL.grid
             //--------------------- old code
             var singularToUseInMenu = entityName.replace(/ /g, "_");
             return def.promise();
-        },
+        }
+        ,
         updateCurrentCSVToServer: function (entityName) { //update all records of entityName Table existing in dictionary
             // entityName- Name of entity that will be stored
             // if entityName has spaces, they will be changed by "_"
@@ -1443,7 +1515,8 @@ FL["grid"] = (function () {//name space FL.grid
                 return def.reject("FL.grid.updateCurrentCSVToServer --> " + entityName + " does not exist in Local Dictionary !");
             }
             return def.promise();
-        },
+        }
+        ,
         csvToGrid: function (csvFile) {//input is a JQuery object (a file representation). Ex var csvFile = $('input[type=file]');
             csvFile.parse({//http://papaparse.com/
                 config: {
@@ -1525,7 +1598,8 @@ FL["grid"] = (function () {//name space FL.grid
                     // utils.mountGridInCsvStore(columnsArr2);//mount backbone views and operates grid - columnsArr must be prepared to backGrid
                 }
             });
-        },
+        }
+        ,
         removeLastRowIfIncomplete: function (data) {
             //by some unknown reason papaparse may leave a last row incomplete....
             //to prevent the existence of an incomplete last line. We will check if last line has the rigth number of columns if not we remove it
@@ -1535,7 +1609,8 @@ FL["grid"] = (function () {//name space FL.grid
             var lastLineCols = ( _.values(lastLineObj) ).length;
             if (lastLineCols != totColsPerRow)
                 data.data.splice(lastRowIndex, 1);
-        },
+        }
+        ,
         csvToGrid2: function (csvFile, delimiter, encoding, entityName) {//input is a file object obtained from DOM	//http://papaparse.com/
             //csvFile - file to load file from local computer
             //delimiter - eventual delimiter to use instead of auto delimiter. This is decided by onchange="FL.grid.validateCSV(this.files)"
@@ -1601,7 +1676,8 @@ FL["grid"] = (function () {//name space FL.grid
                     // spinner.stop();
                 }
             });
-        },
+        }
+        ,
         displayDefaultGrid: function (entityName) { //loads entity from server and display the grid with add,del,edit grid buttons at left and newsletter if a email field exist
             //condition to execute is: FL.API.serverCallBlocked = false;
             entityName = entityName.replace(/_/g, " ");
@@ -1655,7 +1731,8 @@ FL["grid"] = (function () {//name space FL.grid
                 }, function (err) {
                     alert("FL.grid.displayDefaultGrid ERROR: Please try again !" + err);
                 });
-        },
+        }
+        ,
         displayDefaultGrid2: function (entityName) { //loads entity from server and display the grid with add,del,edit grid buttons at left and newsletter if a email field exist
             var def = $.Deferred();
             entityName = entityName.replace(/_/g, " ");
@@ -1715,7 +1792,8 @@ FL["grid"] = (function () {//name space FL.grid
                     return def.reject("FL.grid.displayDefaultGrid2 failure on checkServerCallBlocked() " + err);
                 });
             return def.promise();
-        },
+        }
+        ,
         sendEmailTest: function () {//sends a sample email with eMail/newsletter
             if (FL.login.emailContentTemplate) {
                 // var mailHTML = '<p>Thank you for selecting <a href="http://www.framelink.co"><strong>FrameLink version 8</strong></a> to build your backend site !</p>';
@@ -1743,11 +1821,13 @@ FL["grid"] = (function () {//name space FL.grid
                 var elem = document.getElementById('form__sendNewsletterTemplate_emailTest');
                 elem.parentNode.removeChild(elem);
             }
-        },
+        }
+        ,
         testFunc: function (x) {
             alert("FL.grid.test() -->" + x);
         }
-    };
+    }
+        ;
 })
 ();
 // });

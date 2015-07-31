@@ -61,8 +61,9 @@ var FL = FL || {};
         spinner.stop();
     }, 1000);
     $(document).ready(function () {
-        FL.API.debug = false;
-        FL.API.debugFiltersToShow = ["API", "util", "checkServerCall", "abc", "apigee", "login", "dump", "dd"];//note that "dump" is a reserved word for FL.dd.displayEntities()
+        //FL.common.debugFilter = false;//it was
+        FL.common.debug = false; ////if true shows all FL.common.printToConsole() independentely of filters  ->fallsback to console.log - if false =>only debugFilterToShow will appear
+        FL.common.debugFiltersToShow = ["API", "util", "checkServerCall", "abc", "apigee", "login", "dump", "dd"];//note that "dump" is a reserved word for FL.dd.displayEntities()
         FL.API.fl.setTraceClient(2);
         //alert("xuxu_all");
         FL.common.printToConsole("joakimX1X1", "abc");
@@ -73,42 +74,6 @@ var FL = FL || {};
 
         FL.common.setApplicationSettingsFromSystem();
 
-        var structure = {
-            "root": {
-                "name": "Main Level",
-                nodes: {
-                    "node1": {
-                        "name": "Node 1"
-                    },
-                    "node2": {
-                        "name": "Node 2"
-                    },
-                    "node3": {
-                        "name": "Node 3"
-                    }
-                }
-            },
-            "zz": 132,
-            "zzText": "abcde",
-            "abc": {
-                abcFirst: {
-                    inside_insideAbc: {x: 32, y: 27},
-                    abcFunc: function () {
-                        alert("abcFunc");
-                    },
-                    inside_insideAbc2: {
-                        x: 32,
-                        y: 27,
-                        z: {a: 1, b: 2}
-                    },
-                },
-                z: 32,
-                abcSecond: {name: "jojo", address: "Street A"}
-            }
-        };
-        FL.common.setParent(structure);
-        FL.common.printToConsole("-->setParent END", "abc");
-        var z=32;
 
         // var geoPromise = FL.emailServices.testGoogleGeo("chicago");
         // geoPromise.done(function(){

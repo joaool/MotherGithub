@@ -1196,14 +1196,14 @@ FL["API"] = (function () {//name space FL.API
         data: {},
         offline: true,
         trace: true,//to be removed
-        debug: true,//if it is false  no console log will be shown
+        XXXdebug: true,//if it is false  no console log will be shown - removec to FL.common.debug
         debugStyle: 0,// 0=>means shows numbers to jump to, 1=> no line Numbers to jump to (this only works if debug=true)
 
         // getPageNo: function(pagName){ //to be used by savePage and restorePage
         //	var pageNoObj = {"home":1,"about":2};
         //	return  pageNoObj[pagName];
         // },
-        debugFiltersToShow: null,
+        xxxxdebugFiltersToShow: null,
         serverCallBlocked: false, //HACK to prevent server call (menu calling a grid) before last call is dispatched (ex:cell update) - a promise must be resolved to unblock
         clearServerToken: function () {
             FL.login.token = tokenClear();

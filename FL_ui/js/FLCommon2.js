@@ -100,7 +100,7 @@ FL["common"] = (function () {//name space FL.common
         });
     };
     var setDropdown = function (options) {
-        //fills the content of dropdown box with id=options.boxId with array=options.boxArr presenting options.boxCurrent as default
+        //fills the content of a dropdown box in DOM with id=options.boxId with array=options.boxArr presenting options.boxCurrent as default
         // This method updates onscreen the visible dropdown default, and silently updates the dropdown options
         //example options = {boxId: "_getLookupTableAndField2_field_options", boxCurrent: "zzz", boxArr: lookupFieldOptionsObj}
         var $dropDownSelect = $("#" + options.boxId);
@@ -146,6 +146,7 @@ FL["common"] = (function () {//name space FL.common
         $dropDownSelect.parents('.btn-group').find('.dropdown-toggle').html(options.boxCurrent + ' <span class="caret"></span>');//shows current value
         //... and we load the select box with the current available values
         $dropDownSelect.empty();//removes the child elements of #styleSet.
+        //alert("the place to insert the alternate arr");
         _.each(options.boxArr, function (element) {
             var id = options.boxId + "_" + element.text;
             $dropDownSelect.append("<li id='" + id + "'><a href='#'>" + element.text + "</a></li>");
@@ -172,6 +173,26 @@ FL["common"] = (function () {//name space FL.common
             // onSelection(selText);//runs the callback function
             onSelection(elObj, detailLine);//runs the callback function with the element object as argument and the detail line (-1 =>master)
         });
+    };
+    var loadAllDropdownsPreparingOnSelectCall = function (optionsDropdown, templateName) {
+        _.each(optionsDropdown, function (value, key) {
+            if (value.default && value.arr && value.onSelect) {
+                //    fieldName = s2;
+                //var fieldName = extractFieldNameFromKey(key);
+                //if (fieldName) {
+                //    var buffer = FL.common.generalParametersObj["_" + fieldName];
+                //    if (buffer)
+                //        optionsArr = FL.common.generalParametersObj["_" + fieldName].alternativeOptions;
+                //}
+                var optionsArr = value.arr;
+                //if (value.preField) {
+                //    optionsArr = value.preField();
+                //}
+                selectBox({boxId: key, boxCurrent: value.default, boxArr: optionsArr}, value.onSelect);
+            } else {
+                alert("FLcommon2.js loadAllDropdownsPreparingOnSelectCall - Error dropdown definition missing - check default or arr or onselect");
+            }
+        })
     };
     var getDialogHTML = function (id, stackLevel, title, htmlIn, options) {
         //to work in IE and Firefox always enclose button inside a tag. not a tag inside button tag. - http://stackoverflow.com/questions/12856851/jquery-modal-window-only-working-on-chrome-but-not-ff-ie9
@@ -219,6 +240,19 @@ FL["common"] = (function () {//name space FL.common
             '</div>';
         return before + htmlIn + after;
     };
+    var extractFieldNameFromKey = function (key) {//extracts name before "_options" or before last "_ "if no "_options" exist. If none condition exists returns null
+        //example extracts "table" from "_getLookupTableAndField2_table_options" or from "_getLookupTableAndField2_table"
+        var fieldName = null;
+        var s1 = FL.common.stringBeforeLast(key, "_options");//input ex _getLookupTableAndField2_table_options or  _getLookupTableAndField2_table
+        var s2 = null;
+        if (s1)//ex _getLookupTableAndField2_table_options became _getLookupTableAndField2_table
+            s2 = FL.common.stringAfterLast(s1, "_");//output ex "table"  or null
+        else //_getLookupTableAndField2_table
+            s2 = FL.common.stringAfterLast(key, "_");//output ex "table" or null
+        if (s2)
+            fieldName = s2;
+        return fieldName;
+    };
     return {
         appsettings: {
             dateformat: "DMY",
@@ -232,6 +266,7 @@ FL["common"] = (function () {//name space FL.common
             //     "Brazilian Real":"R$ 999999999/99"
             // }
         },
+        debug: true,//if it is false  no console log will be shown
         generalBufferArr: [],// to be used  and dispose after use - use to read, but never use to load =>always use FL.common.loadGeneralBufferBegin for the 1st one and FL.common.loadGeneralBufferNext for all others
         loadGeneralBufferBegin: function (load) {
             this.generalBufferArr = [];
@@ -240,12 +275,24 @@ FL["common"] = (function () {//name space FL.common
         loadGeneralBufferNext: function (load) {
             this.generalBufferArr.push(load);
         },
+        generalParametersObj: {},// to be used  and dispose after use - use to read, but never use to load =>always use FL.common.loadGeneralBufferBegin for the 1st one and FL.common.loadGeneralBufferNext for all others
+
+        setParametersTo: function (bufferName, arrOfParam) {//used to send parameters (only once) from any module to any module via global window
+            this.generalParametersObj[bufferName] = arrOfParam;
+        },
+        getParametersFrom: function (bufferName) {//bufferName is allways destroyed after each get
+            ////REMEBER THAT getParametersFrom CAN BE USED ONLY ONCE FOR EACH BUFFER NAME
+            // example  var param= FL.common.getParametersFrom("_field");
+            paramArrToReturn = this.generalParametersObj[bufferName];
+            delete this.generalParametersObj[bufferName];
+            return paramArrToReturn;
+        },
         setParent: function (o) {//given a nested  object sets a property parent at each object node
             var keysArr = _.keys(o);
             _.each(keysArr, function (element) {
                 //FL.common.printToConsole("-->verifies node=" + element, "abc");
                 if (FL.common.typeOf(o[element]) == "object") {
-                   if (element != "parent") {
+                    if (element != "parent") {
                         //FL.common.printToConsole("-------------> node=" + element + " is an object", "abc");
                         o[element].parent = o;
                         FL.common.setParent(o[element]);
@@ -326,6 +373,7 @@ FL["common"] = (function () {//name space FL.common
             //               }
             //          }
             var masterDetailItems = masterDetailJson;
+            //FL.common.setParent(options);//this will introduce a parent key in all nested objects - convinient to access one dropdown from another
             this.makeModal(id, title, templateName, options, function (result) {
                 if (result) {
                     fillMasterForTemplate(templateName, masterDetailJson.master);
@@ -482,40 +530,34 @@ FL["common"] = (function () {//name space FL.common
 
             var fullHTML = getDialogHTML(id, stackLevel, title, htmlIn, options);
 
+
             $modalDialog.empty().append(fullHTML);
             if (options.dropdown) {//dropdown is an object with one key per drop down - the key is #id of dropdown on template
-                _.each(options.dropdown, function (value, key) {
-                    if (value.default && value.arr && value.onSelect) {
-                        // var arrOfObjs =_.map(value.arr,function(element,index){ //converted to format {value:0,text:arr[0]},{value:1,text:arr[1]}...etc
-                        //     return {value:index,text:element};
-                        // });
-                        //var optionsArr = value.arr;
-                        //if (value.preField) {
-                        //    optionsArr = value.preField();
-                        //}
-                        selectBox({boxId: key, boxCurrent: value.default, boxArr: value.arr}, value.onSelect);
-                        //selectBox({boxId: key, boxCurrent: value.default, boxArr: optionsArr, preField:value.preField}, value.onSelect);
-                    } else {
-                        alert("FLcommon2.js makeModal - Error dropdown definition missing - check default or arr or onselect");
-                    }
-                });
+                loadAllDropdownsPreparingOnSelectCall(options.dropdown, templateName);
             }
             if (options.detailDropdown) {//detailDropdown is an object with one key per drop down in detail - the key is #id of dropdown on template
                 var templateName = templateName; //to make it accessible inside _.each
                 var index = 0;
                 _.each(options.detailDropdown, function (value, key) {//each key is a dropdown inside detail
                     index++;//the line number inside detail
-                    if (value.arr && value.onSelect) {
-                        // var arrOfObjs =_.map(value.arr,function(element,index){ //converted to format {value:0,text:arr[0]},{value:1,text:arr[1]}...etc
-                        //     return {value:index,text:element};
-                        // });
-                        _.each(window.masterDetailItems.detail, function (element, index) {//within each dropdown for each detail line. 
-                            var lineKey = templateName + "__f" + (index + 1) + "_" + key + "_options";
-                            var defaultValue = element[key]; //masterDetailItems.detail always has a default value !!!!
-                            selectBox({boxId: lineKey, boxCurrent: defaultValue, boxArr: value.arr}, value.onSelect);
-                        });
-                    } else {
-                        alert("FLcommon2.js makeModal - Error detailDropdown definition missing - check default or arr or onselect");
+
+                    if (key != "parent") {//bypasses all "parent" keys
+                        if (value.arr && value.onSelect) {
+                            // var arrOfObjs =_.map(value.arr,function(element,index){ //converted to format {value:0,text:arr[0]},{value:1,text:arr[1]}...etc
+                            //     return {value:index,text:element};
+                            // });
+                            _.each(window.masterDetailItems.detail, function (element, index) {//within each dropdown for each detail line.
+                                var lineKey = templateName + "__f" + (index + 1) + "_" + key + "_options";
+                                var defaultValue = element[key]; //masterDetailItems.detail always has a default value !!!!
+                                selectBox({
+                                    boxId: lineKey,
+                                    boxCurrent: defaultValue,
+                                    boxArr: value.arr
+                                }, value.onSelect);
+                            });
+                        } else {
+                            alert("FLcommon2.js makeModal - Error detailDropdown definition missing - check default or arr or onselect");
+                        }
                     }
                 });
             }
@@ -527,7 +569,7 @@ FL["common"] = (function () {//name space FL.common
             if (makeModalCB) {
                 $("#__FLDialog_button1").off('click');
                 $modal.on("click", "#__FLDialog_button1", function () {
-                    // alert("makeModal - You clicked button1"); 
+                    // alert("makeModal - You clicked button1");
                     FL.common.printToConsole("Button 1 was clicked");
                     $modal.off('hidden.bs.modal');
                     $modal.modal('hide');
@@ -560,14 +602,14 @@ FL["common"] = (function () {//name space FL.common
                     return makeModalCB(false);
                 });
             } else {
-                // $modal.off('hidden.bs.modal');              
+                // $modal.off('hidden.bs.modal');
                 FL.common.printToConsole("makeModal ----->No callback");
                 $modal.modal('hide');
                 $('body').removeClass('modal-open');
                 $('.modal-backdrop').remove();
             }
             // $('#' + modalId ).modal('show');//to launch it immediatly when calling makeModal
-            $modal.modal('show');//to launch it immediatly when calling makeModal	
+            $modal.modal('show');//to launch it immediatly when calling makeModal
         },
         setStyleAndFont: function (styleName, fontName) {//the css files FL<styleName>.css and FLfont_<fontName>.css must exist in FL_ui/css
             loadCSS("FL" + styleName + ".css");
@@ -586,7 +628,8 @@ FL["common"] = (function () {//name space FL.common
                 }
             }
             return retTag;
-        },
+        }
+        ,
         stringAfterLast: function (str, separator) {//returns the content of str after the last separator character or string - no separator found  =>null
             //ex. FL.common.stringAfterLast("http://www.framelink.co/app?d=myDomain1","=") -->returns  "myDomain1"
             var retStr = null;
@@ -597,7 +640,8 @@ FL["common"] = (function () {//name space FL.common
                     retStr = str.substring(pos + separatorLen);
             }
             return retStr;
-        },
+        }
+        ,
         stringBeforeLast: function (str, separator) {//simply returns the content of str before the last separator character or string - no separator found  =>null
             //ex. FL.common.stringBeforeLast("this is (one) or (two) values","(") -->returns  "this is (one) or "
             var retStr = null;
@@ -607,7 +651,8 @@ FL["common"] = (function () {//name space FL.common
                     retStr = str.substring(0, pos);
             }
             return retStr;
-        },
+        }
+        ,
         stringBeforeFirst: function (str, separator) {//simply returns the content of str before the first separator character or string - no separator found  =>null
             //ex. FL.common.stringBeforeFirst("this is (one) or (two) values","(") -->returns  "this is "
             var retStr = null;
@@ -617,7 +662,8 @@ FL["common"] = (function () {//name space FL.common
                     retStr = str.substring(0, pos);
             }
             return retStr;
-        },
+        }
+        ,
         getLastTagInString: function (str, separator, tagTerminator) {//returns the content after the last separator until end or terminal char
             // str - string that will be processed
             // separator - last ocurrence to be identified in string
@@ -640,13 +686,15 @@ FL["common"] = (function () {//name space FL.common
                 }
             }
             return retStr;
-        },
+        }
+        ,
         repeat: function (str, n) {//repeat str n times
             n = n || 1;
             if (n < 0)
                 n = 0;
             return Array(n + 1).join(str);
-        },
+        }
+        ,
         getTail: function (strNumber, radixpoint) {//returns the decimal part of a string representing a number.
             //radixpoint is the decimal separator. If missing uses the appsettings radixpoint
             if (!radixpoint)
@@ -656,11 +704,13 @@ FL["common"] = (function () {//name space FL.common
             if (posDecimal > 0)
                 tail = strNumber.substr(posDecimal + 1);
             return tail;
-        },
+        }
+        ,
         validateEmail: function (email) {
             var re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
             return re.test(email);
-        },
+        }
+        ,
         clearSpaceBelowMenus: function () {
             $("#_placeHolder").empty();
             $("#personContent").empty();
@@ -676,9 +726,10 @@ FL["common"] = (function () {//name space FL.common
 
             // $("#_belowMenus").hide();
             $("#templateHolder").hide();
-        },
+        }
+        ,
         buildDiff: function (arrOfObjA, arrOfObjB, pivotKey) {
-            //given two arrays of objects A and B, both containing key pivotKey, returns an array with all the elements 
+            //given two arrays of objects A and B, both containing key pivotKey, returns an array with all the elements
             //  existing in A whose pivotKey exists in A and not in B.
             //example
             //   A = [{_id:"abc1",name:"jojo",email:"jojo@j.com"},{_id:"abc2",name:"toto",email:"toto@t.com"},{_id:"abc3",name:"zozo",email:"zozo@z.com"}];
@@ -688,17 +739,19 @@ FL["common"] = (function () {//name space FL.common
             var arrB = _.pluck(arrOfObjB, pivotKey)
             var diffArr = _.difference(arrA, arrB); //returns the values of A not present in B
             var outArr = _.map(diffArr, function (element) {
-                //scn diffArr and return all arrObjA that match the same _id 
+                //scn diffArr and return all arrObjA that match the same _id
                 index = _.find(arrOfObjA, function (elementOfA) {
                     return elementOfA[pivotKey] == element
                 });
                 return arrOfObjA[index - 1];
             });
-        },
+        }
+        ,
         shortEmailName: function (email) {
             var pos = email.indexOf("@");
             return email.substring(0, pos);
-        },
+        }
+        ,
         enc: function (str, incr) {//FL.common.enc("o gato patolinas",1) =>fuzzy => FL.common.enc(fuzzy,-1))=>"o gato patolinas"
             //'H'.charCodeAt(0) =>72 , String.fromCharCode(72) =H
             // var encoded =  FL.common.enc('{Patolinas},:',1);
@@ -709,11 +762,12 @@ FL["common"] = (function () {//name space FL.common
                 var a = str.charCodeAt(i);//returns a number
                 // var b = a ^ 123;    // bitwise XOR with any number, e.g. 123
 
-                encoded = encoded + String.fromCharCode(a + incr);//add a char to the string 
+                encoded = encoded + String.fromCharCode(a + incr);//add a char to the string
             }
             encoded = encoded.replace(/'/g, '"');
             return encoded;
-        },
+        }
+        ,
         loaderAnimationON: function (div) {
             var opts = {
                 lines: 13, // The number of lines to draw
@@ -736,7 +790,8 @@ FL["common"] = (function () {//name space FL.common
             var target = document.getElementById(div);
             var spinner = new Spinner(opts).spin(target);
             return spinner;
-        },
+        }
+        ,
         makeFirstElementsSample: function (arr, sampleSize) {//returns a similar array with max size of sampleSize
             var sample = [];
             var len = arr.length;
@@ -746,13 +801,16 @@ FL["common"] = (function () {//name space FL.common
                 sample.push(arr[i]);
             }
             return sample;
-        },
+        }
+        ,
         selectBox: function (options, onSelection) {
             selectBox(options, onSelection);
-        },
+        }
+        ,
         setDropdown: function (options) {
             setDropdown(options);
-        },
+        }
+        ,
         typeOf: function (xVar) {//given a variable, returns one of :  "number","string","boolean","object","array","null","undefined","date"
             //exemple of undefined: a variable declared but never defined -->var foo; alert(foo); //undefined.
             var xRet = typeof xVar;
@@ -765,15 +823,17 @@ FL["common"] = (function () {//name space FL.common
                     xRet = "null";
             }
             return xRet;
-        },
-        is_phone: function (phone) {//validates formatted phone number 
-            //http://stackoverflow.com/questions/4338267/validate-phone-number-with-javascript - we ignore format and validate numeric content only          
+        }
+        ,
+        is_phone: function (phone) {//validates formatted phone number
+            //http://stackoverflow.com/questions/4338267/validate-phone-number-with-javascript - we ignore format and validate numeric content only
             var phoneRe = /^[2-9]\d{2}[2-9]\d{2}\d{4}/;//^begins by one of [2-9] folowed by {2} occurences of any d (digit),folowed by one [2-9] and follwed by 6 digits
             var digits = phone.replace(/\D/g, "");//Do a global search for non-digit characters and removes them
             if (digits.length > 12)
                 return false;
             return (digits.match(phoneRe) !== null);
-        },
+        }
+        ,
         forceToString: function (xVar) {//convert a variable of any type to string
             var type = this.typeOf(xVar);
             if (type != "string") {
@@ -785,7 +845,8 @@ FL["common"] = (function () {//name space FL.common
                     xVar = "NULL"
             }
             return xVar;
-        },
+        }
+        ,
         formatShortLocalToISODate: function (dateTimeString, sourceFormat) {//return ISO Date for a local dateTimeString "<shortdate> hh:mm <pm|am>"
             //ex:FL.common.formatToISODate("6/25/2015 11:21 am");==>2015-06-25T10:21:00.000Z for PC with -1 hour of time zone difference
             function z(n) {
@@ -818,7 +879,8 @@ FL["common"] = (function () {//name space FL.common
             isoDate += z(d.getUTCHours() + 1 + difHrs) + ":" + z(d.getUTCMinutes() + difMin) + ":" + z(d.getUTCSeconds()) + '.';
             isoDate += p(d.getUTCMilliseconds()) + "Z";
             return isoDate;
-        },
+        }
+        ,
         timeTo24: function (timeString) {//converts a time string "hh:mm <pm|am>" to "hh:mm" where hh=[0-24] if formnat incorret returns null
             //FL.common("11:00 pm") -->"23:00"
             //FL.common("12:00 pm") -->null
@@ -838,8 +900,9 @@ FL["common"] = (function () {//name space FL.common
             hrs = z(hrs);//2-->"02"  13-->"13"
             var min = timeString.substr(3, 2);
             return hrs + ":" + min;
-        },
-        toISODate: function (dateTimeString, sourceFormat) {//returns ISO date from a dateTimeString "<shortdate> hh:mm <pm|am>" and a format DMY or MDY 
+        }
+        ,
+        toISODate: function (dateTimeString, sourceFormat) {//returns ISO date from a dateTimeString "<shortdate> hh:mm <pm|am>" and a format DMY or MDY
             //<shortdate> may be:yyyy/mm/dd, dd/mm/yyyy or mm/dd/yyyy
             //examples:
             //   toISODate("6/12/2015 6:00 am","DMY") =>2015-12-06T05:00:00.000Z
@@ -874,8 +937,9 @@ FL["common"] = (function () {//name space FL.common
                 }
             }
             return isoDate;
-        },
-        fromISODateToShortdate: function (isoDate, outFormat) {//returs a dateTimeString shortdate> may be:yyyy/mm/dd, dd/mm/yyyy or mm/dd/yyyy from ISO date 
+        }
+        ,
+        fromISODateToShortdate: function (isoDate, outFormat) {//returs a dateTimeString shortdate> may be:yyyy/mm/dd, dd/mm/yyyy or mm/dd/yyyy from ISO date
             // if isoDate is not acceptable it will return null
             //sourceFormat may be "YMD","MDY" or "DMY"
             //examples:
@@ -902,11 +966,12 @@ FL["common"] = (function () {//name space FL.common
             else
                 alert("FL.common.fromISODateToShortdate outFormat=" + outFormat + " is invalid!");
             return shortDate;
-        },
-        fromISODateToTime: function (isoDate) {//returs a time string "hh:mm <pm|am>"" from ISO date 
+        }
+        ,
+        fromISODateToTime: function (isoDate) {//returs a time string "hh:mm <pm|am>"" from ISO date
             //examples:
             //   FL.common.fromISODateToTime("2015-12-06T05:00:00.000Z") ==>"06:00 am"
-            //   FL.common.fromISODateToTime("2015-12-06T15:45:00.000Z") ==>"04:45 pm"  
+            //   FL.common.fromISODateToTime("2015-12-06T15:45:00.000Z") ==>"04:45 pm"
             function z(n) {
                 return (n < 10 ? '0' : '') + n;
             }
@@ -921,8 +986,9 @@ FL["common"] = (function () {//name space FL.common
             hrs = z(hrs);//2-->"02"  13-->"01"
             var min = z(d.getUTCMinutes());
             return hrs + ":" + min + " " + amPm;
-        },
-        fromISODateToShortdateTime: function (isoDate, sourceFormat) {//returs a dateTimeString "<shortdate> hh:mm <pm|am>" from ISO date 
+        }
+        ,
+        fromISODateToShortdateTime: function (isoDate, sourceFormat) {//returs a dateTimeString "<shortdate> hh:mm <pm|am>" from ISO date
             //sourceFormat may be "YMD","MDY" or "DMY"
             //examples:
             //   FL.common.fromISODateToShortdateTime("2015-12-06T05:00:00.000Z","MDY") ==>"12/06/2015 06:00 am"
@@ -931,19 +997,20 @@ FL["common"] = (function () {//name space FL.common
             if (!shortDate)
                 return null;
             return shortDate + " " + this.fromISODateToTime(isoDate);
-        },
+        }
+        ,
         is_validShortDate: function (shortDate) {//validate  xx-xx-xx or xx/xx/xx or xx.xx.xx where year can be xxxx
             //->accepts DMY(europe), MDY(US), YMD(China - the default accepted by Date.Parse)
             // YMD accepts "2014/12/30","2014-12-30","2014.12.30" -> rejects "14/12/30"
             var bRet = false;
-            var reYMD = /^(19|20)\d{2}([- /.])(0[1-9]|1[012]|[1-9])\2(0[1-9]|[12][0-9]|3[01]|[1-9])$/;//Formats accepted yyyy/mm/dd or yyyy/m/d 
-            var reDMY = /^(0[1-9]|[12][0-9]|3[01]|[1-9])([- /.])(0[1-9]|1[012]|[1-9])\2(19|20)\d\d$/;//Formats accepted dd/mm/yyyy or d-m-yyyy 
+            var reYMD = /^(19|20)\d{2}([- /.])(0[1-9]|1[012]|[1-9])\2(0[1-9]|[12][0-9]|3[01]|[1-9])$/;//Formats accepted yyyy/mm/dd or yyyy/m/d
+            var reDMY = /^(0[1-9]|[12][0-9]|3[01]|[1-9])([- /.])(0[1-9]|1[012]|[1-9])\2(19|20)\d\d$/;//Formats accepted dd/mm/yyyy or d-m-yyyy
             var reMDY = /^(0[1-9]|1[012]|[1-9])([- /.])(0[1-9]|[12][0-9]|3[01]|[1-9])\2(19|20)\d\d$/;//Formats accepted mm/dd/yyyy or mm-dd-yyyy or mm.dd.yyyy format
             //group 1 -  /^(0[1-9]|1[012]) - ^begins by  ()a group of 0 folowed by one of 1-9 =>01-09 or 1 followed by 0,1,o2 2 =>10, 11 or 12 =>02 or 11
             //group 2 -  ([- /.]) - the char - or space or / or .
             //group 3 -  (0[1-9]|[12][0-9]|3[01]) - the digits 01 until 09 or ( 1 or 2 followed by any of 0-9 ) or (3 followed by 0 or 1)
             //group 4 -  \2 Backreference. It matches the contents of the n'th set of parentheses in the expression. repeats ([- /.])
-            //group 5 -  (19|20)\d\d$  19 or 20 followed by any d (digit) and d(another digit)  $ means look at the end of string while ^means look at the beginning 
+            //group 5 -  (19|20)\d\d$  19 or 20 followed by any d (digit) and d(another digit)  $ means look at the end of string while ^means look at the beginning
             // if( !isNaN( Date.parse(shortDate) ) ){//"24/06/2015" returns isNaN, but it is a valid date !!!!
             //     bRet=true;
             if (reYMD.test(shortDate)) {
@@ -954,12 +1021,13 @@ FL["common"] = (function () {//name space FL.common
                 bRet = true;
             }
             return bRet;
-        },
+        }
+        ,
         is_ValidDate: function (dateString) {
             // returns true - if dateString has an acceptable format for a date. Ex
             //      ex:"March 21, 2012", "2015/06/24", "2015-06-24"
             //      for xx-xx-xx ->accepts DMY(europe), MDY(US), YMD(China - the default accepted by Date.Parse)
-            // refuse ->"Stage Paris 2014", "209999" 
+            // refuse ->"Stage Paris 2014", "209999"
             if (isNaN(Date.parse(dateString))) {//"24/06/2015" MDY returns isNaN, but it is a valid date !!!!
                 //it will check if it is DMY or MDY(mm/dd/yyy)
                 if (dateString.length == 10) {//may be acceptable
@@ -978,7 +1046,7 @@ FL["common"] = (function () {//name space FL.common
             var weekDaysArr3 = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri"];
             var testArr = [monthsArr[d.getMonth()], monthsArr3[d.getMonth()], weekDaysArr[d.getDay()], weekDaysArr3[d.getDay()]];//possible values for first string
             var firstString = this.stringBeforeFirst(dateString, " ");//for "Stage Paris 2014", first will be -->"Stage"
-            if (!firstString) { //examples: "Stage,Paris,2014" or "209999" 
+            if (!firstString) { //examples: "Stage,Paris,2014" or "209999"
                 firstString = this.stringBeforeFirst(dateString, ",");//for "Stage,Paris,2014", first will be -->"Stage"
                 if (!firstString)
                     firstString = dateString; //example "209999"
@@ -993,7 +1061,7 @@ FL["common"] = (function () {//name space FL.common
                 if (this.is_validShortDate(dateString)) {
                     is_date = true;
                 } else {
-                    var re = /^(0[1-9]|[12][0-9]|3[01])([- /.])(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\2(19|20)\d\d$/;//Formats accepted dd/Mar/yyyy 
+                    var re = /^(0[1-9]|[12][0-9]|3[01])([- /.])(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\2(19|20)\d\d$/;//Formats accepted dd/Mar/yyyy
                     if (re.test(firstString)) {
                         is_date = true;
                     }
@@ -1011,17 +1079,18 @@ FL["common"] = (function () {//name space FL.common
                 // if( re.test(firstString) ){
                 //     is_date = true;
                 // }
-                // var re = /^(0[1-9]|[12][0-9]|3[01])([- /.])(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\2(19|20)\d\d$/;//Formats accepted dd/Mar/yyyy 
+                // var re = /^(0[1-9]|[12][0-9]|3[01])([- /.])(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\2(19|20)\d\d$/;//Formats accepted dd/Mar/yyyy
                 // if( re.test(firstString) ){
                 //     is_date = true;
                 // }
                 // var re = /^(0[1-9]|[12][0-9]|3[01])([- /.])(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\2\d\d$/;//Formats accepted dd/Mar/yy
                 // if( re.test(firstString) ){
                 //     is_date = true;
-                // }                
+                // }
             }
             return is_date;
-        },
+        }
+        ,
         is_dateArrInStringFormat: function (arrOfRowValues) {//returns true if all array elements are a valid string format
             //var d = Date.parse("March 21, 2012");//1332288000000
             //var d = Date.parse("03-21-12");//1332288000000
@@ -1035,7 +1104,7 @@ FL["common"] = (function () {//name space FL.common
             //var d = Date.parse("Wednesday ,  March 21 ,  2012");//1332288000000
             //var d = Date.parse("Friday,  March 21 ,  2012");//1332288000000
             //var d = Date.parse("Friday,  MARCH 21 ,  2012");//1332288000000
-            //var d = Date.parse("Friday MARCH21 2012");//1332288000000         
+            //var d = Date.parse("Friday MARCH21 2012");//1332288000000
             var is_date = false;
             var dateCandidate = null;
             var thiz = this;
@@ -1056,7 +1125,8 @@ FL["common"] = (function () {//name space FL.common
             } else if (_.isUndefined(failElement))
                 is_date = true;
             return is_date;
-        },
+        }
+        ,
         is_jsonString: function (str) {
             try {
                 JSON.parse(str);
@@ -1064,7 +1134,8 @@ FL["common"] = (function () {//name space FL.common
                 return false;
             }
             return true;
-        },
+        }
+        ,
         is_enumerableArr: function (arrOfRowValues, percent) {//returns true arrOfRowValues can colapse to less than percent with unique values
             //normally arrOfRowValues is a sample of the whole array, only to decide if it is enumerable or not
             var is_enumerable = false;
@@ -1074,7 +1145,8 @@ FL["common"] = (function () {//name space FL.common
             if (columnPercent < percent)
                 is_enumerable = true;
             return is_enumerable;
-        },
+        }
+        ,
         extractUniqueFromArray: function (arr) {//returns object with {empties:no_of empties,uniqueArr:uniqueArr}
             //returns an object {empties:no_of empties,uniqueArr:uniqueArr} where:
             //      empties - number of empties ocurrences in arr
@@ -1096,13 +1168,15 @@ FL["common"] = (function () {//name space FL.common
                 return element[0];
             });
             return {empties: empties, uniqueArr: uniqueArr};
-        },
+        }
+        ,
         getLocalLanguage: function () {
             var language = navigator.languages ? navigator.languages[0] : (navigator.language || navigator.userLanguage);
             if (_.isUndefined(language))
                 language = window.navigator.userLanguage || window.navigator.language;
             return language;
-        },
+        }
+        ,
         is_decimal_US: function (strNumber) {
             is_US = false;
             var lastDotIndex = strNumber.lastIndexOf(".");
@@ -1111,7 +1185,8 @@ FL["common"] = (function () {//name space FL.common
                 if (lastDotIndex == firstDotIndex)
                     is_us = true; // (0.123) or (4,294.00) or (4,294,967.00)
             }
-        },
+        }
+        ,
         is_oneOfCharsInString: function (str, charList) {//returns true if any of the chars in par2 exists in par1.
             //ex FL.common.is_oneOfCharsInString("anc 1002,3","* ") =>true because space exists in string
             var is = false;
@@ -1126,7 +1201,8 @@ FL["common"] = (function () {//name space FL.common
                 }
             }
             return is;
-        },
+        }
+        ,
         isNumberSep: function (strNumber, sep) {//sep is thousands sep - returns true if string is a valid number with that thousand separator
             var isNumber = false;
             //case strNumber "1.000,3" with sep="," =>should return false. Without the "special if" it would return true =>1.0002 is valid
@@ -1156,7 +1232,7 @@ FL["common"] = (function () {//name space FL.common
                 sep = "\\.";
             var regex = new RegExp(sep + "\\d", "g");//ex for sep="," all ocurrences of ,+digit will be deleted "123,,456,789.01" =>"123,456789.01"
             // var noSep = strNumber.replace(/,/g, '');
-            var noSep = strNumber.replace(regex, '');//(',') 4,294,967,295.00 => 4294967295.00 ok 
+            var noSep = strNumber.replace(regex, '');//(',') 4,294,967,295.00 => 4294967295.00 ok
                                                      // ('.') 4.294.967.295,00 => 4294967295,00 ok
             if (!isNaN(noSep)) {//4,294,295.00 becomes =>4294295.00
                 isNumber = true;
@@ -1170,11 +1246,12 @@ FL["common"] = (function () {//name space FL.common
                 }
             }
             return isNumber;
-        },
+        }
+        ,
         getArrNumberFormat: function (arrOfRowValues) {//given an array of strings returns id it is a number representation and if yes returns the format
-            //Possible formats : us,de,fr 
+            //Possible formats : us,de,fr
             //returns {number:false, format:null} or {number:true, format:"us"} or (if all integers){number:true, format:null}
-            //4,294,967,295.00  US-English, Thai, 
+            //4,294,967,295.00  US-English, Thai,
             //4 294 967 295,000  =>Dan, Fin, France, sweeden
             //4.294.967.295,000  =>Italy, Norway, Spain, Portugal,Germany(de)
             // returns lang ("us","de","fr","neutral") neutral means a number simply
@@ -1217,7 +1294,7 @@ FL["common"] = (function () {//name space FL.common
                             if (is_de)
                                 return false;//goes to next element
                             else {
-                                xRet = {"number": false, "format": null};//its is not a consistent number !!" previous was de but this one is not !"                  
+                                xRet = {"number": false, "format": null};//its is not a consistent number !!" previous was de but this one is not !"
                                 return true;
                             }
                         } else if (xRet.format == "fr") {
@@ -1225,7 +1302,7 @@ FL["common"] = (function () {//name space FL.common
                             if (is_fr)
                                 return false;//goes to next element
                             else {
-                                xRet = {"number": false, "format": null};//its is not a consistent number !!" previous was fr but this one is not !"                  
+                                xRet = {"number": false, "format": null};//its is not a consistent number !!" previous was fr but this one is not !"
                                 return true;
                             }
                         } else if (xRet.format == "us") {
@@ -1233,7 +1310,7 @@ FL["common"] = (function () {//name space FL.common
                             if (is_us)
                                 return false;//goes to next element
                             else {
-                                xRet = {"number": false, "format": null};//its is not a consistent number !!" previous was us but this one is not !"                  
+                                xRet = {"number": false, "format": null};//its is not a consistent number !!" previous was us but this one is not !"
                                 return true;
                             }
                         }
@@ -1244,7 +1321,8 @@ FL["common"] = (function () {//name space FL.common
             if (!_.isUndefined(failElement))
                 xRet = {"number": false, "format": null};
             return xRet;
-        },
+        }
+        ,
         localeStringToNumber: function (str, format) {//returns number or 0 if is unable to convert
             // str - str to convert to number
             // format - us, de or fr -->all other formats return 0
@@ -1273,12 +1351,14 @@ FL["common"] = (function () {//name space FL.common
                     n = 0;
             }
             return n;
-        },
+        }
+        ,
         convertStringVectorToNumber: function (arr, format) {//given an array of strings and a format converts that string to a number to numeric according to string format
             return _.map(arr, function (element) {
                 return FL.common.localeStringToNumber(element, format);
             });
-        },
+        }
+        ,
         getServerName: function () {//return server name form url. if server is local host =>test.framelink.co
             //extracts content from url in browser (after // and before the first /)
             //example (in FL.API _login):fl.serverName(FL.common.getServerName());
@@ -1291,7 +1371,8 @@ FL["common"] = (function () {//name space FL.common
                 server = "test.framelink.co";
             FL.common.printToConsole("FL.common.getServerName() -->" + server);
             return server;
-        },
+        }
+        ,
         getMandrillKey: function () {
             var server = this.getServerName();
             var key = "S8_4ExqKlIdZiSBqgiLBUw"; //assume
@@ -1300,6 +1381,8 @@ FL["common"] = (function () {//name space FL.common
             }
             return key;
         },
+        debug: false, //if true shows all FL.common.printToConsole() independentely of filters  ->fallsback to console.log - if false =>only debugFilterToShow will appear
+        debugFiltersToShow: null,
         debugFilter: null,//an object with all  filters collected from the app. Each key is a filter with value true or false. To be created by printToConsole()
         printToConsole: function (toDisplay, filter) {//forces (whatever the debug or debugStyle values) a display without line numbers link
             //example of use:FL.common.printToConsole("   => " + apiName + ' : ' + JSON.stringify(superJ),"API");
@@ -1312,12 +1395,11 @@ FL["common"] = (function () {//name space FL.common
                 if (_.isUndefined(this.debugFilter[filter]))
                     this.debugFilter[filter] = true;
             }
-            ;
-            if (FL.API.debug) {//shows all FL.common.printToConsole() even without filter parameter
+            if (FL.common.debug) {//shows all FL.common.printToConsole() even without filter parameter
                 console.log(toDisplay);
             } else {
                 if (filter) {//if there is no filter, does not display, otherwise checks if there is a reason to display
-                    _.each(FL.API.debugFiltersToShow, function (element) {
+                    _.each(this.debugFiltersToShow, function (element) {
                         if (element == filter) //checks if print request is inside filters to display (FL.API.debugFiltersToShow)
                             if (this.debugFilter[element])//checks if the current filter is active
                                 console.log(" -->" + filter + ":" + toDisplay);
@@ -1327,6 +1409,7 @@ FL["common"] = (function () {//name space FL.common
             // FL.API.debug = debugStatus;
             // FL.API.debugStyle = debugStyleStatus;
         },
+        masterDetailItems: null,//used by modalIn
         getBrowserWidth: function () {
             if (window.innerWidth) {
                 return window.innerWidth;
@@ -1338,7 +1421,8 @@ FL["common"] = (function () {//name space FL.common
                 return document.body.clientWidth;
             }
             return 0;
-        },
+        }
+        ,
         getBase64Width: function (imageData) {
             $("body").append("<img id='hiddenImage' src='" + imageData + "' />");
             var w = $('#hiddenImage').width();
@@ -1347,7 +1431,8 @@ FL["common"] = (function () {//name space FL.common
             console.log("width:" + w + " height:" + h);
             FL.common.printToConsole("getBase64Width before exit w=" + w + " h=" + h, "abc");
             return w;
-        },
+        }
+        ,
         getBrowser: function () {
             var isChrome = /Chrome/.test(navigator.userAgent) && /Google Inc/.test(navigator.vendor);
             if (isChrome)
@@ -1367,12 +1452,14 @@ FL["common"] = (function () {//name space FL.common
                 browser = "ie";
             }
             return browser;
-        },
+        }
+        ,
         getDecimalSeparator: function () {//http://stackoverflow.com/questions/1074660/with-a-browser-how-do-i-know-which-decimal-separator-does-the-client-use
             var n = 1.1;
             n = n.toLocaleString().substring(1, 2);
             return n;
-        },
+        }
+        ,
         getLocaleSettings: function () {//http://stackoverflow.com/questions/2388115/get-locale-short-date-format-using-javascript
             var formats = {
                 "ar-SA": {mask: "dd/MM/yy", ymdFormat: "DMY", radix: ",", thousands: ".", currency: "$"},
@@ -1612,6 +1699,36 @@ FL["common"] = (function () {//name space FL.common
             this.appsettings.thousandsSeparator = thousandsSeparator;
             this.appsettings.dateformat = this.getLocaleSettings().ymdFormat;
             this.appsettings.currency = this.getLocaleSettings().currency;
+        },
+        getDOMContentFromId: function (id) {
+            var content = null;
+            var domTarget = "#" + id;
+            var $domTarget = $(domTarget);
+            if ($domTarget.length === 0) {//not in DOM
+                alert("FL.common.getDOMContentFromId ERROR - id=" + id + " not in DOM");
+                return null;
+            }
+            var tagElement = $domTarget.prop("tagName");
+            if(tagElement ==="INPUT")
+                content = $domTarget.val();
+            else
+                content = $domTarget.text();
+            return content;
+        },
+        setDOMContentToId: function (id,value) {
+            var content = null;
+            var domTarget = "#" + id;
+            var $domTarget = $(domTarget);
+            if ($domTarget.length === 0) {//not in DOM
+                alert("FL.common.setDOMContentToId ERROR - id=" + id + " not in DOM");
+                return null;
+            }
+            var tagElement = $domTarget.prop("tagName");
+            if(tagElement ==="INPUT")
+                $domTarget.val(value);
+            else
+                $domTarget.text(value);
+            return content;
         },
         testFunc: function (x) {
             alert("FL.common.test() -->" + x);

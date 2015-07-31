@@ -312,7 +312,7 @@ $(function () {
         success = utils.typeUIOf(xVar);
         ok(success === null, "utils.typeUIOf('951219244558') -->'invalid phone'");//14
     });
-    test("FL.common tests", function () {
+    test("FL.common tests", function (assert) {
         FL.common.appsettings.radixpoint = ",";
         FL.common.appsettings.thousandsSeparator = ".";
 
@@ -930,176 +930,74 @@ $(function () {
         success = FL.common.convertStringVectorToNumber(arrOfRowValues, 'de');
         okResult = [-4294, 0, 1000.3, 0.324, -27];
         ok(JSON.stringify(success) === JSON.stringify(okResult), "convertStringVectorToNumber(arrOfRowValues, 'de') -->ok for 'a' among numbers");//72
+        var structure = {
+            "root": {
+                "name": "Main Level",
+                nodes: {
+                    "node1": {
+                        "name": "Node 1"
+                    },
+                    "node2": {
+                        "name": "Node 2"
+                    },
+                    "node3": {
+                        "name": "Node 3"
+                    }
+                }
+            },
+            "zz": 132,
+            "zzText": "abcde",
+            "abc": {
+                abcFirst: {
+                    insideAbcFirst: {x: 32, y: 27},
+                    abcFunc: function () {
+                        alert("abcFunc");
+                    },
+                    insideAbcFirstB: {
+                        x: 32,
+                        y: 27,
+                        z: {a: 1, b: 2}
+                    },
+                },
+                z: 32,
+                abcSecond: {name: "jojo", address: "Street A"}
+            }
+        };
+        FL.common.setParent(structure);
+        assert.deepEqual(structure.root.nodes.node3, {
+            name: "Node 3",
+            parent: structure.root.nodes
+        }, "FL.common.setParent()- added a parent to structure.root.nodes.node3");
+        assert.deepEqual(structure.root.nodes.node3.parent.parent.parent.zz, 132, "FL.common.setParent()- structure.root.nodes.node3.parent.parent.parent.zz=132");
+        assert.deepEqual(structure.root.nodes.node3.parent.parent.parent.abc.z, 32, "FL.common.setParent()-structure.root.nodes.node3.parent.parent.parent.zz=32");
+        assert.deepEqual(structure.abc, structure.abc.abcFirst.parent, "FL.common.setParent()- structure.abc=structure.abc.abcFirst.parent");
+        assert.deepEqual(structure.abc.abcFirst.insideAbcFirstB, structure.abc.abcFirst.insideAbcFirst.parent.insideAbcFirstB, "FL.common.setParent()- accessing brother - a child of the parent");
+        assert.deepEqual(structure.abc.abcSecond, structure.abc.abcFirst.insideAbcFirst.parent.parent.abcSecond, "FL.common.setParent()- accessing oncle - a child of the grand parent");
+        assert.deepEqual(structure.abc.abcFirst.insideAbcFirst.parent.parent.abcSecond.name, "jojo", "FL.common.setParent()- accessing 'jojo' from structure.abc.abcFirst.insideAbcFirst");
+
+
+        var objToSend = {a: 10, b: 20, c: 30};
+        FL.common.setParametersTo("abc", objToSend);
+        // before get "abc" entry exists in FL.common.generalParametersObj
+        var z = FL.common.generalParametersObj["abc"];
+        ok(FL.common.typeOf(z) == "object", " FL.common.setParametersTo('abc',{}) creates a abc buffer -->ok");//68
+
+        var result = FL.common.getParametersFrom("abc");//returns the same object as {a:10,b:20,c:30} (same reference)
+        var z = FL.common.generalParametersObj["abc"];
+        var zz = FL.common.typeOf(z);
+        // after get "abc" entry is deleted from  FL.common.generalParametersObj
+        ok(FL.common.typeOf(z) == "undefined", " FL.common.getParametersFrom('abc') deletes  abc buffer -->ok");//68
+        //QUnit.inArray(result, [10,20,30], ' FL.common.getParametersFrom returned 10,20,30 +JSON.stringify(list)' );
+        assert.deepEqual(result, objToSend, "FL.common.getParametersFrom returned " + JSON.stringify(objToSend));
+
+
+        FL.common.setParametersTo("abc",{p1:{name:"jojo",address:"Nairobi"},p2:[10,20,30]});
+        ok(FL.common.getParametersFrom("abc").p1.name == "jojo", " FL.common.getParametersFrom('abc').p1.name = 'jojo' -->ok");//68
+        //
+        FL.common.setParametersTo("abc",{p1:{name:"jojo",address:"Nairobi"},p2:[10,20,30]});
+        // We had to resend ->REMEBER THAT getParametersFrom CAN BE USED ONLY ONCE FOR EACH BUFFER NAME (it is deleted after each getParametersFrom()
+        ok(FL.common.getParametersFrom("abc").p2[1] == 20, " FL.common.getParametersFrom('abc').p2[1] = 20 -->ok");//68
+
     });
-    test("client Dictionary tests", function () { //one test can have several assertions
-        //client
-        var success = FL.dd.createEntity("client","company we may invoice");
-        ok(success === true , "createEntity operation successfull for first entity !" );
-        actual = FL.dd.entities["client"];
-        ok(actual.csingular == "2ls", "Compressed code for first entity = '2ls'");//first entity is 9999 + 1
-        ok(actual.description == "company we may invoice", "description is correct");
-        ok(actual.plural == "clients", "plural is clients");
-        success = FL.dd.createEntity("client","another company we may invoice");
-        ok(success === false , "createEntity refused because client exists already !" );
 
-        //order
-        success = FL.dd.createEntity("order","client's product request");
-        ok(success === true , "createEntity operation successfull for 2nd entity !" );
-        actual = FL.dd.entities["order"];
-        ok(actual.csingular == "2lS", "Compressed code for 2nd entity = '2lS'");
-        ok(actual.description == "client's product request", "description is correct for 2nd entity");
-        ok(actual.plural == "orders", "plural is orders");
-
-        // updateEntityBySingular - updates the server dictionary !!!! - it needs a working connection
-        //success = FL.dd.updateEntityBySingular("client",{plural:"customers",description:"frequent buyer"});
-        //ok(success === true , "updateEntityBySingular operation successfull for client" );//10
-
-        actual = FL.dd.entities["client"];
-        ok(actual.csingular == "2ls", "Compressed code for first entity = '2ls'");
-        // ok(actual.description == "frequent buyer", "description was updated correctely");
-        // ok(actual.plural == "customers", "plural has changed to customers");
-
-        // updateEntityBySingular - updates the server dictionary !!!! - it needs a working connection
-        // success = FL.dd.updateEntityBySingular("client",{singular:"customer", plural:"customers",description:"frequent buyer"});
-        // actual = FL.dd.entities["customer"];
-        // ok(success === true && actual.singular == "customer", "updateEntityBySingular SUCCESS changing entity singular FROM client TO customer" );//14
-
-        // success = FL.dd.updateEntityBySingular("customer",{singular:"client", plural:"customers",description:"frequent buyer"});
-        // actual = FL.dd.entities["client"];
-        // ok(success === true && actual.singular == "client" , "updateEntityBySingular SUCCESS changing entity singular FROM customer TO client" );//15
-
-        success = FL.dd.updateEntityByCName("2ls",{plural:"clients",description:"very frequent buyer"});
-        ok(success === true , "updateEntityByCName operation successfull for client" );
-        actual = FL.dd.entities["client"];
-        ok(actual.csingular == "2ls", "Compressed code for first entity = '2ls'");
-        ok(actual.description == "very frequent buyer", "description was updated correctely");
-        ok(actual.plural == "clients", "plural has changed back to clients");
-
-        var entityCN = FL.dd.getCEntity("order");
-        ok(entityCN == "2lS", "FL.dd.getCEntity ->Compressed code for 'order' is = '2lS'");
-        entityCN = FL.dd.getCEntity("patolinas");
-        ok(entityCN === null, "FL.dd.getCEntity ->Compressed code for patolinas is null - not existing");
-
-        FL.dd.addAttribute("order","shipped","expedition status","Shipped","boolean","checkbox",null);
-        actual = FL.dd.getEntityBySingular("order");
-        ok(actual.attributes.length == 2, "Order has 2 attributes");//20
-
-        actual = FL.dd.countEntitiesBeginningBy("client");
-        ok(actual == 1, "countEntitiesBeginningBy('client') is 1");
-
-        success = FL.dd.createEntity("client1","another company we may invoice");
-        actual = FL.dd.countEntitiesBeginningBy("client");
-        ok(actual == 2, "countEntitiesBeginningBy('client') is 2");
-        actual = FL.dd.countEntitiesBeginningBy("patolinas");
-        ok(actual === 0, "countEntitiesBeginningBy('patolinas') is 0");
-        actual = FL.dd.nextEntityBeginningBy("client");
-        ok(actual === "client2", "nextEntityBeginningBy('client') is 'client2'");
-        actual = FL.dd.nextEntityBeginningBy("patolinas");
-        ok(actual === "patolinas", "nextEntityBeginningBy('patolinas') is 'patolinas'");//27
-
-        actual = FL.dd.getEntityBySingular("order").sync;
-        ok(actual === false, "order sync status is:'not synchronized'");//28
-        FL.dd.setSync("order",true);
-        actual = FL.dd.getEntityBySingular("order").sync;
-        ok(actual === true, "FL.dd.setSync-->order sync status is now:'synchronized'");//29
-        FL.dd.setSync("order",false);
-        actual = FL.dd.getEntityBySingular("order").sync;
-        ok(actual === false, "FL.dd.setSync-->order sync status is again:'not synchronized'");//30
-
-        actual = FL.dd.getFieldCompressedName("order","id");
-        ok(actual === "00", "FL.dd.getFieldCompressedName -->compressed name for id='00'");//31
-        actual = FL.dd.getFieldCompressedName("order","shipped");
-        ok(actual === "01", "FL.dd.getFieldCompressedName -->compressed name for shipped='01'");//32
-
-        FL.dd.addAttribute("order","product","unique order item","product","string","textbox",null);
-        actual = FL.dd.getFieldCompressedName("order","product");
-        ok(actual === "02", "FL.dd.getFieldCompressedName -->compressed name is '02'");//33
-
-
-        FL.common.printToConsole("%%%%%%%%%%%%%% begin %%%%%%%%%%%%%%%%%%%%%%%%");
-        FL.dd.displayEntities();
-
-        // FL.dd.updateAttribute('order','shipped',{type:'date',typeUI:'datebox'});//change type and typeUI for attribute "shipped" - previously type="boolean" typeUI="checkbox"
-        // actual = FL.dd.getEntityAttribute("order","shipped");
-        // ok(actual.type == "date" && actual.typeUI == "datebox", "FL.dd.updateAttribute('order','shipped',{type:'date',typeUI:'datebox'}) -->update done!");//34
-
-        // FL.dd.updateAttribute('order','shipped',{type:'boolean',typeUI:'checkbox'});//change type and typeUI for attribute "shipped" - previously type="boolean" typeUI="checkbox"
-        // actual = FL.dd.getEntityAttribute("order","shipped");
-        // FL.common.printToConsole(JSON.stringify(actual));
-        // ok(actual.type == "boolean" && actual.typeUI == "checkbox", "FL.dd.updateAttribute('order','shipped',{type:'boolean',typeUI:'checkbox'}) -->update done!");//35
-
-        // FL.dd.updateAttribute('order','shipped',{name:'sent',label:'Sent'});//change type and typeUI for attribute "shipped" - previously type="boolean" typeUI="checkbox"
-        // actual = FL.dd.getEntityAttribute("order","sent");
-        // FL.common.printToConsole(JSON.stringify(actual));
-        // ok(actual.name == "sent" && actual.label == "Sent", "FL.dd.updateAttribute('order','shipped',{name:'sent',label:'Sent'}) -->update done!");//36
-
-        // FL.dd.updateAttribute('order','sent',{name:'shipped',label:'Shipped'});//change type and typeUI for attribute "shipped" - previously type="boolean" typeUI="checkbox"
-        // actual = FL.dd.getEntityAttribute("order","shipped");
-        // FL.common.printToConsole(JSON.stringify(actual));
-        // ok(actual.name == "shipped" && actual.label == "Shipped", "FL.dd.updateAttribute('order','sent',{name:'shipped',label:'Shipped'}) -->update done!");//37
-
-        // FL.dd.displayEntities();
-
-
-        //addRelation: function(xSingular,rCN,withEntityName,verb,cardinality,side,storedHere) {//adds a new relation to the array of relations of entity xSingular
-        FL.dd.createEntity("sales_rep","employee responsable for sales");
-        // FL.dd.addAttribute(xSingular,xAttribute,xDescription,xLabel,xType,xTypeUI,arrEnumerable);
-        FL.dd.addAttribute("sales_rep","name","sales_rep's name","Rep Name","string","textbox",null);
-        FL.dd.addAttribute("sales_rep","phone","sales_rep's phone","Rep Phone","number","numberbox",null);
-        FL.dd.addAttribute("sales_rep","eMail","sales_rep's eMail","Rep eMail","string","emailbox",null);
-
-        FL.dd.upsertAttribute("client","pointer to sales Rep",{
-            label:"sales rep",
-            typeUI:"lookupbox",
-            specialTypeDef:"2lT" //for lookup this means the compressed name of the foreigner table
-        });
-        FL.dd.displayEntities();
-
-        //------------ test FL.dd.t.xxx
-        FL.dd.init_t();
-        var listAll = FL.dd.t.entities.list();
-        var list = [];
-        _.each(listAll,function(element){list.push(element.singular)});
-        //assert.deepEqual( obj, { foo: "bar" }, "Two objects can be the same in value" );
-        QUnit.inArray(list, ["order","client","client1","sales_rep"], 'FL.dd.t.entities.list() returned singular '+JSON.stringify(list) + " -------------------------------------------------------------------------------------------------------------------------------------- FL.dd.t.entities.list() ");
-        // ok(list == "12345.67" , "FL.common.currencyToStringNumber('"+xVar+"') -->radixpoint=','-->"+result+"'" );//67
-        list = [];
-        _.each(listAll,function(element){list.push(element.csingular)});
-        QUnit.inArray(list, ["2lS","2ls","2lt","2lT"], 'FL.dd.t.entities.list() returned csingular '+JSON.stringify(list) );
-        ok(FL.dd.t.entities["2ls"].singular == "client" , "FL.dd.t.entities['2ls'].singular == 'client'");
-        xVar = FL.dd.t.entities["2ls"].plural;
-        ok(FL.dd.t.entities["2ls"].plural == "clients" , "FL.dd.t.entities['2ls'].plural == 'clients'");
-        ok(FL.dd.t.entities["2ls"].csingular == "2ls" , "FL.dd.t.entities['2ls'].csingular == '2ls'");
-        ok(FL.dd.t.entities["2ls"].description == "very frequent buyer" , "FL.dd.t.entities['2ls'].description == 'very frequent buyer'");
-
-        FL.dd.t.entities["2ls"].set({description:"company we may invoice"})
-        ok(FL.dd.t.entities["2ls"].description == "company we may invoice" , "FL.dd.t.entities['2ls'].set({description:'company we may invoice'})");
-        //alert("JujuXXYY");
-
-
-        FL.dd.addRelation("client","order","has","N",0,true,"En");//
-        FL.dd.addRelation("client","sales_rep","is managed by ","1",0,true,"En");
-        FL.dd.addRelation("sales_rep","client","is responsable by complaints of ","N",0,true,"En");
-
-
-        FL.common.printToConsole("------- after ---------------");
-        FL.dd.displayEntities();
-        actual = FL.dd.relationsOf("sales_rep");
-        ok(actual[0].rCN === "02", "first relation from FL.dd.relationsOf('sales_rep') has rCN=='02'"+ " -------------------------------------------------------------------------------------------------------------------------------------- FL.dd.relationsOf() ");
-        ok(actual[0].semantic === "sales_rep manages many clients", "first relation from FL.dd.relationsOf('sales_rep') has semantic 'sales_rep manages many clients'");//33
-        ok(actual[1].rCN === "03", "first relation from FL.dd.relationsOf('sales_rep') has rCN=='03'");//34
-        ok(actual[1].semantic === "sales_rep is responsable by complaints of  many clients", "first relation from FL.dd.relationsOf('sales_rep') has semantic 'sales_rep is responsable by complaints of  many clients'");//35
-        FL.common.printToConsole("relations ="+JSON.stringify(actual));
-
-        actual = FL.dd.relationsOf("client");
-        ok(actual[0].rCN === "01", "first relation from FL.dd.relationsOf('client') has rCN=='01'");//36+4
-        ok(actual[0].semantic === "client has many orders", "first relation from FL.dd.relationsOf('client') has semantic 'client has many orders'");//37
-        FL.common.printToConsole("relations="+JSON.stringify(actual));
-
-        actual = FL.dd.relationsOf("order");
-        FL.common.printToConsole("relations="+JSON.stringify(actual));
-
-        ok(actual[0].rCN === "01", "first relation from FL.dd.relationsOf('order') has rCN=='01'");//36
-        ok(actual[0].semantic === "order is referred by one and only one client", "first relation from FL.dd.relationsOf('order') has semantic 'order is referred by one and only one client'");//37
-    });
 });
