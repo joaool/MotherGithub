@@ -196,7 +196,7 @@
                         '</div>';
                 return before + htmlIn + after;
             };
-            var prepareButtonsClick = function (makeModalCB, $modal, modalId, templateName, dataObj) {
+            var prepareButtonsClick = function (makeModalCB, $modal, modalId, templateName, dataObj, modalIn) {
                 var button1Id = modalId + "_button1";
                 var button2Id = modalId + "_button2";
                 templateName = templateName;//to pass value by closure to click events
@@ -205,7 +205,7 @@
                     FL.common.printToConsole("Button 1 was clicked", "modalIn");
                     $modal.off('hidden.bs.modal');
                     $modal.modal('hide');
-                    result(false, templateName);
+                    result(false, templateName, modalIn);
                 });
 //                $("#__FLDialog_button2").off('click');
                 $("#" + button2Id).off('click');
@@ -215,7 +215,7 @@
                         FL.common.printToConsole('no client side errors!', "modalIn");
                         $modal.off('hidden.bs.modal');
                         $modal.modal('hide');
-                        result(true, templateName);
+                        result(true, templateName, modalIn);
                     } else {
                         FL.common.printToConsole('Client side errors!!!!', "modalIn");
                         $('.invalid-form-error-message')
@@ -230,53 +230,32 @@
                     return makeModalCB(false);
                 });
             };
-            var fillMasterForTemplate = function (templateName, masterJson) {
+            var fillMasterForTemplate = function (templateName, masterJson, modalIn) {
                 // returns masterJson with new values retrieved from the template for ids corresponding to the keys in masterJson
-                //ex: if templateName="_A" and masterJson={entityName:"client",entityDescription:"someone we may invoice"}
-                //      and if id="_A_entityName" has "xclient" and  id="_A_entityDescription" has "xsomeone we may invoice"
-                //		returns {entityName:"xclient",entityDescription:"xsomeone we may invoice"}
-                //
-                // the same as:
-                //		var singular = $("#_dictEditEntityTemplate_entityName").val();
-                //		var description = $("#_dictEditEntityTemplate_entityDescription").val();
                 _.each(masterJson, function (value, key) {
-                    var domTarget = "#" + templateName + "_" + key;
-                    var newValue = $(domTarget).val();
-                    if (domTarget.substr(domTarget.length - 8) == "_options") {//extract from a dropdown
-                        var pos = domTarget.lastIndexOf("_options");
-                        var domTarget2 = domTarget.substring(0, pos);
-                        newValue = $(domTarget2).text();
+                    if (key.substr(key.length - 8) == "_options") {//extract from a dropdown
+                        //tbd
                     } else {
-                        masterJson[key] = newValue;//not <fieldName>_options
+                        var fieldContent = modalIn.getFieldFromDisplay(key);
+                        modalIn.setFieldToStore(key, fieldContent + "_z");
                     }
                 });
             };
-            var loadComboTo = function (templateName, dropdownName, optionsArr, currentValue) {
-                //  templateName - ex:"getLookupTableAndFields3"
-                //  dropdownName - the name of the dropdown field in the template. If it is a dropdown it must have an associate <fieldName>_options  ex:"table"
-                //  optionsArr - array of JSON ("value" and "text" are mandatory). Ex:[{value: 0, text: "op a", op: "A"}, {value: 1, text: "op b", op: "B"}]
-                //  currentValue - content when dropdown is closed - Ex. "table Afonso A"
-                // fills the content of dropdownName  with optionsArr presenting currentValue as default - ex
-                // NOTE:optionsArr is an array of JSON where "value" and "text" are mandatory keys. All other are optional
-                var $dropDownSelect = $("#" + templateName + "_" + dropdownName);
-                if ($dropDownSelect === 0) {//not in DOM
-                    alert("modalIn ERROR - loadComboTo - dropdown not in DOM");
+            this.getOptions = function (optionsFieldName) {
+                return FL.common.masterDetailItems.master[optionsFieldName];
+            };
+            this.setOptions = function (optionsFieldName, optionsArr) {
+                if (optionsFieldName.substr(optionsFieldName.length - 8) != "_options") {
+                    alert("modalIn object ERROR in method setOptions -->optionsFieldName parameter must have the format <name>_options !!! Instead it is->"+ optionsFieldName);
+                    return;
                 }
-                var $dropDownSelectOptions = $("#" + templateName + "_" + dropdownName + "_options");
-                if ($dropDownSelectOptions === 0) {//not in DOM
-                    alert("modalIn ERROR - loadComboTo - dropdown options not in DOM");
-                }
-                var dropdownOutArr = [];
+                FL.common.masterDetailItems.master[optionsFieldName] = optionsArr;
+                var $dropDownSelectOptions = $("#" + this.templateName + "_" + optionsFieldName);
                 $dropDownSelectOptions.empty();//removes the options.
                 _.each(optionsArr, function (element, index) {
-                    var id = templateName + "_" + dropdownName + "_options_" + index;
+                    var id = templateName + "_" + optionsFieldName + "_" + index;
                     $dropDownSelectOptions.append("<li id='" + id + "'><a href='#'>" + element.text + "</a></li>");
-//                    var x = FL.common.masterDetailItems.master[dropdownName + "_options"][index].text;
-                    dropdownOutArr.push({value: index, text: element.text + "-->In"});
-//                    FL.common.masterDetailItems.master[dropdownName + "_options"][index].text = element.text + "-->In";
                 });
-                var x = FL.common.masterDetailItems.master[dropdownName + "_options"];
-                FL.common.masterDetailItems.master[dropdownName + "_options"] = dropdownOutArr;
             };
             // function modalIn(title, templateName, data, options, makeModalCB) {
             this.title = title;
@@ -296,9 +275,9 @@
 //                var x = "<div id='" + this.modalId + "'></div>";
 //                $domBase.append("<div id='" + this.modalId + "'></div>"); //not working because parsley needs the dom ready
             }
-            var result = function (bOk, templateName) {
+            var result = function (bOk, templateName, modalIn) {
                 if (bOk) {//button 2 was pressed
-                    fillMasterForTemplate(templateName, FL.common.masterDetailItems.master);
+                    fillMasterForTemplate(templateName, FL.common.masterDetailItems.master, modalIn);
 //                    fillDetailForTemplate(templateName, masterDetailJson.detail);
 //                    return editMasterDetailCB(true);
 //                    alert("result = "+bOk);
@@ -326,20 +305,28 @@
             this.setFieldToStore = function (fieldName, value) {
                 FL.common.masterDetailItems.master[fieldName] = value;
             };
+            this.get = function (fieldName) {
+                var fieldContent = this.getFieldFromDisplay(fieldName);
+                this.setFieldToStore(fieldName, fieldContent);
+                return fieldContent;
+            };
+            this.set = function (fieldName, value) {
+                this.setFieldToDisplay(fieldName, value);
+                this.setFieldToStore(fieldName, value);
+            };
             this.refresh = function () {
                 var dataObj = this.data;
                 FL.common.masterDetailItems = dataObj;
                 var fullHTML = this.compiled(dataObj);
                 this.$modalDialog.empty().append(fullHTML);//places final HTML  (with empty dropboxes...) in slot
                 var templateName = this.templateName;
-                //for master loads dropdown options in slot - for each <fieldName>_option field
+
+                //for master, loads dropdown options in slot - for each <fieldName>_option field
                 _.each(dataObj.master, function (value, key) {
                     if (key.substr(key.length - 8) == "_options") {//extract from a dropdown
-                        var pos = key.lastIndexOf("_options");
-                        var dropdownName = key.substring(0, pos);
-                        loadComboTo(templateName, dropdownName, dataObj.master[key], dataObj.master[dropdownName])
+                        this.setOptions(key, value);
                     }
-                });
+                }, this);
 
                 var $modal = $('#' + this.modalId + "_modal");
                 form = $("#form_" + this.templateName);
@@ -353,9 +340,6 @@
                     var $field = $("#" + selector);
                     var options = this.options;
                     if (key.substr(key.length - 8) == "_options") {//Load events for combo
-//                        var pos = key.lastIndexOf("_options");
-//                        var dropdownName = key.substring(0, pos);
-//                        loadComboTo(templateName, dropdownName, dataObj.master[key], dataObj.master[dropdownName])
                         FL.common.printToConsole("(TBD)Loading click events for options list:" + key, "modalIn");
                     } else {//not a combo
                         FL.common.printToConsole("Loading click events for field:" + key, "modalIn");
@@ -393,7 +377,7 @@
 
                 form.parsley().validate();
                 if (makeModalCB) {
-                    prepareButtonsClick(makeModalCB, $modal, this.modalId, this.templateName, dataObj);
+                    prepareButtonsClick(makeModalCB, $modal, this.modalId, this.templateName, dataObj, this);
                 } else {
                     // $modal.off('hidden.bs.modal');
                     FL.common.printToConsole("makeModal ----->No callback");
@@ -428,10 +412,9 @@
                     thisModalIn.test("END click name");
                 },
                 table: function (thisModalIn) {
-                    alert("preField  code for table with content " + thisModalIn.getFieldFromStore("table"));
+//                    alert("preField  code for table with content " + thisModalIn.getFieldFromStore("table"));
                     //fills fields with content
-                    var newField_options = [{value: 0, text: "new field 1"}, {value: 1, text: "new field 2"}];
-
+//                    var newField_options = [{value: 0, text: "new field 1"}, {value: 1, text: "new field 2"}];
                 },
                 table_options: function () {
                     alert("click code for table_options in options");
@@ -447,11 +430,12 @@
                     FL.common.printToConsole("posField code for name in options content=" + x, "modalIn");
                     FL.common.printToConsole("posField code for name in options content=" + thisModalIn.getFieldFromStore("table"), "modalIn");
                     FL.common.printToConsole("posField code for name in options content=" + thisModalIn.getFieldFromStore("field"), "modalIn");
-                    if (thisModalIn.getFieldFromDisplay("name") == "Joao") {
-                        thisModalIn.setFieldToDisplay("name", "Joao Oliveira");
-                        thisModalIn.setFieldToStore("name", "Joao Oliveira");
-                        thisModalIn.setFieldToDisplay("table", "Table Joao Oliveira");
-                        thisModalIn.setFieldToStore("table", "Table Joao Oliveira");
+                    var xName = thisModalIn.get("name");
+                    thisModalIn.set("name", xName + " Oliveira");
+                    if (thisModalIn.get("name") == "Joao Oliveira") {
+                        thisModalIn.set("name", "Joao Carlos Oliveira");
+                        thisModalIn.set("table", "Table Joao Carlos Oliveira");
+                        thisModalIn.setOptions("table_options",  [{value: 0, text: "JCO table A"}, {value: 0, text: "JCO table B"}]);
                     }
                     thisModalIn.test("END posField name");
                 },
