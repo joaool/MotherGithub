@@ -628,8 +628,7 @@ FL["common"] = (function () {//name space FL.common
                 }
             }
             return retTag;
-        }
-        ,
+        },
         stringAfterLast: function (str, separator) {//returns the content of str after the last separator character or string - no separator found  =>null
             //ex. FL.common.stringAfterLast("http://www.framelink.co/app?d=myDomain1","=") -->returns  "myDomain1"
             var retStr = null;
@@ -640,8 +639,7 @@ FL["common"] = (function () {//name space FL.common
                     retStr = str.substring(pos + separatorLen);
             }
             return retStr;
-        }
-        ,
+        },
         stringBeforeLast: function (str, separator) {//simply returns the content of str before the last separator character or string - no separator found  =>null
             //ex. FL.common.stringBeforeLast("this is (one) or (two) values","(") -->returns  "this is (one) or "
             var retStr = null;
@@ -651,8 +649,7 @@ FL["common"] = (function () {//name space FL.common
                     retStr = str.substring(0, pos);
             }
             return retStr;
-        }
-        ,
+        },
         stringBeforeFirst: function (str, separator) {//simply returns the content of str before the first separator character or string - no separator found  =>null
             //ex. FL.common.stringBeforeFirst("this is (one) or (two) values","(") -->returns  "this is "
             var retStr = null;
@@ -662,8 +659,18 @@ FL["common"] = (function () {//name space FL.common
                     retStr = str.substring(0, pos);
             }
             return retStr;
-        }
-        ,
+        },
+        stringAfterFirst: function (str, separator) {//returns the content of str after the first separator character or string - no separator found  =>null
+            //ex. FL.common.stringAfterafter("http://www.framelink.co/app?d=myDomain1","=") -->returns  "myDomain1"
+            var retStr = null;
+            if (str) {
+                var pos = str.indexOf(separator);
+                var separatorLen = separator.length;
+                if (pos >= 0)
+                    retStr = str.substring(pos + separatorLen);
+            }
+            return retStr;
+        },
         getLastTagInString: function (str, separator, tagTerminator) {//returns the content after the last separator until end or terminal char
             // str - string that will be processed
             // separator - last ocurrence to be identified in string

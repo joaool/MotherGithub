@@ -340,7 +340,29 @@
                     var $field = $("#" + selector);
                     var options = this.options;
                     if (key.substr(key.length - 8) == "_options") {//Load events for combo
-                        FL.common.printToConsole("(TBD)Loading click events for options list:" + key, "modalIn");
+                        FL.common.printToConsole("Loading click events for options list:" + key, "modalIn");
+                        var selectorOptions = templateName + "_" + key + " li";
+                        var $selectedOptions = $("#" + selectorOptions);
+                        var thiz = this;
+                        var fieldName = key;
+                        $selectedOptions.each(function(index,value){
+                            FL.common.printToConsole("--->" + index + ':' + $(this).attr('id'), "modalIn");
+                            var optionItemId = $(this).attr('id');
+                            var $optionItem = $("#" + optionItemId);
+                            $optionItem.off('click');
+                            $optionItem.on("click", {modalId: thiz, selected:thiz.getOptions(fieldName)[index]}, function (e) {
+                                var id = $optionItem.prop("id");
+                                FL.common.printToConsole("prefield event for option =" + id + " with content=" + $optionItem.text() + " ocurred !", "modalIn");
+                                if (_.has(options, "preField")) {
+                                    var fieldName = FL.common.stringBeforeLast(id, "_");
+                                    fieldName = FL.common.stringAfterFirst(fieldName, "_");
+                                    if (_.has(options.preField, fieldName)) {
+                                        options.preField[fieldName](e.data.modalId,e.data.selected);
+                                    }
+                                }
+                                var z=32;
+                            });
+                        });
                     } else {//not a combo
                         FL.common.printToConsole("Loading click events for field:" + key, "modalIn");
                         $field.off('click');
@@ -393,9 +415,9 @@
             master: {
                 name: "Joakim",
                 table: "table A",
-                table_options: [{value: 0, text: "table A"}, {value: 0, text: "table B"}],
+                table_options: [{value: 0, text: "table A",op:"A"}, {value: 0, text: "table B",op:"B"}],
                 field: "field 1",
-                table_options: [{value: 0, text: "field 1"}, {value: 0, text: "field 2"}],
+                field_options: [{value: 0, text: "field 1"}, {value: 0, text: "field 2"}],
             }
         };
         var options = {
@@ -416,11 +438,18 @@
                     //fills fields with content
 //                    var newField_options = [{value: 0, text: "new field 1"}, {value: 1, text: "new field 2"}];
                 },
-                table_options: function () {
-                    alert("click code for table_options in options");
+                table_options: function (thisModalIn,selected) {//selected returns the object corresponding to the selected option
+//                    alert("click code for table_options in options !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! name="+thisModalIn.get("name")+" selected="+JSON.stringify(selected));
+                    if(selected.op =="A")
+                        thisModalIn.setOptions("field_options",  [{value: 0, text: "A->field 1"}, {value: 0, text: "A->field 2"}]);
+                    if(selected.op =="B")
+                        thisModalIn.setOptions("field_options",  [{value: 0, text: "B->field 1"}, {value: 0, text: "B->field 2"}]);
                 },
                 field: function () {
-                    alert("click code for field in options");
+//                    alert("click code for field in options");
+                },
+                field_options: function (thisModalIn,selected) {
+//                    alert("click code for field_options in options !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! name = "+thisModalIn.get("name")+" selected="+JSON.stringify(selected));
                 },
             },
             posField: {
@@ -435,7 +464,7 @@
                     if (thisModalIn.get("name") == "Joao Oliveira") {
                         thisModalIn.set("name", "Joao Carlos Oliveira");
                         thisModalIn.set("table", "Table Joao Carlos Oliveira");
-                        thisModalIn.setOptions("table_options",  [{value: 0, text: "JCO table A"}, {value: 0, text: "JCO table B"}]);
+                        thisModalIn.setOptions("table_options",  [{value: 0, text: "JCO table A",op:"A"}, {value: 0, text: "JCO table B",op:"B"}]);
                     }
                     thisModalIn.test("END posField name");
                 },
@@ -471,7 +500,7 @@
             master: {
                 name: "Afonso d'AlBu Queque",
                 table: "table AfonsoA",
-                table_options: [{value: 0, text: "tab A"}, {value: 1, text: "tab B"}],
+                table_options: [{value: 0, text: "tab A", op:"A"}, {value: 1, text: "tab B",op:"B"}],
                 field: "field Afonso1",
                 field_options: [{value: 0, text: "field 1"}, {value: 1, text: "field 2"}]
             }
