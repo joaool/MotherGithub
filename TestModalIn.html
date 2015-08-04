@@ -19,32 +19,6 @@
     }
 </style>
 <script src="FL_ui/js/jquery-1.11.1.js" type="text/javascript"></script>
-<script>
-    window.ParsleyConfig = {
-        classHandler: function (elem, isRadioOrCheckbox) {
-            // specify where parsley error-success classes are set
-            return $(elem).parents(".form-group");
-        },
-        errorsWrapper: '<span class="parsley-help-block"></span>',
-        errorTemplate: '<span></span>'
-    };
-</script>
-<script src="FL_ui/js/parsley.js"></script>
-<script type="text/javascript">
-    window.ParsleyValidator
-            .addValidator('entityDuplicate', function (value) {
-                return !FL.dd.isEntityInLocalDictionary(value);
-            }, 32)
-            .addValidator('entityDuplicateExceptDefault', function (value, inputId) {
-                // var defaultValue = $("#_dictEditEntityTemplate_entityName")[0].defaultValue;
-                var defaultValue = $("#" + inputId)[0].defaultValue;
-                if (value != defaultValue) {
-                    return !FL.dd.isEntityInLocalDictionary(value);
-                } else {
-                    return true;
-                }
-            }, 32)
-</script>
 <script src="FL_ui/js/underscore.js"></script>
 <script src="FL_ui/js/bootstrap.min.js"></script>
 
@@ -52,50 +26,11 @@
 <link href="FL_ui/css/FLreadable.css" rel="stylesheet">
 
 <script src="FL_ui/js/FLCommon2.js"></script>
-
-<script id="_getLookupTableAndField2" type="text/template">
-    <div class="getLookupTableAndField2" style="margin-top:0px;">
-        <form id="form__getLookupTableAndField2" novalidate="novalidate">
-            <legend>Please define your lookup:</legend>
-            <div class="row">
-                <div class="col-xs-12">
-                    <div class="input-group" style="line-height:0px;">
-                        <span class="input-group-addon">Name:</span>
-                        <input type="text" class="form-control" id="_ getLookupTableAndField2_name"
-                               placeholder="ex:Client"
-                               value="<%= masterDetailItems.master.name %>" data-parsley-trigger="change">
-                        <span class="input-group-addon"><span class="glyphicon glyphicon-pencil"></span></span>
-                    </div>
-                    <div class="input-group" style="line-height:0px;">
-                        <span class="input-group-addon">Entity for lookup:</span>
-
-                        <div class="btn-group" style="width:100%">
-                            <a class="btn btn-default btn-block dropdown-toggle" data-toggle="dropdown"
-                               style="font-size:14px;font-weight:bold;margin-right:-4.0em;display:inline-block;height:100%;"
-                               id="_getLookupTableAndField2_table" href="#"> <span class="caret"></span></a>
-                            <ul id="_getLookupTableAndField2_table_options" class="dropdown-menu"></ul>
-                        </div>
-                        <span class="input-group-addon"><span class="glyphicon glyphicon-th-list"></span></span>
-                    </div>
-                    <div class="input-group" style="line-height:0px;">
-                        <span class="input-group-addon">Field to lookup:</span>
-
-                        <div class="btn-group" style="width:100%">
-                            <a class="btn btn-default  btn-block dropdown-toggle" data-toggle="dropdown"
-                               id="_getLookupTableAndField2_field" href="#"> <span class="caret"></span></a>
-                            <ul id="_getLookupTableAndField2_field_options" class="dropdown-menu"></ul>
-                        </div>
-                        <span class="input-group-addon"><span class="glyphicon glyphicon-th-list"></span></span>
-                    </div>
-                </div>
-            </div>
-        </form>
-    </div>
-</script>
+<script src="FL_ui/js/FLmodal2.js"></script>
 
 <script id="getLookupTableAndField3" type="text/template">
-    <div class="getLookupTableAndField2" style="margin-top:0px;">
-        <form id="form_getLookupTableAndField3" novalidate="novalidate">
+    <div class="getLookupTableAndField3" style="margin-top:0px;">
+        <form id="form_getLookupTableAndField3" >
             <legend>Please define your lookup:</legend>
             <div class="row">
                 <div class="col-xs-12">
@@ -103,7 +38,7 @@
                         <span class="input-group-addon">Name:</span>
                         <input type="text" class="form-control" id="getLookupTableAndField3_name"
                                placeholder="ex:Client"
-                               value="<%= master.name %>" data-parsley-trigger="change">
+                               value="<%= master.name %>" >
                         <span class="input-group-addon"><span class="glyphicon glyphicon-pencil"></span></span>
                     </div>
                     <div class="input-group" style="line-height:0px;">
@@ -134,288 +69,39 @@
         </form>
     </div>
 </script>
+<script id="getSurname" type="text/template">
+    <div class="getSurname" style="margin-top:0px;">
+        <form id="form_getSurname" novalidate="novalidate">
+            <legend>Please choose your surname:</legend>
+            <div class="row">
+                <div class="col-xs-12">
+                    <div class="input-group" style="line-height:0px;">
+                        <span class="input-group-addon">Surname to choose:</span>
+                        <div class="btn-group" style="width:100%">
+                            <a class="btn btn-default btn-block dropdown-toggle" data-toggle="dropdown"
+                               style="font-size:14px;font-weight:bold;margin-right:-4.0em;display:inline-block;height:100%;"
+                               id="getSurname_surname" href="#"> <%= master.table %> <span
+                                    class="caret"></span></a>
+                            <ul id="getSurname_surname_options" class="dropdown-menu"></ul>
+                        </div>
+                        <span class="input-group-addon"><span class="glyphicon glyphicon-th-list"></span></span>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</script>
 <body>
-<div id="_modalDialog"></div>
-<div id="_modalDialogA"></div>
-<div id="_modalDialogB"></div>
-<div id="_modalIn">
-    <div id="_modalIn_getLookupTableAndField3"></div>
-    <div id="_modalIn_getLookupTableAndField4"></div>
-</div>
 <script>
     $(document).ready(function () {
+//         FL.modal.externalTest("Hello");
         FL.common.debug = false; ////if true shows all FL.common.printToConsole() independentely of filters  ->fallsback to console.log - if false =>only debugFilterToShow will appear
         FL.common.debugFiltersToShow = ["modalIn"];
-        function modalIn(title, templateName, data, options, makeModalCB) {
-            var getDialogHTML = function (modalId, stackLevel, title, htmlIn, options) {
-                //to work in IE and Firefox always enclose button inside a tag. not a tag inside button tag. - http://stackoverflow.com/questions/12856851/jquery-modal-window-only-working-on-chrome-but-not-ff-ie9
-                // CORRECT - Button inside a ref
-                //  <div class="btn-group" style="margin: 0 5px 0 0;">
-                //     <a href="#?w=385" rel="login_popup" class="poplight" style="text-decoration:none;"><button type="button">Login</button></a>
-                //  </div>
-                <!-- /btn-group -->
-                // INCORRECT - ref inside a button tag
-                //  <div class="btn-group" style="margin: 0 5px 0 0;">
-                //      <button class="btn btn-small btn-info" type="button"><a href="#?w=385" rel="login_popup" class="poplight" style="text-decoration:none;">Login</a></button>
-                //  </div>
-                <!-- /btn-group -->
-                var zIndexContent = "";
-                if (stackLevel > 1) zIndexContent = "z-Index:" + (1000 * stackLevel);//place a modal inside a modal
-                var iconHTML = "";
-                if (options.icon) iconHTML = '<i class="glyphicon glyphicon-' + options.icon + '"></i>';
-                var button1HTML = "";
-                if (options.button1) {
-//                    button1HTML = '<a href="#" id="__FLDialog_button1" data-dismiss="modal" class="btn">' + options.button1 + '</a>';
-                    button1HTML = '<a href="#" id="' + modalId + '_button1" data-dismiss="modal" class="btn">' + options.button1 + '</a>';
-                }
-                var button2HTML = "";
-                if (options.button2) { //this button has the parsley validate (like APPLE ->OK at right)
-//                    button2HTML = '<a href="#" id="__FLDialog_button2" class="btn btn-' + options.type + ' validate">' + options.button2 + '</a>';
-                    button2HTML = '<a href="#" id="' + modalId + '_button2" class="btn btn-' + options.type + ' validate">' + options.button2 + '</a>';
-                }
-                var before = '<div class="modal fade" id="' + modalId + '_modal" style="' + zIndexContent + '">' +
-                        '<div class="modal-dialog">' +
-                        '<div class="modal-content">' +
-                        '<div class="modal-header modal-header-' + options.type + '">' +
-                        '<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>' +
-                            // '<h3 style="color:white;" class="modal-title">' + title + '</h3>' +
-                            // '<h3 style="color:white;" class="modal-title"><i class="glyphicon glyphicon-thumbs-up"></i>' + title + '</h3>' +
-                        '<h3 style="color:white;" class="modal-title">' + iconHTML + title + '</h3>' +
-                        '</div>' +
-                        '<div class="modal-body">';
-                var after = '</div>' +
-                        '<div class="modal-footer">' +
-                            // '<a href="#button1" id="__FLDialog_button1" data-dismiss="modal" class="btn">Close</a>' +
-                        button1HTML +
-                            // '<a href="#button2" id="__FLDialog_button2" class="btn btn-primary">Save changes</a>' +
-                        button2HTML +
-                        '</div>' +
-                        '</div>' +
-                        '</div>' +
-                        '</div>' +
-                        '</div>';
-                return before + htmlIn + after;
-            };
-            var prepareButtonsClick = function (makeModalCB, $modal, modalId, templateName, dataObj, modalIn) {
-                var button1Id = modalId + "_button1";
-                var button2Id = modalId + "_button2";
-                templateName = templateName;//to pass value by closure to click events
-                $("#" + button1Id).off('click');
-                $modal.on("click", "#" + button1Id, function () {
-                    FL.common.printToConsole("Button 1 was clicked", "modalIn");
-                    $modal.off('hidden.bs.modal');
-                    $modal.modal('hide');
-                    result(false, templateName, modalIn);
-                });
-//                $("#__FLDialog_button2").off('click');
-                $("#" + button2Id).off('click');
-                $modal.on("click", "#" + button2Id, function () {
-                    FL.common.printToConsole("Button 2 was clicked", "modalIn");
-                    if (form.parsley().isValid()) {//http://stackoverflow.com/questions/19821934/parsley-js-validation-not-triggering
-                        FL.common.printToConsole('no client side errors!', "modalIn");
-                        $modal.off('hidden.bs.modal');
-                        $modal.modal('hide');
-                        result(true, templateName, modalIn);
-                    } else {
-                        FL.common.printToConsole('Client side errors!!!!', "modalIn");
-                        $('.invalid-form-error-message')
-                                .html("You must correctly fill the fields...")
-                                .addClass("filled");
-                        event.preventDefault();
-                    }
-                });
-                $modal.on('hidden.bs.modal', function () {
-                    // alert("makeModal - You closed the window !!!");
-//                    FL.common.masterDetailItems = null;
-                    return makeModalCB(false);
-                });
-            };
-            var fillMasterForTemplate = function (templateName, masterJson, modalIn) {
-                // returns masterJson with new values retrieved from the template for ids corresponding to the keys in masterJson
-                _.each(masterJson, function (value, key) {
-                    if (key.substr(key.length - 8) == "_options") {//extract from a dropdown
-                        //tbd
-                    } else {
-                        var fieldContent = modalIn.getFieldFromDisplay(key);
-                        modalIn.setFieldToStore(key, fieldContent + "_z");
-                    }
-                });
-            };
-            this.getOptions = function (optionsFieldName) {
-                return FL.common.masterDetailItems.master[optionsFieldName];
-            };
-            this.setOptions = function (optionsFieldName, optionsArr) {
-                if (optionsFieldName.substr(optionsFieldName.length - 8) != "_options") {
-                    alert("modalIn object ERROR in method setOptions -->optionsFieldName parameter must have the format <name>_options !!! Instead it is->"+ optionsFieldName);
-                    return;
-                }
-                FL.common.masterDetailItems.master[optionsFieldName] = optionsArr;
-                var $dropDownSelectOptions = $("#" + this.templateName + "_" + optionsFieldName);
-                $dropDownSelectOptions.empty();//removes the options.
-                _.each(optionsArr, function (element, index) {
-                    var id = templateName + "_" + optionsFieldName + "_" + index;
-                    $dropDownSelectOptions.append("<li id='" + id + "'><a href='#'>" + element.text + "</a></li>");
-                });
-            };
-            // function modalIn(title, templateName, data, options, makeModalCB) {
-            this.title = title;
-            this.templateName = templateName;
-            this.data = data;
-            this.options = _.extend({icon: null, type: "success", button1: "Cancel", button2: "Ok"}, options);
-            this.modalId = "_modalIn_" + templateName;
-            var rawTemplate = $("#" + templateName).html();
-            var stackLevel = 2;
-            var modalTemplate = getDialogHTML(this.modalId, stackLevel, title, rawTemplate, options);//adjust htmlIn to modal form adding title and buttons
-            FL.common.printToConsole(modalTemplate, "modalIn");
-            this.compiled = _.template(modalTemplate);
-            this.$modalDialog = $("#" + this.modalId);
-            if (this.$modalDialog.length === 0) {//not in DOM
-//                alert("modalIn ERROR - missing DOM id='_modalDialog' Please introduce <div id='_modalIn_" + templateName + "_" + slot + "'></div> inside div with id='_modalIn' after <body> tag. ");
-//                var $domBase = $("#_modalIn");
-//                var x = "<div id='" + this.modalId + "'></div>";
-//                $domBase.append("<div id='" + this.modalId + "'></div>"); //not working because parsley needs the dom ready
-            }
-            var result = function (bOk, templateName, modalIn) {
-                if (bOk) {//button 2 was pressed
-                    fillMasterForTemplate(templateName, FL.common.masterDetailItems.master, modalIn);
-//                    fillDetailForTemplate(templateName, masterDetailJson.detail);
-//                    return editMasterDetailCB(true);
-//                    alert("result = "+bOk);
-                    return makeModalCB(true);
-                } else {//button1 was pressed
-                    return makeModalCB(false);
-                }
-            };
-            this.test = function (display) {
-                FL.common.printToConsole("************************ " + display + " test ***************************", "modalIn");
-            };
-            this.getFieldFromDisplay = function (fieldName) {
-                var id = this.templateName + "_" + fieldName;
-                var content = FL.common.getDOMContentFromId(id);
-                return content;
-            };
-            this.setFieldToDisplay = function (fieldName, value) {
-                var id = this.templateName + "_" + fieldName;
-                var content = FL.common.setDOMContentToId(id, value);
-            };
-            this.getFieldFromStore = function (fieldName) {
-                var fieldContent = FL.common.masterDetailItems.master[fieldName];
-                return fieldContent;
-            };
-            this.setFieldToStore = function (fieldName, value) {
-                FL.common.masterDetailItems.master[fieldName] = value;
-            };
-            this.get = function (fieldName) {
-                var fieldContent = this.getFieldFromDisplay(fieldName);
-                this.setFieldToStore(fieldName, fieldContent);
-                return fieldContent;
-            };
-            this.set = function (fieldName, value) {
-                this.setFieldToDisplay(fieldName, value);
-                this.setFieldToStore(fieldName, value);
-            };
-            this.refresh = function () {
-                var dataObj = this.data;
-                FL.common.masterDetailItems = dataObj;
-                var fullHTML = this.compiled(dataObj);
-                this.$modalDialog.empty().append(fullHTML);//places final HTML  (with empty dropboxes...) in slot
-                var templateName = this.templateName;
-
-                //for master, loads dropdown options in slot - for each <fieldName>_option field
-                _.each(dataObj.master, function (value, key) {
-                    if (key.substr(key.length - 8) == "_options") {//extract from a dropdown
-                        this.setOptions(key, value);
-                    }
-                }, this);
-
-                var $modal = $('#' + this.modalId + "_modal");
-                form = $("#form_" + this.templateName);
-                form.parsley();
-
-                //------ test preField and posField
-                var options = this.options;
-                _.each(dataObj.master, function (value, key) {
-//                    FL.common.printToConsole("Loading events for field:" + key, "modalIn");
-                    var selector = templateName + "_" + key;
-                    var $field = $("#" + selector);
-                    var options = this.options;
-                    if (key.substr(key.length - 8) == "_options") {//Load events for combo
-                        FL.common.printToConsole("Loading click events for options list:" + key, "modalIn");
-                        var selectorOptions = templateName + "_" + key + " li";
-                        var $selectedOptions = $("#" + selectorOptions);
-                        var thiz = this;
-                        var fieldName = key;
-                        $selectedOptions.each(function(index,value){
-                            FL.common.printToConsole("--->" + index + ':' + $(this).attr('id'), "modalIn");
-                            var optionItemId = $(this).attr('id');
-                            var $optionItem = $("#" + optionItemId);
-                            $optionItem.off('click');
-                            $optionItem.on("click", {modalId: thiz, selected:thiz.getOptions(fieldName)[index]}, function (e) {
-                                var id = $optionItem.prop("id");
-                                FL.common.printToConsole("prefield event for option =" + id + " with content=" + $optionItem.text() + " ocurred !", "modalIn");
-                                if (_.has(options, "preField")) {
-                                    var fieldName = FL.common.stringBeforeLast(id, "_");
-                                    fieldName = FL.common.stringAfterFirst(fieldName, "_");
-                                    if (_.has(options.preField, fieldName)) {
-                                        options.preField[fieldName](e.data.modalId,e.data.selected);
-                                    }
-                                }
-                                var z=32;
-                            });
-                        });
-                    } else {//not a combo
-                        FL.common.printToConsole("Loading click events for field:" + key, "modalIn");
-                        $field.off('click');
-                        $field.on("click", {modalId: this}, function (e) {
-                            var id = $field.prop("id");
-                            FL.common.printToConsole("prefield event for field=" + id + " with content=" + $field.text() + " ocurred !", "modalIn");
-                            if (_.has(options, "preField")) {
-                                var fieldName = FL.common.stringAfterLast(id, "_");
-                                if (_.has(options.preField, fieldName)) {
-                                    options.preField[fieldName](e.data.modalId);
-                                }
-                            }
-                        });
-                    }
-                    if (key.substr(key.length - 8) == "_options") {//Load blur events for combo
-                        FL.common.printToConsole("(TBD)Loading blur events for options list:" + key, "modalIn");
-                    } else {//not a combo
-                        FL.common.printToConsole("Loading blur events for field:" + key, "modalIn");
-                        $field.off('blur');
-                        $field.on("blur", {modalId: this}, function (e) {
-                            var id = $field.prop("id");
-                            FL.common.printToConsole("posField event for field " + id + " with content=" + $field.text() + " ocurred !", "modalIn");
-                            if (_.has(options, "posField")) {
-                                var fieldName = FL.common.stringAfterLast(id, "_");
-                                if (_.has(options.posField, fieldName)) {
-                                    options.posField[fieldName](e.data.modalId);
-                                }
-                            }
-                        });
-                    }
-                }, this);
-                //---------------------
-
-
-                form.parsley().validate();
-                if (makeModalCB) {
-                    prepareButtonsClick(makeModalCB, $modal, this.modalId, this.templateName, dataObj, this);
-                } else {
-                    // $modal.off('hidden.bs.modal');
-                    FL.common.printToConsole("makeModal ----->No callback");
-                    $modal.modal('hide');
-                    $('body').removeClass('modal-open');
-                    $('.modal-backdrop').remove();
-                }
-                $modal.modal('show');//to launch it immediatly when calling makeModal
-
-            };
-        };
         var masterDetailItems = {
             master: {
                 name: "Joakim",
                 table: "table A",
-                table_options: [{value: 0, text: "table A",op:"A"}, {value: 0, text: "table B",op:"B"}],
+                table_options: [{value: 0, text: "table A", op: "A"}, {value: 0, text: "table B", op: "B"}],
                 field: "field 1",
                 field_options: [{value: 0, text: "field 1"}, {value: 0, text: "field 2"}],
             }
@@ -428,33 +114,24 @@
             preField: {
                 name: function (thisModalIn) {
                     thisModalIn.test("BEGIN click name");
-                    FL.common.printToConsole("click code for name in options content=" + thisModalIn.getFieldFromStore("name"), "modalIn");
-                    FL.common.printToConsole("click code for name in options content=" + thisModalIn.getFieldFromStore("table"), "modalIn");
-                    FL.common.printToConsole("click code for name in options content=" + thisModalIn.getFieldFromStore("field"), "modalIn");
+                    FL.common.printToConsole("=====================================>user code in preField (name)", "modalIn");
+//                    FL.common.printToConsole("click code for name in options content=" + thisModalIn.getFieldFromStore("name"), "modalIn");
+//                    FL.common.printToConsole("click code for name in options content=" + thisModalIn.getFieldFromStore("table"), "modalIn");
+//                    FL.common.printToConsole("click code for name in options content=" + thisModalIn.getFieldFromStore("field"), "modalIn");
                     thisModalIn.test("END click name");
                 },
                 table: function (thisModalIn) {
-//                    alert("preField  code for table with content " + thisModalIn.getFieldFromStore("table"));
-                    //fills fields with content
+                    FL.common.printToConsole("=====================================>user code in preField (table)", "modalIn");
 //                    var newField_options = [{value: 0, text: "new field 1"}, {value: 1, text: "new field 2"}];
                 },
-                table_options: function (thisModalIn,selected) {//selected returns the object corresponding to the selected option
-//                    alert("click code for table_options in options !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! name="+thisModalIn.get("name")+" selected="+JSON.stringify(selected));
-                    if(selected.op =="A")
-                        thisModalIn.setOptions("field_options",  [{value: 0, text: "A->field 1"}, {value: 0, text: "A->field 2"}]);
-                    if(selected.op =="B")
-                        thisModalIn.setOptions("field_options",  [{value: 0, text: "B->field 1"}, {value: 0, text: "B->field 2"}]);
-                },
                 field: function () {
-//                    alert("click code for field in options");
-                },
-                field_options: function (thisModalIn,selected) {
-//                    alert("click code for field_options in options !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! name = "+thisModalIn.get("name")+" selected="+JSON.stringify(selected));
+                    FL.common.printToConsole("=====================================>user code in preField (field)", "modalIn");
                 },
             },
             posField: {
                 name: function (thisModalIn) {
                     thisModalIn.test("BEGIN posField name");
+                    FL.common.printToConsole("=====================================>user code in posField (name)", "modalIn");
                     var x = thisModalIn.getFieldFromDisplay("name");
                     FL.common.printToConsole("posField code for name in options content=" + x, "modalIn");
                     FL.common.printToConsole("posField code for name in options content=" + thisModalIn.getFieldFromStore("table"), "modalIn");
@@ -464,70 +141,103 @@
                     if (thisModalIn.get("name") == "Joao Oliveira") {
                         thisModalIn.set("name", "Joao Carlos Oliveira");
                         thisModalIn.set("table", "Table Joao Carlos Oliveira");
-                        thisModalIn.setOptions("table_options",  [{value: 0, text: "JCO table A",op:"A"}, {value: 0, text: "JCO table B",op:"B"}]);
+                        thisModalIn.setOptions("table_options", [{value: 0, text: "JCO table A", op: "A"}, {
+                            value: 0,
+                            text: "JCO table B",
+                            op: "B"
+                        }]);
+                    } else {
+                        if (thisModalIn.get("name") == "Nico Oliveira") {
+                            var options = {
+                                type: "primary",
+                                icon: "th-list",
+                                button1: "Cancel",
+                                button2: "Confirm surname"
+                            }
+                            var md = {
+                                master: {
+                                    surname: "select one surname from the list",
+                                    surname_options: [{value: 0, text: "Cuvillier", op: "Cuv"}, {value: 1, text: "Oliveira", op: "Oli"}, {value: 2, text: "Almeida", op: "Al"}],
+                                }
+                            };
+                            var surnameModal = new FL.modal.box("Surname selection", "getSurname", md, options, function (result,data) {
+                                if (result) {
+                                    alert("surname=" + JSON.stringify(data.master));
+                                }
+                            });
+                            surnameModal.show();
+                        }
+                        thisModalIn.set("table", "Table " + xName);
+                        thisModalIn.setOptions("table_options", [{
+                            value: 0,
+                            text: xName + " table A",
+                            op: "A"
+                        }, {value: 0, text: xName + " table B", op: "B"}]);
                     }
                     thisModalIn.test("END posField name");
                 },
                 table: function (thisModalIn) {
-                    //fills fields with content
-                    var newField_options = [{value: 0, text: "new field 1"}, {value: 1, text: "new field 2"}];
-
-                }
-            },
-            dropdown: {
-                "_getLookupTableAndField2_table_options": {
-                    arr: [{value: 0, text: "op a", op: "A"}, {value: 1, text: "op b", op: "B"}],                             //properties value and text are mandatory
-                    default: "XXX                                                ",
-                    onSelect: function (selected) {
-                        alert("Table choice was " + selected.op)
-                    }
+                    FL.common.printToConsole("=====================================>user code in posField (table)", "modalIn");
+                    var xTable = thisModalIn.get("table");
+//                    var newField_options = [{value: 0, text: xTable+" new field 1"}, {value: 1, text: xTable+" new field 2"}];
                 },
-                "_getLookupTableAndField2_field_options": {
-                    arr: [{value: 0, text: "f1", op: "-->f1"}, {value: 1, text: "f2", op: "-->f2"}],                                          //properties value and text are mandatory
-                    default: "YYY ",
-                    onSelect: function (selected) {
-                        alert("Field choice was " + selected.op)
-                    }
-                }
-            }
-        };
-        //                FL.common.editMasterDetail("A2", "Define Lookup", "_getLookupTableAndField2", masterDetailItems, options, function (result) {
-        //                    if (result) {
-        //                        alert("Master  = " + JSON.stringify(masterDetailItems));
-        //                    }
-        //                });
-        var masterDetailItems2 = {
+            },
+            option: {
+                table_options: function (thisModalIn, selected) {//selected returns the object corresponding to the selected option
+                    FL.common.printToConsole("=====================================>user code in option (table_options)", "modalIn");
+                    var xTable = thisModalIn.get("table");
+                    if (selected.op == "A")
+                        thisModalIn.setOptions("field_options", [{
+                            value: 0,
+                            text: xTable + " A->field 1"
+                        }, {value: 0, text: xTable + " A->field 2"}]);
+                    if (selected.op == "B")
+                        thisModalIn.setOptions("field_options", [{
+                            value: 0,
+                            text: xTable + " B->field 1"
+                        }, {value: 0, text: xTable + " B->field 2"}]);
+                },
+                field_options: function (thisModalIn, selected) {
+                    FL.common.printToConsole("=====================================>user code in option (field_options)", "modalIn");
+                    FL.common.printToConsole("********************>user code field_options --> content=" + JSON.stringify(selected), "modalIn");
+                },
+            },
+         };
+         var masterDetailItems2 = {
             master: {
                 name: "Afonso d'AlBu Queque",
                 table: "table AfonsoA",
-                table_options: [{value: 0, text: "tab A", op:"A"}, {value: 1, text: "tab B",op:"B"}],
+                table_options: [{value: 0, text: "tab A", op: "A"}, {value: 1, text: "tab B", op: "B"}],
                 field: "field Afonso1",
                 field_options: [{value: 0, text: "field 1"}, {value: 1, text: "field 2"}]
             }
         };
-        var MyModal = new modalIn("MODAL 1", "getLookupTableAndField3", masterDetailItems2, options, function (result) {
+        var MyModal = new FL.modal.Box("MODAL 1", "getLookupTableAndField3", masterDetailItems2, options, function (result,data) {
             if (result) {
-                //windows.masterDetailItems is available with the collected results (for the last show argument)
-                alert("MyModal Master  " + JSON.stringify(FL.common.masterDetailItems));
+                 alert("MyModal Master  " + JSON.stringify(data.master));
             }
         });
-        //    var MyModal2 = new modalIn("MODAL TITLE 2","2"{
-        //        master: {
-        //            name: "Manel",
-        //            table_options: "T AAAA",
-        //            field_options: "F 1111111"
-        //        }
-        //    }, "getLookupTableAndField3", options, function (result) {
-        //        if (result) {
-        //            alert("MyModal 2 Master  ");
-        //        }
-        //    });
-        //    console.clear();
-//        MyModal.show(masterDetailItems);
-//        alert("Now display second data");
-        MyModal.refresh();
-        MyModal.test("modalIn object");
-//            MyModal2.show();
+        MyModal.show();
+
+        var options2 = {
+            type: "primary",
+            icon: "th-list",
+            button1: "Cancel",
+            button2: "Confirm surname"
+        }
+        var md = {
+            master: {
+                surname: "select one surname from the list",
+                surname_options: [{value: 0, text: "Cuvillier", op: "Cuv"}, {value: 1, text: "Oliveira", op: "Oli"}, {value: 2, text: "Almeida", op: "Al"}],
+            }
+        };
+//        var surnameModal = new FL.modal.Box("Surname selection", "getSurname", md, options2, function (result,data) {
+//            if (result) {
+//                alert("surname=" + JSON.stringify(data.master));
+//            }
+//        });
+//        surnameModal.show();
+
     });
 </script>
 </body>

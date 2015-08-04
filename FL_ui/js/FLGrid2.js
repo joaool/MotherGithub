@@ -333,13 +333,23 @@ FL["grid"] = (function () {//name space FL.grid
                             FL.dd.t.entities.dumpToConsole();
                             var currentECN = FL.dd.getCEntity(entityName);
                             var currentFCN = FL.dd.t.entities[currentECN].getCName(currentAttribute);
+                            FL.common.setParametersTo("lookupTransfer_FromEditMasterDetail_to_Box",[currentECN,currentFCN]);//HACK
+                            //var lookupTableName = "No table";
+                            //var lookupFieldName = "No field";
+                            //lookupObj = FL.dd.getLookupFor(currentECN,currentFCN);//if no lookup returns null
+                            //if(lookupObj){
+                            //    lookupTableName = lookupObj.tableName;
+                            //    lookupFieldName = lookupObj.fieldName;
+                            //}
+
                             var lookupArr = FL.dd.t.entities[currentECN].fields[currentFCN].specialTypeDef;
                             var lookupTypeStr = "Invalid format";
                             var lookupTableName = "No table";
                             var lookupFieldName = "No field";
                             var lookupTableOptionsObj = []
                             _.each(FL.dd.t.entities.list(), function (element, index) {
-                                lookupTableOptionsObj.push({value: index, text: element.singular})
+                                if(element.singular.substring(0,1)!="_")
+                                    lookupTableOptionsObj.push({value: index, text: element.singular})
                             });
                             var lookupFieldOptionsObj = []
                             if (lookupArr) {
@@ -347,108 +357,63 @@ FL["grid"] = (function () {//name space FL.grid
                                     var lookupObj = lookupArr[0];
                                     if (FL.common.typeOf(lookupObj) == "object") {
                                         lookupTableName = FL.dd.getEntityByCName(lookupObj.eCN);
+
+                                        if(!lookupObj.fCN) { //if not existing choose the first field (any field)
+                                            var xFieldName = FL.dd.getArrayOfFields(lookupTableName)[0].attribute;
+                                            var xFCN = FL.dd.getFieldCompressedName(lookupTableName,xFieldName);
+                                            lookupObj.fCN = xFCN;
+                                        }
                                         lookupFieldName = FL.dd.t.entities[lookupObj.eCN].fields[lookupObj.fCN].name;
-                                        lookupTypeStr = lookupObj.eCN + "," + lookupObj.fCN;//loojupObj format is {eCN:<entity compressed name>, fCN:<field compressed name>}
+                                        //xxxlookupTypeStr = lookupObj.eCN + "," + lookupObj.fCN;//loojupObj format is {eCN:<entity compressed name>, fCN:<field compressed name>}
                                     }
                                 }
                             }
-                            var masterDetailListItems = {
+                            var lookupMasterDetailItems = {
                                 master: {
-                                    table_options: lookupTableName,
-                                    field_options: lookupFieldName
+                                    table: lookupTableName,
+                                    table_options: lookupTableOptionsObj,
+                                    field: lookupFieldName,
+                                    field_options: []
                                 }
                             };
-                            var options = {
+                            var lookupOptions = {
                                 type: "primary",
                                 icon: "th-list",
                                 button1: "Cancel",
                                 button2: "Confirm lookup data",
-                                dropdown: {
-                                    "_getLookupTableAndField2_table_options": {
-                                        arr: lookupTableOptionsObj,//[{value: 0, text: "op a", op: "A"}, {value: 1, text: "op b", op: "B"}],
-                                        default: lookupTableName,
-                                        onSelect: function (selected) {
-                                            alert("Table choice was " + selected.text);
-                                            var eCN = FL.dd.getCEntity(selected.text);
-                                            lookupFieldOptionsObj = []
-                                            _.each(FL.dd.t.entities[eCN].fieldsList(), function (element, index) {
-                                                lookupFieldOptionsObj.push({value: index, text: element.name})
-                                            });
-                                            alert("Table " + selected.text + " has fields:" + JSON.stringify(lookupFieldOptionsObj));
-                                            //FL.common.loadGeneralBufferBegin(eCN);
-                                            //FL.common.loadGeneralBufferNext(lookupFieldOptionsObj);
-                                            FL.common.setParametersTo("_field", {
-                                                eCN: eCN,
-                                                alternativeOptions: lookupFieldOptionsObj
-                                            });
-                                            //this.refreshField();
-                                            //FL.common.selectBox({boxId:"_getLookupTableAndField2_field_options",boxCurrent:"zzz",boxArr:lookupFieldOptionsObj},)
-                                            //FL.common.setDropdown({boxId: "_getLookupTableAndField2_field_options",boxCurrent: select.text,boxArr: lookupFieldOptionsObj});
-                                            //var z= this.parent._getLookupTableAndField2_field_options.onSelect();
-                                            var zz = 32;
-                                            //FL.common.setDropdown({
-                                            //    boxId: "_getLookupTableAndField2_field_options",
-                                            //    boxCurrent: "Please choose a field",
-                                            //    boxArr: lookupFieldOptionsObj
-                                            //});
-
-                                            //FL.common.selectBox({
-                                            //    boxId: "_getLookupTableAndField2_field_options",
-                                            //    boxCurrent: "zzz",
-                                            //    boxArr: lookupFieldOptionsObj
-                                            //}, this.parent._getLookupTableAndField2_field_options.onSelect);
-                                            //--------------------- test
-                                            //var dropdownId = "_getLookupTableAndField2_field_options";
-                                            //var $dropDownSelect = $("#" + dropdownId);
-                                            //var defaultValue = "Select a field from ";
-                                            //var optionsArr = lookupFieldOptionsObj;
-                                            //$dropDownSelect.parents('.btn-group').find('.dropdown-toggle').html(defaultValue + ' <span class="caret"></span>');//shows current value
-                                            //$dropDownSelect.empty();//removes the child elements of #styleSet.
-                                            //_.each(optionsArr, function (element) {
-                                            //    var id = dropdownId + "_" + element.text;
-                                            //    $dropDownSelect.append("<li id='" + id + "'><a href='#'>" + element.text + "</a></li>");
-                                            //});
-                                            //-------------------
-                                            var z = 32;
-                                            //FL.common.loadGeneralBufferBegin(lookupFieldOptionsObj);
-                                        },
-                                    },
-                                    "_getLookupTableAndField2_field_options": {
-                                        arr: [{value: 0, text: "f 1", op: "1"}, {value: 1, text: "f2", op: "2"}],
-                                        default: lookupFieldName,
-                                        //preField:function(){
-                                        //    var lookupFieldOptionsObj = FL.common.generalBufferArr[0];
-                                        //    return lookupFieldOptionsObj;
-                                        //    //return [{value:0,text:"Funfunfa"},{value:1,text:"jojo"}];
-                                        //},
-                                        onSelect: function (selected) {
-                                            //console.log("Field choice was " + selected.op);
-                                            //var eCN = FL.common.generalBufferArr[0];
-                                            var param = FL.common.getParametersFrom("_field");
-
-                                            alert("Field choice was eCN=" + param.eCN + " the rest=" + JSON.stringify(param.alternativeOptions));
-                                            return 23;
-                                        }
-                                    },
-                                    refreshField:function(){
-                                        slert("I am refreshing...");
+                                option: {
+                                    table_options: function (thisModalIn, selected) {//selected returns the object corresponding to the selected option
+                                        FL.common.printToConsole("***************************************>user code in option (table_options) selected.text=" + selected.text, "modalIn");
+                                        var eCN = FL.dd.getCEntity(selected.text);
+                                        var lookupFieldOptionsObj = []
+                                        _.each(FL.dd.t.entities[eCN].fieldsList(), function (element, index) {
+                                            lookupFieldOptionsObj.push({value: index, text: element.name});
+                                        });
+                                        thisModalIn.setOptions("field_options", lookupFieldOptionsObj);
+                                        thisModalIn.set("field", "Fields of table " + selected.text);
                                     }
-                                }
+                                },
                             };
-                            FL.common.editMasterDetail("A2", lookupTitle, "_getLookupTableAndField2", masterDetailListItems, options, function (result) {
+                            var lookupModal = new FL.modal.Box(lookupTitle, "getLookup", lookupMasterDetailItems, lookupOptions, function (result, data) {
                                 if (result) {
-                                    alert("The list is ->" + JSON.stringify(masterDetailListItems));
-                                    //var specialTypeDef = masterDetailListItems.master.special;
-                                    ////save into the data dictionary
-                                    //var specialDefTemporaryArr = specialTypeDef.split(",");
-                                    //var specialObj = {eCN: specialDefTemporaryArr[0], fCN: specialDefTemporaryArr[1]};
-                                    //var specialArr = [];
-                                    //specialArr.push(specialObj);
-                                    //FL.dd.t.entities[currentECN].fields[currentFCN].setField({specialTypeDef: specialArr});
-                                    //var z = 32;
+                                    //alert("lookupModal Master  " + JSON.stringify(data.master));
+                                    var tableName = data.master.table;
+                                    var fieldName = data.master.field;
+                                    var eCN = FL.dd.getCEntity(tableName);
+                                    var fCN = FL.dd.getFieldCompressedName(tableName,fieldName);
+                                    //FL.dd.setLookupFor(currentECN,currentFCN,eCN,fCN);
+                                    var specialObj = {eCN: eCN, fCN: fCN};
+                                    var specialArr = [];
+                                    specialArr.push(specialObj);
+                                    FL.dd.init_t();//to init the temporary subsystem
+                                    var param=FL.common.getParametersFrom("lookupTransfer_FromEditMasterDetail_to_Box");//HACK
+                                    var currentECN = param[0];
+                                    var currentFCN = param[1];
+                                    FL.dd.t.entities[currentECN].fields[currentFCN].setField({specialTypeDef: specialArr});
+                                    var z=32;
                                 }
-
                             });
+                            lookupModal.show();
                         }
                     }
                     // alert("The selection was "+selectedType);

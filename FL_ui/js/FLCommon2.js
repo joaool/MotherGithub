@@ -1716,13 +1716,13 @@ FL["common"] = (function () {//name space FL.common
                 return null;
             }
             var tagElement = $domTarget.prop("tagName");
-            if(tagElement ==="INPUT")
+            if (tagElement === "INPUT")
                 content = $domTarget.val();
             else
                 content = $domTarget.text();
             return content;
         },
-        setDOMContentToId: function (id,value) {
+        setDOMContentToId: function (id, value) {
             var content = null;
             var domTarget = "#" + id;
             var $domTarget = $(domTarget);
@@ -1731,11 +1731,29 @@ FL["common"] = (function () {//name space FL.common
                 return null;
             }
             var tagElement = $domTarget.prop("tagName");
-            if(tagElement ==="INPUT")
+            if (tagElement === "INPUT")
                 $domTarget.val(value);
-            else
-                $domTarget.text(value);
+            else {
+                var targetExistingContent = $domTarget.html();//if is an anchor it may be:<a ...>sometext<span class="caret"></span></a></a> - we want to change sometext but keep the span !
+                if (targetExistingContent) {
+                    var existingHTML = null;
+                    var existingHTMLPos = targetExistingContent.indexOf("<");
+                    if (existingHTMLPos > 0) {
+                        existingHTML = targetExistingContent.substring(existingHTMLPos);
+                        $domTarget.html(value + existingHTML);
+                    } else {
+                        $domTarget.text(value);
+                    }
+                } else {
+                    $domTarget.text(value);
+                }
+             }
             return content;
+        },
+        checkHTML: function (html) {
+            var doc = document.createElement('div');
+            doc.innerHTML = html;
+            return ( doc.innerHTML === html );
         },
         testFunc: function (x) {
             alert("FL.common.test() -->" + x);

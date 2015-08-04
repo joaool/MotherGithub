@@ -802,7 +802,7 @@ FL["bg"] = (function () {//name space FL.common
                 var formatterObj = _.extend({}, Backgrid.CellFormatter.prototype, {
                     fromRaw: function (rawValue) {
                         console.log("fromRaw------------------>" + rawValue);
-                        return rawValue + "_In";
+                        return rawValue ;
                     },
                     toRaw: function (formattedData) {
                         alert("searchbox toRaw-->" + formattedData);

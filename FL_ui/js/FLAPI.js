@@ -2502,8 +2502,7 @@ FL["API"] = (function () {//name space FL.API
         testFunc: function (x) {
             alert("FL.server.test() -->" + x);
         }
-    }
-        ;
+    };
 })
 ();
 // });
