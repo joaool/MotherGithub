@@ -100,24 +100,24 @@ var FL = FL || {};
         // loadPicture();
         // Dropzone.options.myAwesomeDropzone = { maxFilesize: 1 };
         // Dropzone.options.myAwesomeDropzone = false;
-        Dropzone.options.fileDropzone = {//match id=file-dropzone
-            accept: function (file, done) {
-                // Test if the file is valid
-                if (file.size == 1337) {
-                    done("Can't accept the file because the filesize is weird.");
-                }
-                else done(); // All good
-            },
-            init: function () {
-                // Setup event listeners if necessary, example:
-                this.on("success", function () {
-                    alert("Thank you for uploading a file.");
-                });
-            }
-        };
-        $(document).on('click', '#btnTestUpload', function () {
-            var myDropzone = new Dropzone("form#file-dropzone", {url: 'file_upload_route'});
-        });
+        //Dropzone.options.fileDropzone = {//match id=file-dropzone
+        //    accept: function (file, done) {
+        //        // Test if the file is valid
+        //        if (file.size == 1337) {
+        //            done("Can't accept the file because the filesize is weird.");
+        //        }
+        //        else done(); // All good
+        //    },
+        //    init: function () {
+        //        // Setup event listeners if necessary, example:
+        //        this.on("success", function () {
+        //            alert("Thank you for uploading a file.");
+        //        });
+        //    }
+        //};
+        //$(document).on('click', '#btnTestUpload', function () {
+        //    var myDropzone = new Dropzone("form#file-dropzone", {url: 'file_upload_route'});
+        //});
 
         var fl = new flMain();//only place where this must exist !!!!
         FL.fl = fl; //new flMain();
@@ -273,27 +273,27 @@ var FL = FL || {};
     FL.common.printToConsole(document.title + "......  END..");
 })();
 
-loadPicture = function () {//call filepicker.io to get name
-    FL.common.printToConsole("frames.selectURL ------------------------------------------------------> !!!!", "picker");
-    filepicker.setKey("AQ4FJXxNSy66KTmrqp5nzz");
-    filepicker.pick({
-            mimetypes: ['image/*', 'text/plain'],
-            container: 'modal',   // 'window',
-            //services:['COMPUTER', 'FACEBOOK', 'GOOGLE_DRIVE', 'PICASA','DROPBOX','INSTAGRAM'],
-            services: ['COMPUTER', 'DROPBOX', 'FACEBOOK'],
-        }, function (FPFile) {
-            FL.common.printToConsole("frames.selectURL----------------  file uploaded -----------------------------------", "picker");
-            FL.common.printToConsole(JSON.stringify(FPFile), "picker");
-            FL.common.printToConsole("URL=" + FPFile.url, "picker");
-            FL.common.printToConsole("frames.selectURL----------------  fim de file uploaded -----------------------------------", "picker");
-            xTest = FPFile.url;
-            // frames._fprop.setFieldPropsByName("txtURL",{value:xTest});
-            //frames.frames[frames.currentFrameOrder].address=FPFile.url;
-            // frames.updateImage(frames.currentFrameOrder,FPFile.url);
-            FL.common.printToConsole("frames.selectURL----------------  CONCLUIU -----------------------------------");
-        },
-        function (FPError) {
-            FL.common.printToConsole(FPError.toString(), "picker");
-        }
-    );
-};//selectURL	
+//loadPicture = function () {//call filepicker.io to get name
+//    FL.common.printToConsole("frames.selectURL ------------------------------------------------------> !!!!", "picker");
+//    filepicker.setKey("AQ4FJXxNSy66KTmrqp5nzz");
+//    filepicker.pick({
+//            mimetypes: ['image/*', 'text/plain'],
+//            container: 'modal',   // 'window',
+//            //services:['COMPUTER', 'FACEBOOK', 'GOOGLE_DRIVE', 'PICASA','DROPBOX','INSTAGRAM'],
+//            services: ['COMPUTER', 'DROPBOX', 'FACEBOOK'],
+//        }, function (FPFile) {
+//            FL.common.printToConsole("frames.selectURL----------------  file uploaded -----------------------------------", "picker");
+//            FL.common.printToConsole(JSON.stringify(FPFile), "picker");
+//            FL.common.printToConsole("URL=" + FPFile.url, "picker");
+//            FL.common.printToConsole("frames.selectURL----------------  fim de file uploaded -----------------------------------", "picker");
+//            xTest = FPFile.url;
+//            // frames._fprop.setFieldPropsByName("txtURL",{value:xTest});
+//            //frames.frames[frames.currentFrameOrder].address=FPFile.url;
+//            // frames.updateImage(frames.currentFrameOrder,FPFile.url);
+//            FL.common.printToConsole("frames.selectURL----------------  CONCLUIU -----------------------------------");
+//        },
+//        function (FPError) {
+//            FL.common.printToConsole(FPError.toString(), "picker");
+//        }
+//    );
+//};//selectURL

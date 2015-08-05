@@ -576,7 +576,7 @@ FL["dd"] = (function () {//name space FL.dd
         relationSemantics: function (sSingular, sRightEntity, sVerb, sCardinality, xLanguage) {
             return relationSemantics(sSingular, sRightEntity, sVerb, sCardinality, xLanguage);
         },
-        displayEntities: function () {//display all entities with their attributes and relations
+        displayEntities: function (title) {//display all entities with their attributes and relations
             //Reads dDictionary.entities={} and 
             //returns a collection of menu structure objects - {book:{},editor:{},..someEntity:{}}
             //the key of the internal objects are the singular entity name
@@ -589,9 +589,10 @@ FL["dd"] = (function () {//name space FL.dd
             //			NOTE: enumerable is null for all type except "enumerable" - in this case enumerable is an array of strings
             // 
             // FL.API.debug = true;FL.API.debugStyle = 1;
+            if (title)
+                FL.common.printToConsole("*****************************************************************=>" + title + "<=********************************************", "dump");
             FL.common.printToConsole("********************************** FL.dd.displayEntities ********************************", "dump");
             FL.common.printToConsole("********************************************** BEGIN ******************************************", "dump");
-
             var oEntities = this.entities;
             for (var key in oEntities) {
                 if (oEntities.hasOwnProperty(key)) {//this restrain the iteration only to the object's own attributes
@@ -615,9 +616,9 @@ FL["dd"] = (function () {//name space FL.dd
                                 var xTypeUI = xArr[i].typeUI;
                                 var xMask = xArr[i].mask;
                                 var xSpecialTypeDef = xArr[i].specialTypeDef;
-                                if (FL.common.typeOf(xSpecialTypeDef) == "array"){
+                                if (FL.common.typeOf(xSpecialTypeDef) == "array") {
                                     var specialEl = xSpecialTypeDef[0];
-                                    if (FL.common.typeOf(specialEl)=="object"){
+                                    if (FL.common.typeOf(specialEl) == "object") {
                                         xSpecialTypeDef = JSON.stringify(specialEl);
                                     }
                                 }
@@ -657,6 +658,8 @@ FL["dd"] = (function () {//name space FL.dd
                 }
             }
             FL.common.printToConsole("********************************************** END of displayEntities *****************************************", "dump");
+            if (title)
+                FL.common.printToConsole("**********************************************************=>End of " + title + "<=********************************************", "dump");
             // FL.API.debug = false; FL.API.debugStyle = 0;
         },
         countEntitiesBeginningBy: function (singularPrefix) {//return the number of entities whose singular name begins by singularPrefix
