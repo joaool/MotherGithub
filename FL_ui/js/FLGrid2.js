@@ -1657,7 +1657,7 @@ FL["grid"] = (function () {//name space FL.grid
                         csvStore.setEntityName(entityName);//stores <entityName> in csvStore object
                         csvStore.store(data);//data is an array of objects [{},{},....{}] where id field is mandatory inside {}
                         var z = csvStore.csvRows;//only for debugging
-                        FL.common.printToConsole("show csvStore=" + JSON.stringify(csvStore.csvRows));
+                        FL.common.printToConsole("show csvStore=" + JSON.stringify(csvStore.csvRows),"grid");
 
                         var eCN = FL.dd.getCEntity(entityName);//to remove later when we change entityName by eCN
                         var gridLayout = FL.bg.getGridDefaultLayout(eCN);

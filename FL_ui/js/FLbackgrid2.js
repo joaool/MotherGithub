@@ -150,6 +150,7 @@ FL["bg"] = (function () {//name space FL.common
     var CurrencyCellEditor = Backgrid.InputCellEditor.extend({
         initialize: function (options) {
             Backgrid.InputCellEditor.prototype.initialize.apply(this, arguments);
+            //alert("CurrencyCellEditor.initialize ");
             var decimals = CurrencyCellEditor.prototype.decimals;
             var currency = CurrencyCellEditor.prototype.currency;
             var thousandsSeparator = FL.common.appsettings.thousandsSeparator;
@@ -203,6 +204,7 @@ FL["bg"] = (function () {//name space FL.common
     var IntegerCellEditor = Backgrid.InputCellEditor.extend({
         initialize: function (options) {
             Backgrid.InputCellEditor.prototype.initialize.apply(this, arguments);
+            //alert("IntegerCellEditor.initialize");
             var mask = "#" + FL.common.appsettings.thousandsSeparator + "##0";//ex."#.##0"
             var cellVal = $(this.el).val();
             $(this.el).focus(function () {
@@ -320,6 +322,7 @@ FL["bg"] = (function () {//name space FL.common
         },
         initialize: function (options) {
             Backgrid.InputCellEditor.prototype.initialize.apply(this, arguments);
+            //alert("DateTimeCellEditor.initialize");
             this.column = options.column;
             var input = this;
             var thisView = this;
@@ -805,7 +808,7 @@ FL["bg"] = (function () {//name space FL.common
                         return rawValue ;
                     },
                     toRaw: function (formattedData) {
-                        alert("searchbox toRaw-->" + formattedData);
+                        //alert("searchbox toRaw-->" + formattedData);
                         return formattedData + "_Out";
                     }
                 });
@@ -904,8 +907,9 @@ FL["bg"] = (function () {//name space FL.common
             //}
             // FL.dd.init_t();//to init the temporary subsystem
             // var arrOfFieldsObj = FL.dd.t.entities[oLayout.baseTable].fieldsList();
+            FL.dd.displayEntities("FL.bg.setupGridColumnsArr");
             _.each(oLayout.format, function (element, index) {//each element of oLayout.format array is like {fCN:"50","1st Column",width:20,nestingArr:[]}
-                console.log(element.fCN);
+                console.log("setupGridColumnsArr -->prepares fCN=" + element.fCN,"grid");
                 // var name = FL.dd.t.entities[oLayout.baseTable].fields[element.fCN].name;
                 // var typeUI = FL.dd.t.entities[oLayout.baseTable].fields[element.fCN].typeUI;
                 // var enumerable = FL.dd.t.entities[oLayout.baseTable].fields[element.fCN].enumerable;
@@ -916,6 +920,8 @@ FL["bg"] = (function () {//name space FL.common
                 if (field.typeUI == "lookupbox") {
                     //var fCN = field.specialTypeDef[0].fCN;
                     //alert("setupGridColumnsArr  ***********************************  specialTypeDef=" + JSON.stringify(lookupObj.getColumn() + "\n lookupObj.defaultFCN=" + lookupObj.defaultFCN));
+                    if(!lookupObj)
+                            field.typeUI = "textbox";//forces textbox if there is no table
                 }
                 var arrElObj = FL.bg.colDef(gridDefinition, field, lookupObj);
                 arrElObj = _.omit(arrElObj, ["nesting", "orderable", "resizeable", "width"]);//temporary while these propoerties are inactive
