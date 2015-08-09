@@ -254,63 +254,356 @@ $(function () {
         // // alert("is_menuHide="+myMenu1.is_menuHide+" is_contextOn="+myMenu1.is_contextOn);
         // */
     });
-    test("util2 tests", function () {
+    test("type tests in FL.common", function () {
 
         //typeOf
         var xVar = "abc";
-        var success = utils.typeOf(xVar);
-        ok(success == "string", "FL.util.typeOf('abc') -->'string'");//1
+        var success = FL.common.typeOf(xVar);
+        ok(success == "string", "FL.common.typeOf('abc') -->'string'");//1
         xVar = 123;
-        success = utils.typeOf(xVar);
-        ok(success == "number", "FL.util.typeOf(123) -->'number'");//2
+        success = FL.common.typeOf(xVar);
+        ok(success == "number", "FL.common.typeOf(123) -->'number'");//2
         xVar = true;
-        success = utils.typeOf(xVar);
-        ok(success == "boolean", "FL.util.typeOf(true) -->'boolean'");//3
+        success = FL.common.typeOf(xVar);
+        ok(success == "boolean", "FL.common.typeOf(true) -->'boolean'");//3
         xVar = {key1: "abc"};
-        success = utils.typeOf(xVar);
-        ok(success == "object", "FL.util.typeOf({key1:'abc'}) -->'object'");//4
+        success = FL.common.typeOf(xVar);
+        ok(success == "object", "FL.common.typeOf({key1:'abc'}) -->'object'");//4
         xVar = [1, 2, 3];
-        success = utils.typeOf(xVar);
-        ok(success == "array", "FL.util.typeOf([1,2,3]) -->'array'");//5
-
-        // xVar = "abc@link.com";
-        // success = utils.typeOf(xVar);
-        // ok(success == "email" , "FL.util.typeOf('abc@link.com') -->'email'");//6
-
+        success = FL.common.typeOf(xVar);
+        ok(success == "array", "FL.common.typeOf([1,2,3]) -->'array'");//5
         xVar = new Date();
-        success = utils.typeOf(xVar);
-        ok(success == "date", "utils.typeOf(new Date()) -->'date'");//6
+        success = FL.common.typeOf(xVar);
+        ok(success == "date", "FL.common.typeOf(new Date()) -->'date'");//6
         var foo;
-        success = utils.typeOf(foo);
-        ok(success == "undefined", "utils.typeOf(foo) foo is undefined -->'undefined'");//7
+        success = FL.common.typeOf(foo);
+        ok(success == "undefined", "FL.common.typeOf(foo) foo is undefined -->'undefined'");//7
 
         xVar = "abc@link.com";
-        success = utils.typeUIOf(xVar);
-        ok(success == "email", "utils.typeUIOf('abc@link.com') -->'email'");//8
+        success = FL.common.typeUIOf(xVar);
+        ok(success == "email", "FL.common.typeUIOf('abc@link.com') -->'email'");//8
 
         xVar = "jojo@mail.telepac.pt";
-        success = utils.typeUIOf(xVar);
-        ok(success == "email", "utils.typeUIOf('jojo@mail.telepac.pt') -->'email'");//9
+        success = FL.common.typeUIOf(xVar);
+        ok(success == "email", "FL.common.typeUIOf('jojo@mail.telepac.pt') -->'email'");//9
 
         xVar = "jojo@.mail.telepac.pt";
-        success = utils.typeUIOf(xVar);
-        ok(success === null, "utils.typeUIOf('jojo@.mail.telepac.pt') -->'invalid email'");//10
+        success = FL.common.typeUIOf(xVar);
+        ok(success === null, "FL.common.typeUIOf('jojo@.mail.telepac.pt') -->'invalid email'");//10
 
         xVar = "http://www.framelink.co";
-        success = utils.typeUIOf(xVar);
-        ok(success == "url", "utils.typeUIOf('http://www.framelink.co') -->'url'");//11
+        success = FL.common.typeUIOf(xVar);
+        ok(success == "url", "FL.common.typeUIOf('http://www.framelink.co') -->'url'");//11
 
         xVar = "http://www.framelink..co";
-        success = utils.typeUIOf(xVar);
-        ok(success === null, "utils.typeUIOf('http://www.framelink..co') -->'invalid url'");//12
+        success = FL.common.typeUIOf(xVar);
+        ok(success === null, "FL.common.typeUIOf('http://www.framelink..co') -->'invalid url'");//12
 
         xVar = "351219244558";
-        success = utils.typeUIOf(xVar);
-        ok(success == "phone", "utils.typeUIOf('351219244558') -->'valid phone'");//13
+        success = FL.common.typeUIOf(xVar);
+        ok(success == "phone", "FL.common.typeUIOf('351219244558') -->'valid phone'");//13
 
         xVar = "3512192445582";
-        success = utils.typeUIOf(xVar);
-        ok(success === null, "utils.typeUIOf('951219244558') -->'invalid phone'");//14
+        success = FL.common.typeUIOf(xVar);
+        ok(success === null, "FL.common.typeUIOf('951219244558') -->'invalid phone'");//14
+
+        xVar = "351,2,19244,5582";
+        ok(xVar.getOcurrencesOf(",") === 3, "FL.common  ---> (" + xVar + ").getOcurrencesOf(',') -->3");//15
+
+        xVar = "351xx2xx19244xx5582";
+        ok(xVar.getOcurrencesOf("xx") === 3, "FL.common  ---> (" + xVar + ").getOcurrencesOf('xx') -->3");//16
+
+        xVar = "1234";
+        ok(xVar.isNumeric_US(), "FL.common  ---> (" + xVar + ").isNumeric_US() -->true");//17
+
+        xVar = "-1234";
+        ok(xVar.isNumeric_US(), "FL.common  ---> (" + xVar + ").isNumeric_US() -->true");//17
+
+        xVar = "1234.5";
+        ok(xVar.isNumeric_US(), "FL.common  ---> (" + xVar + ").isNumeric_US() -->true");//18
+
+        xVar = "1,234.5";
+        ok(xVar.isNumeric_US(), "FL.common  ---> (" + xVar + ").isNumeric_US() -->true");//19
+
+        xVar = "1,234.5,6";
+        ok(!xVar.isNumeric_US(), "FL.common  ---> (" + xVar + ").isNumeric_US() -->false");//20
+
+        xVar = "abcd.6";
+        ok(!xVar.isNumeric_US(), "FL.common  ---> (" + xVar + ").isNumeric_US() -->false");//21
+
+        xVar = "-1234.56";
+        ok(xVar.isNumeric(), "FL.common  ---> (" + xVar + ").isNumeric() -->true");//22
+
+        xVar = "1234.567";
+        ok(xVar.isNumeric(), "FL.common  ---> (" + xVar + ").isNumeric() 23-->true");//23
+
+        xVar = "1234.567.8";
+        ok(xVar.isNumeric(), "FL.common  ---> (" + xVar + ").isNumeric() 24-->true");//24
+
+        xVar = "1.234,5678";
+        ok(xVar.isNumeric(), "FL.common  ---> (" + xVar + ").isNumeric() 25-->true");//20
+
+        xVar = "-1.234,5678";
+        ok(xVar.isNumeric(), "FL.common  ---> (" + xVar + ").isNumeric() 25-->true");//20
+
+        xVar = "1 234,5678";
+        ok(xVar.isNumeric(), "FL.common  ---> (" + xVar + ").isNumeric() -->true");//20
+
+        xVar = "1 234,567,8";
+        ok(!xVar.isNumeric(), "FL.common  ---> (" + xVar + ").isNumeric() -->false");//20
+
+        xVar = "1 234 567,8";
+        ok(xVar.isNumeric(), "FL.common  ---> (" + xVar + ").isNumeric() -->true");//20
+
+        xVar = "1 234 567.89";
+        ok(!xVar.isNumeric(), "FL.common  ---> (" + xVar + ").isNumeric() -->false if thousands is space radix must be comma");//20
+
+        xVar = "1,234,567.8";
+        ok(xVar.isNumeric(), "FL.common  ---> (" + xVar + ").isNumeric() -->true");//20
+
+        xVar = "1,234,567.89.2";
+        ok(!xVar.isNumeric(), "FL.common  ---> (" + xVar + ").isNumeric() -->false");//20
+
+        xVar = "12,00%";
+        ok(xVar.isPercent(), "FL.common  ---> (" + xVar + ").isPercent() -->true");//20
+
+        xVar = " 12,00 %";
+        ok(xVar.isPercent(), "FL.common  ---> (" + xVar + ").isPercent() -->true");//20
+
+        xVar = "-12,00 %";
+        ok(xVar.isPercent(), "FL.common  ---> (" + xVar + ").isPercent() -->true");//20
+
+        xVar = "-12.540 %";
+        ok(xVar.isPercent(), "FL.common  ---> (" + xVar + ").isPercent() -->true");//20
+
+        xVar = "1%";
+        ok(xVar.isPercent(), "FL.common  ---> (" + xVar + ").isPercent() -->true");//20
+
+        xVar = "1%x";
+        ok(!xVar.isPercent(), "FL.common  ---> (" + xVar + ").isPercent() -->false");//20
+
+        xVar = "xx1,234yyy";
+        var result = FL.common.extractContentBetweenFirstAndLastDigit(xVar);
+        ok(result == "1,234", "FL.common.extractContentBetweenFirstAndLastDigit('" + xVar + "') -->" + result);//20
+
+        xVar = "xx-1,234yyy";
+        var result = FL.common.extractContentBetweenFirstAndLastDigit(xVar);
+        ok(result == "1,234", "FL.common.extractContentBetweenFirstAndLastDigit('" + xVar + "') -->" + result);//20
+
+
+        xVar = "xx 12,3yy1 yweqw";
+        var result = FL.common.extractContentBetweenFirstAndLastDigit(xVar);
+        ok(result == "12,3yy1", "FL.common.extractContentBetweenFirstAndLastDigit('" + xVar + "') -->" + result);//20
+
+        xVar = "US$1.253,45";
+        var result = FL.common.extractContentBetweenFirstAndLastDigit(xVar);
+        ok(result == "1.253,45", "FL.common.extractContentBetweenFirstAndLastDigit('" + xVar + "') -->" + result);//20
+
+        xVar = "US$1.253,45";
+        ok(xVar.isCurrency(), "FL.common  ---> (" + xVar + ").isCurrency() -->true");//20
+
+        xVar = "S/. 1.250,45   ";
+        ok(xVar.isCurrency(), "FL.common  ---> (" + xVar + ").isCurrency() -->true");//20
+
+        xVar = "1.253,45 USD";
+        ok(xVar.isCurrency(), "FL.common  ---> (" + xVar + ").isCurrency() -->true");//20
+
+        xVar = "US$1.2x53,45";
+        ok(!xVar.isCurrency(), "FL.common  ---> (" + xVar + ").isCurrency() -->false");//20
+
+        xVar = "1.253,45";
+        ok(!xVar.isCurrency(), "FL.common  ---> (" + xVar + ").isCurrency() -->false because it lacks any currency sign");//20
+
+        xVar = "-1.253,45";
+        ok(!xVar.isCurrency(), "FL.common  ---> (" + xVar + ").isCurrency() -->false because it lacks any currency sign");//20
+
+        xVar = "1.253,45x";
+        ok(!xVar.isCurrency(), "FL.common  ---> (" + xVar + ").isCurrency() -->false there is no currency 'x'");//20
+
+        xVar = "R$ 1 253,45";
+        ok(xVar.isCurrency(), "FL.common  ---> (" + xVar + ").isCurrency() -->true");//20
+
+        xVar = "R$ 1 253.45";
+        ok(!xVar.isCurrency(), "FL.common  ---> (" + xVar + ").isCurrency() -->false because if decimal separator is space radix must be comma");//20
+
+        xVar = "¥1,467";
+        ok(xVar.isCurrency(), "FL.common  ---> (" + xVar + ").isCurrency() -->true");//20
+
+        xVar = "£1.234.567,89 GBP";
+        ok(xVar.isCurrency(), "FL.common  ---> (" + xVar + ").isCurrency() -->true");//20
+
+        xVar = "$1,234,567.89 CAD";
+        ok(xVar.isCurrency(), "FL.common  ---> (" + xVar + ").isCurrency() -->true");//20
+
+        xVar = "$-1,234,567.89 CAD";
+        ok(xVar.isCurrency(), "FL.common  ---> (" + xVar + ").isCurrency() -->true");//20
+
+        //----------------------- FL.common.isArrOf<XXXX> Currency, number, email, url, check, phone,datetime
+        var arrOfRowValues = [
+            "$-1,234,567.89 CAD",
+            "£1.234.567,89 GBP",
+            "US$1.253,45",
+            "1.253,45 USD",
+            "1,253.45$"
+        ];
+        var success = FL.common.isArrOfCurrency(arrOfRowValues);
+        ok(success == true, "FL.common.isArrOfCurrency('array of valid currency') -->'true' ---------------------------------- FL.common.isArrOf<XXXX> ");//19
+
+        var arrOfRowValues = [
+            "$-1,234,567.89 CAD",
+            "£1.234.567,89 GBP",
+            "1.253,45",// ofending value - is a number not a currency
+            "1.253,45 USD",
+            "1,253.45$"
+        ];
+        var success = FL.common.isArrOfCurrency(arrOfRowValues);
+        ok(success == false, "FL.common.isArrOfCurrency('array with one invalid currency') -->'false'");//19
+
+        var arrOfRowValues = [
+            "123",
+            "1.234.567,89",
+            "1.253,45",
+            "1 253,45",
+            "1,253.45"
+        ];
+        var success = FL.common.isArrOfNumber(arrOfRowValues);
+        ok(success == true, "FL.common.isArrOfNumber('array with valid numbers') -->'true'");//19
+
+        var arrOfRowValues = [
+            "123",
+            "1.234.567,89",
+            "1.253,45$",//ofending value is a currency
+            "1 253,45",
+            "1,253.45"
+        ];
+        var success = FL.common.isArrOfNumber(arrOfRowValues);
+        ok(success == false, "FL.common.isArrOfNumber('array with one invalid number') -->'false'");//19
+
+        var arrOfRowValues = [
+            "123%",
+            "1.234%",
+            "0.5%",
+            "0,26 %",
+            "-5%"
+        ];
+        var success = FL.common.isArrOfPercent(arrOfRowValues);
+        ok(success == true, "FL.common.isArrOfPercent('array with valid percents') -->'true'");//19
+
+        var arrOfRowValues = [
+            "123%",
+            "1.234%",
+            "0.5%x",//ofending value is not a percent
+            "0,26 %",
+            "-5%"
+        ];
+        var success = FL.common.isArrOfPercent(arrOfRowValues);
+        ok(success == false, "FL.common.isArrOfPercent('array with invalid percent') -->'false'");//19
+
+        var arrOfRowValues = [
+            "jojo@jojo.com",
+            "toto@toto.com",
+            "toto@toto.telepac.pt",
+            "joaocarloscoliveira@gmail.com",
+            "joaoccoliveira@live.com",
+        ];
+        var success = FL.common.isArrOfEmail(arrOfRowValues);
+        ok(success == true, "FL.common.isArrOfEmail('array with valid emails') -->'true'");//19
+
+        var arrOfRowValues = [
+            "jojo@jojo.com",
+            "toto@toto.com",
+            "totototo.telepac.pt",//ofending value
+            "joaocarloscoliveira@gmail.com",
+            "joaoccoliveira@live.com",
+        ];
+        var success = FL.common.isArrOfEmail(arrOfRowValues);
+        ok(success == false, "FL.common.isArrOfEmail('array with one invalid email') -->'false'");//19
+
+        var arrOfRowValues = [
+            "http://microsoft.com",
+            "http://www.framelink.co",
+            "https://babeljs.io/",
+            "https://github.com/joaool/MotherGithub",
+            "http://appendto.com/",
+        ];
+        var success = FL.common.isArrOfURL(arrOfRowValues);
+        ok(success == true, "FL.common.isArrOfURL('array with valid URLs') -->'true'");//19
+
+        var arrOfRowValues = [
+            "http://microsoft.com",
+            "http://www.framelink..co",//ofending value
+            "babeljs.io/",//ofending value
+            "https://github.com/joaool/MotherGithub",
+            "http://appendto.com/",
+        ];
+        var success = FL.common.isArrOfURL(arrOfRowValues);
+        ok(success == false, "FL.common.isArrOfURL('array with one invalid url') -->'false'");//19
+
+        var arrOfRowValues = [
+            "TRUE",
+            "false",
+            "FALSE",
+            "True",
+            "False",
+        ];
+        var success = FL.common.isArrOfCheck(arrOfRowValues);
+        ok(success == true, "FL.common.isArrOfCheck('array with valid true/false string') -->'true'");//19
+
+        var arrOfRowValues = [
+            "TRUE",
+            "falsex",//ofending value
+            "FALSE",
+            "True",
+            "False",
+        ];
+        var success = FL.common.isArrOfCheck(arrOfRowValues);
+        ok(success == false, "FL.common.isArrOfCheck('array with one invalid true/false string') -->'false'");//19
+
+        /*
+         var arrOfRowValues = [
+         "415-555-1212",
+         "415-555-1212",
+         ];
+         var success = FL.common.isArrOfPhone(arrOfRowValues);
+         ok(success == true, "FL.common.isArrOfPhone('array with valid phone string') -->'true'");//19
+
+         var arrOfRowValues = [
+         "415-555-1212",
+         "415-555-1212",
+         ];
+         var success = FL.common.isArrOfPhone(arrOfRowValues);
+         ok(success == false, "FL.common.isArrOfPhone('array with one invalid phone string') -->'false'");//19
+         */
+        //----------------------- FL.common.is_dateArrInStringFormat
+        arrOfRowValues = [
+            "March 21, 2012",
+            "03-21-2012",
+            //var d = Date.parse("15-21-12");//NaN
+            "03/21/2012",
+            "21-Mar-2012"
+        ];
+        var success = FL.common.is_dateArrInStringFormat(arrOfRowValues);
+        ok(success == true, "FL.common.is_dateArrInStringFormat('array of values with all valid') -->'true'");//19
+
+        arrOfRowValues = [
+            "March 21, 2012",
+            "03-21-12",
+            "15-21-12",//ofending value
+            "03/21/2012",
+            "21-Mar-2012"
+        ];
+        success = FL.common.is_dateArrInStringFormat(arrOfRowValues);
+        ok(success == false, "FL.common.is_dateArrInStringFormat('array of values with one invalid') -->'false'");//20
+
+        arrOfRowValues = [
+            " ",
+            "",
+            "",
+            " ",
+            " "
+        ];
+        success = FL.common.is_dateArrInStringFormat(arrOfRowValues);
+        ok(success === false, "FL.common.is_dateArrInStringFormat('array of spaces and empty values') -->'false'");//21
     });
     test("FL.common tests", function (assert) {
         FL.common.appsettings.radixpoint = ",";
@@ -656,36 +949,6 @@ $(function () {
         success = FL.common.is_ValidDate(xVar);
         ok(success === false, "FL.common.is_ValidDate('209999') -->'false'");//18
 
-
-        var arrOfRowValues = [
-            "March 21, 2012",
-            "03-21-2012",
-            //var d = Date.parse("15-21-12");//NaN
-            "03/21/2012",
-            "21-Mar-2012"
-        ];
-        var success = FL.common.is_dateArrInStringFormat(arrOfRowValues);
-        ok(success == true, "FL.common.is_dateArrInStringFormat('array of values with all valid') -->'true'");//19
-        arrOfRowValues = [
-            "March 21, 2012",
-            "03-21-12",
-            "15-21-12",//ofending value
-            "03/21/2012",
-            "21-Mar-2012"
-        ];
-        success = FL.common.is_dateArrInStringFormat(arrOfRowValues);
-        ok(success == false, "FL.common.is_dateArrInStringFormat('array of values with one invalid') -->'false'");//20
-        arrOfRowValues = [
-            " ",
-            "",
-            "",
-            " ",
-            " "
-        ];
-        success = FL.common.is_dateArrInStringFormat(arrOfRowValues);
-        ok(success === false, "FL.common.is_dateArrInStringFormat('array of spaces and empty values') -->'false'");//21
-
-
         //------------------- currencyToStringNumber
         FL.common.appsettings.radixpoint = ",";
         xVar = "€ 12345,67";
@@ -991,10 +1254,10 @@ $(function () {
         assert.deepEqual(result, objToSend, "FL.common.getParametersFrom returned " + JSON.stringify(objToSend));
 
 
-        FL.common.setParametersTo("abc",{p1:{name:"jojo",address:"Nairobi"},p2:[10,20,30]});
+        FL.common.setParametersTo("abc", {p1: {name: "jojo", address: "Nairobi"}, p2: [10, 20, 30]});
         ok(FL.common.getParametersFrom("abc").p1.name == "jojo", " FL.common.getParametersFrom('abc').p1.name = 'jojo' -->ok");//68
         //
-        FL.common.setParametersTo("abc",{p1:{name:"jojo",address:"Nairobi"},p2:[10,20,30]});
+        FL.common.setParametersTo("abc", {p1: {name: "jojo", address: "Nairobi"}, p2: [10, 20, 30]});
         // We had to resend ->REMEBER THAT getParametersFrom CAN BE USED ONLY ONCE FOR EACH BUFFER NAME (it is deleted after each getParametersFrom()
         ok(FL.common.getParametersFrom("abc").p2[1] == 20, " FL.common.getParametersFrom('abc').p2[1] = 20 -->ok");//68
 

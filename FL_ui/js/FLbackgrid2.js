@@ -800,12 +800,20 @@ FL["bg"] = (function () {//name space FL.common
                 retObj["cell"] = EmailCell;
                 retObj["formatter"] = formatterObj;
             } else if (typeUI == "lookupbox") {
+                if (!lookupObj) {
+                    alert("FL.bg.cellType ERROR missing parameter lookupObj in lookup case !");
+                    return null;
+                }
                 AutocompleteCellEditor.prototype.lookupObj = lookupObj;
+                if (!field.specialTypeDef) {
+                    alert("FL.bg.cellType ERROR missing field.specialTypeDef in lookup case !");
+                    return null;
+                }
                 AutocompleteCellEditor.prototype.lookupFCN = field.specialTypeDef[0].fCN;
                 var formatterObj = _.extend({}, Backgrid.CellFormatter.prototype, {
                     fromRaw: function (rawValue) {
                         console.log("fromRaw------------------>" + rawValue);
-                        return rawValue ;
+                        return rawValue;
                     },
                     toRaw: function (formattedData) {
                         //alert("searchbox toRaw-->" + formattedData);
@@ -845,7 +853,7 @@ FL["bg"] = (function () {//name space FL.common
         colDef: function (gridDefinition, field, lookupObj) {
             //colDef will receive two type of data:
             //	 grid definition data - label, nestingArr, width
-            //	 field dictionary data  - name, typeUI, enumerable, decimals
+            //	 field dictionary data  - name, typeUI, enumerable,
             //   lookupObj - a table object (built with FL.API.openTable)
             //name - The key of the model attribute
             //label - The name to display in the header
@@ -865,10 +873,10 @@ FL["bg"] = (function () {//name space FL.common
                 resizeable: true,
                 orderable: true
             };
-            _.extend(retObj, cellType(field, lookupObj));
+            _.extend(retObj, cellType(field, lookupObj));//decimals are passed via public
             return retObj;
         },
-        getGridDefaultLayout: function (eCN) {//returns an object {baseTable:eCN,format:[array of objects defining each column]}
+        getGridDefaultLayout: function (eCN) {//returns an object {baseTable:eCN,format:[array of objects defining each column]} defining a grid Layout based on Dictionary
             // the array of objects returned in getGridDefaultLayout().format can be produced by a grid designer
             // returns an array of {fCN:fCN,label:label,width:"*",nestingArr:nestingArr,type:"field"} with as many elements as attributres in data dictionary
             //  where for column i:
@@ -902,14 +910,9 @@ FL["bg"] = (function () {//name space FL.common
         setupGridColumnsArr: function (oLayout, lookupObj) {//returns the columnArr to be used in utils.mountGridInCsvStore
             // ex: var columnsArr = FL.bg.setupGridColumnsArr(gridLayout);
             var columnsArr = [];
-            //if(lookupObj){
-            //	alert("prepareGridColumnsArr lookup !!! ->" + JSON.stringify(lookupObj));
-            //}
-            // FL.dd.init_t();//to init the temporary subsystem
-            // var arrOfFieldsObj = FL.dd.t.entities[oLayout.baseTable].fieldsList();
             FL.dd.displayEntities("FL.bg.setupGridColumnsArr");
             _.each(oLayout.format, function (element, index) {//each element of oLayout.format array is like {fCN:"50","1st Column",width:20,nestingArr:[]}
-                console.log("setupGridColumnsArr -->prepares fCN=" + element.fCN,"grid");
+                console.log("setupGridColumnsArr -->prepares fCN=" + element.fCN, "grid");
                 // var name = FL.dd.t.entities[oLayout.baseTable].fields[element.fCN].name;
                 // var typeUI = FL.dd.t.entities[oLayout.baseTable].fields[element.fCN].typeUI;
                 // var enumerable = FL.dd.t.entities[oLayout.baseTable].fields[element.fCN].enumerable;
@@ -920,10 +923,37 @@ FL["bg"] = (function () {//name space FL.common
                 if (field.typeUI == "lookupbox") {
                     //var fCN = field.specialTypeDef[0].fCN;
                     //alert("setupGridColumnsArr  ***********************************  specialTypeDef=" + JSON.stringify(lookupObj.getColumn() + "\n lookupObj.defaultFCN=" + lookupObj.defaultFCN));
-                    if(!lookupObj)
-                            field.typeUI = "textbox";//forces textbox if there is no table
+                    if (!lookupObj)
+                        field.typeUI = "textbox";//forces textbox if there is no table
                 }
                 var arrElObj = FL.bg.colDef(gridDefinition, field, lookupObj);
+                arrElObj = _.omit(arrElObj, ["nesting", "orderable", "resizeable", "width"]);//temporary while these propoerties are inactive
+                columnsArr.push(arrElObj);
+            }, this);
+            //inserts auxiliary columns upfront
+            columnsArr.unshift({name: "", cell: "select-row", headerCell: "select-all"}, {
+                editable: false,
+                label: "#",
+                name: "id",
+                cell: Backgrid.IntegerCell.extend({orderSeparator: ''})
+            });
+            return columnsArr;//each element of columnsArr array is like {cell:"string",label:"a",name:"a"...eventually others}
+        },
+        setupGridColumnsArrNoDict: function (layoutFormatArr) {//returns the columnArr to be used in utils.mountGridInCsvStore
+            //layoutFormatArr = [ {label:"title1,nestingArr:[],width:10,typeUI:"textbox",enumerable:null}, {label:"title2,nestingArr:[],width:30,typeUI:"textbox",enumeralble:null}  ]
+            // ex: var columnsArr = FL.bg.setupGridColumnsArrNoDict(arrOfColumns);
+            var columnsArr = [];
+            _.each(layoutFormatArr, function (element, index) {//each element of oLayout.format array is like {fCN:"50","1st Column",width:20,nestingArr:[]}
+                console.log("setupGridColumnsArrNoDict -->prepares column with title=" + element.label, "grid");
+                // var name = FL.dd.t.entities[oLayout.baseTable].fields[element.fCN].name;
+                // var typeUI = FL.dd.t.entities[oLayout.baseTable].fields[element.fCN].typeUI;
+                // var enumerable = FL.dd.t.entities[oLayout.baseTable].fields[element.fCN].enumerable;
+                // var ddFieldDefinition = {name:name,typeUI:typeUI,enumerable:enumerable};
+                var gridDefinition = {label: element.label, nestingArr: element.nestingArr, width: element.width};
+                //var arrElObj = FL.bg.colDef(name,element.label,element.nestingArr,element.width,typeUI,enumerable);
+                //var field = FL.dd.t.entities[oLayout.baseTable].fields[element.fCN];
+                var field = {typeUI: element.typeUI, enumerable: element.enumerable};
+                var arrElObj = FL.bg.colDef(gridDefinition, field);
                 arrElObj = _.omit(arrElObj, ["nesting", "orderable", "resizeable", "width"]);//temporary while these propoerties are inactive
                 columnsArr.push(arrElObj);
             }, this);

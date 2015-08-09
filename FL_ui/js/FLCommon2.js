@@ -45,6 +45,113 @@ String.prototype.pad = function (l, s, t) {
         + 1).join(s)).substr(0, t = !t ? l : t == 1 ? 0 : Math.ceil(l / 2))
     + this + s.substr(0, l - t) : this;
 };
+String.prototype.getOcurrencesOf = function (str) {//return how many times str exist on current string
+    return this.split(str).length - 1;
+};
+String.prototype.isNumeric_US = function () {//returns true if a string has the format of an US number. Ex."12.345,67" otherwise returns false
+    function isNumeric_US_NoSep(num) {
+        return !isNaN(num)
+    };
+    if (this.length === 0)
+        return false;
+    var tail = FL.common.getTail(this, ".");
+    if (tail.getOcurrencesOf(",") > 0)// makes "12.345,678" return false - commas are not allowed in tail
+        return false;
+    var strNumNoSep = this.replace(/,/g, '');
+    return isNumeric_US_NoSep(strNumNoSep)
+};
+String.prototype.ToNumeric_US = function () {//tries to convert a string to Numeric US format (radix="." and no separators) - if unable returns null
+    if (this.isNumeric()) {
+        var strNum = null;
+        if (this.isNumeric_US()) {
+            strNum = this.replace(/,/g, '');//remove ,
+            return strNum;
+        } else {//format may be 123.456,78 or 123 456,78
+            strNum = this.replace(/\./g, '');//remove .
+            strNum = strNum.replace(/ /g, '');//remove spaces
+            strNum = strNum.replace(/,/g, '.');//replace the comma by a point
+            return strNum;
+        }
+    }
+    return null;
+};
+String.prototype.isNumeric = function () {//returns true if a string has the format of an US or european number. Ex."12,345.67" or "12 345,67" are valid numbers
+    if (this.length === 0)
+        return false;
+    if (this.isNumeric_US())
+        return true;
+    if (this.getOcurrencesOf(",") > 1)
+        return false;//there is no non US number with more than  1 comma
+    //no us number. It may be no number or european number (, or space thousands separator
+    var strNumTemp = this.replace(/,/g, '@');//temporary radix substitution - not perfect but reasonable enough
+    if (strNumTemp.getOcurrencesOf(".") >= 1)   // checks if it has "." as separator
+        strNumTemp = strNumTemp.replace(/\./g, ',');//remove .
+    else
+        strNumTemp = strNumTemp.replace(/ /g, ',');//remove spaces
+    var strNumUS = strNumTemp.replace(/@/g, '.');// reposition the radix
+    return strNumUS.isNumeric_US();//tried to convert european format (with spaces or , as thousand separator to US format
+};
+String.prototype.isCurrency = function () {//returns true if a string has the format of a currency
+    var symbolsTable = {
+        "$": true,
+        "US$": true,
+        "USD": true,
+        "CAD": true,
+        "€": true,
+        "EUR": true,
+        "£": true,
+        "GBP": true,
+        "Kr": true,
+        "Kz": true,
+        "MT": true,
+        "R$": true,
+        "元": true,
+        "₹": true,
+        "Rs": true,
+        "S/.": true,
+        "¥": true,
+    };
+    var strCurr = this.trim();
+    var preStr = FL.common.preDigit(strCurr);//string till first digit or minus sign
+    if (preStr) {
+        preStr = preStr.trim();
+        if (!symbolsTable[preStr])
+            return false;// pre string exist and is not any of the possible symbols
+    }
+    var posStr = FL.common.posDigit(strCurr);
+    if (posStr) {
+        posStr = posStr.trim();
+        if (!symbolsTable[posStr])
+            return false;// pos string exist and is not any of the possible symbols
+    }
+    //now we are sure that valid pre or pos digits exist - lets check the digit content
+    var strTemp = this.replace(/\./g, '');//remove .
+    strTemp = strTemp.replace(/,/g, '');//remove ,
+    strTemp = strTemp.replace(/-/g, '');//remove ,
+    strTemp = strTemp.replace(/ /g, '');//remove spaces
+    var firstNonDigit = strTemp.match(/\D/);
+    if (!firstNonDigit) {
+        return false; //all currency have at least a nonDigit char (excluding . , and spaces)
+    }
+    var innerStr = FL.common.extractContentBetweenFirstAndLastDigit(this);
+    return innerStr.isNumeric();
+};
+String.prototype.isPercent = function () {//returns true if a string has the format of Percentage number. Ex."12,34%" or "12,45 %"
+    var strCurr = this.trim();
+    var preStr = FL.common.preDigit(strCurr);
+    if (preStr) {
+        return false;// Percent cannot have preString
+    }
+    var posStr = FL.common.posDigit(strCurr);
+    if (posStr) {
+        posStr = posStr.trim();
+        if (posStr == "%") {//pos string exists an is a %
+            var strNum = FL.common.extractContentBetweenFirstAndLastDigit(strCurr);
+            return strNum.isNumeric();
+        }
+    }
+    return false;
+};
 FL["common"] = (function () {//name space FL.common
     var loadCSS = function (fileCss) {
         var cssLink = $("<link rel='stylesheet' type='text/css' href='FL_ui/css/" + fileCss + "'>");
@@ -299,6 +406,44 @@ FL["common"] = (function () {//name space FL.common
                     }
                 }
             });
+        },
+        getNumberFromCurrency: function (currencyStr) {
+            var strOut = currencyStr.replace(/[^0-9.,-]/g, "");
+            return strOut;
+        },
+        preDigit: function (str) {//from a string input return the content before the first digit or - sign - or null if no digit exists
+            var strOut = null;
+            str = str.replace(/-/g, '');//remove -
+            var firstDigit = str.match(/\d/);
+            if (firstDigit) {
+                var firstPos = str.indexOf(firstDigit);
+                strOut = str.substring(0, firstPos);
+            }
+            return strOut;
+        },
+        posDigit: function (str) {//from a string inout return the content after the last digit - or null if no digit exists
+            var strOut = null;
+            var lastDigit = str.match(/\D{1,}$/);
+            if (lastDigit) {
+                var lastPos = str.indexOf(lastDigit);
+                strOut = str.substring(lastPos);
+            }
+            return strOut;
+        },
+        extractContentBetweenFirstAndLastDigit: function (str) {//http://www.javascriptkit.com/javatutors/re2.shtml
+            // signs like + or - are not digits
+            var strOut = str;
+            var firstDigit = strOut.match(/\d/);
+            if (firstDigit) {
+                var firstPos = strOut.indexOf(firstDigit);
+                strOut = strOut.substring(firstPos);
+            }
+            var lastDigit = strOut.match(/\D{1,}$/);
+            if (lastDigit) {
+                var lastPos = strOut.indexOf(lastDigit);
+                strOut = strOut.substring(0, lastPos);
+            }
+            return strOut;
         },
         currencyToStringNumber: function (currencyStr) {
             //converts a currency string ex "€ 12345,67" to a string representing a number ex:"12345.67" using appsettings
@@ -693,15 +838,13 @@ FL["common"] = (function () {//name space FL.common
                 }
             }
             return retStr;
-        }
-        ,
+        },
         repeat: function (str, n) {//repeat str n times
             n = n || 1;
             if (n < 0)
                 n = 0;
             return Array(n + 1).join(str);
-        }
-        ,
+        },
         getTail: function (strNumber, radixpoint) {//returns the decimal part of a string representing a number.
             //radixpoint is the decimal separator. If missing uses the appsettings radixpoint
             if (!radixpoint)
@@ -711,13 +854,11 @@ FL["common"] = (function () {//name space FL.common
             if (posDecimal > 0)
                 tail = strNumber.substr(posDecimal + 1);
             return tail;
-        }
-        ,
+        },
         validateEmail: function (email) {
             var re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
             return re.test(email);
-        }
-        ,
+        },
         clearSpaceBelowMenus: function () {
             $("#_placeHolder").empty();
             $("#personContent").empty();
@@ -733,8 +874,7 @@ FL["common"] = (function () {//name space FL.common
 
             // $("#_belowMenus").hide();
             $("#templateHolder").hide();
-        }
-        ,
+        },
         buildDiff: function (arrOfObjA, arrOfObjB, pivotKey) {
             //given two arrays of objects A and B, both containing key pivotKey, returns an array with all the elements
             //  existing in A whose pivotKey exists in A and not in B.
@@ -752,13 +892,11 @@ FL["common"] = (function () {//name space FL.common
                 });
                 return arrOfObjA[index - 1];
             });
-        }
-        ,
+        },
         shortEmailName: function (email) {
             var pos = email.indexOf("@");
             return email.substring(0, pos);
-        }
-        ,
+        },
         enc: function (str, incr) {//FL.common.enc("o gato patolinas",1) =>fuzzy => FL.common.enc(fuzzy,-1))=>"o gato patolinas"
             //'H'.charCodeAt(0) =>72 , String.fromCharCode(72) =H
             // var encoded =  FL.common.enc('{Patolinas},:',1);
@@ -773,8 +911,7 @@ FL["common"] = (function () {//name space FL.common
             }
             encoded = encoded.replace(/'/g, '"');
             return encoded;
-        }
-        ,
+        },
         loaderAnimationON: function (div) {
             var opts = {
                 lines: 13, // The number of lines to draw
@@ -797,8 +934,7 @@ FL["common"] = (function () {//name space FL.common
             var target = document.getElementById(div);
             var spinner = new Spinner(opts).spin(target);
             return spinner;
-        }
-        ,
+        },
         makeFirstElementsSample: function (arr, sampleSize) {//returns a similar array with max size of sampleSize
             var sample = [];
             var len = arr.length;
@@ -808,16 +944,13 @@ FL["common"] = (function () {//name space FL.common
                 sample.push(arr[i]);
             }
             return sample;
-        }
-        ,
+        },
         selectBox: function (options, onSelection) {
             selectBox(options, onSelection);
-        }
-        ,
+        },
         setDropdown: function (options) {
             setDropdown(options);
-        }
-        ,
+        },
         typeOf: function (xVar) {//given a variable, returns one of :  "number","string","boolean","object","array","null","undefined","date"
             //exemple of undefined: a variable declared but never defined -->var foo; alert(foo); //undefined.
             var xRet = typeof xVar;
@@ -830,8 +963,39 @@ FL["common"] = (function () {//name space FL.common
                     xRet = "null";
             }
             return xRet;
-        }
-        ,
+        },
+        typeUIOf: function (xVar) {//for string type returns one of the typeUI "email", "url", "phone"etc. If not string returns null
+            // used in FL.grid   private function  is_ColumnOfSubtype(subtype,sampleArr)
+            var subtype = null;
+            var xtype = typeof xVar;
+            if (xtype == "string") {
+                if (this.is_email(xVar))
+                    subtype = "email";
+                else if (this.is_url(xVar))
+                    subtype = "url";
+                else if (FL.common.is_phone(xVar))
+                    subtype = "phone";
+            }
+            return subtype;
+        },
+        is_email: function (email) {
+            var re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+            return re.test(email);
+        },
+        is_url: function (url) {
+            // var re = /(ftp|http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?/;
+            // var re = /((([A-Za-z]{3,9}:(?:\/\/)?)(?:[-;:&=\+\$,\w]+@)?[A-Za-z0-9.-]+|(?:www.|[-;:&=\+\$,\w]+@)[A-Za-z0-9.-]+)((?:\/[\+~%\/.\w-_]*)?\??(?:[-\+=&;%@.\w_]*)#?(?:[\w]*))?)/;
+            // var re= /^[a-z](?:[-a-z0-9\+\.])*:(?:\/\/(?:(?:%[0-9a-f][0-9a-f]|[-a-z0-9\._~\x{A0}-\x{D7FF}\x{F900}-\x{FDCF}\x{FDF0}-\x{FFEF}\x{10000}-\x{1FFFD}\x{20000}-\x{2FFFD}\x{30000}-\x{3FFFD}\x{40000}-\x{4FFFD}\x{50000}-\x{5FFFD}\x{60000}-\x{6FFFD}\x{70000}-\x{7FFFD}\x{80000}-\x{8FFFD}\x{90000}-\x{9FFFD}\x{A0000}-\x{AFFFD}\x{B0000}-\x{BFFFD}\x{C0000}-\x{CFFFD}\x{D0000}-\x{DFFFD}\x{E1000}-\x{EFFFD}!\$&'\(\)\*\+,;=:])*@)?(?:\[(?:(?:(?:[0-9a-f]{1,4}:){6}(?:[0-9a-f]{1,4}:[0-9a-f]{1,4}|(?:[0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])(?:\.(?:[0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])){3})|::(?:[0-9a-f]{1,4}:){5}(?:[0-9a-f]{1,4}:[0-9a-f]{1,4}|(?:[0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])(?:\.(?:[0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])){3})|(?:[0-9a-f]{1,4})?::(?:[0-9a-f]{1,4}:){4}(?:[0-9a-f]{1,4}:[0-9a-f]{1,4}|(?:[0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])(?:\.(?:[0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])){3})|(?:[0-9a-f]{1,4}:[0-9a-f]{1,4})?::(?:[0-9a-f]{1,4}:){3}(?:[0-9a-f]{1,4}:[0-9a-f]{1,4}|(?:[0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])(?:\.(?:[0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])){3})|(?:(?:[0-9a-f]{1,4}:){0,2}[0-9a-f]{1,4})?::(?:[0-9a-f]{1,4}:){2}(?:[0-9a-f]{1,4}:[0-9a-f]{1,4}|(?:[0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])(?:\.(?:[0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])){3})|(?:(?:[0-9a-f]{1,4}:){0,3}[0-9a-f]{1,4})?::[0-9a-f]{1,4}:(?:[0-9a-f]{1,4}:[0-9a-f]{1,4}|(?:[0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])(?:\.(?:[0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])){3})|(?:(?:[0-9a-f]{1,4}:){0,4}[0-9a-f]{1,4})?::(?:[0-9a-f]{1,4}:[0-9a-f]{1,4}|(?:[0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])(?:\.(?:[0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])){3})|(?:(?:[0-9a-f]{1,4}:){0,5}[0-9a-f]{1,4})?::[0-9a-f]{1,4}|(?:(?:[0-9a-f]{1,4}:){0,6}[0-9a-f]{1,4})?::)|v[0-9a-f]+[-a-z0-9\._~!\$&'\(\)\*\+,;=:]+)\]|(?:[0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])(?:\.(?:[0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])){3}|(?:%[0-9a-f][0-9a-f]|[-a-z0-9\._~\x{A0}-\x{D7FF}\x{F900}-\x{FDCF}\x{FDF0}-\x{FFEF}\x{10000}-\x{1FFFD}\x{20000}-\x{2FFFD}\x{30000}-\x{3FFFD}\x{40000}-\x{4FFFD}\x{50000}-\x{5FFFD}\x{60000}-\x{6FFFD}\x{70000}-\x{7FFFD}\x{80000}-\x{8FFFD}\x{90000}-\x{9FFFD}\x{A0000}-\x{AFFFD}\x{B0000}-\x{BFFFD}\x{C0000}-\x{CFFFD}\x{D0000}-\x{DFFFD}\x{E1000}-\x{EFFFD}!\$&'\(\)\*\+,;=@])*)(?::[0-9]*)?(?:\/(?:(?:%[0-9a-f][0-9a-f]|[-a-z0-9\._~\x{A0}-\x{D7FF}\x{F900}-\x{FDCF}\x{FDF0}-\x{FFEF}\x{10000}-\x{1FFFD}\x{20000}-\x{2FFFD}\x{30000}-\x{3FFFD}\x{40000}-\x{4FFFD}\x{50000}-\x{5FFFD}\x{60000}-\x{6FFFD}\x{70000}-\x{7FFFD}\x{80000}-\x{8FFFD}\x{90000}-\x{9FFFD}\x{A0000}-\x{AFFFD}\x{B0000}-\x{BFFFD}\x{C0000}-\x{CFFFD}\x{D0000}-\x{DFFFD}\x{E1000}-\x{EFFFD}!\$&'\(\)\*\+,;=:@]))*)*|\/(?:(?:(?:(?:%[0-9a-f][0-9a-f]|[-a-z0-9\._~\x{A0}-\x{D7FF}\x{F900}-\x{FDCF}\x{FDF0}-\x{FFEF}\x{10000}-\x{1FFFD}\x{20000}-\x{2FFFD}\x{30000}-\x{3FFFD}\x{40000}-\x{4FFFD}\x{50000}-\x{5FFFD}\x{60000}-\x{6FFFD}\x{70000}-\x{7FFFD}\x{80000}-\x{8FFFD}\x{90000}-\x{9FFFD}\x{A0000}-\x{AFFFD}\x{B0000}-\x{BFFFD}\x{C0000}-\x{CFFFD}\x{D0000}-\x{DFFFD}\x{E1000}-\x{EFFFD}!\$&'\(\)\*\+,;=:@]))+)(?:\/(?:(?:%[0-9a-f][0-9a-f]|[-a-z0-9\._~\x{A0}-\x{D7FF}\x{F900}-\x{FDCF}\x{FDF0}-\x{FFEF}\x{10000}-\x{1FFFD}\x{20000}-\x{2FFFD}\x{30000}-\x{3FFFD}\x{40000}-\x{4FFFD}\x{50000}-\x{5FFFD}\x{60000}-\x{6FFFD}\x{70000}-\x{7FFFD}\x{80000}-\x{8FFFD}\x{90000}-\x{9FFFD}\x{A0000}-\x{AFFFD}\x{B0000}-\x{BFFFD}\x{C0000}-\x{CFFFD}\x{D0000}-\x{DFFFD}\x{E1000}-\x{EFFFD}!\$&'\(\)\*\+,;=:@]))*)*)?|(?:(?:(?:%[0-9a-f][0-9a-f]|[-a-z0-9\._~\x{A0}-\x{D7FF}\x{F900}-\x{FDCF}\x{FDF0}-\x{FFEF}\x{10000}-\x{1FFFD}\x{20000}-\x{2FFFD}\x{30000}-\x{3FFFD}\x{40000}-\x{4FFFD}\x{50000}-\x{5FFFD}\x{60000}-\x{6FFFD}\x{70000}-\x{7FFFD}\x{80000}-\x{8FFFD}\x{90000}-\x{9FFFD}\x{A0000}-\x{AFFFD}\x{B0000}-\x{BFFFD}\x{C0000}-\x{CFFFD}\x{D0000}-\x{DFFFD}\x{E1000}-\x{EFFFD}!\$&'\(\)\*\+,;=:@]))+)(?:\/(?:(?:%[0-9a-f][0-9a-f]|[-a-z0-9\._~\x{A0}-\x{D7FF}\x{F900}-\x{FDCF}\x{FDF0}-\x{FFEF}\x{10000}-\x{1FFFD}\x{20000}-\x{2FFFD}\x{30000}-\x{3FFFD}\x{40000}-\x{4FFFD}\x{50000}-\x{5FFFD}\x{60000}-\x{6FFFD}\x{70000}-\x{7FFFD}\x{80000}-\x{8FFFD}\x{90000}-\x{9FFFD}\x{A0000}-\x{AFFFD}\x{B0000}-\x{BFFFD}\x{C0000}-\x{CFFFD}\x{D0000}-\x{DFFFD}\x{E1000}-\x{EFFFD}!\$&'\(\)\*\+,;=:@]))*)*|(?!(?:%[0-9a-f][0-9a-f]|[-a-z0-9\._~\x{A0}-\x{D7FF}\x{F900}-\x{FDCF}\x{FDF0}-\x{FFEF}\x{10000}-\x{1FFFD}\x{20000}-\x{2FFFD}\x{30000}-\x{3FFFD}\x{40000}-\x{4FFFD}\x{50000}-\x{5FFFD}\x{60000}-\x{6FFFD}\x{70000}-\x{7FFFD}\x{80000}-\x{8FFFD}\x{90000}-\x{9FFFD}\x{A0000}-\x{AFFFD}\x{B0000}-\x{BFFFD}\x{C0000}-\x{CFFFD}\x{D0000}-\x{DFFFD}\x{E1000}-\x{EFFFD}!\$&'\(\)\*\+,;=:@])))(?:\?(?:(?:%[0-9a-f][0-9a-f]|[-a-z0-9\._~\x{A0}-\x{D7FF}\x{F900}-\x{FDCF}\x{FDF0}-\x{FFEF}\x{10000}-\x{1FFFD}\x{20000}-\x{2FFFD}\x{30000}-\x{3FFFD}\x{40000}-\x{4FFFD}\x{50000}-\x{5FFFD}\x{60000}-\x{6FFFD}\x{70000}-\x{7FFFD}\x{80000}-\x{8FFFD}\x{90000}-\x{9FFFD}\x{A0000}-\x{AFFFD}\x{B0000}-\x{BFFFD}\x{C0000}-\x{CFFFD}\x{D0000}-\x{DFFFD}\x{E1000}-\x{EFFFD}!\$&'\(\)\*\+,;=:@])|[\x{E000}-\x{F8FF}\x{F0000}-\x{FFFFD}|\x{100000}-\x{10FFFD}\/\?])*)?(?:\#(?:(?:%[0-9a-f][0-9a-f]|[-a-z0-9\._~\x{A0}-\x{D7FF}\x{F900}-\x{FDCF}\x{FDF0}-\x{FFEF}\x{10000}-\x{1FFFD}\x{20000}-\x{2FFFD}\x{30000}-\x{3FFFD}\x{40000}-\x{4FFFD}\x{50000}-\x{5FFFD}\x{60000}-\x{6FFFD}\x{70000}-\x{7FFFD}\x{80000}-\x{8FFFD}\x{90000}-\x{9FFFD}\x{A0000}-\x{AFFFD}\x{B0000}-\x{BFFFD}\x{C0000}-\x{CFFFD}\x{D0000}-\x{DFFFD}\x{E1000}-\x{EFFFD}!\$&'\(\)\*\+,;=:@])|[\/\?])*)?$/i;
+            // var re = /^(ht|f)tps?:\/\/[a-z0-9-\.]+\.[a-z]{2,4}\/?([^\s<>\#%"\,\{\}\\|\\\^\[\]`]+)?$/;
+            var re = /^(?:(?:https?|ftp):\/\/)(?:\S+(?::\S*)?@)?(?:(?!10(?:\.\d{1,3}){3})(?!127(?:\.\d{1,3}){3})(?!169\.254(?:\.\d{1,3}){2})(?!192\.168(?:\.\d{1,3}){2})(?!172\.(?:1[6-9]|2\d|3[0-1])(?:\.\d{1,3}){2})(?:[1-9]\d?|1\d\d|2[01]\d|22[0-3])(?:\.(?:1?\d{1,2}|2[0-4]\d|25[0-5])){2}(?:\.(?:[1-9]\d?|1\d\d|2[0-4]\d|25[0-4]))|(?:(?:[a-z\u00a1-\uffff0-9]+-?)*[a-z\u00a1-\uffff0-9]+)(?:\.(?:[a-z\u00a1-\uffff0-9]+-?)*[a-z\u00a1-\uffff0-9]+)*(?:\.(?:[a-z\u00a1-\uffff]{2,})))(?::\d{2,5})?(?:\/[^\s]*)?$/i;
+            return re.test(url);
+        },
+        is_check: function (str) {
+            strUpper = str.trim().toUpperCase();
+            if (strUpper == "TRUE" || strUpper == "FALSE")
+                return true;
+            return false;
+        },
         is_phone: function (phone) {//validates formatted phone number
             //http://stackoverflow.com/questions/4338267/validate-phone-number-with-javascript - we ignore format and validate numeric content only
             var phoneRe = /^[2-9]\d{2}[2-9]\d{2}\d{4}/;//^begins by one of [2-9] folowed by {2} occurences of any d (digit),folowed by one [2-9] and follwed by 6 digits
@@ -839,8 +1003,7 @@ FL["common"] = (function () {//name space FL.common
             if (digits.length > 12)
                 return false;
             return (digits.match(phoneRe) !== null);
-        }
-        ,
+        },
         forceToString: function (xVar) {//convert a variable of any type to string
             var type = this.typeOf(xVar);
             if (type != "string") {
@@ -852,8 +1015,7 @@ FL["common"] = (function () {//name space FL.common
                     xVar = "NULL"
             }
             return xVar;
-        }
-        ,
+        },
         formatShortLocalToISODate: function (dateTimeString, sourceFormat) {//return ISO Date for a local dateTimeString "<shortdate> hh:mm <pm|am>"
             //ex:FL.common.formatToISODate("6/25/2015 11:21 am");==>2015-06-25T10:21:00.000Z for PC with -1 hour of time zone difference
             function z(n) {
@@ -886,8 +1048,7 @@ FL["common"] = (function () {//name space FL.common
             isoDate += z(d.getUTCHours() + 1 + difHrs) + ":" + z(d.getUTCMinutes() + difMin) + ":" + z(d.getUTCSeconds()) + '.';
             isoDate += p(d.getUTCMilliseconds()) + "Z";
             return isoDate;
-        }
-        ,
+        },
         timeTo24: function (timeString) {//converts a time string "hh:mm <pm|am>" to "hh:mm" where hh=[0-24] if formnat incorret returns null
             //FL.common("11:00 pm") -->"23:00"
             //FL.common("12:00 pm") -->null
@@ -907,8 +1068,7 @@ FL["common"] = (function () {//name space FL.common
             hrs = z(hrs);//2-->"02"  13-->"13"
             var min = timeString.substr(3, 2);
             return hrs + ":" + min;
-        }
-        ,
+        },
         toISODate: function (dateTimeString, sourceFormat) {//returns ISO date from a dateTimeString "<shortdate> hh:mm <pm|am>" and a format DMY or MDY
             //<shortdate> may be:yyyy/mm/dd, dd/mm/yyyy or mm/dd/yyyy
             //examples:
@@ -944,8 +1104,7 @@ FL["common"] = (function () {//name space FL.common
                 }
             }
             return isoDate;
-        }
-        ,
+        },
         fromISODateToShortdate: function (isoDate, outFormat) {//returs a dateTimeString shortdate> may be:yyyy/mm/dd, dd/mm/yyyy or mm/dd/yyyy from ISO date
             // if isoDate is not acceptable it will return null
             //sourceFormat may be "YMD","MDY" or "DMY"
@@ -973,8 +1132,7 @@ FL["common"] = (function () {//name space FL.common
             else
                 alert("FL.common.fromISODateToShortdate outFormat=" + outFormat + " is invalid!");
             return shortDate;
-        }
-        ,
+        },
         fromISODateToTime: function (isoDate) {//returs a time string "hh:mm <pm|am>"" from ISO date
             //examples:
             //   FL.common.fromISODateToTime("2015-12-06T05:00:00.000Z") ==>"06:00 am"
@@ -1004,8 +1162,7 @@ FL["common"] = (function () {//name space FL.common
             if (!shortDate)
                 return null;
             return shortDate + " " + this.fromISODateToTime(isoDate);
-        }
-        ,
+        },
         is_validShortDate: function (shortDate) {//validate  xx-xx-xx or xx/xx/xx or xx.xx.xx where year can be xxxx
             //->accepts DMY(europe), MDY(US), YMD(China - the default accepted by Date.Parse)
             // YMD accepts "2014/12/30","2014-12-30","2014.12.30" -> rejects "14/12/30"
@@ -1028,8 +1185,7 @@ FL["common"] = (function () {//name space FL.common
                 bRet = true;
             }
             return bRet;
-        }
-        ,
+        },
         is_ValidDate: function (dateString) {
             // returns true - if dateString has an acceptable format for a date. Ex
             //      ex:"March 21, 2012", "2015/06/24", "2015-06-24"
@@ -1096,8 +1252,7 @@ FL["common"] = (function () {//name space FL.common
                 // }
             }
             return is_date;
-        }
-        ,
+        },
         is_dateArrInStringFormat: function (arrOfRowValues) {//returns true if all array elements are a valid string format
             //var d = Date.parse("March 21, 2012");//1332288000000
             //var d = Date.parse("03-21-12");//1332288000000
@@ -1132,8 +1287,7 @@ FL["common"] = (function () {//name space FL.common
             } else if (_.isUndefined(failElement))
                 is_date = true;
             return is_date;
-        }
-        ,
+        },
         is_jsonString: function (str) {
             try {
                 JSON.parse(str);
@@ -1141,8 +1295,7 @@ FL["common"] = (function () {//name space FL.common
                 return false;
             }
             return true;
-        }
-        ,
+        },
         is_enumerableArr: function (arrOfRowValues, percent) {//returns true arrOfRowValues can colapse to less than percent with unique values
             //normally arrOfRowValues is a sample of the whole array, only to decide if it is enumerable or not
             var is_enumerable = false;
@@ -1152,8 +1305,7 @@ FL["common"] = (function () {//name space FL.common
             if (columnPercent < percent)
                 is_enumerable = true;
             return is_enumerable;
-        }
-        ,
+        },
         extractUniqueFromArray: function (arr) {//returns object with {empties:no_of empties,uniqueArr:uniqueArr}
             //returns an object {empties:no_of empties,uniqueArr:uniqueArr} where:
             //      empties - number of empties ocurrences in arr
@@ -1175,15 +1327,13 @@ FL["common"] = (function () {//name space FL.common
                 return element[0];
             });
             return {empties: empties, uniqueArr: uniqueArr};
-        }
-        ,
+        },
         getLocalLanguage: function () {
             var language = navigator.languages ? navigator.languages[0] : (navigator.language || navigator.userLanguage);
             if (_.isUndefined(language))
                 language = window.navigator.userLanguage || window.navigator.language;
             return language;
-        }
-        ,
+        },
         is_decimal_US: function (strNumber) {
             is_US = false;
             var lastDotIndex = strNumber.lastIndexOf(".");
@@ -1192,8 +1342,7 @@ FL["common"] = (function () {//name space FL.common
                 if (lastDotIndex == firstDotIndex)
                     is_us = true; // (0.123) or (4,294.00) or (4,294,967.00)
             }
-        }
-        ,
+        },
         is_oneOfCharsInString: function (str, charList) {//returns true if any of the chars in par2 exists in par1.
             //ex FL.common.is_oneOfCharsInString("anc 1002,3","* ") =>true because space exists in string
             var is = false;
@@ -1208,8 +1357,7 @@ FL["common"] = (function () {//name space FL.common
                 }
             }
             return is;
-        }
-        ,
+        },
         isNumberSep: function (strNumber, sep) {//sep is thousands sep - returns true if string is a valid number with that thousand separator
             var isNumber = false;
             //case strNumber "1.000,3" with sep="," =>should return false. Without the "special if" it would return true =>1.0002 is valid
@@ -1253,9 +1401,8 @@ FL["common"] = (function () {//name space FL.common
                 }
             }
             return isNumber;
-        }
-        ,
-        getArrNumberFormat: function (arrOfRowValues) {//given an array of strings returns id it is a number representation and if yes returns the format
+        },
+        getArrNumberFormat: function (arrOfRowValues) {//given an array of strings returns if it is a number representation and if yes returns the format
             //Possible formats : us,de,fr
             //returns {number:false, format:null} or {number:true, format:"us"} or (if all integers){number:true, format:null}
             //4,294,967,295.00  US-English, Thai,
@@ -1328,8 +1475,89 @@ FL["common"] = (function () {//name space FL.common
             if (!_.isUndefined(failElement))
                 xRet = {"number": false, "format": null};
             return xRet;
-        }
-        ,
+        },
+        getArrUserType: function (arrOfRowValues) {//given an array of strings returns one of textbox,percentbox,numberbox,currencybox,checkbox,datetimebox,emailbox,urlbox
+            // NOTE combobox must be resolved outside - phonebox TBD
+            var userType = "textbox";
+            if (FL.common.isArrOfCurrency(arrOfRowValues)) {
+                userType = "currencybox";
+            } else if (FL.common.isArrOfPercent(arrOfRowValues)) {
+                userType = "percentbox";
+            } else if (FL.common.isArrOfNumber(arrOfRowValues)) {
+                userType = "numberbox";
+            } else if (FL.common.isArrOfEmail(arrOfRowValues)) {
+                userType = "emailbox";
+            } else if (FL.common.isArrOfURL(arrOfRowValues)) {
+                userType = "urlbox";
+            } else if (FL.common.isArrOfCheck(arrOfRowValues)) {
+                userType = "checkbox";
+                //} else if (FL.common.isArrOfPhone(arrOfRowValues)) { //not working
+                //    userType = "phonebox";
+            } else if (FL.common.is_dateArrInStringFormat(arrOfRowValues)) {//values are in string format but are they a deguised date column ?
+                userType = "datetimebox";
+            }
+            return userType;
+        },
+        isArrOfNumber: function (arrOfRowValues) {//given an array of strings returns true if it is a number representation, false if not
+            var failElement = _.find(arrOfRowValues, function (element) { //if failElement is undefined => all elements are a valid number format
+                return !element.isNumeric();
+            });
+            if (!_.isUndefined(failElement))//not an array of numbers
+                return false;
+            return true;//it is an array of numbers
+        },
+        isArrOfCurrency: function (arrOfRowValues) {//given an array of strings returns true if it is a currency representation, false if not
+            var failElement = _.find(arrOfRowValues, function (element) { //if failElement is undefined => all elements are a valid number format
+                return !element.isCurrency();
+            });
+            if (!_.isUndefined(failElement))//not an array of currency
+                return false;
+            return true;//it is an array of currency
+        },
+        isArrOfPercent: function (arrOfRowValues) {//given an array of strings returns true if it is a percent representation, false if not
+            var failElement = _.find(arrOfRowValues, function (element) { //if failElement is undefined => all elements are a valid number format
+                return !element.isPercent();
+            });
+            if (!_.isUndefined(failElement))//not an array of percent
+                return false;
+            return true;//it is an array of percent
+        },
+        isArrOfEmail: function (arrOfRowValues) {//given an array of strings returns true if it is a valid email representation, false if not
+            var failElement = _.find(arrOfRowValues, function (element) { //if failElement is undefined => all elements are a valid number format
+                var is_email = FL.common.is_email(element);
+                return !is_email;
+            });
+            if (!_.isUndefined(failElement))//not an array of numbers
+                return false;
+            return true;//it is an array of emails
+        },
+        isArrOfURL: function (arrOfRowValues) {//given an array of strings returns true if it is a valid URL representation, false if not
+            var failElement = _.find(arrOfRowValues, function (element) { //if failElement is undefined => all elements are a valid number format
+                var is_url = FL.common.is_url(element);
+                return !is_url;
+            });
+            if (!_.isUndefined(failElement))//not an array of numbers
+                return false;
+            return true;//it is an array of urls
+        },
+        isArrOfCheck: function (arrOfRowValues) {//given an array of strings returns true if it is a valid true/false representation, false if not
+            var failElement = _.find(arrOfRowValues, function (element) { //if failElement is undefined => all elements are a valid number format
+                var is_check = FL.common.is_check(element);
+                return !is_check;
+            });
+            if (!_.isUndefined(failElement))//not an array of numbers
+                return false;
+            return true;//it is an array of true/false
+        },
+        isArrOfPhone: function (arrOfRowValues) {//given an array of strings returns true if it is a valid phone representation, false if not
+            var failElement = _.find(arrOfRowValues, function (element) { //if failElement is undefined => all elements are a valid number format
+                var is_phone = FL.common.is_phone(element);
+                return !is_phone;
+            });
+            if (!_.isUndefined(failElement))//not an array of numbers
+                return false;
+            return true;//it is an array of phone numbers
+        },
         localeStringToNumber: function (str, format) {//returns number or 0 if is unable to convert
             // str - str to convert to number
             // format - us, de or fr -->all other formats return 0
@@ -1358,14 +1586,12 @@ FL["common"] = (function () {//name space FL.common
                     n = 0;
             }
             return n;
-        }
-        ,
+        },
         convertStringVectorToNumber: function (arr, format) {//given an array of strings and a format converts that string to a number to numeric according to string format
             return _.map(arr, function (element) {
                 return FL.common.localeStringToNumber(element, format);
             });
-        }
-        ,
+        },
         getServerName: function () {//return server name form url. if server is local host =>test.framelink.co
             //extracts content from url in browser (after // and before the first /)
             //example (in FL.API _login):fl.serverName(FL.common.getServerName());
@@ -1378,8 +1604,7 @@ FL["common"] = (function () {//name space FL.common
                 server = "test.framelink.co";
             FL.common.printToConsole("FL.common.getServerName() -->" + server);
             return server;
-        }
-        ,
+        },
         getMandrillKey: function () {
             var server = this.getServerName();
             var key = "S8_4ExqKlIdZiSBqgiLBUw"; //assume
@@ -1747,7 +1972,7 @@ FL["common"] = (function () {//name space FL.common
                 } else {
                     $domTarget.text(value);
                 }
-             }
+            }
             return content;
         },
         checkHTML: function (html) {
