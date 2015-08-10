@@ -10,6 +10,7 @@ FormDesigner.Views.MainView = Backbone.View.extend({
         this.setEntityModel(new FormDesigner.Models.EntityModel());
         this.entityTempalate = Handlebars.compile($("#entityOption").html() );
         this.fieldsTempalate = Handlebars.compile($("#fieldsOption").html() );
+        $("#type").html(Handlebars.compile($("#typeTemplate").html())(FormMaker.TypeTemplate));
         
         this.entitiesDropDown = this.$("#entities .options");
         this.fieldsList = this.$("#fields");

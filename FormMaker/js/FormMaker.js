@@ -119,3 +119,86 @@ FormMaker.DBType = {
     string : "text",
     text : "text"
 }
+
+FormMaker.TypeTemplate = [
+    {
+        typeId : "TypeTextLabel",
+        typeValue : "TextLabel",
+        displayLabel: "Label"
+    },
+    {
+        typeId : "TypeText",
+        typeValue : "Text",
+        displayLabel: "Textbox"
+    },
+    {
+        typeId : "TypeButton",
+        typeValue : "Button",
+        displayLabel: "Button"   
+    },
+    {
+        typeId : "TypeCheckbox",
+        typeValue : "Checkbox",
+        displayLabel: "Checkbox"
+    },
+    {
+        typeId : "TypeRadio",
+        typeValue : "Radio",
+        displayLabel: "Radio"
+    },
+    {
+        typeId : "TypeCombo",
+        typeValue : "Combo",
+        displayLabel: "Combo"
+    },
+    {
+        typeId : "TypeDate",
+        typeValue : "Date",
+        displayLabel: "Date"
+    },
+    {
+        typeId : "TypeTextArea",
+        typeValue : "TextArea",
+        displayLabel: "Text area"
+    },
+    {
+        typeId : "TypeImage",
+        typeValue : "Image",
+        displayLabel: "Image"
+    },
+    {
+        typeId : "TypeNumber",
+        typeValue : "Number",
+        displayLabel: "Number"
+    },
+    {
+        typeId : "TypePercent",
+        typeValue : "Percent",
+        displayLabel: "Percent"
+    },
+    {
+        typeId : "TypeCurrency",
+        typeValue : "Currency",
+        displayLabel: "Currency"
+    },
+    {
+        typeId : "TypeEmail",
+        typeValue : "Email",
+        displayLabel: "Email"
+    },
+    {
+        typeId : "TypePhone",
+        typeValue : "Phone",
+        displayLabel: "Phone"
+    },
+    {
+        typeId : "TypeUrl",
+        typeValue : "Url",
+        displayLabel: "Url"
+    },
+    {
+        typeId : "TypeLookup",
+        typeValue : "LoolUp",
+        displayLabel: "LookUp"
+    }
+]

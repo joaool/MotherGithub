@@ -106,7 +106,6 @@ FormDesigner.Views.ElementHolder = Backbone.View.extend({
         var dropDownEnum = $(droppedObject).data("enum");
         var description = $(droppedObject).data("description");
         var id = this.getNextId();
-        var fieldName = FL.dd.t.entities[this.entityLoaded.csingular].getFieldCName(name);
         var alignment = target.id == "designerCol1" ? "left" : "right";
         
         var element = {
@@ -116,16 +115,19 @@ FormDesigner.Views.ElementHolder = Backbone.View.extend({
             "type" : inputType,
             "value" : dropDownEnum,
             "id" : id,
-            "fieldName" : fieldName
+            "fieldName" : ""
         };
         if (cname){
+            var fieldName = FL.dd.t.entities[this.entityLoaded.csingular].getFieldCName(name);
             element = this.model.getElement(cname);
             element = jQuery.extend(true,{},element);
             var id = this.getNextId();
             element.id = id;
             element.cname = cname;
+            element.fieldName = fieldName;
         }
-        element.entityName = this.entityLoaded.csingular;
+        if(this.entityLoaded)
+            element.entityName = this.entityLoaded.csingular;
         element.alignment = alignment;
         
         this.addElement(target.id,element);
