@@ -167,10 +167,10 @@
 							}
 						},
 						"_editAppSettings_currency_options":{
-							arr:[ {value:1,text:"$ (Dollar)",op:"$"}, {value:2,text:"€ (Euro)",op:"€"}, {value:3,text:"Kr (Krona)",op:"Kr "},
-								{value:4,text:"Kz (Kwanza)",op:"Kz "}, {value:5,text:"MT (Metical)",op:"MT "}, {value:6,text:"R$ (Real)",op:"R$ "},
-								{value:7,text:"元 (Renmimbi)",op:"元"}, {value:7,text:"₹ (Rupee)",op:"₹"}, {value:8,text:"Rs (Rupee)",op:"Rs "},
-								{value:8,text:"¥ (Yen)",op:"¥"} ],
+							arr:[ {value:1,text:"$ (Dollar)",op:"$"}, {value:2,text:"€ (Euro)",op:"€"},{value:3,text:"£ (Pound)",op:"£"}, {value:4,text:"Kr (Krona)",op:"Kr "},
+								{value:5,text:"Kz (Kwanza)",op:"Kz "}, {value:6,text:"MT (Metical)",op:"MT "}, {value:7,text:"R$ (Real)",op:"R$ "},
+								{value:8,text:"元 (Renmimbi)",op:"元"}, {value:9,text:"₹ (Rupee)",op:"₹"}, {value:10,text:"Rs (Rupee)",op:"Rs "},
+								{value:11,text:"¥ (Yen)",op:"¥"} ],
 							default:FL.common.appsettings.currency,
 							onSelect:function(objSelected){
 								$("#_editAppSettings_currency").text(objSelected.op);

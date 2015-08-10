@@ -97,7 +97,8 @@ FL["grid"] = (function () {//name space FL.grid
                 var numberObj = FL.common.getArrNumberFormat(arrOfSampleRowValues);
                 if (numberObj.number) {//this string is a number in string format
                     obj[element] = {
-                        "fieldType": "number",
+                        //"fieldType": "number",
+                        "fieldType": "string",
                         "fieldTypeUI": "numberbox",
                         "numberFormat": numberObj.format,
                         enumerable: null,
@@ -108,8 +109,10 @@ FL["grid"] = (function () {//name space FL.grid
                     // FL.common.convertStringVectorToNumber(arrOfColumnToConvert,numberObj.format);
                 } else if (FL.common.is_dateArrInStringFormat(arrOfSampleRowValues)) {//values are in string format but are they a deguised date column ?
                     obj[element] = {
-                        "fieldType": "date",
-                        "fieldTypeUI": "datetextbox",
+                        //"fieldType": "date",
+                        "fieldType": "string",
+                        //"fieldTypeUI": "datetextbox",
+                        "fieldTypeUI": "datetimebox",
                         "numberFormat": null,
                         enumerable: null,
                         label: element
@@ -134,16 +137,17 @@ FL["grid"] = (function () {//name space FL.grid
                         label: element
                     };
                     if (is_ColumnOfSubtype("email", uniqueObj.uniqueArr)) //checks that all sample objects are of subtype
-                        obj[element]["fieldTypeUI"] = "email";
+                        obj[element]["fieldTypeUI"] = "emailbox";
                     else if (is_ColumnOfSubtype("url", uniqueObj.uniqueArr))
-                        obj[element]["fieldTypeUI"] = "url";
+                        obj[element]["fieldTypeUI"] = "urlbox";
                     else if (is_ColumnOfSubtype("phone", uniqueObj.uniqueArr))
-                        obj[element]["fieldTypeUI"] = "phone";
+                        obj[element]["fieldTypeUI"] = "phonebox";
                 }
             } else {
                 if (dataType == "number") {//possible datatypes:string, integer, number, boolean, date, or json
                     obj[element] = {
-                        "fieldType": "number",
+                        //"fieldType": "number",
+                        "fieldType": "string",
                         "fieldTypeUI": "numberbox",
                         "numberFormat": null,
                         enumerable: null,
@@ -159,7 +163,8 @@ FL["grid"] = (function () {//name space FL.grid
                     };
                 } else if (dataType == "boolean") {
                     obj[element] = {
-                        "fieldType": "boolean",
+                        //"fieldType": "boolean",
+                        "fieldType": "string",
                         "fieldTypeUI": "checkbox",
                         "numberFormat": null,
                         enumerable: null,
@@ -167,7 +172,8 @@ FL["grid"] = (function () {//name space FL.grid
                     };
                 } else if (dataType == "date") {
                     obj[element] = {
-                        "fieldType": "date",
+                        //"fieldType": "date",
+                        "fieldType": "string",
                         "fieldTypeUI": "datetextbox",
                         "numberFormat": null,
                         enumerable: null,
@@ -184,6 +190,58 @@ FL["grid"] = (function () {//name space FL.grid
                 }
             }
             arrOfTypes.push(obj);
+        });
+        return arrOfTypes;
+    };
+    var dataRowAnalysis2 = function (rows, percent) {
+        // this methods decides the date type of every single column in rows by analysing a sample (rows).
+        // returns an array of attributes (one element per column) each element  with  format:
+        //		{"fieldType":"string","fieldTypeUI":"textbox","numberFormat":null, enumerable:null,label:element};
+        //
+        // assumes that all rows have the same json pattern with same type in the whole array - assumes type of row = type of first row
+        // If column row type is "string" search for enumerables within that column
+        //    if [(total number of groups)/(number of rows) < percent ] assumes enumerable and identifies an array of enumerables
+        // returns
+        //   [ {name:{fieldType:"string", label:"Name"}}, ...., {service:{fieldType:"enumerable", label:"Name", enumerable:[*]}} ]
+        //      if fieldType="enumerable" the property enumerable has an array with the enumerable options.
+        var numOfRows = rows.length;
+        var rowsSample = FL.common.makeFirstElementsSample(rows, 50); //reduces max size of array to 50
+        var numOfSampleRows = rowsSample.length;
+        var arrOfKeys = _.keys(rows[0]);//at least row[0] must exist
+        var arrOfTypes = [];
+        _.each(arrOfKeys, function (element, index) {
+            if (element) {
+                var dataType = FL.common.typeOf((rows[0][element]));//one of  "number","string","email","boolean","object","array","null","undefined","date"
+                //note about numbers: if dataType is number no doubt about it. But...it could be a string representing a number
+                var userType = null;
+                var enumerable = null;
+                var obj = {};
+                if (dataType == "string") {
+                    //From possible user types: textbox,numberbox,currencybox,integerbox,percentbox,urlbox,areabox,combobox,checkbox,phonebox,datetimebox,emailbox,lookupbox
+                    //  we only try to recognize: textbox,numberbox,currencybox,combobox,checkbox,datetimebox,emailbox -->later on: integerbox,percentbox,urlbox,phonebox
+                    //analysis of the first 50 elements or all if length<50
+                    var arrOfSampleRowValues = _.pluck(rowsSample, element);
+                    userType = FL.common.getArrUserType(arrOfSampleRowValues);//one of textbox,numberbox,currencybox,urlbox,checkbox,datetimebox,emailbox
+                    if (userType == "textbox") {//it may be a combobox
+                        if (FL.common.is_enumerableArr(arrOfSampleRowValues, percent)) {//It is an enumerable we will prepare the enumerable content
+                            var arrOfAllRowValues = _.pluck(rows, element);
+                            var fullUniqueObj = FL.common.extractUniqueFromArray(arrOfAllRowValues);
+                            enumerable = fullUniqueObj.uniqueArr;
+                            userType = "combobox";
+                        }
+                    }
+                } else {
+                    userType = "numberbox"
+                }
+                obj[element] = {
+                    "fieldType": "string",
+                    "fieldTypeUI": userType,
+                    //"numberFormat": numberObj.format,
+                    enumerable: enumerable,
+                    label: element
+                };
+                arrOfTypes.push(obj);
+            }
         });
         return arrOfTypes;
     };
@@ -206,6 +264,28 @@ FL["grid"] = (function () {//name space FL.grid
         });
         return attributesArr;
     };
+    var translateToDDFormat2 = function (arrOfAttributes) {//translates arrOfAttributes format to dd format and includes info for setupGridColumnsArrNoDict
+        // format of array [attributeName1:{fieldType":"string","fieldTypeUI":"textbox","numberFormat":null, enumerable:null,label:element},attributeName2:{..}]
+        // returns  - array of objects in dd format [{name:"address",description:"address to send invoices",label:"Address",type:"string",typeUI:"textbox",enumerable:null,key:false},{}..];
+        var attributesArr = [];
+        var attrName = null;
+        _.each(arrOfAttributes, function (element, index) {
+            attrName = _.keys(element)[0];
+            attributesArr.push({
+                name: attrName,
+                description: "description of " + attrName,
+                label: element[attrName].label,
+                type: element[attrName].fieldType,
+                typeUI: element[attrName].fieldTypeUI,
+                enumerable: element[attrName].enumerable,
+                key: false,
+                //---extra fields for setupGridColumnsArrNoDict
+                nestingArr: [],
+                width: "*"
+            });
+        });
+        return attributesArr;
+    };
     // var createAttributesArrFromCsvAnalisys = function(rows){//creates the equivalent to a dd entry from a set of rows
     var adjustRowsToAttributes = function (rows, arrOfAttributes) {//creates the equivalent to a dd entry from a set of rows
         // rows - an array of objects format [{"colum1Name":col11,"colum2Name":col12,..},{"colum1Name":col21,"colum2Name":col22,..}...{}]
@@ -218,7 +298,7 @@ FL["grid"] = (function () {//name space FL.grid
         var rrows = rows;
         //	format of arrOfAttributes {"fieldType":"string","fieldTypeUI":"textbox","numberFormat":null, enumerable:null,label:element};
         _.each(arrOfAttributes, function (element, index) {
-            var attrName = _.keys(element)[0];
+            var attrName = _.keys(element)[0];//extract keys from first line
             var fieldType = element[attrName].fieldType;
             var fieldTypeUI = element[attrName].fieldTypeUI;
             var numberFormat = element[attrName].numberFormat;
@@ -249,21 +329,59 @@ FL["grid"] = (function () {//name space FL.grid
                         rowElement[attrName] = new Date(rowElement[attrName]);//old content in string is converted to date
                     }
                 });
-                FL.common.printToConsole("createAttributesArrFromCsvAnalisys DATE attrName=" + attrName + " is complete........");
+                FL.common.printToConsole("createAttributesArrFromCsvAnalisys DATE attrName=" + attrName + " is complete........", "grid");
             }
         });
+    };
+    var adjustRowsToAttributes2 = function (rows, arrOfAttributes) {//correct each row content from external csv to framelink fieldTypeUI identified by dataRowAnalysis2
+        // rows - an array of objects format [{"colum1Name":col11,"colum2Name":col12,..},{"colum1Name":col21,"colum2Name":col22,..}...{}]
+        // arrOfAttributes has analysis format ->[attributeName1:{fieldType":"string","fieldTypeUI":"textbox","numberFormat":null, enumerable:null,label:element},attributeName2{..}]
+        //arrOfAttributes - array of objects ex: [{name:"address",description:"address to send invoices",label:"Address",type:"string",typeUI:"textbox",enumerable:null,key:false},{}..];
+        var rrows = rows;
+        //	format of arrOfAttributes {"fieldType":"string","fieldTypeUI":"textbox","numberFormat":null, enumerable:null,label:element};
+        _.each(arrOfAttributes, function (element, index) {//for each attributes check if it is necessary to correct all rows from external csv
+            var attrName = _.keys(element)[0];//extract keys from first line
+            var fieldType = element[attrName].fieldType;
+            var fieldTypeUI = element[attrName].fieldTypeUI;
+            var numberFormat = element[attrName].numberFormat;
+            var label = element[attrName].label;
+            var enumerable = null;
+            var columnVector = null;
+            var rows = rrows;
+            //  “textbox”,"numberbox","currencybox","integerbox","percentbox", "urlbox", ”areabox”, ”combobox”, ”checkbox”, “phonebox”, “datetimebox”, "emailbox", "lookupbox"“
+            // must be changed: "numberbox","currencybox","integerbox","percentbox" --->to string in US format (radix=. no separators)
+            if (fieldTypeUI == "numberbox") {
+                _.each(rows, function (rowElement, index) {
+                    var numberStr = rowElement[attrName];
+                    numberStr = ''+numberStr;
+                    rowElement[attrName] = numberStr.ToNumeric_US();
+                });
+            } else if (fieldTypeUI == "currencybox"){
+                _.each(rows, function (rowElement, index) {
+                    var currencyStr = rowElement[attrName];
+                    var strNum = FL.common.extractContentBetweenFirstAndLastDigit(currencyStr);// - is excluded !!!! IMPORTANT
+                    rowElement[attrName] = strNum.ToNumeric_US();
+                });
+            }else if (fieldTypeUI == "percentbox"){
+                _.each(rows, function (rowElement, index) {
+                    var percentStr = rowElement[attrName];
+                    var strNum = FL.common.extractContentBetweenFirstAndLastDigit(percentStr);// - is excluded !!!! IMPORTANT
+                    rowElement[attrName] = strNum.ToNumeric_US();
+                });
+            }
+         });
     };
     var is_ColumnOfSubtype = function (subtype, sampleArr) {//scans all elements of sampleArr and returns true if all non empty elements belongs to subtype
         //example
         //		if( is_ColumnOfSubtype("email",arrOfRowValues) )
         //		if( is_ColumnOfSubtype("url",arrOfRowValues) )
         //		if( is_ColumnOfSubtype("phone",arrOfRowValues) )
-        //  the subtype must be one of the existing subtypes in FL.utils.typeUIOf()
+        //  the subtype must be one of the existing subtypes in FL.common.typeUIOf()
         var is = false;
         var len = sampleArr.length;
         for (var i = 0; i < len; i++) {
             if (sampleArr[i].trim().length > 0) {
-                if (utils.typeUIOf(sampleArr[i]) == subtype) {
+                if (FL.common.typeUIOf(sampleArr[i]) == subtype) {
                     is = true;
                 } else {
                     is = false;
@@ -302,23 +420,28 @@ FL["grid"] = (function () {//name space FL.grid
                         var oldAttribute = masterDetailItems.detail[line].attribute;
                         var currentAttribute = $("#_dictEditEntityTemplate__f" + (line + 1) + "_attribute").val();//"_dictEditEntityTemplate__f4_userType_options"
                         // var title = " Define possible values for "+masterDetailItems.detail[line].attribute;
-                        var title = " Define possible values for " + currentAttribute;
+                        var listTitle = " Define possible values for " + currentAttribute;
+                        var lookupTitle = " Define lookup Table/Field for " + currentAttribute;
                         var enumArr = csvStore.getEnumerableFromAttribute(oldAttribute);
                         var enumStr = "";
+                        var zMasterDetail = {};
+                        var masterDetailListItems = {};
                         if (enumArr)
                             enumStr = enumArr.join(",");
                         if (selectedType == "combo list") {
-                            var masterDetailListItems = {master: {list: enumStr}};
+                            //masterDetailListItems = {master: {list: enumStr}};
+                            //zMmasterDetail = {master: {list: enumStr}};
+                            zMasterDetail["master"] = {list: enumStr};
                             var enumOptions = {
                                 type: "primary",
                                 icon: "th-list",
                                 button1: "Cancel",
                                 button2: "Confirm select list"
                             };
-                            FL.common.editMasterDetail("A2", title, "_getComboList", masterDetailListItems, enumOptions, function (result) {
+                            FL.common.editMasterDetail("A2", listTitle, "_getComboList", zMasterDetail, enumOptions, function (result) {
                                 if (result) {
                                     // alert("The list is ->"+masterDetailListItems.master.list);
-                                    var listOfValuesStr = masterDetailListItems.master.list;
+                                    var listOfValuesStr = zMasterDetail.master.list;
                                     csvStore.setEnumerableForAttribute(oldAttribute, listOfValuesStr.split(","));
                                 }
                             });
@@ -328,40 +451,88 @@ FL["grid"] = (function () {//name space FL.grid
                             FL.dd.t.entities.dumpToConsole();
                             var currentECN = FL.dd.getCEntity(entityName);
                             var currentFCN = FL.dd.t.entities[currentECN].getCName(currentAttribute);
+                            FL.common.setParametersTo("lookupTransfer_FromEditMasterDetail_to_Box", [currentECN, currentFCN]);//HACK
+                            //var lookupTableName = "No table";
+                            //var lookupFieldName = "No field";
+                            //lookupObj = FL.dd.getLookupFor(currentECN,currentFCN);//if no lookup returns null
+                            //if(lookupObj){
+                            //    lookupTableName = lookupObj.tableName;
+                            //    lookupFieldName = lookupObj.fieldName;
+                            //}
+
                             var lookupArr = FL.dd.t.entities[currentECN].fields[currentFCN].specialTypeDef;
                             var lookupTypeStr = "Invalid format";
+                            var lookupTableName = "No table";
+                            var lookupFieldName = "No field";
+                            var lookupTableOptionsObj = []
+                            _.each(FL.dd.t.entities.list(), function (element, index) {
+                                if (element.singular.substring(0, 1) != "_")
+                                    lookupTableOptionsObj.push({value: index, text: element.singular})
+                            });
+                            var lookupFieldOptionsObj = []
                             if (lookupArr) {
                                 if (FL.common.typeOf(lookupArr) == "array") {
                                     var lookupObj = lookupArr[0];
                                     if (FL.common.typeOf(lookupObj) == "object") {
-                                        lookupTypeStr = lookupObj.eCN + "," + lookupObj.fCN;//loojupObj format is {eCN:<entity compressed name>, fCN:<field compressed name>}
+                                        lookupTableName = FL.dd.getEntityByCName(lookupObj.eCN);
+
+                                        if (!lookupObj.fCN) { //if not existing choose the first field (any field)
+                                            var xFieldName = FL.dd.getArrayOfFields(lookupTableName)[0].attribute;
+                                            var xFCN = FL.dd.getFieldCompressedName(lookupTableName, xFieldName);
+                                            lookupObj.fCN = xFCN;
+                                        }
+                                        lookupFieldName = FL.dd.t.entities[lookupObj.eCN].fields[lookupObj.fCN].name;
+                                        //xxxlookupTypeStr = lookupObj.eCN + "," + lookupObj.fCN;//loojupObj format is {eCN:<entity compressed name>, fCN:<field compressed name>}
                                     }
                                 }
                             }
-                            ;
+                            var lookupMasterDetailItems = {
+                                master: {
+                                    table: lookupTableName,
+                                    table_options: lookupTableOptionsObj,
+                                    field: lookupFieldName,
+                                    field_options: []
+                                }
+                            };
+                            var lookupOptions = {
+                                type: "primary",
+                                icon: "th-list",
+                                button1: "Cancel",
+                                button2: "Confirm lookup data",
+                                option: {
+                                    table_options: function (thisModalIn, selected) {//selected returns the object corresponding to the selected option
+                                        FL.common.printToConsole("***************************************>user code in option (table_options) selected.text=" + selected.text, "modalIn");
+                                        var eCN = FL.dd.getCEntity(selected.text);
+                                        var lookupFieldOptionsObj = []
+                                        _.each(FL.dd.t.entities[eCN].fieldsList(), function (element, index) {
+                                            lookupFieldOptionsObj.push({value: index, text: element.name});
+                                        });
+                                        thisModalIn.setOptions("field_options", lookupFieldOptionsObj);
+                                        thisModalIn.set("field", "Fields of table " + selected.text);
+                                    }
+                                },
+                            };
+                            var lookupModal = new FL.modal.Box(lookupTitle, "getLookup", lookupMasterDetailItems, lookupOptions, function (result, data) {
+                                if (result) {
+                                    //alert("lookupModal Master  " + JSON.stringify(data.master));
+                                    var tableName = data.master.table;
+                                    var fieldName = data.master.field;
+                                    var eCN = FL.dd.getCEntity(tableName);
+                                    var fCN = FL.dd.getFieldCompressedName(tableName, fieldName);
+                                    //FL.dd.setLookupFor(currentECN,currentFCN,eCN,fCN);
+                                    var specialObj = {eCN: eCN, fCN: fCN};
+                                    var specialArr = [];
+                                    specialArr.push(specialObj);
+                                    FL.dd.init_t();//to init the temporary subsystem
+                                    var param = FL.common.getParametersFrom("lookupTransfer_FromEditMasterDetail_to_Box");//HACK
+                                    var currentECN = param[0];
+                                    var currentFCN = param[1];
+                                    FL.dd.t.entities[currentECN].fields[currentFCN].setField({specialTypeDef: specialArr});
+                                    var z = 32;
+                                }
+                            });
+                            lookupModal.show();
                         }
-                        ;
-                        var masterDetailListItems = {master: {special: lookupTypeStr}};
-                        var enumOptions = {
-                            type: "primary",
-                            icon: "th-list",
-                            button1: "Cancel",
-                            button2: "Confirm lookup data"
-                        };
-                        FL.common.editMasterDetail("A2", title, "_getLookupTableAndField", masterDetailListItems, enumOptions, function (result) {
-                            if (result) {
-                                // alert("The list is ->"+masterDetailListItems.master.list);
-                                var specialTypeDef = masterDetailListItems.master.special;
-                                //save into the data dictionary
-                                var specialDefTemporaryArr = specialTypeDef.split(",");
-                                var specialObj = {eCN: specialDefTemporaryArr[0], fCN: specialDefTemporaryArr[1]};
-                                var specialArr = [];
-                                specialArr.push(specialObj);
-                                FL.dd.t.entities[currentECN].fields[currentFCN].setField({specialTypeDef: specialArr});
-                                var z = 32;
-                            }
-
-                        });
                     }
                     // alert("The selection was "+selectedType);
                 }
@@ -1059,6 +1230,47 @@ FL["grid"] = (function () {//name space FL.grid
         csvFile: null,
         csvFileDelimiter: null,
         csvEncoding: null,
+        xxxx: function (boxId) {
+            var optionsArr = null;
+            var fieldName = "field";
+            var boxCurrent = "Please Choose";
+            var buffer = FL.common.generalParametersObj["_" + fieldName];
+            if (buffer) {
+                optionsArr = FL.common.generalParametersObj["_" + fieldName].alternativeOptions;
+                var $dropDownSelect = $("#" + boxId);
+                //$dropDownSelect.parents('.btn-group').find('.dropdown-toggle').html(boxCurrent + ' <span class="caret"></span>');//shows current value
+                ////... and we load the select box with the current available values
+
+                //$dropDownSelect.empty();//removes the child elements of the dropdown.
+                _.each(optionsArr, function (element) {
+                    var id = boxId + "_" + element.text;
+                    console.log("--->" + id);
+                    $dropDownSelect.append("<li id='" + id + "'><a href='#'>" + element.text + "</a></li>");
+                });
+
+                $("#" + boxId + " li a").click(function () {
+                    var detailLine = -1; //assumes master
+                    var detailLineStr = FL.common.stringAfterLast(boxId, "__f");//"_dictEditEntityTemplate__f4_userType_options"
+                    if (detailLineStr) {
+                        detailLineStr = FL.common.stringBeforeFirst(detailLineStr, "_");//"4_userType_options" =>"4"
+                        detailLine = parseInt(detailLineStr, 10) - 1;//to convert to base 0
+                    }
+                    var selText = $(this).text();
+                    var list = $("#" + boxId + " li a");
+                    var index = list.index(this);
+
+                    var elObj = optionsArr[index]; //exchanged by test
+
+
+                    $dropDownSelect.parents('.btn-group').find('.dropdown-toggle').html(selText + ' <span class="caret"></span>');
+                    // onSelection(selText);//runs the callback function
+                    onSelection(elObj, detailLine);//runs the callback function with the element object as argument and the detail line (-1 =>master)
+                });
+
+            }
+            console.log("FL.gridxxxx() -->" + boxId);
+            return true;
+        },
         createGrid: function () {//call with menu key "uri": "javascript:FL.grid.createGrid()"
             var masterDetailItems = {
                 master: {entityName: "sample", headerString: ""},
@@ -1104,10 +1316,12 @@ FL["grid"] = (function () {//name space FL.grid
                     FL.common.makeModalInfo("Create Grid canceled");
                 }
             });
-        },
+        }
+        ,
         adjustRowsToAttributes: function (rows, arrOfAttributes) {
             adjustRowsToAttributes(rows, arrOfAttributes);
-        },
+        }
+        ,
         verifyPapaFields: function (metaFieldsArr) {
             //Ex  metaFieldsArr has :{aborted: false, cursor: 322587, delimiter: ",",fields: Array[52],linebreak: "↵",truncated: false}
             //This is the place to add some inteligence in evaluation of CSV files.
@@ -1163,7 +1377,8 @@ FL["grid"] = (function () {//name space FL.grid
                 comma_repetitions: comma_repetitions,
                 semi_colon_repetitions: semi_colon_repetitions
             };
-        },
+        }
+        ,
         validateCSV: function (fileObj) {//this is called directly from template id="_importCSV" ->onchange="FL.grid.validateCSV(this.files)"
             // if there is an error FL.grid.csvFile will be null. No error => FL.grid.csvFile = csvFile
             // all this does is to leave a message in FL.grid.csvFile after verifing possible CSV errors !!!!
@@ -1219,7 +1434,8 @@ FL["grid"] = (function () {//name space FL.grid
                     }
                 });
             }
-        },
+        }
+        ,
         importGrid: function () {//call with menu key "uri": "javascript:FL.grid.importGrid()" in Settings
             // The real treatment to the csvFile is done here  - FL.grid.importGrid() -  using FL.grid.csvFile prepared in FL.grid.validateCSV()
             var masterDetailItems = {
@@ -1260,7 +1476,8 @@ FL["grid"] = (function () {//name space FL.grid
                     alert("Create Grid canceled");
                 }
             });
-        },
+        }
+        ,
         csvToStore: function (rows) {//rows is an array of JSON [{},{}...{}]; each JSON  has a key/value = attribute/content
             //feeds the csvStore (memoryCsv.js)  with rows injecting id column and converting other column names to lower case
             var csvrows = [];
@@ -1276,7 +1493,8 @@ FL["grid"] = (function () {//name space FL.grid
                 csvrows.push(element2);
             });
             csvStore.store(csvrows);
-        },
+        }
+        ,
         insertDefaultGridMenu: function (singular, plural) {// Adds a menu with title <plural> and content displayDefaultGrid(<singular>)
             // cursor over menu position <plural> will show: javascript:FL.links.setDefaultGrid('<singular>')
             // if singular has spaces, they will be changed by "_"
@@ -1294,7 +1512,8 @@ FL["grid"] = (function () {//name space FL.grid
             saveTablePromise.fail(function (err) {
                 alert("FLGrid2.js --> insertDefaultGridMenu FAILURE !!! err=" + err);
             });
-        },
+        }
+        ,
         storeCurrentCSVToServerAndInsertMenu: function (entityName, insertMenu) { //(entityName,plural) Adds a menu with title <plural> and content displayDefaultGrid(<singular>)
             // entityName- Name of entity that will be stored
             // insertMenu - true=> create new menu false=>no menu will be created
@@ -1337,7 +1556,8 @@ FL["grid"] = (function () {//name space FL.grid
             //--------------------- old code
             var singularToUseInMenu = entityName.replace(/ /g, "_");
             return def.promise();
-        },
+        }
+        ,
         updateCurrentCSVToServer: function (entityName) { //update all records of entityName Table existing in dictionary
             // entityName- Name of entity that will be stored
             // if entityName has spaces, they will be changed by "_"
@@ -1378,7 +1598,8 @@ FL["grid"] = (function () {//name space FL.grid
                 return def.reject("FL.grid.updateCurrentCSVToServer --> " + entityName + " does not exist in Local Dictionary !");
             }
             return def.promise();
-        },
+        }
+        ,
         csvToGrid: function (csvFile) {//input is a JQuery object (a file representation). Ex var csvFile = $('input[type=file]');
             csvFile.parse({//http://papaparse.com/
                 config: {
@@ -1460,7 +1681,8 @@ FL["grid"] = (function () {//name space FL.grid
                     // utils.mountGridInCsvStore(columnsArr2);//mount backbone views and operates grid - columnsArr must be prepared to backGrid
                 }
             });
-        },
+        }
+        ,
         removeLastRowIfIncomplete: function (data) {
             //by some unknown reason papaparse may leave a last row incomplete....
             //to prevent the existence of an incomplete last line. We will check if last line has the rigth number of columns if not we remove it
@@ -1470,7 +1692,8 @@ FL["grid"] = (function () {//name space FL.grid
             var lastLineCols = ( _.values(lastLineObj) ).length;
             if (lastLineCols != totColsPerRow)
                 data.data.splice(lastRowIndex, 1);
-        },
+        }
+        ,
         csvToGrid2: function (csvFile, delimiter, encoding, entityName) {//input is a file object obtained from DOM	//http://papaparse.com/
             //csvFile - file to load file from local computer
             //delimiter - eventual delimiter to use instead of auto delimiter. This is decided by onchange="FL.grid.validateCSV(this.files)"
@@ -1504,28 +1727,36 @@ FL["grid"] = (function () {//name space FL.grid
                     //  ->Store csvStore to Serverr and place menu titem to acess data from server.
 
                     thiz.removeLastRowIfIncomplete(data);//to remove eventual incomplete last line
-                    var arrOfAttributes = dataRowAnalisys(data.data, 0.5);//row analisys returning array of attributes (one element per column)
-                    // arrOfAttributes ->[attributeName1:{fieldType":"string","fieldTypeUI":"textbox","numberFormat":null, enumerable:null,label:element},attributeName2{..}]
-
-                    adjustRowsToAttributes(data.data, arrOfAttributes);//here we will adjust data.data according with the analisys feedback in arrOfColumns
-
-                    var arrOfColumns = translateToDDFormat(arrOfAttributes);//translates arrOfAttributes format to dd format
+                    //var arrOfAttributes = dataRowAnalisys(data.data, 0.5);//row analisys returning array of attributes (one element per column)
+                    var arrOfAttributes = dataRowAnalysis2(data.data, 0.5);//row analisys returning array of attributes (one element per column)
+                    adjustRowsToAttributes2(data.data, arrOfAttributes);//here we will adjust data.data according with the analisys feedback in arrOfColumns
+                    var arrOfColumns = translateToDDFormat2(arrOfAttributes);//translates arrOfAttributes format to dd format
                     // returns an array with the same format as dd dictionary array of attributes. Each element has the following format:
                     //   ex: {name:"address",description:"address to send invoices",label:"Address",type:"string",enumerable:null,key:false});
-
-                    // injectId("id",arrOfColumns); //now the first column is an "id" column
-                    injectId("#", arrOfColumns); //now the first column is an "id" column
-
+                    //injectId("#", arrOfColumns); //now the first column is an "id" column
                     csvStore.setAttributesArr(arrOfColumns);
                     FL.grid.csvToStore(data.data); //feeds the csvStore data store object. It inserts id element and converts keys to lowercase
 
-                    var columnsArr = utils.backGridColumnsFromArray(arrOfColumns);//extracts attributes from dictionary and prepares columns object for backgrid
-                    FL.common.printToConsole("columns defined..." + JSON.stringify(columnsArr));
+                    //var columnsArr = utils.backGridColumnsFromArray(arrOfColumns);//extracts attributes from dictionary and prepares columns object for backgrid
+                    var columnsArr = FL.bg.setupGridColumnsArrNoDict(arrOfColumns);//prepares columns object for backgrid
 
+                    FL.common.printToConsole("FL.grid.csvToGrid2 columns defined..." + JSON.stringify(columnsArr), "grid");
                     utils.mountGridInCsvStore(columnsArr);//mount backbone views and operates grid - columnsArr must be prepared to backGrid
+
                     // to prepare columnArr to backGrid use utils.backGridColumnsExtractedFromDictionary() or backGridColumnsFromArray()
                     // utils.mountGridInCsvStore(columnsArr2);//mount backbone views and operates grid - columnsArr must be prepared to backGrid
                     // FL.grid.storeCurrentCSVToServerAndInsertMenu(entityName);//the
+                    //
+                    //
+                    // ---new format ---- will use FL.API.openTable standard object
+                    // ------------->//dataArray format--> [{"_id":1,"d":{"53":"line 1 content of field1","54":"line 1 content of field2"},"v":0},...]
+                    //var gridLayout = FL.bg.getGridDefaultLayout(eCN);
+                    //--> gridLayout={baseTable:"5M",format:[{fCN:"50",label:"1st Column",width:20,nestingArr:[]},{fCN:"5P",label:"2st Column",width:30,nestingArr:[]},
+                    //			{fCN:"5Q",label:"3st Column",width:10,nestingArr:[]}] }
+                    //var columnsArr = FL.bg.setupGridColumnsArr(gridLayout);
+                    // mountGridFromColumnsArr(columnsArr, eCN);
+
+
                     var promise = FL.grid.storeCurrentCSVToServerAndInsertMenu(entityName);
                     promise.done(function () {
                         FL.grid.displayDefaultGrid(entityName);
@@ -1536,7 +1767,8 @@ FL["grid"] = (function () {//name space FL.grid
                     // spinner.stop();
                 }
             });
-        },
+        }
+        ,
         displayDefaultGrid: function (entityName) { //loads entity from server and display the grid with add,del,edit grid buttons at left and newsletter if a email field exist
             //condition to execute is: FL.API.serverCallBlocked = false;
             entityName = entityName.replace(/_/g, " ");
@@ -1551,7 +1783,7 @@ FL["grid"] = (function () {//name space FL.grid
                         csvStore.setEntityName(entityName);//stores <entityName> in csvStore object
                         csvStore.store(data);//data is an array of objects [{},{},....{}] where id field is mandatory inside {}
                         var z = csvStore.csvRows;//only for debugging
-                        FL.common.printToConsole("show csvStore=" + JSON.stringify(csvStore.csvRows));
+                        FL.common.printToConsole("show csvStore=" + JSON.stringify(csvStore.csvRows), "grid");
 
                         var eCN = FL.dd.getCEntity(entityName);//to remove later when we change entityName by eCN
                         var gridLayout = FL.bg.getGridDefaultLayout(eCN);
@@ -1590,7 +1822,8 @@ FL["grid"] = (function () {//name space FL.grid
                 }, function (err) {
                     alert("FL.grid.displayDefaultGrid ERROR: Please try again !" + err);
                 });
-        },
+        }
+        ,
         displayDefaultGrid2: function (entityName) { //loads entity from server and display the grid with add,del,edit grid buttons at left and newsletter if a email field exist
             var def = $.Deferred();
             entityName = entityName.replace(/_/g, " ");
@@ -1650,7 +1883,8 @@ FL["grid"] = (function () {//name space FL.grid
                     return def.reject("FL.grid.displayDefaultGrid2 failure on checkServerCallBlocked() " + err);
                 });
             return def.promise();
-        },
+        }
+        ,
         sendEmailTest: function () {//sends a sample email with eMail/newsletter
             if (FL.login.emailContentTemplate) {
                 // var mailHTML = '<p>Thank you for selecting <a href="http://www.framelink.co"><strong>FrameLink version 8</strong></a> to build your backend site !</p>';
@@ -1678,11 +1912,13 @@ FL["grid"] = (function () {//name space FL.grid
                 var elem = document.getElementById('form__sendNewsletterTemplate_emailTest');
                 elem.parentNode.removeChild(elem);
             }
-        },
+        }
+        ,
         testFunc: function (x) {
             alert("FL.grid.test() -->" + x);
         }
-    };
+    }
+        ;
 })
 ();
 // });

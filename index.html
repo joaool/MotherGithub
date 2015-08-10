@@ -1,56 +1,95 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-	<meta charset="UTF-8">
-	<meta name="viewport" content="width=device-width">
-	<title>version 13.47</title>
-	<!--
-		testApigee
-	-->
-<!-- start Mixpanel --><script type="text/javascript">(function(f,b){if(!b.__SV){var a,e,i,g;window.mixpanel=b;b._i=[];b.init=function(a,e,d){function f(b,h){var a=h.split(".");2==a.length&&(b=b[a[0]],h=a[1]);b[h]=function(){b.push([h].concat(Array.prototype.slice.call(arguments,0)))}}var c=b;"undefined"!==typeof d?c=b[d]=[]:d="mixpanel";c.people=c.people||[];c.toString=function(b){var a="mixpanel";"mixpanel"!==d&&(a+="."+d);b||(a+=" (stub)");return a};c.people.toString=function(){return c.toString(1)+".people (stub)"};i="disable track track_pageview track_links track_forms register register_once alias unregister identify name_tag set_config people.set people.set_once people.increment people.append people.track_charge people.clear_charges people.delete_user".split(" ");
-for(g=0;g<i.length;g++)f(c,i[g]);b._i.push([a,e,d])};b.__SV=1.2;a=f.createElement("script");a.type="text/javascript";a.async=!0;a.src="//cdn.mxpnl.com/libs/mixpanel-2.2.min.js";e=f.getElementsByTagName("script")[0];e.parentNode.insertBefore(a,e)}})(document,window.mixpanel||[]);
-mixpanel.init("19ada1cb259cc3272c67085eb1bf03fc");</script><!-- end Mixpanel -->	
-<!-- 	<meta charset="utf-8" /> 
-    <meta http-equiv="X-UA-Compatible" content="IE=edge, chrome=1" /> 
-    <meta name="apple-mobile-web-app-capable" content="yes" /> 
-    <meta name="apple-mobile-web-app-status-bar-style" content="black" /> 
-    <meta name="format-detection" content="telephone=no"/> 
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /> 
-    <meta name="fragment" content="!"> 
-    <link href='http://fonts.googleapis.com/css?family=Open+Sans:300,400' rel='stylesheet' type='text/css'> 	 -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width">
+    <title>version 13.52</title>
+    <!--
+        testApigee
+    -->
+    <!-- start Mixpanel -->
+    <script type="text/javascript">(function (f, b) {
+        if (!b.__SV) {
+            var a, e, i, g;
+            window.mixpanel = b;
+            b._i = [];
+            b.init = function (a, e, d) {
+                function f(b, h) {
+                    var a = h.split(".");
+                    2 == a.length && (b = b[a[0]], h = a[1]);
+                    b[h] = function () {
+                        b.push([h].concat(Array.prototype.slice.call(arguments, 0)))
+                    }
+                }
 
-	<!-- <script src="http://code.jquery.com/jquery-latest.min.js" type="text/javascript"></script> -->
-	<!-- <link rel="shortcut icon" href="FL_ui/img/favicon.ico" /> -->
-	<link rel="shortcut icon" href="FL_ui/img/favicon.ico" />
-	<!-- <link rel="icon" href="FL_ui/img/favicon.ico" type="image/x-icon" /> -->
-	<script src="FL_ui/js/jquery-1.11.1.js" type="text/javascript"></script>
+                var c = b;
+                "undefined" !== typeof d ? c = b[d] = [] : d = "mixpanel";
+                c.people = c.people || [];
+                c.toString = function (b) {
+                    var a = "mixpanel";
+                    "mixpanel" !== d && (a += "." + d);
+                    b || (a += " (stub)");
+                    return a
+                };
+                c.people.toString = function () {
+                    return c.toString(1) + ".people (stub)"
+                };
+                i = "disable track track_pageview track_links track_forms register register_once alias unregister identify name_tag set_config people.set people.set_once people.increment people.append people.track_charge people.clear_charges people.delete_user".split(" ");
+                for (g = 0; g < i.length; g++)f(c, i[g]);
+                b._i.push([a, e, d])
+            };
+            b.__SV = 1.2;
+            a = f.createElement("script");
+            a.type = "text/javascript";
+            a.async = !0;
+            a.src = "//cdn.mxpnl.com/libs/mixpanel-2.2.min.js";
+            e = f.getElementsByTagName("script")[0];
+            e.parentNode.insertBefore(a, e)
+        }
+    })(document, window.mixpanel || []);
+    mixpanel.init("19ada1cb259cc3272c67085eb1bf03fc");</script>
+    <!-- end Mixpanel -->
+    <!-- 	<meta charset="utf-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge, chrome=1" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+        <meta name="format-detection" content="telephone=no"/>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta name="fragment" content="!">
+        <link href='http://fonts.googleapis.com/css?family=Open+Sans:300,400' rel='stylesheet' type='text/css'> 	 -->
+
+    <!-- <script src="http://code.jquery.com/jquery-latest.min.js" type="text/javascript"></script> -->
+    <!-- <link rel="shortcut icon" href="FL_ui/img/favicon.ico" /> -->
+    <link rel="shortcut icon" href="FL_ui/img/favicon.ico"/>
+    <!-- <link rel="icon" href="FL_ui/img/favicon.ico" type="image/x-icon" /> -->
+    <script src="FL_ui/js/jquery-1.11.1.js" type="text/javascript"></script>
     <script>
-    window.ParsleyConfig = {
-        classHandler: function ( elem, isRadioOrCheckbox ) {
-          // specify where parsley error-success classes are set
-          return $(elem).parents(".form-group");
-        },
-        errorsWrapper: '<span class="parsley-help-block"></span>',
-        errorTemplate: '<span></span>' 
-       };
+        window.ParsleyConfig = {
+            classHandler: function (elem, isRadioOrCheckbox) {
+                // specify where parsley error-success classes are set
+                return $(elem).parents(".form-group");
+            },
+            errorsWrapper: '<span class="parsley-help-block"></span>',
+            errorTemplate: '<span></span>'
+        };
     </script>
     <script src="FL_ui/js/parsley.js"></script>
-	<script type="text/javascript">
-	window.ParsleyValidator
-	  .addValidator('entityDuplicate', function (value) {
-	  	return !FL.dd.isEntityInLocalDictionary(value);
-	  }, 32)
-	  .addValidator('entityDuplicateExceptDefault', function (value,inputId) {
-	  	// var defaultValue = $("#_dictEditEntityTemplate_entityName")[0].defaultValue;
-	  	var defaultValue = $("#"+inputId)[0].defaultValue;
-	  	if(value != defaultValue){
-	  		return !FL.dd.isEntityInLocalDictionary(value);
-	  	}else{
-	  		return true;
-	  	}	
-	  }, 32)
-	</script>
-    <link type="text/css" rel="stylesheet" href="FL_ui/css/parsley.css" />
+    <script type="text/javascript">
+        window.ParsleyValidator
+                .addValidator('entityDuplicate', function (value) {
+                    return !FL.dd.isEntityInLocalDictionary(value);
+                }, 32)
+                .addValidator('entityDuplicateExceptDefault', function (value, inputId) {
+                    // var defaultValue = $("#_dictEditEntityTemplate_entityName")[0].defaultValue;
+                    var defaultValue = $("#" + inputId)[0].defaultValue;
+                    if (value != defaultValue) {
+                        return !FL.dd.isEntityInLocalDictionary(value);
+                    } else {
+                        return true;
+                    }
+                }, 32)
+    </script>
+    <link type="text/css" rel="stylesheet" href="FL_ui/css/parsley.css"/>
 
     <!-- http://www.particletree.com/features/dynamic-resolution-dependent-layouts/ and dynamiclayout.js"
  	<link rel="stylesheet" type="text/css" href="FL_ui/css/FLreadable.css" title="default"/>
@@ -59,8 +98,8 @@ mixpanel.init("19ada1cb259cc3272c67085eb1bf03fc");</script><!-- end Mixpanel -->
 	<link rel="alternate stylesheet" type="text/css" href="FL_ui/css/FLspacelab.css" title="wider"/>
 	-->
 
-	<!-- next line is necessary because jquery.slidePanel.js needs $.browser has been removed from JQuery 1.9. -->
-	<!-- // <script src="http://code.jquery.com/jquery-migrate-1.0.0.js" type="text/javascript"></script>  -->
+    <!-- next line is necessary because jquery.slidePanel.js needs $.browser has been removed from JQuery 1.9. -->
+    <!-- // <script src="http://code.jquery.com/jquery-migrate-1.0.0.js" type="text/javascript"></script>  -->
     <!-- <link href="FL_ui/css/bootstrap.min.css" rel="stylesheet" type="text/css" /> -->
     <!-- <script src="FL_ui/js/bootstrap.min.js"></script> -->
 
@@ -70,42 +109,42 @@ mixpanel.init("19ada1cb259cc3272c67085eb1bf03fc");</script><!-- end Mixpanel -->
     <script type="text/javascript" src="FL_ui/js/tests/vendor/jquery.smartmenus.bootstrap.js"></script>
     <!-- <link type="text/css" rel="stylesheet" href="FL_ui/css/flat-ui.css" />	-->
 
-    <link href="FL_ui/css/bootstrap-dialog.css" rel="stylesheet" type="text/css" />
+    <link href="FL_ui/css/bootstrap-dialog.css" rel="stylesheet" type="text/css"/>
     <script src="FL_ui/js/bootstrap-dialog.js"></script>
-    
+
     <link rel="stylesheet" href="FL_ui/css/jquery-ui-1.10.4.custom.min.css"/>
-	<link href="FL_ui/css/jquery-ui-timepicker.css" rel="stylesheet" type="text/css" />
-	<!--<link rel="stylesheet" href="FL_ui/css/intlTelInput.css" />-->
+    <link href="FL_ui/css/jquery-ui-timepicker.css" rel="stylesheet" type="text/css"/>
+    <!--<link rel="stylesheet" href="FL_ui/css/intlTelInput.css" />-->
 
-	<link href="FL_ui/css/backgrid.css" rel="stylesheet">    
-	<link href="FL_ui/css/backgrid-paginator.css" rel="stylesheet">    
-	<link href="FL_ui/css/backgrid-select-all.min.css" rel="stylesheet">    
-	<link href="FL_ui/css/backgrid-filter.min.css" rel="stylesheet">
-	<link href="FL_ui/css/backgrid-text-cell.css" rel="stylesheet">
+    <link href="FL_ui/css/backgrid.css" rel="stylesheet">
+    <link href="FL_ui/css/backgrid-paginator.css" rel="stylesheet">
+    <link href="FL_ui/css/backgrid-select-all.min.css" rel="stylesheet">
+    <link href="FL_ui/css/backgrid-filter.min.css" rel="stylesheet">
+    <link href="FL_ui/css/backgrid-text-cell.css" rel="stylesheet">
 
 
-	
-	<!--  awesomplete CSS -->
-	<link rel="stylesheet" href="https://leaverou.github.io/prism/themes/prism.css" />
-	<link rel="stylesheet" href="FL_ui/css/awesomplete.css" />
-	<!--<link rel="stylesheet" href="FL_ui/css/style.css" />-->
+    <!--  awesomplete CSS -->
+    <link rel="stylesheet" href="https://leaverou.github.io/prism/themes/prism.css"/>
+    <link rel="stylesheet" href="FL_ui/css/awesomplete.css"/>
+    <!--<link rel="stylesheet" href="FL_ui/css/style.css" />-->
 
-	<script src="FL_ui/js/spin.min.js"></script>
-	<script src="FL_ui/js/FLMenu2.js"></script>
-	<!--<script src="FL_ui/js/FLLoadCss2.js"></script>-->
-	<script src="FL_ui/js/FLCommon2.js"></script>
-	<script src="FL_ui/js/FLlogin2.js"></script>
-	<script src="FL_ui/js/FLGrid2.js"></script>
-	<script src="FL_ui/js/FLServices2.js"></script>
+    <script src="FL_ui/js/spin.min.js"></script>
+    <script src="FL_ui/js/FLMenu2.js"></script>
+    <!--<script src="FL_ui/js/FLLoadCss2.js"></script>-->
+    <script src="FL_ui/js/FLCommon2.js"></script>
+    <script src="FL_ui/js/FLmodal2.js"></script>
+    <script src="FL_ui/js/FLlogin2.js"></script>
+    <script src="FL_ui/js/FLGrid2.js"></script>
+    <script src="FL_ui/js/FLServices2.js"></script>
 
-   	<!-- <link href="FL_ui/css/FLcosmos.css" rel="stylesheet"> -->
-   	<link href="FL_ui/css/FLreadable.css" rel="stylesheet">
-   	<!-- <link href="FL_ui/css/FLred.css" rel="stylesheet"> -->
-  	<!-- <link href="FL_ui/css/FLcerulean.css" rel="stylesheet"> -->
-   	<!-- <link href="FL_ui/css/FLspacelab.css" rel="stylesheet"> -->
+    <!-- <link href="FL_ui/css/FLcosmos.css" rel="stylesheet"> -->
+    <link href="FL_ui/css/FLreadable.css" rel="stylesheet">
+    <!-- <link href="FL_ui/css/FLred.css" rel="stylesheet"> -->
+    <!-- <link href="FL_ui/css/FLcerulean.css" rel="stylesheet"> -->
+    <!-- <link href="FL_ui/css/FLspacelab.css" rel="stylesheet"> -->
 
     <link href="FL_ui/css/bootstrap-editable.css" rel="stylesheet">
-	<script src="FL_ui/js/bootstrap-editable.js"></script>
+    <script src="FL_ui/js/bootstrap-editable.js"></script>
     <!--
     <script src="http://code.jquery.com/jquery-2.0.3.min.js"></script> 
  	-->
@@ -113,33 +152,33 @@ mixpanel.init("19ada1cb259cc3272c67085eb1bf03fc");</script><!-- end Mixpanel -->
     <link href="FL_ui/css/jquery.smartmenus.bootstrap.css" rel="stylesheet">
     <script type="text/javascript" src="FL_ui/js/FLjquery.slidePanel.js"></script>
     <link rel="stylesheet" href="FL_ui/css/font-awesome.min.css">
-    
-	<!-- <script src="FL_ui/js/underscore-min.js"></script> -->
-	<script src="FL_ui/js/underscore.js"></script>
-	<!-- <script src="js/jquery-1.11.1.min.js"></script> -->
-	<!-- <script src="FL_ui/js/backbone-min.js"></script> -->
-	<script src="FL_ui/js/backbone.js"></script>
 
-	<script src="FL_ui/js/jquery-ui-1.10.4.js"></script>
+    <!-- <script src="FL_ui/js/underscore-min.js"></script> -->
+    <script src="FL_ui/js/underscore.js"></script>
+    <!-- <script src="js/jquery-1.11.1.min.js"></script> -->
+    <!-- <script src="FL_ui/js/backbone-min.js"></script> -->
+    <script src="FL_ui/js/backbone.js"></script>
+
+    <script src="FL_ui/js/jquery-ui-1.10.4.js"></script>
     <script src="FL_ui/js/jquery-ui-timepicker.js"></script>
 
     <!-- backgrid phone widget -->
-    <script src="FL_ui/js/jquery.bind-first-0.2.3.min.js" ></script>
+    <script src="FL_ui/js/jquery.bind-first-0.2.3.min.js"></script>
     <script src="FL_ui/js/jquery.inputmask1_2_2.js"></script>
-	<script src="FL_ui/js/jquery.inputmask-multi.js"></script>
-    
+    <script src="FL_ui/js/jquery.inputmask-multi.js"></script>
+
     <!-- number and currency masks -->
     <script src="FL_ui/js/accounting.min.js"></script>
     <script src="FL_ui/js/jquery.mask.min.js"></script>
 
-	<!-- <script src="js/bootstrap.min.js"></script> -->
-	<!-- necessary for backgrid  -->
-	<script src="FL_ui/js/backbone.paginator.js"></script>
-	<script src="FL_ui/js/backgrid.js"></script>
-	<script src="FL_ui/js/backgrid-paginator.js"></script>
-	<script src="FL_ui/js/backgrid-select-all.min.js"></script>
-	<script src="FL_ui/js/backgrid-filter.min.js"></script>
-	<script src="FL_ui/js/backgrid-text-cell.js"></script>
+    <!-- <script src="js/bootstrap.min.js"></script> -->
+    <!-- necessary for backgrid  -->
+    <script src="FL_ui/js/backbone.paginator.js"></script>
+    <script src="FL_ui/js/backgrid.js"></script>
+    <script src="FL_ui/js/backgrid-paginator.js"></script>
+    <script src="FL_ui/js/backgrid-select-all.min.js"></script>
+    <script src="FL_ui/js/backgrid-filter.min.js"></script>
+    <script src="FL_ui/js/backgrid-text-cell.js"></script>
 
     <!--  searchbox awesomplete  -->
     <!--<script src="FL_ui/js/awesomplete.js"></script>-->
@@ -147,366 +186,417 @@ mixpanel.init("19ada1cb259cc3272c67085eb1bf03fc");</script><!-- end Mixpanel -->
     <!--<script type='text/javascript' src='FL_ui/js/autocomplete-cell.js'></script>-->
     <script type='text/javascript' src='FL_ui/js/mockjax.js'></script>
 
-	<script src="FL_ui/js/moment.js"></script>
-	<script src="FL_ui/js/backgrid-moment-cell.js"></script>
-	<!--<script src="FL_ui/js/bootstrap-datetimepicker.js"></script>-->
+    <script src="FL_ui/js/moment.js"></script>
+    <script src="FL_ui/js/backgrid-moment-cell.js"></script>
+    <!--<script src="FL_ui/js/bootstrap-datetimepicker.js"></script>-->
 
-	<!-- <link rel="stylesheet" href="//code.jquery.com/ui/1.11.3/themes/smoothness/jquery-ui.css"> -->
+    <!-- <link rel="stylesheet" href="//code.jquery.com/ui/1.11.3/themes/smoothness/jquery-ui.css"> -->
 
 
+    <script src="FL_ui/js/jquery.parse.min.js"></script>
+    <!-- to load csv reader http://papaparse.com/  -->
+    <script src="FL_ui/js/papaparse.min.js"></script>
+    <!-- to load csv reader http://papaparse.com/  -->
 
-	<script src="FL_ui/js/jquery.parse.min.js"></script> <!-- to load csv reader http://papaparse.com/  -->
-	<script src="FL_ui/js/papaparse.min.js"></script> <!-- to load csv reader http://papaparse.com/  -->
+    <script src="FL_ui/js/utils2.js"></script>
+    <script src="FL_ui/js/FLdd2.js"></script>
+    <script src="FL_ui/js/FLemailServices2.js"></script>
+    <script src="FL_ui/js/FLmenulinks2.js"></script>
+    <script src="FL_ui/js/FLSlidePanels.js"></script>
+    <!-- TO BE REMOVED SOON -->
+    <script src="FL_ui/js/memoryCsv.js"></script>
+    <script src="FL_ui/js/bootstrap-filestyle.js"></script>
+    <!--<script src="FL_ui/js/bootstrap-select.min.js"> </script> -->
+    <!-- <script src="FL_ui/js/async.js"> </script> -->
+    <script src="FL_ui/js/mandrill.js"></script>
+    <script src="FL_ui/flClient/flClient.js"></script>
+    <script src="FL_ui/flClient/ajaxBrowser.js"></script>
+    <script src="FL_ui/js/FLServer.js"></script>
+    <!-- TO BE REMOVED SOON has offline TBR-->
+    <!--<script src="FL_ui/js/phoneparser.js"></script>-->
 
-	<script src="FL_ui/js/utils2.js"></script>            
-	<script src="FL_ui/js/FLdd2.js"></script> 
-	<script src="FL_ui/js/FLemailServices2.js"></script>
-	<script src="FL_ui/js/FLmenulinks2.js"></script>            
-	<script src="FL_ui/js/FLSlidePanels.js"></script> <!-- TO BE REMOVED SOON -->           
-	<script src="FL_ui/js/memoryCsv.js"></script>  
-	<script src="FL_ui/js/bootstrap-filestyle.js"> </script> 
-	<!--<script src="FL_ui/js/bootstrap-select.min.js"> </script> -->
-	<!-- <script src="FL_ui/js/async.js"> </script> -->
-	<script src="FL_ui/js/mandrill.js"> </script> 	
-	<script src="FL_ui/flClient/flClient.js"></script>
-	<script src="FL_ui/flClient/ajaxBrowser.js"></script>
-	<script src="FL_ui/js/FLServer.js"></script> <!-- TO BE REMOVED SOON has offline TBR-->  
-	<!--<script src="FL_ui/js/phoneparser.js"></script>-->
+    <script src="FL_ui/js/FLAPI.js"></script>
+    <script src="FL_ui/js/FLbackgrid2.js"></script>
+    <!--<script  src="https://www.google.com/jsapi" type="text/javascript"></script>-->
 
-	<script src="FL_ui/js/FLAPI.js"></script>
-	<script src="FL_ui/js/FLbackgrid2.js"></script>
-	<!--<script  src="https://www.google.com/jsapi" type="text/javascript"></script>-->
+    <!-- <script src="FL_ui/js/objectid.js"></script> -->
 
-	<!-- <script src="FL_ui/js/objectid.js"></script> -->
-
-    <script type="text/javascript" src="https://js.stripe.com/v2/"></script> 
+    <script type="text/javascript" src="https://js.stripe.com/v2/"></script>
     <!--<script type="text/javascript" src="https://widget.cloudinary.com/global/all.js"></script>-->
-	<!--
-	<script src='FL_ui/js/jquery.ui.widget.js' type='text/javascript'></script>
-	<script src='FL_ui/js/jquery.iframe-transport.js' type='text/javascript'></script>
-	<script src='FL_ui/js/jquery.fileupload.js' type='text/javascript'></script>
-	<script src='FL_ui/js/jquery.cloudinary.js' type='text/javascript'></script>
-	<script src="https://rawgit.com/enyo/dropzone/master/dist/dropzone.js"></script>
-	-->
-	<script src='FL_ui/js/dropzone.js'></script>
-	<link rel="stylesheet" href="https://rawgit.com/enyo/dropzone/master/dist/dropzone.css">
-</script>
-
+    <!--
+    <script src='FL_ui/js/jquery.ui.widget.js' type='text/javascript'></script>
+    <script src='FL_ui/js/jquery.iframe-transport.js' type='text/javascript'></script>
+    <script src='FL_ui/js/jquery.fileupload.js' type='text/javascript'></script>
+    <script src='FL_ui/js/jquery.cloudinary.js' type='text/javascript'></script>
+    <script src="https://rawgit.com/enyo/dropzone/master/dist/dropzone.js"></script>
+    -->
+    <script src='FL_ui/js/dropzone.js'></script>
+    <link rel="stylesheet" href="https://rawgit.com/enyo/dropzone/master/dist/dropzone.css">
     <script type="text/javascript" src="//api.filepicker.io/v1/filepicker.js"></script>
     <!-- <script src="FL_ui/js/dynamiclayout.js" type="text/javascript"></script> -->
-	<!-- <script src="js/main3.js"></script> --> 
+    <!-- <script src="js/main3.js"></script> -->
 
     <!--
-	-->  	
+	-->
 </head>
 <style>
-	img {
-	    max-width: 100%;
-	}
-	.modal-header-success {
-	    color:#fff;
-	    padding:9px 15px;
-	    border-bottom:1px solid #eee;
-	    background-color: #5cb85c;
-	    -webkit-border-top-left-radius: 5px;
-	    -webkit-border-top-right-radius: 5px;
-	    -moz-border-radius-topleft: 5px;
-	    -moz-border-radius-topright: 5px;
-	     border-top-left-radius: 5px;
-	     border-top-right-radius: 5px;
-	}
-	.modal-header-warning {
-	    color:#fff;
-	    padding:9px 15px;
-	    border-bottom:1px solid #eee;
-	    background-color: #f0ad4e;
-	    -webkit-border-top-left-radius: 5px;
-	    -webkit-border-top-right-radius: 5px;
-	    -moz-border-radius-topleft: 5px;
-	    -moz-border-radius-topright: 5px;
-	     border-top-left-radius: 5px;
-	     border-top-right-radius: 5px;
-	}
-	.modal-header-danger {
-	    color:#fff;
-	    padding:9px 15px;
-	    border-bottom:1px solid #eee;
-	    background-color: #d9534f;
-	    -webkit-border-top-left-radius: 5px;
-	    -webkit-border-top-right-radius: 5px;
-	    -moz-border-radius-topleft: 5px;
-	    -moz-border-radius-topright: 5px;
-	     border-top-left-radius: 5px;
-	     border-top-right-radius: 5px;
-	}
-	.modal-header-info {
-	    color:#fff;
-	    padding:9px 15px;
-	    border-bottom:1px solid #eee;
-	    background-color: #5bc0de;
-	    -webkit-border-top-left-radius: 5px;
-	    -webkit-border-top-right-radius: 5px;
-	    -moz-border-radius-topleft: 5px;
-	    -moz-border-radius-topright: 5px;
-	     border-top-left-radius: 5px;
-	     border-top-right-radius: 5px;
-	}
-	.modal-header-primary {
-	    color:#fff;
-	    padding:9px 15px;
-	    border-bottom:1px solid #eee;
-	    background-color: #428bca;
-	    -webkit-border-top-left-radius: 5px;
-	    -webkit-border-top-right-radius: 5px;
-	    -moz-border-radius-topleft: 5px;
-	    -moz-border-radius-topright: 5px;
-	     border-top-left-radius: 5px;
-	     border-top-right-radius: 5px;
-	}
-	/* Social proof buttons from GitHub & Twitter for internal pages*/
-	.bs-docs-social {
-	  padding: 15px 0;
-	  text-align: center;
-	  background-color: #f5f5f5;
-	  border-top: 1px solid #fff;
-	  border-bottom: 1px solid #ddd;
-	}
-	.bs-docs-social-buttons {
-	  margin-left: 0;
-	  margin-bottom: 0;
-	  padding-left: 0;
-	  list-style: none;
-	}	
-	/*Marketing css to be used by internal pages*/
-	.marketing {
-	  text-align: center;
-	  color: #5a5a5a;
-	}
-	.marketing h1 {
-	  margin: 60px 0 10px;
-	  font-size: 60px;
-	  font-weight: 200;
-	  line-height: 1;
-	  letter-spacing: -1px;
-	}
-	.marketing h2 {
-	  font-weight: 200;
-	  margin-bottom: 5px;
-	}
-	.marketing p {
-	  font-size: 16px;
-	  line-height: 1.5;
-	}
-	.marketing .col-md-4 {/*the background for 3 columns division*/
-		background-color: #ffffff;
-	}	
-	.marketing .marketing-byline {
-	  margin-bottom: 40px;
-	  font-size: 20px;
-	  font-weight: 300;
-	  line-height: 1.25;
-	  color: #999;
-	}
-	.marketing-img {
-	  display: block;
-	  margin: 0 auto 30px;
-	  max-height: 145px;
-	}
-	/* Footer 	-------------------------------------------------- */	
-	.footer {
-	  text-align: center;
-	  padding: 30px 0;
-	  margin-top: 70px;
-	  border-top: 1px solid #e5e5e5;
-	  background-color: #f5f5f5;  
-	}
-	.footer p {
-	  margin-bottom: 0;
-	  color: #777;
-	}
-	.footer-links {
-	  margin: 10px 0;
-	}
-	.footer-links li {
-	  display: inline;
-	  padding: 0 2px;
-	}
-	.footer-links li:first-child {
-	  padding-left: 0;
-	}
-	body {
-		overflow-x:hidden;
-	}
-	.navbar-default{
-	    line-height: 150px;
-	    margin-left:0%;
-	    /*margin-right:1.0em;*/
-	    /*width:95%;*/
-	    height: auto;
-	    padding-top: 0;
-	}	
-	.navbar-brand{
-	    line-height: 150px;
-	    height: 150px;
-	    padding-top: 0;
-	}
-	.navbar-nav li {
-	    /*line-height: 30px;*/
-	    /*height: 30px;*/
-	    /*margin-left: 100px;*/
-	}
-	.navbar-nav li a {
-	    /*line-height: 30px;*/
-	    /*height: 30px;*/
-	    /*padding-top: 10px;*/
-	}
-    /* CSS for slidePanel */
-	a:focus {
-	outline: none;
-	}
-	a.trigger{
-		position: absolute;
-		background:#bccbe3 url(FL_ui/sidepanel/plus.png) 5px no-repeat; /*#88bbd4 the tabs background */
-		text-decoration: none;
-		font-size: 10px;
-		letter-spacing:-1px;
-		font-family: verdana, helvetica, arial, sans-serif;
-		color:#fff;
-		padding:4px 4px 4px 24px;
-		font-weight: bold;
-		
-		z-index:2;
-	}
-	a.trigger.left {
-		left: 0;
-		border-top-right-radius: 5px;
-		-moz-border-radius-topright: 5px;
-		-webkit-border-top-right-radius: 5px;
-		-moz-border-radius-bottomright: 5px;
-		-webkit-border-bottom-right-radius: 5px;
-		border-bottom-right-radius: 5px;
-	}
-	a.trigger.right {
-		right: 0;
-		border-bottom-left-radius: 5px;
-		border-top-left-radius: 5px;
-		-moz-border-radius-bottomleft: 5px;
-		-moz-border-radius-topleft: 5px;
-		-webkit-border-bottom-left-radius: 5px;
-		-webkit-border-top-left-radius: 5px;
-	}
-	a.trigger:hover {
-		background-color:#59B;
-	}
-	a.active.trigger {
-		background:#666 url(FL_ui/sidepanel/minus.png) 6% 55% no-repeat;
-	}
-	.slide_panel {
-		position: absolute;
-		top: 50px;
-		left: 30px;
-		display: none;
-		background-color: #000000; /*#000000*/
-		color: white;
-		border:1px solid transparent;  /*#111111*/
-		-moz-border-radius-topright: 20px;
-		-webkit-border-top-right-radius: 20px;
-		-moz-border-radius-bottomright: 20px;
-		-webkit-border-bottom-right-radius: 20px;
-		width: 420px;/* <----------------------------------------------------------------------------*/
-		height: auto;
-		padding: 30px 30px 30px 130px;
-		filter: alpha(opacity=55);
-		opacity: .55;
-	}
-	.slide_panel.left {
-		left: 60px;
-		padding: 20px 30px 20px 100px;
-		border-top-right-radius: 15px;
-		border-top-left-radius: 15px;
-		-moz-border-radius-topright: 15px;
-		-webkit-border-top-right-radius: 15px;
-		-moz-border-radius-bottomright: 15px;
-		-webkit-border-bottom-right-radius: 15px;
-		border-bottom-right-radius: 15px;
-		border-bottom-left-radius: 15px;
-	}
-	.slide_panel.right {
-		right: 0;
-		padding: 20px 100px 20px 30px;
-		border-bottom-left-radius: 15px;
-		border-top-left-radius: 15px;
-		-moz-border-radius-bottomleft: 15px;
-		-moz-border-radius-topleft: 15px;
-		-webkit-border-bottom-left-radius: 15px;
-		-webkit-border-top-left-radius: 15px;
-	}
-	.slide_panel p {
-		font-size:12px;
-	} 
-	.columns{
-		clear: both;
-		width: 300px;
-		padding: 0 0 20px 0;
-		line-height: 22px;
-	}
-	.colleft{
-		float: left;
-		width: 130px;
-		line-height: 22px;
-	}
-	.colright{
-		float: right;
-		width: 150px;
-		line-height: 22px;
-	}
-	.dropGroup{
-		/*right: 0;*/
-		color:white;
-		/*width:580px;*/
-		margin-left:-1px;
-	}
-/*	.backgrid th {
-	  background-image: linear-gradient(#2F2727, #1a82f7);
-	}	*/
-	/* Or maybe you enjoy zebra stripes */
-	.backgrid tbody tr:nth-child(even) {
-	  background-color: #F3F3F3;/*#f9f9f9;*/
-	}
-	.backgrid .backgridDelColumn {/* FrameLink specific defined in utils.backGridColumnsFromArray() */
-	  /*background-color: #D6F5F5;*/
-	  width:50px;
-	}
-	div ximg {/* FrameLink specific to adjust logo size line 638*/
-	  max-height: 218px;
-	  width:auto;
-	}
-    .spinner {
-      position: fixed;
-      top: 50%;
-      left: 50%;
+    img {
+        max-width: 100%;
     }
-	#drop_zone {
-	    width: 50%;
-	    border: 2px dashed #BBB;
-	    border-radius: 5px;
-	    padding: 25px;
-	    text-align: center;
-	    color: #F00;
-	}
-	.removeAllImages {
-	    cursor:pointer;
-	}
-	.ui-datepicker{ 
-		font-size: 80%;
-		background:#DADADA;
- 		border: 1px solid black;/*general border */
-    	color: black;	/* weekdays color*/
- 	}
-	.ui-datepicker-header{
-	    background: black;
- 		border: 1px solid black;/*border around header*/
-	}
+
+    .modal-header-success {
+        color: #fff;
+        padding: 9px 15px;
+        border-bottom: 1px solid #eee;
+        background-color: #5cb85c;
+        -webkit-border-top-left-radius: 5px;
+        -webkit-border-top-right-radius: 5px;
+        -moz-border-radius-topleft: 5px;
+        -moz-border-radius-topright: 5px;
+        border-top-left-radius: 5px;
+        border-top-right-radius: 5px;
+    }
+
+    .modal-header-warning {
+        color: #fff;
+        padding: 9px 15px;
+        border-bottom: 1px solid #eee;
+        background-color: #f0ad4e;
+        -webkit-border-top-left-radius: 5px;
+        -webkit-border-top-right-radius: 5px;
+        -moz-border-radius-topleft: 5px;
+        -moz-border-radius-topright: 5px;
+        border-top-left-radius: 5px;
+        border-top-right-radius: 5px;
+    }
+
+    .modal-header-danger {
+        color: #fff;
+        padding: 9px 15px;
+        border-bottom: 1px solid #eee;
+        background-color: #d9534f;
+        -webkit-border-top-left-radius: 5px;
+        -webkit-border-top-right-radius: 5px;
+        -moz-border-radius-topleft: 5px;
+        -moz-border-radius-topright: 5px;
+        border-top-left-radius: 5px;
+        border-top-right-radius: 5px;
+    }
+
+    .modal-header-info {
+        color: #fff;
+        padding: 9px 15px;
+        border-bottom: 1px solid #eee;
+        background-color: #5bc0de;
+        -webkit-border-top-left-radius: 5px;
+        -webkit-border-top-right-radius: 5px;
+        -moz-border-radius-topleft: 5px;
+        -moz-border-radius-topright: 5px;
+        border-top-left-radius: 5px;
+        border-top-right-radius: 5px;
+    }
+
+    .modal-header-primary {
+        color: #fff;
+        padding: 9px 15px;
+        border-bottom: 1px solid #eee;
+        background-color: #428bca;
+        -webkit-border-top-left-radius: 5px;
+        -webkit-border-top-right-radius: 5px;
+        -moz-border-radius-topleft: 5px;
+        -moz-border-radius-topright: 5px;
+        border-top-left-radius: 5px;
+        border-top-right-radius: 5px;
+    }
+
+    /* Social proof buttons from GitHub & Twitter for internal pages*/
+    .bs-docs-social {
+        padding: 15px 0;
+        text-align: center;
+        background-color: #f5f5f5;
+        border-top: 1px solid #fff;
+        border-bottom: 1px solid #ddd;
+    }
+
+    .bs-docs-social-buttons {
+        margin-left: 0;
+        margin-bottom: 0;
+        padding-left: 0;
+        list-style: none;
+    }
+
+    /*Marketing css to be used by internal pages*/
+    .marketing {
+        text-align: center;
+        color: #5a5a5a;
+    }
+
+    .marketing h1 {
+        margin: 60px 0 10px;
+        font-size: 60px;
+        font-weight: 200;
+        line-height: 1;
+        letter-spacing: -1px;
+    }
+
+    .marketing h2 {
+        font-weight: 200;
+        margin-bottom: 5px;
+    }
+
+    .marketing p {
+        font-size: 16px;
+        line-height: 1.5;
+    }
+
+    .marketing .col-md-4 {
+        /*the background for 3 columns division*/
+        background-color: #ffffff;
+    }
+
+    .marketing .marketing-byline {
+        margin-bottom: 40px;
+        font-size: 20px;
+        font-weight: 300;
+        line-height: 1.25;
+        color: #999;
+    }
+
+    .marketing-img {
+        display: block;
+        margin: 0 auto 30px;
+        max-height: 145px;
+    }
+
+    /* Footer 	-------------------------------------------------- */
+    .footer {
+        text-align: center;
+        padding: 30px 0;
+        margin-top: 70px;
+        border-top: 1px solid #e5e5e5;
+        background-color: #f5f5f5;
+    }
+
+    .footer p {
+        margin-bottom: 0;
+        color: #777;
+    }
+
+    .footer-links {
+        margin: 10px 0;
+    }
+
+    .footer-links li {
+        display: inline;
+        padding: 0 2px;
+    }
+
+    .footer-links li:first-child {
+        padding-left: 0;
+    }
+
+    body {
+        overflow-x: hidden;
+    }
+
+    .navbar-default {
+        line-height: 150px;
+        margin-left: 0%;
+        /*margin-right:1.0em;*/
+        /*width:95%;*/
+        height: auto;
+        padding-top: 0;
+    }
+
+    .navbar-brand {
+        line-height: 150px;
+        height: 150px;
+        padding-top: 0;
+    }
+
+    .navbar-nav li {
+        /*line-height: 30px;*/
+        /*height: 30px;*/
+        /*margin-left: 100px;*/
+    }
+
+    .navbar-nav li a {
+        /*line-height: 30px;*/
+        /*height: 30px;*/
+        /*padding-top: 10px;*/
+    }
+
+    /* CSS for slidePanel */
+    a:focus {
+        outline: none;
+    }
+
+    a.trigger {
+        position: absolute;
+        background: #bccbe3 url(FL_ui/sidepanel/plus.png) 5px no-repeat; /*#88bbd4 the tabs background */
+        text-decoration: none;
+        font-size: 10px;
+        letter-spacing: -1px;
+        font-family: verdana, helvetica, arial, sans-serif;
+        color: #fff;
+        padding: 4px 4px 4px 24px;
+        font-weight: bold;
+
+        z-index: 2;
+    }
+
+    a.trigger.left {
+        left: 0;
+        border-top-right-radius: 5px;
+        -moz-border-radius-topright: 5px;
+        -webkit-border-top-right-radius: 5px;
+        -moz-border-radius-bottomright: 5px;
+        -webkit-border-bottom-right-radius: 5px;
+        border-bottom-right-radius: 5px;
+    }
+
+    a.trigger.right {
+        right: 0;
+        border-bottom-left-radius: 5px;
+        border-top-left-radius: 5px;
+        -moz-border-radius-bottomleft: 5px;
+        -moz-border-radius-topleft: 5px;
+        -webkit-border-bottom-left-radius: 5px;
+        -webkit-border-top-left-radius: 5px;
+    }
+
+    a.trigger:hover {
+        background-color: #59B;
+    }
+
+    a.active.trigger {
+        background: #666 url(FL_ui/sidepanel/minus.png) 6% 55% no-repeat;
+    }
+
+    .slide_panel {
+        position: absolute;
+        top: 50px;
+        left: 30px;
+        display: none;
+        background-color: #000000; /*#000000*/
+        color: white;
+        border: 1px solid transparent; /*#111111*/
+        -moz-border-radius-topright: 20px;
+        -webkit-border-top-right-radius: 20px;
+        -moz-border-radius-bottomright: 20px;
+        -webkit-border-bottom-right-radius: 20px;
+        width: 420px; /* <----------------------------------------------------------------------------*/
+        height: auto;
+        padding: 30px 30px 30px 130px;
+        filter: alpha(opacity=55);
+        opacity: .55;
+    }
+
+    .slide_panel.left {
+        left: 60px;
+        padding: 20px 30px 20px 100px;
+        border-top-right-radius: 15px;
+        border-top-left-radius: 15px;
+        -moz-border-radius-topright: 15px;
+        -webkit-border-top-right-radius: 15px;
+        -moz-border-radius-bottomright: 15px;
+        -webkit-border-bottom-right-radius: 15px;
+        border-bottom-right-radius: 15px;
+        border-bottom-left-radius: 15px;
+    }
+
+    .slide_panel.right {
+        right: 0;
+        padding: 20px 100px 20px 30px;
+        border-bottom-left-radius: 15px;
+        border-top-left-radius: 15px;
+        -moz-border-radius-bottomleft: 15px;
+        -moz-border-radius-topleft: 15px;
+        -webkit-border-bottom-left-radius: 15px;
+        -webkit-border-top-left-radius: 15px;
+    }
+
+    .slide_panel p {
+        font-size: 12px;
+    }
+
+    .columns {
+        clear: both;
+        width: 300px;
+        padding: 0 0 20px 0;
+        line-height: 22px;
+    }
+
+    .colleft {
+        float: left;
+        width: 130px;
+        line-height: 22px;
+    }
+
+    .colright {
+        float: right;
+        width: 150px;
+        line-height: 22px;
+    }
+
+    .dropGroup {
+        /*right: 0;*/
+        color: white;
+        /*width:580px;*/
+        margin-left: -1px;
+    }
+
+    /*	.backgrid th {
+          background-image: linear-gradient(#2F2727, #1a82f7);
+        }	*/
+    /* Or maybe you enjoy zebra stripes */
+    .backgrid tbody tr:nth-child(even) {
+        background-color: #F3F3F3; /*#f9f9f9;*/
+    }
+
+    .backgrid .backgridDelColumn {
+        /* FrameLink specific defined in utils.backGridColumnsFromArray() */
+        /*background-color: #D6F5F5;*/
+        width: 50px;
+    }
+
+    div ximg {
+        /* FrameLink specific to adjust logo size line 638*/
+        max-height: 218px;
+        width: auto;
+    }
+
+    .spinner {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+    }
+
+    #drop_zone {
+        width: 50%;
+        border: 2px dashed #BBB;
+        border-radius: 5px;
+        padding: 25px;
+        text-align: center;
+        color: #F00;
+    }
+
+    .removeAllImages {
+        cursor: pointer;
+    }
+
+    .ui-datepicker {
+        font-size: 80%;
+        background: #DADADA;
+        border: 1px solid black; /*general border */
+        color: black; /* weekdays color*/
+    }
+
+    .ui-datepicker-header {
+        background: black;
+        border: 1px solid black; /*border around header*/
+    }
+
     /*
 	.datepicker thead {  
 	    background-color: #f7f7f7;  
@@ -528,646 +618,800 @@ mixpanel.init("19ada1cb259cc3272c67085eb1bf03fc");</script><!-- end Mixpanel -->
 	    filter: dropshadow(color=#fff, offx=1, offy=0);  
 	}
 	*/
-	/* 	 	
-	.datepicker prev, .datepicker next {  
-	    display: inline-block;  
-	    width: 30px;  
-	    height: 30px;  
-	    text-align: center;  
-	    cursor: pointer;  
-	    background-image: url('../img/arrow.png');  
-	    background-repeat: no-repeat;  
-	    line-height: 600%;  
-	    overflow: hidden;  
-	}
-	.datepicker prev {  
-	    float: left;  
-	    background-position: center -30px;  
-	}  
-	.datepicker next {  
-	    float: rightright;  
-	    background-position: center 0px;  
-	}  
-	*/	 		 
-/*	.backgrid .backgridId {
-	  background-color: green;
-	  width:300px;
-	}*/
-/*    .loginExample{
-    	margin-top:-100px;
-    }*/
+    /*
+    .datepicker prev, .datepicker next {
+        display: inline-block;
+        width: 30px;
+        height: 30px;
+        text-align: center;
+        cursor: pointer;
+        background-image: url('../img/arrow.png');
+        background-repeat: no-repeat;
+        line-height: 600%;
+        overflow: hidden;
+    }
+    .datepicker prev {
+        float: left;
+        background-position: center -30px;
+    }
+    .datepicker next {
+        float: rightright;
+        background-position: center 0px;
+    }
+    */
+    /*	.backgrid .backgridId {
+          background-color: green;
+          width:300px;
+        }*/
+    /*    .loginExample{
+            margin-top:-100px;
+        }*/
 
 </style>
-    <script id="_dictEditEntityTemplate" type="text/template"> 
-        <div class="dictTemplate" style="margin-top:0px;">
-            <form id="form__dictEditEntityTemplate" novalidate="novalidate">
-                <div class="row">
-                    <div class="col-xs-12" >
-                        <div class="form-group">
-                            <label class="control-label" for="_dictEditEntityTemplate_entityName">Please give a name common to every single line...</label>
-                            <div class="input-group" style="line-height:0px;">
-                                <span class="input-group-addon">Each line is a single:</span>
-                                <input type="text" class="form-control" id="_dictEditEntityTemplate_entityName" name="entityName" placeholder="Ex. client, supplier, member, partner..." value="<%= masterDetailItems.master.entityName %>" 
-                                	data-parsley-trigger="change" 
-                                	data-parsley-entityDuplicateExceptDefault = "_dictEditEntityTemplate_entityName"
-                                	data-parsley-entityDuplicateExceptDefault-message="This entity name already exists in your database !. Please choose another name or keep the current name." 
-                                	required onkeyup="FL.slidePanels.dictTemplateChangeWhatIsLabel(this.form)">
-                            </div>
-                            <label class="control-label" for="_dictEditEntityTemplate_entityDescription" id="_dictEditEntityTemplate_whatIsLabel" >What is a </label>
-                            <div class="input-group" style="line-height:0px;">
-                                <span class="input-group-addon">Description:</span>
-                             <textarea class="form-control" id="_dictEditEntityTemplate_entityDescription" name="entityDescription" onkeyup="FL.   slidePanels.dictTemplateChangeDescription(this.form)" rows="2"><%= masterDetailItems.master.entityDescription %></textarea>
-                            </div>                      
-                            <div>
-                                <h4 id="_dictEditEntityTemplate_plural"></h4>
-                            </div>
-                            <div class="table-responsive"> 
-                                <table class="table table-bordered">
-                                    <thead>
-                                        <% _.each(masterDetailItems.detailHeader, function(item,index) { %>
-                                            <th><%= item %></th> 
-                                        <% }); %>                                     
-                                    </thead>
-                                    <tbody>
-                                        <% _.each(masterDetailItems.detail, function(item,index) { %> 
-                                             <% var xId = "_dictEditEntityTemplate__f"+(index+1) %><!-- create more variables -->
-                                            <tr>
-                                                <!-- use variables -->
-                                                <td rowspan="2"><%= index+1 %></td>
-                        <td><input type="text" class="form-control" id="<%= xId %>_attribute" name="attr<%= index+1 %>" value="<%= item.attribute %>" onkeyup="FL.slidePanels.dictTemplateAttributeValidation(this.form,<%= index+1 %>)"></td>
-                        <td rowspan="2"><textarea rows="4" id="<%= xId %>_description" onkeyup="FL.slidePanels.dictTemplateAttributeValidation(this.form,<%= index+1 %>)"><%= item.description %></textarea></td>
-                                                <td rowspan="2" id="<%= xId %>_statement" ><%= item.statement %></td>
-                                             </tr>
-                                              	<td>
- 													<div class="btn-group">
-											          <a class="btn btn-default dropdown-toggle" data-toggle="dropdown" style="font-size:14px;font-weight:bold;" id="<%= xId %>_userType" href="#"> Type <span class="caret"></span></a>
-											          <ul id="<%= xId %>_userType_options" class="dropdown-menu">
-															<li><a href="#">templ1</a></li>
-															<li><a href="#">templ2</a></li>
-											          </ul>
-													</div>
-                                              	</td>
-                                        <% }); %>
-                                     </tbody>    
-                                </table>
-                            </div>
+<script id="_dictEditEntityTemplate" type="text/template">
+    <div class="dictTemplate" style="margin-top:0px;">
+        <form id="form__dictEditEntityTemplate" novalidate="novalidate">
+            <div class="row">
+                <div class="col-xs-12">
+                    <div class="form-group">
+                        <label class="control-label" for="_dictEditEntityTemplate_entityName">Please give a name common
+                            to every single line...</label>
+
+                        <div class="input-group" style="line-height:0px;">
+                            <span class="input-group-addon">Each line is a single:</span>
+                            <input type="text" class="form-control" id="_dictEditEntityTemplate_entityName"
+                                   name="entityName" placeholder="Ex. client, supplier, member, partner..."
+                                   value="<%= masterDetailItems.master.entityName %>"
+                                   data-parsley-trigger="change"
+                                   data-parsley-entityDuplicateExceptDefault="_dictEditEntityTemplate_entityName"
+                                   data-parsley-entityDuplicateExceptDefault-message="This entity name already exists in your database !. Please choose another name or keep the current name."
+                                   required onkeyup="FL.slidePanels.dictTemplateChangeWhatIsLabel(this.form)">
+                        </div>
+                        <label class="control-label" for="_dictEditEntityTemplate_entityDescription"
+                               id="_dictEditEntityTemplate_whatIsLabel">What is a </label>
+
+                        <div class="input-group" style="line-height:0px;">
+                            <span class="input-group-addon">Description:</span>
+                            <textarea class="form-control" id="_dictEditEntityTemplate_entityDescription"
+                                      name="entityDescription"
+                                      onkeyup="FL.   slidePanels.dictTemplateChangeDescription(this.form)" rows="2"><%= masterDetailItems.master.entityDescription %></textarea>
+                        </div>
+                        <div>
+                            <h4 id="_dictEditEntityTemplate_plural"></h4>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table table-bordered">
+                                <thead>
+                                <% _.each(masterDetailItems.detailHeader, function(item,index) { %>
+                                <th><%= item %></th>
+                                <% }); %>
+                                </thead>
+                                <tbody>
+                                <% _.each(masterDetailItems.detail, function(item,index) { %>
+                                <% var xId = "_dictEditEntityTemplate__f"+(index+1) %><!-- create more variables -->
+                                <tr>
+                                    <!-- use variables -->
+                                    <td rowspan="2"><%= index+1 %></td>
+                                    <td><input type="text" class="form-control" id="<%= xId %>_attribute"
+                                               name="attr<%= index+1 %>" value="<%= item.attribute %>"
+                                               onkeyup="FL.slidePanels.dictTemplateAttributeValidation(this.form,<%= index+1 %>)">
+                                    </td>
+                                    <td rowspan="2"><textarea rows="4" id="<%= xId %>_description"
+                                                              onkeyup="FL.slidePanels.dictTemplateAttributeValidation(this.form,<%= index+1 %>)"><%= item.description %></textarea>
+                                    </td>
+                                    <td rowspan="2" id="<%= xId %>_statement"><%= item.statement %></td>
+                                </tr>
+                                <td>
+                                    <div class="btn-group">
+                                        <a class="btn btn-default dropdown-toggle" data-toggle="dropdown"
+                                           style="font-size:14px;font-weight:bold;" id="<%= xId %>_userType" href="#">
+                                            Type <span class="caret"></span></a>
+                                        <ul id="<%= xId %>_userType_options" class="dropdown-menu">
+                                            <li><a href="#">templ1</a></li>
+                                            <li><a href="#">templ2</a></li>
+                                        </ul>
+                                    </div>
+                                </td>
+                                <% }); %>
+                                </tbody>
+                            </table>
                         </div>
                     </div>
                 </div>
-            </form>
+            </div>
+        </form>
+    </div>
+</script>
+<script id="loginTemplate" type="text/template">
+    <div class="loginExample" style="margin-top:0px;">
+        <form id="form_loginTemplate" novalidate="novalidate">
+            <div class="row">
+                <div class="col-xs-12">
+                    <div class="input-group" style="line-height:0px;">
+                        <input type="email" class="form-control" id="login_email" placeholder="Email Address"
+                               value="<%= masterDetailItems.master.email %>" name="email" data-parsley-trigger="change"
+                               required>
+                        <span class="input-group-addon"><span class="glyphicon glyphicon-envelope"></span></span>
+                    </div>
+                    <div class="input-group" style="line-height:0px;">
+                        <input type="password" class="form-control" id="login_password" placeholder="Password"
+                               value="<%= masterDetailItems.master.password %>" name="password"
+                               data-parsley-minlength="3" required data-parsley-trigger="change">
+                        <span class="input-group-addon"><span class="glyphicon glyphicon-lock"></span></span>
+                    </div>
+                    <!--<button type="submit" class="btn btn-primary" onclick="FL.login.register()">Sign up</button>-->
+                </div>
+            </div>
+        </form>
+    </div>
+</script>
+<script id="_getComboList" type="text/template">
+    <div class="getComboList" style="margin-top:0px;">
+        <form id="form__getComboList" novalidate="novalidate">
+            <div class="row">
+                <div class="col-xs-12">
+                    <div class="input-group" style="line-height:0px;">
+                        <input type="text" class="form-control" id="_getComboList_list"
+                               placeholder="List of values comma separated" value="<%= masterDetailItems.master.list %>"
+                               name="list" data-parsley-trigger="change" required>
+                        <span class="input-group-addon"><span class="glyphicon glyphicon-th-list"></span></span>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</script>
+<script id="getLookup" type="text/template">
+    <div class="getLookup" style="margin-top:0px;">
+        <form id="form_getLookup">
+            <legend>Please choose your lookup:</legend>
+            <div class="row">
+                <div class="col-xs-12">
+                    <div class="input-group" style="line-height:0px;">
+                        <span class="input-group-addon">Table to choose:</span>
+                        <div class="btn-group" style="width:100%">
+                            <a class="btn btn-default btn-block dropdown-toggle" data-toggle="dropdown"
+                               style="font-size:14px;font-weight:bold;margin-right:-4.0em;display:inline-block;height:100%;"
+                               id="getLookup_table" href="#"> <%= master.table %> <span
+                                    class="caret"></span></a>
+                            <ul id="getLookup_table_options" class="dropdown-menu"></ul>
+                        </div>
+                        <span class="input-group-addon"><span class="glyphicon glyphicon-th-list"></span></span>
+                    </div>
+                    <div class="input-group" style="line-height:0px;">
+                        <span class="input-group-addon">Field to choose:</span>
+                        <div class="btn-group" style="width:100%">
+                            <a class="btn btn-default btn-block dropdown-toggle" data-toggle="dropdown"
+                               style="font-size:14px;font-weight:bold;margin-right:-4.0em;display:inline-block;height:100%;"
+                               id="getLookup_field" href="#"> <%= master.field %> <span
+                                    class="caret"></span></a>
+                            <ul id="getLookup_field_options" class="dropdown-menu"></ul>
+                        </div>
+                        <span class="input-group-addon"><span class="glyphicon glyphicon-th-list"></span></span>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</script>
+<script id="_getLookupTableAndField" type="text/template">
+    <div class="getLookupTableAndField" style="margin-top:0px;">
+        <form id="form__getLookupTableAndField" novalidate="novalidate">
+            <div class="row">
+                <div class="col-xs-12">
+                    <div class="input-group" style="line-height:0px;">
+                        <input type="text" class="form-control" id="_getLookupTableAndField_special"
+                               placeholder="eCN,fCN" value="<%= masterDetailItems.master.special %>" name="list"
+                               data-parsley-trigger="change" required>
+                        <span class="input-group-addon"><span class="glyphicon glyphicon-th-list"></span></span>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</script>
+<script id="_getLookupTableAndField2" type="text/template">
+    <div class="getLookupTableAndField2" style="margin-top:0px;">
+        <form id="form__getLookupTableAndField2" novalidate="novalidate">
+            <legend>Please define your lookup:</legend>
+            <div class="row">
+                <div class="col-xs-12">
+                    <div class="input-group" style="line-height:0px;">
+                        <span class="input-group-addon">Entity for lookup:</span>
+                        <div class="btn-group" style="width:100%">
+                                <a class="btn btn-default btn-block dropdown-toggle" data-toggle="dropdown"  style="font-size:14px;font-weight:bold;margin-right:-4.0em;display:inline-block;height:100%;"
+                                   id="_getLookupTableAndField2_table" href="#"> <span class="caret"></span></a>
+                                <ul id="_getLookupTableAndField2_table_options" class="dropdown-menu"></ul>
+                        </div>
+                        <span class="input-group-addon"><span class="glyphicon glyphicon-th-list"></span></span>
+                    </div>
+                    <div class="input-group" style="line-height:0px;">
+                        <span class="input-group-addon">Field to lookup:</span>
+                        <div class="btn-group" style="width:100%">
+                            <a class="btn btn-default  btn-block dropdown-toggle" data-toggle="dropdown"
+                               id="_getLookupTableAndField2_field" href="#" onClick="FL.grid.xxxx('_getLookupTableAndField2_field_options');"> <span class="caret"></span></a>
+                            <ul id="_getLookupTableAndField2_field_options" class="dropdown-menu"></ul>
+                        </div>
+                        <span class="input-group-addon"><span class="glyphicon glyphicon-th-list"></span></span>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</script>
+<script id="getStartedTemplate" type="text/template">
+    <div class="getStartedExample" style="margin-top:0px;">
+        <form id="form_getStartedTemplate" novalidate="novalidate">
+            <legend>Sign up and press <strong>'Start now'</strong> button.</legend>
+            <div class="row">
+                <div class="col-xs-12">
+                    <div class="input-group" style="line-height:0px;">
+                        <input type="email" class="form-control" id="getStarted_email" placeholder="Your Email Address"
+                               value="<%= masterDetailItems.master.eMail %>" data-parsley-trigger="change">
+                        <span class="input-group-addon"><span class="glyphicon glyphicon-envelope"></span></span>
+                    </div>
+                    <div class="input-group" style="line-height:0px;">
+                        <input type="password" class="form-control" id="getStarted_password" placeholder="Password"
+                               value="<%= masterDetailItems.master.password %>">
+                        <span class="input-group-addon"><span class="glyphicon glyphicon-lock"></span></span>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</script>
+<script id="_createGridTemplate" type="text/template">
+    <div class="_createGridExample" style="margin-top:0px;">
+        <form id="form__createGridTemplate" novalidate="novalidate">
+            <legend>Please define the title and headers of your grid:</legend>
+            <div class="row">
+                <div class="col-xs-12">
+                    <div class="input-group" style="line-height:0px;">
+                        <span class="input-group-addon">Title:</span>
+                        <input type="text" class="form-control" id="_createGrid_entityName" placeholder="ex:Client"
+                               value="<%= masterDetailItems.master.entityName %>" data-parsley-trigger="change"
+                               data-parsley-entityDuplicate
+                               data-parsley-entityDuplicate-message="This entity name already exists in your database !. Please choose another name.">
+                        <span class="input-group-addon"><span class="glyphicon glyphicon-pencil"></span></span>
+                    </div>
+
+                    <div class="input-group" style="line-height:0px;">
+                        <span class="input-group-addon">Headers (comma separated):</span>
+                        <input type="Headers" class="form-control" id="_createGrid_header"
+                               placeholder="Example: name,address,email, phone"
+                               value="<%= masterDetailItems.master.headerString %>" data-parsley-trigger="change">
+                        <span class="input-group-addon"><span class="glyphicon glyphicon-header"></span></span>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</script>
+<script id="_editAppSettingsTemplate" type="text/template">
+    <div class="_editAppSettingsExample" style="margin-top:0px;">
+        <form id="form__editAppSettingsTemplate" novalidate="novalidate">
+            <legend>Please edit your application parameters:</legend>
+            <div class="row">
+                <div class="col-xs-12">
+                    <div class="input-group" style="line-height:0px;">
+                        <span class="input-group-addon">Press to automaticaly choose browser settings  ------->:</span>
+                        <button type="submit" class="btn btn-primary" onclick="FL.links.appSettingsForceButton()">Reset
+                            to browser settings
+                        </button>
+                    </div>
+                    <div class="input-group" style="line-height:0px;">
+                        <span class="input-group-addon">Decimal separator:</span>
+
+                        <div class="btn-group">
+                            <a class="btn btn-default dropdown-toggle" data-toggle="dropdown"
+                               id="_editAppSettings_radixpoint" href="#"> <span class="caret"></span></a>
+                            <ul id="_editAppSettings_radixpoint_options" class="dropdown-menu"></ul>
+                        </div>
+                        <span class="input-group-addon"><span class="glyphicon glyphicon-ok"></span></span>
+                    </div>
+                    <div class="input-group" style="line-height:0px;">
+                        <span class="input-group-addon">Thousands separator:</span>
+
+                        <div class="btn-group">
+                            <a class="btn btn-default dropdown-toggle" data-toggle="dropdown"
+                               id="_editAppSettings_thousandsSeparator" href="#"> <span class="caret"></span></a>
+                            <ul id="_editAppSettings_thousandsSeparator_options" class="dropdown-menu"></ul>
+                        </div>
+                        <span class="input-group-addon"><span class="glyphicon glyphicon-ok"></span></span>
+                    </div>
+                    <div class="input-group" style="line-height:0px;">
+                        <span class="input-group-addon">Default Decimals:</span>
+                        <input type="number" class="form-control" id="_editAppSettings_decimals"
+                               placeholder="ex:2 (decimals to appear after decimal separator)"
+                               value="<%= masterDetailItems.master.decimals %>" data-parsley-trigger="change">
+                        <span class="input-group-addon"><span class="glyphicon glyphicon-ok"></span></span>
+                    </div>
+                    <div class="input-group" style="line-height:0px;">
+                        <span class="input-group-addon">Date Format:</span>
+
+                        <div class="btn-group">
+                            <a class="btn btn-default dropdown-toggle" data-toggle="dropdown"
+                               id="_editAppSettings_dateformat" href="#"> <span class="caret"></span></a>
+                            <ul id="_editAppSettings_dateformat_options" class="dropdown-menu"></ul>
+                        </div>
+                        <span class="input-group-addon"><span class="glyphicon glyphicon-ok"></span></span>
+                    </div>
+                    <div class="input-group" style="line-height:0px;">
+                        <span class="input-group-addon">Default Currency:</span>
+
+                        <div class="btn-group">
+                            <a class="btn btn-default dropdown-toggle" data-toggle="dropdown"
+                               id="_editAppSettings_currency" href="#"> <span class="caret"></span></a>
+                            <ul id="_editAppSettings_currency_options" class="dropdown-menu"></ul>
+                        </div>
+                        <span class="input-group-addon"><span class="glyphicon glyphicon-ok"></span></span>
+                    </div>
+
+                </div>
+            </div>
+        </form>
+    </div>
+</script>
+<script id="_importCSV" type="text/template">
+    <div class="_importCSV" style="margin-top:0px;">
+        <form id="form__importCSV" novalidate="novalidate">
+            <legend>Please select the CSV file to upload:</legend>
+            <div class="row">
+                <div class="col-xs-12">
+                    <div class="input-group" style="line-height:0px;">
+                        <span class="input-group-addon">Give a singular name to a table row:</span>
+                        <input type="text" class="form-control" id="_importCSV_entityName"
+                               placeholder="Ex. client, supplier, member, partner..."
+                               value="<%= masterDetailItems.master.entityName %>" data-parsley-trigger="change"
+                               data-parsley-entityDuplicate
+                               data-parsley-entityDuplicate-message="This entity name already exists in your database !. Please choose another name.">
+                        <span class="input-group-addon"><span class="glyphicon glyphicon-pencil"></span></span>
+                    </div>
+                    <div class="input-group" style="line-height:0px;">
+                        <span class="input-group-addon">Choose the CSV file:</span>
+                        <input type="file" class="form-control" id="_importCSV_fileName" accept=".csv"
+                               value="<%= masterDetailItems.master.fileName %>"
+                               onchange="FL.grid.validateCSV(this.files)">
+                        <span class="input-group-addon"><span class="glyphicon glyphicon-cloud-upload"></span></span>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</script>
+<script id="templatePreview" type="text/template">
+    <div class="col-lg-12">
+        <div id="templateHolder" class="template_holder">
+            <div id="template_holder_header" class="header">
+                <%= header %>
+            </div>
+            <br><br>
+
+            <div id="template_holder_body" class="template_holder_body">
+                <%= body %>
+            </div>
+            <br/><br>
+
+            <div id="template_holder_footer" class="footer">
+                <%= footer %>
+            </div>
         </div>
-    </script>    
-	<script id="loginTemplate" type="text/template"> 
-		<div class="loginExample" style="margin-top:0px;">
-			<form id="form_loginTemplate" novalidate="novalidate">
-				<div class="row">
-					<div class="col-xs-12" >
-						<div class="input-group" style="line-height:0px;">
-							<input type="email" class="form-control" id="login_email" placeholder="Email Address" value="<%= masterDetailItems.master.email %>" name="email" data-parsley-trigger="change" required >
-							<span class="input-group-addon"><span class="glyphicon glyphicon-envelope"></span></span>
-					    </div>
-						<div class="input-group" style="line-height:0px;">
-					        <input type="password" class="form-control" id="login_password" placeholder="Password" value="<%= masterDetailItems.master.password %>" name="password" data-parsley-minlength="3" required data-parsley-trigger="change" >
-							<span class="input-group-addon"><span class="glyphicon glyphicon-lock"></span></span>
-					    </div>
-                        <!--<button type="submit" class="btn btn-primary" onclick="FL.login.register()">Sign up</button>-->
-				    </div>
-		    	</div>
-			</form>
-		</div>
-	</script>
-	<script id="_getComboList" type="text/template"> 
-		<div class="getComboList" style="margin-top:0px;">
-			<form id="form__getComboList" novalidate="novalidate">
-				<div class="row">
-					<div class="col-xs-12" >
-						<div class="input-group" style="line-height:0px;">
-							<input type="text" class="form-control" id="_getComboList_list" placeholder="List of values comma separated" value="<%= masterDetailItems.master.list %>" name="list" data-parsley-trigger="change" required >
-							<span class="input-group-addon"><span class="glyphicon glyphicon-th-list"></span></span>
-					    </div>
-				    </div>
-		    	</div>
-			</form>
-		</div>
-	</script>
-	<script id="_getLookupTableAndField" type="text/template"> 
-		<div class="getComboList" style="margin-top:0px;">
-			<form id="form__getLookupTableAndField" novalidate="novalidate">
-				<div class="row">
-					<div class="col-xs-12" >
-						<div class="input-group" style="line-height:0px;">
-							<input type="text" class="form-control" id="_getLookupTableAndField_special" placeholder="eCN,fCN" value="<%= masterDetailItems.master.special %>" name="list" data-parsley-trigger="change" required >
-							<span class="input-group-addon"><span class="glyphicon glyphicon-th-list"></span></span>
-					    </div>
-				    </div>
-		    	</div>
-			</form>
-		</div>
-	</script>		
-	<script id="getStartedTemplate" type="text/template"> 
-		<div class="getStartedExample" style="margin-top:0px;">
-			<form id="form_getStartedTemplate" novalidate="novalidate">
-			<legend>Sign up and press <strong>'Start now'</strong> button.</legend>
-				<div class="row">
-					<div class="col-xs-12" >
-						<div class="input-group" style="line-height:0px;">
-							<input type="email" class="form-control" id="getStarted_email" placeholder="Your Email Address" value="<%= masterDetailItems.master.eMail %>" data-parsley-trigger="change" >
-							<span class="input-group-addon"><span class="glyphicon glyphicon-envelope"></span></span>
-					    </div>
-						<div class="input-group" style="line-height:0px;">
-					        <input type="password" class="form-control" id="getStarted_password" placeholder="Password" value="<%= masterDetailItems.master.password %>" >
-							<span class="input-group-addon"><span class="glyphicon glyphicon-lock"></span></span>
-					    </div>
-				    </div>
-		    	</div>
-			</form>
-		</div>
-	</script>
-	<script id="_createGridTemplate" type="text/template"> 
-		<div class="_createGridExample" style="margin-top:0px;">
-			<form id="form__createGridTemplate" novalidate="novalidate">
-			<legend>Please define the title and headers of your grid:</legend>
-				<div class="row">
-					<div class="col-xs-12" >
-						<div class="input-group" style="line-height:0px;">
-							<span class="input-group-addon">Title:</span>
-							<input type="text" class="form-control" id="_createGrid_entityName" placeholder="ex:Client" value="<%= masterDetailItems.master.entityName %>" data-parsley-trigger="change" data-parsley-entityDuplicate data-parsley-entityDuplicate-message="This entity name already exists in your database !. Please choose another name.">
-							<span class="input-group-addon"><span class="glyphicon glyphicon-pencil"></span></span>
-					    </div>
+    </div>
+</script>
+<script id="_sendNewsletterTemplate" type="text/template">
+    <div class="_sendNewsletterTemplate" style="margin-top:0px;">
+        <form id="form__sendNewsletterTemplate" novalidate="novalidate">
+            <div class="row">
+                <div class="col-xs-12">
+                    <div class="input-group" style="line-height:0px;">
+                        <span class="input-group-addon">From name:</span>
+                        <input type="text" class="form-control" id="_sendNewsletter_name" placeholder="ex:John"
+                               value="<%= masterDetailItems.master.toEmail %>" data-parsley-trigger="change">
+                        <span class="input-group-addon"><span class="glyphicon glyphicon-user"></span></span>
+                    </div>
+                    <div class="input-group" style="line-height:0px;">
+                        <span class="input-group-addon">From email:</span>
+                        <input type="email" class="form-control" id="_sendNewsletter_email"
+                               placeholder="full email sender ex:support@framelink.co"
+                               value="<%= masterDetailItems.master.email %>" data-parsley-trigger="change">
+                        <span class="input-group-addon"><span class="glyphicon glyphicon-envelope"></span></span>
+                    </div>
+                    <div class="input-group" style="line-height:0px;">
+                        <span class="input-group-addon">Subject:</span>
+                        <input type="text" class="form-control" id="_sendNewsletter_subject" placeholder="email subject"
+                               value="<%= masterDetailItems.master.subject %>" required data-parsley-trigger="change">
+                        <span class="input-group-addon"><span class="glyphicon glyphicon-pencil"></span></span>
+                    </div>
+                    <div class="input-group" style="line-height:0px;">
+                        <span class="input-group-addon">Choose a template:</span>
 
-						<div class="input-group" style="line-height:0px;">
-							<span class="input-group-addon">Headers (comma separated):</span>
-							<input type="Headers" class="form-control" id="_createGrid_header" placeholder="Example: name,address,email, phone" value="<%= masterDetailItems.master.headerString %>" data-parsley-trigger="change" >
-							<span class="input-group-addon"><span class="glyphicon glyphicon-header"></span></span>
-					    </div>
-				    </div>
-		    	</div>
-			</form>
-		</div>
-	</script>
-	<script id="_editAppSettingsTemplate" type="text/template"> 
-		<div class="_editAppSettingsExample" style="margin-top:0px;">
-			<form id="form__editAppSettingsTemplate" novalidate="novalidate">
-			<legend>Please edit your application parameters:</legend>
-				<div class="row">
-					<div class="col-xs-12" >
-						<div class="input-group" style="line-height:0px;">
-							<span class="input-group-addon">Press to automaticaly choose browser settings  ------->:</span>
-							<button type="submit" class="btn btn-primary"  onclick="FL.links.appSettingsForceButton()">Reset to browser settings</button>
-						</div>	
-						<div class="input-group" style="line-height:0px;">
-							<span class="input-group-addon">Decimal separator:</span>
-							<div class="btn-group">
-								<a class="btn btn-default dropdown-toggle" data-toggle="dropdown" id="_editAppSettings_radixpoint" href="#"> <span class="caret"></span></a>
-								<ul id="_editAppSettings_radixpoint_options" class="dropdown-menu"></ul>
-							</div>
-							<span class="input-group-addon"><span class="glyphicon glyphicon-ok"></span></span>
-						</div>					    
-						<div class="input-group" style="line-height:0px;">
-							<span class="input-group-addon">Thousands separator:</span>
-							<div class="btn-group">
-								<a class="btn btn-default dropdown-toggle" data-toggle="dropdown" id="_editAppSettings_thousandsSeparator" href="#"> <span class="caret"></span></a>
-								<ul id="_editAppSettings_thousandsSeparator_options" class="dropdown-menu"></ul>
-							</div>
-							<span class="input-group-addon"><span class="glyphicon glyphicon-ok"></span></span>
-					    </div>
-						<div class="input-group" style="line-height:0px;">
-							<span class="input-group-addon">Default Decimals:</span>
-							<input type="number" class="form-control" id="_editAppSettings_decimals" placeholder="ex:2 (decimals to appear after decimal separator)" value="<%= masterDetailItems.master.decimals %>" data-parsley-trigger="change">
-							<span class="input-group-addon"><span class="glyphicon glyphicon-ok"></span></span>
-					    </div>
-						<div class="input-group" style="line-height:0px;">
-							<span class="input-group-addon">Date Format:</span>
-							<div class="btn-group">
-								<a class="btn btn-default dropdown-toggle" data-toggle="dropdown" id="_editAppSettings_dateformat" href="#"> <span class="caret"></span></a>
-								<ul id="_editAppSettings_dateformat_options" class="dropdown-menu"></ul>
-							</div>
-							<span class="input-group-addon"><span class="glyphicon glyphicon-ok"></span></span>
-						</div>					    
-						<div class="input-group" style="line-height:0px;">
-							<span class="input-group-addon">Default Currency:</span>
-							<div class="btn-group">
-								<a class="btn btn-default dropdown-toggle" data-toggle="dropdown" id="_editAppSettings_currency" href="#"> <span class="caret"></span></a>
-								<ul id="_editAppSettings_currency_options" class="dropdown-menu"></ul>
-							</div>
-							<span class="input-group-addon"><span class="glyphicon glyphicon-ok"></span></span>
-						</div>
-						
-				    </div>
-		    	</div>
-			</form>
-		</div>
-	</script>	
-	<script id="_importCSV" type="text/template"> 
-		<div class="_importCSV" style="margin-top:0px;">
-			<form id="form__importCSV" novalidate="novalidate">
-			<legend>Please select the CSV file to upload:</legend>
-				<div class="row">
-					<div class="col-xs-12" >
-						<div class="input-group" style="line-height:0px;">
-							<span class="input-group-addon">Give a singular name to a table row:</span>
-							<input type="text" class="form-control" id="_importCSV_entityName" placeholder="Ex. client, supplier, member, partner..." value="<%= masterDetailItems.master.entityName %>" data-parsley-trigger="change" data-parsley-entityDuplicate data-parsley-entityDuplicate-message="This entity name already exists in your database !. Please choose another name.">
-							<span class="input-group-addon"><span class="glyphicon glyphicon-pencil"></span></span>
-					    </div>
-						<div class="input-group" style="line-height:0px;">
-							<span class="input-group-addon">Choose the CSV file:</span>
-							<input type="file" class="form-control" id="_importCSV_fileName" accept=".csv"value="<%= masterDetailItems.master.fileName %>" onchange="FL.grid.validateCSV(this.files)" >
-							<span class="input-group-addon"><span class="glyphicon glyphicon-cloud-upload"></span></span>
-					    </div>
-				    </div>
-		    	</div>
-			</form>
-		</div>
-	</script>	
-	<script id="templatePreview" type="text/template"> 
-		<div class="col-lg-12">
-			<div id="templateHolder" class="template_holder">
-				<div id="template_holder_header" class="header" >
-					<%= header %>
-				</div>
-				<br><br>
-				<div id="template_holder_body" class="template_holder_body">
-					<%= body %>
-				</div>
-				<br/><br>
-				<div id="template_holder_footer" class="footer">
-					<%= footer %>
-				</div>
-			</div>
-		</div>
-	</script>
-	<script id="_sendNewsletterTemplate" type="text/template"> 
-		<div class="_sendNewsletterTemplate" style="margin-top:0px;">
-			<form id="form__sendNewsletterTemplate" novalidate="novalidate">
-				<div class="row">
-					<div class="col-xs-12" >
-						<div class="input-group" style="line-height:0px;">
-							<span class="input-group-addon">From name:</span>
-							<input type="text" class="form-control" id="_sendNewsletter_name" placeholder="ex:John" value="<%= masterDetailItems.master.toEmail %>" data-parsley-trigger="change" >
-							<span class="input-group-addon"><span class="glyphicon glyphicon-user"></span></span>
-					    </div>
-						<div class="input-group" style="line-height:0px;">
-							<span class="input-group-addon">From email:</span>
-					        <input type="email" class="form-control" id="_sendNewsletter_email" placeholder="full email sender ex:support@framelink.co" value="<%= masterDetailItems.master.email %>" data-parsley-trigger="change" >
-							<span class="input-group-addon"><span class="glyphicon glyphicon-envelope"></span></span>
-					    </div>
-						<div class="input-group" style="line-height:0px;">
-							<span class="input-group-addon">Subject:</span>
-							<input type="text" class="form-control" id="_sendNewsletter_subject" placeholder="email subject" value="<%= masterDetailItems.master.subject %>" required data-parsley-trigger="change" >
-							<span class="input-group-addon"><span class="glyphicon glyphicon-pencil"></span></span>
-					    </div>
-					    <div class="input-group" style="line-height:0px;">
-							<span class="input-group-addon">Choose a template:</span>
-							<div class="btn-group">
-								<a class="btn btn-default dropdown-toggle" data-toggle="dropdown" style="font-size:14px;font-weight:bold;margin-right:-4.0em" href="#"> Choose Template <span class="caret"></span></a>
-								<ul id="_sendNewsletter_template" class="dropdown-menu">
-									<li><a href="#">templ1</a></li>
-									<li><a href="#">templ2</a></li>
-								</ul>
-							</div>
-						</div>			    
-					    <legend><br>Test Email</legend>
-						<div class="input-group" style="line-height:0px;">
-							<span class="input-group-addon">Test email:</span>
-					        <input type="email" class="form-control" id="_sendNewsletter_testEmail" placeholder="full email sender ex:jessica.costa@weadvice.pt" value="<%= masterDetailItems.master.testEmail %>" >
-							<span class="input-group-addon"><span class="glyphicon glyphicon-envelope"></span></span>
-					    </div>					    
-                        <button type="submit" id="form__sendNewsletterTemplate_emailTest" name="submit" value="submit" onclick="FL.grid.sendEmailTest();" class="btn btn-default">Send test email</button>
+                        <div class="btn-group">
+                            <a class="btn btn-default dropdown-toggle" data-toggle="dropdown"
+                               style="font-size:14px;font-weight:bold;margin-right:-4.0em" href="#"> Choose Template
+                                <span class="caret"></span></a>
+                            <ul id="_sendNewsletter_template" class="dropdown-menu">
+                                <li><a href="#">templ1</a></li>
+                                <li><a href="#">templ2</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                    <legend><br>Test Email</legend>
+                    <div class="input-group" style="line-height:0px;">
+                        <span class="input-group-addon">Test email:</span>
+                        <input type="email" class="form-control" id="_sendNewsletter_testEmail"
+                               placeholder="full email sender ex:jessica.costa@weadvice.pt"
+                               value="<%= masterDetailItems.master.testEmail %>">
+                        <span class="input-group-addon"><span class="glyphicon glyphicon-envelope"></span></span>
+                    </div>
+                    <button type="submit" id="form__sendNewsletterTemplate_emailTest" name="submit" value="submit"
+                            onclick="FL.grid.sendEmailTest();" class="btn btn-default">Send test email
+                    </button>
 
-				    </div>
-		    	</div>
-			</form>
-		</div>
-	</script>	
-<script id="dictTemplate23" type="text/template"> 
-	<div class="container">
-	    <div class="row">
-		   <div class="col-xs-12 col-sm-8 col-md-6 col-sm-offset-2 col-md-offset-3">
-				<form role="form">
-					<h2>Please Sign Up <small>It is free and always will be.</small></h2>
-					<div class="row">
-						<div class="col-xs-6 col-sm-6 col-md-6">
-							<div class="form-group">
-									<input type="text" name="name" id="name" class="form-control input-lg" placeholder="First Name" tabindex="1">  
-							</div>
-						</div>
-						<div class="col-xs-6 col-sm-6 col-md-6">
-							<div class="form-group">
-								<input type="text" name="last_name" id="last_name" class="form-control input-lg" placeholder="Last Name" tabindex="2">
-							</div>							
-						</div>
-					</div>
-					<div class="form-group">
-						<input type="text" name="display_name" id="display_name" class="form-control input-lg" placeholder="Display Name" tabindex="3">
-						</div>
-					</div>
-					<div class="form-group">
-						<input type="email" name="email" id="email" class="form-control input-lg" placeholder="Email Address" tabindex="4">
-					</div>						
-					<div class="row">
-						<div class="col-xs-6 col-sm-6 col-md-6">
-							<div class="form-group">
-								<input type="password" name="password" id="password" class="form-control input-lg" placeholder="Password" tabindex="5">
-							</div>
-						</div>
-						<div class="col-xs-6 col-sm-6 col-md-6">
-							<div class="form-group">
-								<input type="password" name="password_confirmation" id="password_confirmation" class="form-control input-lg" placeholder="Confirm Password" tabindex="6">
-							</div>
-						</div>
-					</div>
-					<div class="row">
-						<div class="col-xs-3 col-sm-3 col-md-3">
+                </div>
+            </div>
+        </form>
+    </div>
+</script>
+<script id="dictTemplate23" type="text/template">
+    <div class="container">
+        <div class="row">
+            <div class="col-xs-12 col-sm-8 col-md-6 col-sm-offset-2 col-md-offset-3">
+                <form role="form">
+                    <h2>Please Sign Up
+                        <small>It is free and always will be.</small>
+                    </h2>
+                    <div class="row">
+                        <div class="col-xs-6 col-sm-6 col-md-6">
+                            <div class="form-group">
+                                <input type="text" name="name" id="name" class="form-control input-lg"
+                                       placeholder="First Name" tabindex="1">
+                            </div>
+                        </div>
+                        <div class="col-xs-6 col-sm-6 col-md-6">
+                            <div class="form-group">
+                                <input type="text" name="last_name" id="last_name" class="form-control input-lg"
+                                       placeholder="Last Name" tabindex="2">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <input type="text" name="display_name" id="display_name" class="form-control input-lg"
+                               placeholder="Display Name" tabindex="3">
+                    </div>
+            </div>
+            <div class="form-group">
+                <input type="email" name="email" id="email" class="form-control input-lg" placeholder="Email Address"
+                       tabindex="4">
+            </div>
+            <div class="row">
+                <div class="col-xs-6 col-sm-6 col-md-6">
+                    <div class="form-group">
+                        <input type="password" name="password" id="password" class="form-control input-lg"
+                               placeholder="Password" tabindex="5">
+                    </div>
+                </div>
+                <div class="col-xs-6 col-sm-6 col-md-6">
+                    <div class="form-group">
+                        <input type="password" name="password_confirmation" id="password_confirmation"
+                               class="form-control input-lg" placeholder="Confirm Password" tabindex="6">
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-xs-3 col-sm-3 col-md-3">
 							<span class="button-checkbox">
 								<button type="button" class="btn" data-color="info" tabindex="7">I Agree</button>
 		                        <input type="checkbox" name="t_and_c" id="t_and_c" class="hidden" value="1">
 							</span>
-						</div>
-						<div class="col-xs-9 col-sm-9 col-md-9">
-							 By clicking <strong class="label label-primary">Register</strong>, you agree to the <a href="#" data-toggle="modal" data-target="#t_and_c_m">Terms and Conditions</a> set out by this site, including our Cookie Use.
-						</div>
-					</div>
-					<div class="row">
-						<div class="col-xs-6 col-md-6"><input type="submit" value="Register" class="btn btn-primary btn-block btn-lg" tabindex="7"></div>
-						<div class="col-xs-6 col-md-6"><a href="#" class="btn btn-success btn-block btn-lg">Sign In</a></div>
-					</div>
-				</form>						
-			</div>				
-		</div>
-	</div>      
+                </div>
+                <div class="col-xs-9 col-sm-9 col-md-9">
+                    By clicking <strong class="label label-primary">Register</strong>, you agree to the <a href="#"
+                                                                                                           data-toggle="modal"
+                                                                                                           data-target="#t_and_c_m">Terms
+                    and Conditions</a> set out by this site, including our Cookie Use.
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-xs-6 col-md-6"><input type="submit" value="Register"
+                                                      class="btn btn-primary btn-block btn-lg" tabindex="7"></div>
+                <div class="col-xs-6 col-md-6"><a href="#" class="btn btn-success btn-block btn-lg">Sign In</a></div>
+            </div>
+            </form>
+        </div>
+    </div>
+    </div>
 </script>
 <script type="text/template" id="titleDroppedItem">
-	<tr>
-		<td bgcolor="<%= bgColor %>" width="<%= paddingLeft %>"><%= elNo %></td>
-		<td bgcolor="<%= bgColor %>" width="<%= centralWidth %>" style="padding-top: 10; padding-bottom: 8;">
-			<div id="titleTemplateItem0" class="titleDroppedItem droppedObject ui-state-default" type="title"> 
-				Put your Text Here 
-			</div>
-		</td>	
-		<td bgcolor="<%= bgColor %>" width="<%= paddingRight %>"><%= elNo %></td>
-	</tr>	
+    <tr>
+        <td bgcolor="<%= bgColor %>" width="<%= paddingLeft %>"><%= elNo %></td>
+        <td bgcolor="<%= bgColor %>" width="<%= centralWidth %>" style="padding-top: 10; padding-bottom: 8;">
+            <div id="titleTemplateItem0" class="titleDroppedItem droppedObject ui-state-default" type="title">
+                Put your Text Here
+            </div>
+        </td>
+        <td bgcolor="<%= bgColor %>" width="<%= paddingRight %>"><%= elNo %></td>
+    </tr>
 </script>
 <script type="text/template" id="imageDroppedItem">
-	<tr>
-		<td bgcolor="<%= bgColor %>" width="<%= paddingLeft %>"><%= elNo %></td>
-		<td bgcolor="<%= bgColor %>" width="<%= centralWidth %>" style="padding-top: 10; padding-bottom: 8;" border="1">
-			<div id="imageTemplateItem0" class="imageDroppedItem droppedObject ui-state-default" type="image"> 
-				<a id="imageLink" href="#" target="_blank">
-					<div> 
-						<img class="" src="./mailer/images/empty_image-72.png" style="display:block" />
-					</div>
-				</a>
-			</div>
-		</td>		
-		<td bgcolor="<%= bgColor %>" width="<%= paddingRight %>"><%= elNo %></td>
-	</tr>		
+    <tr>
+        <td bgcolor="<%= bgColor %>" width="<%= paddingLeft %>"><%= elNo %></td>
+        <td bgcolor="<%= bgColor %>" width="<%= centralWidth %>" style="padding-top: 10; padding-bottom: 8;" border="1">
+            <div id="imageTemplateItem0" class="imageDroppedItem droppedObject ui-state-default" type="image">
+                <a id="imageLink" href="#" target="_blank">
+                    <div>
+                        <img class="" src="./mailer/images/empty_image-72.png" style="display:block"/>
+                    </div>
+                </a>
+            </div>
+        </td>
+        <td bgcolor="<%= bgColor %>" width="<%= paddingRight %>"><%= elNo %></td>
+    </tr>
 </script>
-<script type="text/template" id="SocialLinksDroppedItem" >
-	<tr>
-		<td bgcolor="<%= bgColor %>" width="<%= paddingLeft %>"><%= elNo %></td>
-		<td bgcolor="<%= bgColor %>" width="<%= centralWidth %>" style="padding-top: 10; padding-bottom: 8;" border="1">
-			<div style="text-align: center"></div>
-		</td>		
-		<td bgcolor="<%= bgColor %>" width="<%= paddingRight %>"><%= elNo %></td>
-	</tr>					
+<script type="text/template" id="SocialLinksDroppedItem">
+    <tr>
+        <td bgcolor="<%= bgColor %>" width="<%= paddingLeft %>"><%= elNo %></td>
+        <td bgcolor="<%= bgColor %>" width="<%= centralWidth %>" style="padding-top: 10; padding-bottom: 8;" border="1">
+            <div style="text-align: center"></div>
+        </td>
+        <td bgcolor="<%= bgColor %>" width="<%= paddingRight %>"><%= elNo %></td>
+    </tr>
 </script>
 
 
 <script type="text/template" id="emailTemplateHolder">
-	<div id="templateHolder" class="template_holder">
-		<center>		
-			<table cellspacing="0" cellpadding="0" border="0" width="<%= globalPercent %>%" >
-				<tbody id="template_holder_header"></tbody>
-				<tbody id="template_holder_body"></tbody>
-				<tbody id="template_holder_footer"></tbody>
-			</table>
-		</center>
-	</div>
+    <div id="templateHolder" class="template_holder">
+        <center>
+            <table cellspacing="0" cellpadding="0" border="0" width="<%= globalPercent %>%">
+                <tbody id="template_holder_header"></tbody>
+                <tbody id="template_holder_body"></tbody>
+                <tbody id="template_holder_footer"></tbody>
+            </table>
+        </center>
+    </div>
 </script>
 <body style="padding-top:10px;">
-	<div id="_modalDialog"></div>
-    <div id="_modalDialogA"></div>
-    <div id="_modalDialogB"></div>
-    <div id='spinnerDiv'></div>
-	<script id="personTemplate" type="text/template"> 
-	    <span><strong><%= name %></strong> (<%= age %>) - <%= occupation %></span> 
-	    <button class="edit btn btn-primary">Edit</button>
-	    <button class="btn delete">Delete</button>            
-	</script> 	
-	<script id="personTemplate2" type="text/template"> 
-		<div class="container">
-		    <div class="row">
-		        <form class="form-horizontal col-sm-12">
-					<fieldset>
-					 	<legend>Person Template2</legend>
-            			<br/>
-						<div class="row">
-							<div class="col-sm-3">					
-								<div class="control-group">
-								    <label for="name" class="control-label">Name:</label> 
-								    <div class="controls">
-										<input type="text" id="name" name="name" value="<%= name %>"/>
-								        <span class="help-inline"></span>
-								    </div>
-								</div>
-								<div class="control-group">
-								    <label for="age" class="control-label">Age:</label>
-								    <div class="controls">
-								        <input type="number" id="age" name="age" value="<%= age %>"/>
-								        <span class="help-inline"></span>
-								    </div>
-								</div>
-								<div class="control-group">
-								    <label for="occupation" class="control-label">Occupation:</label>
-								    <div class="controls">
-								        <input type="text" id="occupation" name="occupation" value="<%= occupation %>"/>
-								        <span class="help-inline"></span>
-								    </div>
-								</div>
-							</div>								
-						    <div class="col-sm-3">
-								<h5>Column 4/12</h5>
-							</div>
-						    <div class="col-sm-3">
-								<h5>Column 7/12</h5>
-							</div>	
-						    <div class="col-sm-3">
-								<h5>Column 9/12</h5>
-							</div>														
-						</div>				
-					</fieldset>
-					</br>
-					<div class="form-actions">
-			            <a href="#" class="btn btn-primary save">Save</a>
-			            <a href="#" class="btn delete">Delete</a>
-					</div>
-			    </form>
-			</div>
-			<div class="row status-bar">
-			    <div class="col-sm-12">
-			        <div class="alert alert-success" style="display: none">
-			            <b>Success!</b> Customer saved successfully
-			        </div>
-			    </div>
-			</div>
-		</div>
-	</script>	
-	<script id="gridDelButton" type="text/template"> 
-		<!-- <button class="btn btn-danger btn-mini">x</button> -->
-		<a class="btn btn-danger btn-xs">
-			<!--<img src="FL_ui/img/signIn.png">-->
-			<i  class="glyphicon glyphicon-trash" style="font-size: 0.9em;color:white;"></i>
-  		</a>
-	</script>
-	<script id="phoneInputTemplate" type="text/template"> 
-		<input type="tel" id="phoneInput"  placeholder="example">
-	</script>	
-	<div class="masthead">
-		<div class="wrap push">
-			<div id="_login">
-				<!-- <span class="aux-text hidden-xs"> Welcome to FrameLink: support@framelink.co </span>
-				<a class="pull-right text-muted" href="javascript:FL.signIn()"> <i class="glyphicon glyphicon-log-in"></i>
-	  				<span> Login</span> </a> -->
-			</div>
-			<div id="menuContainer" class="container" style="width:auto;margin-left:3%;clear:both">
-				<div class="navbar navbar-default" role="navigation" style="margin-left:1%;">
-					<div class="navbar-header" >
-						<button  type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
-							<span class="sr-only">Toggle navigation</span>
-							<span class="icon-bar"></span>
-							<span class="icon-bar"></span>
-							<span class="icon-bar"></span>
-						</button>
-<!-- 						<a  class="navbar-brand" href="javascript:FL.login.home()"><img id="brand" style="width:12.0em;margin-top:-0.9em;margin-left:0.0em;" src="FL_ui/img/framelinklogo.png"></a>
- -->
-<!--  						<a  class="navbar-brand logo" href="javascript:FL.login.home()"><img id="brand" style="width:12.0em;margin-top:-0.9em;margin-left:0.0em;height:auto; width:auto; max-height:72px;" src="FL_ui/img/abc.png"></a> -->
-<!--  						<a  class="navbar-brand logo" href="javascript:FL.login.home()"><img id="brand" style="width:12.0em;margin-top:-0.9em;margin-left:0.0em;height:auto; width:auto; max-height:72px;" src="FL_ui/img/yourlogo.png"></a>
- -->
- <!-- 
- 						<a  class="navbar-brand logo" href="javascript:FL.login.home()"><img id="brand" style="width:12.0em;margin-top:-0.9em;margin-left:0.0em;height:auto; width:auto; max-height:72px;" src="FL_ui/img/NW.png"></a>
--->
- 						<a  class="navbar-brand logo" href="javascript:FL.login.home()"><img id="brand" style="width:12.0em;margin-top:-0.9em;margin-left:0.0em;height:auto; width:11.5em; max-height:72px;" src="FL_ui/img/framelinklogo.png"></a>
-					</div>
-					<div id="toolbar" class="collapse navbar-collapse" style="margin-left:2%;margin-right:0.0em;">
-						<ul id="main-menu" class="nav navbar-nav">
-						</ul>
-					</div>
-				</div>
-				<div id="_belowMenus">
-					<div id="_placeHolder"></div>
-					<!-- <form id="addPerson" action="">
-						<input type="text" placeholder="Person's name">
-						<input class="btn btn-primary" type="submit" value="Add Person">
-					</form> -->
-					<div id="personContent" class="col-sm-12"></div>
-					<div class="row">
-					    <div id="csvcontent" class="col-sm-12"></div>
-					</div>				
-					<div class="col-md-12 backgrid-container">
-						<button id="addGrid" class="edit btn btn-info glyphicon glyphicon-plus-sign" title="add a new row to the bottom of the grid" style="float:left"></button>
-						<button id="_delete" class="edit btn btn-danger glyphicon glyphicon-remove" title="delete selected rows" style="float:left;margin-left:1px"></button>
-						<button id="_editGrid" class="edit btn btn-success glyphicon glyphicon-pencil" title="edit grid columns" style="float:left;margin-left:1px"></button>
-						<button id="_newsletter" class="edit btn btn-success glyphicon glyphicon-envelope" title ="send mail/newsletter to selected rows" style="float:right;margin-left:1px"></button>
-						<button id="_newsletterMC" class="edit btn btn-success glyphicon glyphicon-star" title="send mail/newsletter using mailChimp templates" style="float:right;margin-left:1px"></button>
-						<div style="clear:both;"></div>
-						<!-- <button id="_select" class="edit btn btn-default glyphicon glyphicon-ok" style="float:right"></button> -->
-						<div id="grid">
-						</div>			
-						<div id="paginator"></div>				
-					</div>
-				</div>
-			</div>
-		</div>
-	</div><!-- masthead -->
-	<div class="controls">
-		<!--
-		<button id="btnTestUpload" type="button" >Test FrameLink Upload</button>
-		<input type="file" name="file" />
-		<form action="/upload-target" class="dropzone"></form>
-		<input type="filepicker" name="myName" />
-		-->
-		<!--
-		<input type="filepicker" 
-		data-fp-text="Just Images" 
-		data-fp-mimetypes="image/*" 
-		data-fp-option-multiple="false" 
-		data-fp-option-modal="true" 
-		name="open"/>
-		-->
-	</div>
-	<div class="container-fluid">
-  		<!--
-  		<div class="row">
-    		<div class="col-sm-12">
-    			<h3>FrameLink Upload Example </h3>  
-   			 </div>
-  		</div>
-  		<hr>
-		<div id='drop_zone'> 
-			<form action="/upload" class="dropzone" drop-zone="" id="file-dropzone"></form>
-		</div>
-  		-->
-	</div>
-	<footer class="footer">
-		<div class="container">
-			<p>©2015 FrameLink Co. <a href="http://www.framelink.co/contacts.html" target="">@support</a>.</p>
-		</div>
-	</footer>	
-	
+<div id="_modalDialog"></div>
+<div id="_modalDialogA"></div>
+<div id="_modalDialogB"></div>
+<div id='spinnerDiv'></div>
+<script id="personTemplate" type="text/template">
+    <span><strong><%= name %></strong> (<%= age %>) - <%= occupation %></span>
+    <button class="edit btn btn-primary">Edit</button>
+    <button class="btn delete">Delete</button>
+</script>
+<script id="personTemplate2" type="text/template">
+    <div class="container">
+        <div class="row">
+            <form class="form-horizontal col-sm-12">
+                <fieldset>
+                    <legend>Person Template2</legend>
+                    <br/>
+
+                    <div class="row">
+                        <div class="col-sm-3">
+                            <div class="control-group">
+                                <label for="name" class="control-label">Name:</label>
+
+                                <div class="controls">
+                                    <input type="text" id="name" name="name" value="<%= name %>"/>
+                                    <span class="help-inline"></span>
+                                </div>
+                            </div>
+                            <div class="control-group">
+                                <label for="age" class="control-label">Age:</label>
+
+                                <div class="controls">
+                                    <input type="number" id="age" name="age" value="<%= age %>"/>
+                                    <span class="help-inline"></span>
+                                </div>
+                            </div>
+                            <div class="control-group">
+                                <label for="occupation" class="control-label">Occupation:</label>
+
+                                <div class="controls">
+                                    <input type="text" id="occupation" name="occupation" value="<%= occupation %>"/>
+                                    <span class="help-inline"></span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-3">
+                            <h5>Column 4/12</h5>
+                        </div>
+                        <div class="col-sm-3">
+                            <h5>Column 7/12</h5>
+                        </div>
+                        <div class="col-sm-3">
+                            <h5>Column 9/12</h5>
+                        </div>
+                    </div>
+                </fieldset>
+                </br>
+                <div class="form-actions">
+                    <a href="#" class="btn btn-primary save">Save</a>
+                    <a href="#" class="btn delete">Delete</a>
+                </div>
+            </form>
+        </div>
+        <div class="row status-bar">
+            <div class="col-sm-12">
+                <div class="alert alert-success" style="display: none">
+                    <b>Success!</b> Customer saved successfully
+                </div>
+            </div>
+        </div>
+    </div>
+</script>
+<script id="gridDelButton" type="text/template">
+    <!-- <button class="btn btn-danger btn-mini">x</button> -->
+    <a class="btn btn-danger btn-xs">
+        <!--<img src="FL_ui/img/signIn.png">-->
+        <i class="glyphicon glyphicon-trash" style="font-size: 0.9em;color:white;"></i>
+    </a>
+</script>
+<script id="phoneInputTemplate" type="text/template">
+    <input type="tel" id="phoneInput" placeholder="example">
+</script>
+<div class="masthead">
+    <div class="wrap push">
+        <div id="_login">
+            <!-- <span class="aux-text hidden-xs"> Welcome to FrameLink: support@framelink.co </span>
+            <a class="pull-right text-muted" href="javascript:FL.signIn()"> <i class="glyphicon glyphicon-log-in"></i>
+                  <span> Login</span> </a> -->
+        </div>
+        <div id="menuContainer" class="container" style="width:auto;margin-left:3%;clear:both">
+            <div class="navbar navbar-default" role="navigation" style="margin-left:1%;">
+                <div class="navbar-header">
+                    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                        <span class="sr-only">Toggle navigation</span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                    <!-- 						<a  class="navbar-brand" href="javascript:FL.login.home()"><img id="brand" style="width:12.0em;margin-top:-0.9em;margin-left:0.0em;" src="FL_ui/img/framelinklogo.png"></a>
+                     -->
+                    <!--  						<a  class="navbar-brand logo" href="javascript:FL.login.home()"><img id="brand" style="width:12.0em;margin-top:-0.9em;margin-left:0.0em;height:auto; width:auto; max-height:72px;" src="FL_ui/img/abc.png"></a> -->
+                    <!--  						<a  class="navbar-brand logo" href="javascript:FL.login.home()"><img id="brand" style="width:12.0em;margin-top:-0.9em;margin-left:0.0em;height:auto; width:auto; max-height:72px;" src="FL_ui/img/yourlogo.png"></a>
+                     -->
+                    <!--
+                                            <a  class="navbar-brand logo" href="javascript:FL.login.home()"><img id="brand" style="width:12.0em;margin-top:-0.9em;margin-left:0.0em;height:auto; width:auto; max-height:72px;" src="FL_ui/img/NW.png"></a>
+                   -->
+                    <a class="navbar-brand logo" href="javascript:FL.login.home()"><img id="brand"
+                                                                                        style="width:12.0em;margin-top:-0.9em;margin-left:0.0em;height:auto; width:11.5em; max-height:72px;"
+                                                                                        src="FL_ui/img/framelinklogo.png"></a>
+                </div>
+                <div id="toolbar" class="collapse navbar-collapse" style="margin-left:2%;margin-right:0.0em;">
+                    <ul id="main-menu" class="nav navbar-nav">
+                    </ul>
+                </div>
+            </div>
+            <div id="_belowMenus">
+                <div id="_placeHolder"></div>
+                <!-- <form id="addPerson" action="">
+                    <input type="text" placeholder="Person's name">
+                    <input class="btn btn-primary" type="submit" value="Add Person">
+                </form> -->
+                <div id="personContent" class="col-sm-12"></div>
+                <div class="row">
+                    <div id="csvcontent" class="col-sm-12"></div>
+                </div>
+                <div class="col-md-12 backgrid-container">
+                    <button id="addGrid" class="edit btn btn-info glyphicon glyphicon-plus-sign"
+                            title="add a new row to the bottom of the grid" style="float:left"></button>
+                    <button id="_delete" class="edit btn btn-danger glyphicon glyphicon-remove"
+                            title="delete selected rows" style="float:left;margin-left:1px"></button>
+                    <button id="_editGrid" class="edit btn btn-success glyphicon glyphicon-pencil"
+                            title="edit grid columns" style="float:left;margin-left:1px"></button>
+                    <button id="_newsletter" class="edit btn btn-success glyphicon glyphicon-envelope"
+                            title="send mail/newsletter to selected rows" style="float:right;margin-left:1px"></button>
+                    <button id="_newsletterMC" class="edit btn btn-success glyphicon glyphicon-star"
+                            title="send mail/newsletter using mailChimp templates"
+                            style="float:right;margin-left:1px"></button>
+                    <div style="clear:both;"></div>
+                    <!-- <button id="_select" class="edit btn btn-default glyphicon glyphicon-ok" style="float:right"></button> -->
+                    <div id="grid">
+                    </div>
+                    <div id="paginator"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- masthead -->
+<div class="controls">
+    <!--
+    <button id="btnTestUpload" type="button" >Test FrameLink Upload</button>
+    <input type="file" name="file" />
+    <form action="/upload-target" class="dropzone"></form>
+    <input type="filepicker" name="myName" />
+    -->
+    <!--
+    <input type="filepicker"
+    data-fp-text="Just Images"
+    data-fp-mimetypes="image/*"
+    data-fp-option-multiple="false"
+    data-fp-option-modal="true"
+    name="open"/>
+    -->
+</div>
+<div class="container-fluid">
+    <!--
+    <div class="row">
+      <div class="col-sm-12">
+          <h3>FrameLink Upload Example </h3>
+          </div>
+    </div>
+    <hr>
+  <div id='drop_zone'>
+      <form action="/upload" class="dropzone" drop-zone="" id="file-dropzone"></form>
+  </div>
+    -->
+</div>
+<footer class="footer">
+    <div class="container">
+        <p>©2015 FrameLink Co. <a href="http://www.framelink.co/contacts.html" target="">@support</a>.</p>
+    </div>
+</footer>
+
 <!-- 	<h3>Please enter your phone number, and you will be connected to FrameLink</h3>
 	<form action="makecall.php" method="post">
 	    <span>Your Number: <input type="text" name="called" /></span>
 	    <input type="submit" value="Connect me!" />
 	</form> -->
 
- 	<ul id="contextMenu" class="dropdown-menu" role="menu" style="display:none" >
-	</ul>
-    <!--
-    <script type="text/javascript" charset="utf-8" src="../rivets/dist/rivets.js" ></script>
-    <script src="https://code.jquery.com/jquery-1.10.2.min.js"></script>
-    <script type="text/javascript" src="../smartmenus-master/src/jquery.smartmenus.js"></script>
-    <script type="text/javascript" src="../smartmenus-master/src/addons/bootstrap/jquery.smartmenus.bootstrap.js"></script>
-	-->
-   	<!-- <script src="http://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.5.2/underscore-min.js" type="text/javascript"></script> -->
-   	<!-- <script src="FL_ui/js/underscore-min.js" type="text/javascript"></script> -->
-  	<!-- <script src="http://cdnjs.cloudflare.com/ajax/libs/backbone.js/0.9.2/backbone-min.js" type="text/javascript"></script> -->
-	<script src="FL_ui/js/bbSingleForm.js"></script>  <!-- this code uses embedded templates. Load after the templates html  -->   
-	<script src="FL_ui/js/FLMain.js"></script>  <!-- this code uses embedded templates. Load after the templates html  -->   
-    <!-- Bootstrap core JavaScript
-    ================================================== -->
-    <!-- Placed at the end of the document so the pages load faster -->
-	<!-- <a href="#" id="trigger1" class="trigger left">Settings</a> -->
-	<a href="#" id="trigger1" class="trigger left"><img style="height:30px;" src="FL_ui/sidepanel/slide_settings.png"></a>
-	<div id="panel1" class="slide_panel left">
-	</div>
-	<!-- <a href="#" id="trigger2" class="trigger left">Builder</a> -->
-	<!-- <a href="#" id="trigger2" class="trigger left"><span class="icon icon-builder"></span>Builder</a> -->
-	<!-- <a href="#" id="trigger2" class="trigger left"><span class="icon icon-builder"></span>Builder</a> -->
-	<a href="#" id="trigger2" class="trigger left"><img style="height:30px;" src="FL_ui/sidepanel/slide_form.png"></a>
-	<div id="panel2" class="slide_panel left">
-	</div>
-	<!-- <a href="#" id="trigger3" class="trigger left">Services</a> -->
-	<!-- <a href="#" id="trigger3" class="trigger left"><span class="glyphicon glyphicon-cog"></span>Services</a> -->
-	<a href="#" id="trigger3" class="trigger left"><img style="height:30px;" src="FL_ui/sidepanel/slide_services2.png"></a>
-	<div id="panel3" class="slide_panel left">
-	</div>
-	<!--
-	// <script type="text/javascript">//customer.io initial code snipet
-	//   var _cio = _cio || [];
-	//   (function() {
-	//     var a,b,c;a=function(f){return function(){_cio.push([f].
-	//     concat(Array.prototype.slice.call(arguments,0)))}};b=["load","identify",
-	//     "sidentify","track","page","cookie"];for(c=0;c<b.length;c++){_cio[b[c]]=a(b[c])};
-	//     var t = document.createElement('script'),
-	//         s = document.getElementsByTagName('script')[0];
-	//     t.async = true;
-	//     t.id    = 'cio-tracker';
-	//     t.setAttribute('data-site-id', '8b036b44b1bf5d9a083a');
-	//     t.src = 'https://assets.customer.io/assets/track.js';
-	//     s.parentNode.insertBefore(t, s);
-	//   })();
-	// </script>
-	-->	
+<ul id="contextMenu" class="dropdown-menu" role="menu" style="display:none">
+</ul>
+<!--
+<script type="text/javascript" charset="utf-8" src="../rivets/dist/rivets.js" ></script>
+<script src="https://code.jquery.com/jquery-1.10.2.min.js"></script>
+<script type="text/javascript" src="../smartmenus-master/src/jquery.smartmenus.js"></script>
+<script type="text/javascript" src="../smartmenus-master/src/addons/bootstrap/jquery.smartmenus.bootstrap.js"></script>
+-->
+<!-- <script src="http://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.5.2/underscore-min.js" type="text/javascript"></script> -->
+<!-- <script src="FL_ui/js/underscore-min.js" type="text/javascript"></script> -->
+<!-- <script src="http://cdnjs.cloudflare.com/ajax/libs/backbone.js/0.9.2/backbone-min.js" type="text/javascript"></script> -->
+<script src="FL_ui/js/bbSingleForm.js"></script>
+<!-- this code uses embedded templates. Load after the templates html  -->
+<script src="FL_ui/js/FLMain.js"></script>
+<!-- this code uses embedded templates. Load after the templates html  -->
+<!-- Bootstrap core JavaScript
+================================================== -->
+<!-- Placed at the end of the document so the pages load faster -->
+<!-- <a href="#" id="trigger1" class="trigger left">Settings</a> -->
+<a href="#" id="trigger1" class="trigger left"><img style="height:30px;" src="FL_ui/sidepanel/slide_settings.png"></a>
+
+<div id="panel1" class="slide_panel left">
+</div>
+<!-- <a href="#" id="trigger2" class="trigger left">Builder</a> -->
+<!-- <a href="#" id="trigger2" class="trigger left"><span class="icon icon-builder"></span>Builder</a> -->
+<!-- <a href="#" id="trigger2" class="trigger left"><span class="icon icon-builder"></span>Builder</a> -->
+<a href="#" id="trigger2" class="trigger left"><img style="height:30px;" src="FL_ui/sidepanel/slide_form.png"></a>
+
+<div id="panel2" class="slide_panel left">
+</div>
+<!-- <a href="#" id="trigger3" class="trigger left">Services</a> -->
+<!-- <a href="#" id="trigger3" class="trigger left"><span class="glyphicon glyphicon-cog"></span>Services</a> -->
+<a href="#" id="trigger3" class="trigger left"><img style="height:30px;" src="FL_ui/sidepanel/slide_services2.png"></a>
+
+<div id="panel3" class="slide_panel left">
+</div>
+<!--
+// <script type="text/javascript">//customer.io initial code snipet
+//   var _cio = _cio || [];
+//   (function() {
+//     var a,b,c;a=function(f){return function(){_cio.push([f].
+//     concat(Array.prototype.slice.call(arguments,0)))}};b=["load","identify",
+//     "sidentify","track","page","cookie"];for(c=0;c<b.length;c++){_cio[b[c]]=a(b[c])};
+//     var t = document.createElement('script'),
+//         s = document.getElementsByTagName('script')[0];
+//     t.async = true;
+//     t.id    = 'cio-tracker';
+//     t.setAttribute('data-site-id', '8b036b44b1bf5d9a083a');
+//     t.src = 'https://assets.customer.io/assets/track.js';
+//     s.parentNode.insertBefore(t, s);
+//   })();
+// </script>
+-->
 </body>
-<div id="_freeSlots"><div>
+<div id="_freeSlots">
+    <div>
 </html>

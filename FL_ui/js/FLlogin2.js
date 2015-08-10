@@ -344,12 +344,12 @@ jQuery(document).ready(function($){
 
 			// var	currentStyle = "readable";//default style
 			// var	currentFontFamily = "helvetica";//default font
-			var	currentStyle = this.defaultStyle;
-			var	currentFontFamily = this.defaultFontFamily;
+			var	currentStyle = FL.login.defaultStyle;
+			var	currentFontFamily = FL.login.defaultFontFamily;
 			if (is_logIn) {//a soft reset - the content from local storage will be used. Otherwise force default values
-				if(lastStyleStr)
+				if(lastStyleStr && (lastStyleStr != "undefined"))
 					currentStyle = lastStyleStr;
-				if(lastFontFamilyStr)
+				if(lastFontFamilyStr && (lastFontFamilyStr != "undefined"))
 					currentFontFamily = lastFontFamilyStr;
 			}
 			FL.common.setStyleAndFont(currentStyle,currentFontFamily);
@@ -539,7 +539,7 @@ jQuery(document).ready(function($){
 				// http://www.sitepoint.com/11-ways-to-enhance-your-web-application/
 				// Use cases:
 				// 		New user
-				FL.common.printToConsole("enter signIn");
+				FL.common.printToConsole("enter signIn","login");
 				$.Topic( 'inLogOnProcess' ).publish( true );//broadcast that will be received by FL.menu to update .editable to false
 				if(FL.is_sidePanelOpen){
 					FL.common.makeModalInfo("Please close FrameLink side panel before changing your Sign In/Sign Out status");
@@ -554,7 +554,7 @@ jQuery(document).ready(function($){
 						}
 						var loginOkPromise = loginDialogs(loginObject);
 						loginOkPromise.done(function(loginOk,loginObject){
-							FL.common.printToConsole("signIn --------------->loginOk="+loginOk+" Email="+loginObject.email);//loginOk ==>go false=>repeat
+							FL.common.printToConsole("signIn --------------->loginOk="+loginOk+" Email="+loginObject.email,"login");//loginOk ==>go false=>repeat
 							if(!loginOk){
 								if(loginObject.email.length>0){
 									localStorage.login = JSON.stringify(loginObject);
@@ -585,19 +585,6 @@ jQuery(document).ready(function($){
 				getStartedPromise.fail(function(err){
 					alert("Login access error err="+JSON.stringify(err));
 				});
-			},
-			home:function(){
-				// alert("the brand !!!");
-				var loadAppPromise=FL.API.loadAppDataForSignInUser2();//gets data dictionary + main menu + style + fontFamily + home page
-				loadAppPromise.done(function(menuData,homeHTML){
-					FL.common.printToConsole("FL.login.home ---> homeHTML=" + homeHTML);
-					// FL.common.printToConsole("FL.login.home --------------------------------------------->first menu=" + menuData.oMenu.menu[0].title);				
-					FL.common.clearSpaceBelowMenus();
-					FL.domInject("_placeHolder",homeHTML );
-				});	
-				loadAppPromise.fail(function(err){
-					alert("FLpage_editor ->  --> after successfull connectUserToDefaultApp FAILURE in loadAppDataForSignInUser2 <<<<< error="+err);
-				});				
 			},
 			clearAllSettings: function(){//restore original menu in local storage and updates DOM status - called directly from DOM link
 	            FL.common.makeModalConfirm("Your current edit menu will be lost and you will be logged out. Do you really want this ?","Cancel","OK",function(result){

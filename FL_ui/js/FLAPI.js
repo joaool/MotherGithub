@@ -1196,14 +1196,14 @@ FL["API"] = (function () {//name space FL.API
         data: {},
         offline: true,
         trace: true,//to be removed
-        debug: true,//if it is false  no console log will be shown
+        XXXdebug: true,//if it is false  no console log will be shown - removec to FL.common.debug
         debugStyle: 0,// 0=>means shows numbers to jump to, 1=> no line Numbers to jump to (this only works if debug=true)
 
         // getPageNo: function(pagName){ //to be used by savePage and restorePage
         //	var pageNoObj = {"home":1,"about":2};
         //	return  pageNoObj[pagName];
         // },
-        debugFiltersToShow: null,
+        xxxxdebugFiltersToShow: null,
         serverCallBlocked: false, //HACK to prevent server call (menu calling a grid) before last call is dispatched (ex:cell update) - a promise must be resolved to unblock
         clearServerToken: function () {
             FL.login.token = tokenClear();
@@ -1471,20 +1471,20 @@ FL["API"] = (function () {//name space FL.API
             FL.common.printToConsole("xxxxxxxxx #$%#%#%5 xxxxxxx");
         },
         syncLocalDictionary: function () {//clears local dictionary and updates it from server dictionary
-            FL.common.printToConsole("....................................>beginning syncLocalDictionary....with token=" + JSON.stringify(FL.login.token));
+            FL.common.printToConsole("....................................>beginning syncLocalDictionary....with token=" + JSON.stringify(FL.login.token),"API");
             var def = $.Deferred();
             //_getFullDictionary->FL.dd.clear()->rebuildsLocalDictionary()
             // temporaryRebuildsLocalDictionaryFromServer("ABC");
             // _test();
             var syncLocalDictionary = _getFullDictionary();
             syncLocalDictionary.done(function (entities) {
-                FL.common.printToConsole(">>>>> syncLocalDictionary SUCCESS <<<<< entities=" + entities);
+                FL.common.printToConsole(">>>>> syncLocalDictionary SUCCESS <<<<< entities=" + entities,"API");
                 FL.dd.clear();
                 if (entities) {
                     FL.common.printToConsole(">>>>> syncLocalDictionary -> does temporaryRebuildsLocalDictionaryFromServer(entities)");
                     rebuildsLocalDictionaryFromServer(entities);//interprets entity JSON received from server to local dd
                     // FL.common.printToConsole("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% after rebuildsLocalDictionaryFromServer %%%%%%%%%%%%%%%%%");
-                    FL.dd.displayEntities();
+                    FL.dd.displayEntities("FL.API.syncLocalDictionary");
                 } else {
                     FL.common.printToConsole(">>>>> syncLocalDictionary -> dictionary is empty in server");
                 }
@@ -1637,7 +1637,7 @@ FL["API"] = (function () {//name space FL.API
                 .then(_restoreMainMenuStyleANDfontFamily);
             loadAppDataForSignInUser.done(function (menuData) {
                 //data dictionary was loaded + menu was loaded
-                FL.dd.displayEntities();
+                //FL.dd.displayEntities();
                 var oMenu = FL.login.appToken.menu; //or menuData.oMenu
                 var style = FL.login.appToken.style; //or menuData.style
                 var fontFamily = FL.login.appToken.fontFamily; //or menuData.fontFamily
@@ -1719,7 +1719,7 @@ FL["API"] = (function () {//name space FL.API
             var existingUserPromise = FL.API.isUserExist(loginObject.email);
             existingUserPromise.done(function (exist) {
                 if (exist) {//the user exists
-                    FL.common.printToConsole(loginObject.email + " exists !!!!", "login");
+                    FL.common.printToConsole("loadDefaultApp ->" + loginObject.email + " exists !!!!", "API");
                     var setupExistingUserPromise = FL.API.connectUserToDefaultApp(loginObject.email, loginObject.password);
                     setupExistingUserPromise.done(function () {
                         var loadAppPromise = FL.API.loadAppDataForSignInUser2();//gets data dictionary + main menu + style + fontFamily + home page
@@ -2502,8 +2502,7 @@ FL["API"] = (function () {//name space FL.API
         testFunc: function (x) {
             alert("FL.server.test() -->" + x);
         }
-    }
-        ;
+    };
 })
 ();
 // });

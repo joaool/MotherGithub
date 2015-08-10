@@ -191,7 +191,7 @@ window.utils = {
         }
         return xRet;
     },
-    typeUIOf: function(xVar) {//for string type returns one of the typeUI "email", "url", "phone"etc. If not string returns null
+    xxxtypeUIOf: function(xVar) {//for string type returns one of the typeUI "email", "url", "phone"etc. If not string returns null
         // used in FL.grid   private function  is_ColumnOfSubtype(subtype,sampleArr)
         var subtype = null;
         var xtype = typeof xVar;
