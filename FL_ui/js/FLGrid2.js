@@ -194,9 +194,12 @@ FL["grid"] = (function () {//name space FL.grid
         return arrOfTypes;
     };
     var dataRowAnalysis2 = function (rows, percent) {
-        // this methods decides the date type of every single column in rows by analysing a sample (rows).
+        // this methods decides the userType of every single column in rows by analysing a sample (rows).
+        // It also defines the probable radixpoint and data separator among all columns
+        //     setting FL.grid.csvRadixpoint to "." or "," and FL.grid.csvThousandsSeparator to "." or ","  or "space"
         // returns an array of attributes (one element per column) each element  with  format:
-        //		{"fieldType":"string","fieldTypeUI":"textbox","numberFormat":null, enumerable:null,label:element};
+        //		{"fieldType":<"string" or "number">,"fieldTypeUI":< one of typeUIs>,enumerable:null,label:element};
+        //   fills FL.grid.csvRadixpoint with "." or "," and fills FL.grid.csvThousandsSeparator with "." "," or "space" according to csv analysis
         //
         // assumes that all rows have the same json pattern with same type in the whole array - assumes type of row = type of first row
         // If column row type is "string" search for enumerables within that column
@@ -204,24 +207,61 @@ FL["grid"] = (function () {//name space FL.grid
         // returns
         //   [ {name:{fieldType:"string", label:"Name"}}, ...., {service:{fieldType:"enumerable", label:"Name", enumerable:[*]}} ]
         //      if fieldType="enumerable" the property enumerable has an array with the enumerable options.
+        var flagFormatDiscovered = false; //as soon as radix and separator format are dicovered flag is set to true - no more research needeed to
+        FL.grid.csvRadixpoint = FL.common.appsettings.radixpoint; //initially assumes CSV comes with receptor radixpoint
+        FL.grid.csvThousandsSeparator = FL.common.appsettings.thousandsSeparator; //initially assumes CSV comes with receptor thousandsSeparator}}
+        function discoverRadixAndSep(numStr) {
+            var radix = FL.common.extractRadixFrom(numStr);
+            var sep = FL.common.extractThousandsSeparatorFrom(numStr);
+            if (radix) {
+                FL.grid.csvRadixpoint = radix;
+                if (sep) {
+                    FL.grid.csvThousandsSeparator = sep;
+                    flagFormatDiscovered = true;
+                }
+            }
+        };
         var numOfRows = rows.length;
         var rowsSample = FL.common.makeFirstElementsSample(rows, 50); //reduces max size of array to 50
         var numOfSampleRows = rowsSample.length;
+
         var arrOfKeys = _.keys(rows[0]);//at least row[0] must exist
+        // it is possible that some numeric formats are ambiguous (like 1,234 US (the same as 1234) and 1,234 Europe (the same as 1.234 US))
+        // to resolve that ambiguity dataRowAnalysis tries to find among sample rows a numeric cell that solves ambiguity if not takes the receiving appSettinhs
+        _.each(rows, function (currentRow, index) {
+            if (!flagFormatDiscovered) {
+                _.each(arrOfKeys, function (colName, index) {
+                    if (!flagFormatDiscovered) {
+                        var userType = FL.common.getArrUserType([currentRow[colName]]);
+                        if (userType == "numberbox") {
+                            discoverRadixAndSep(currentRow[colName]);
+                        } else if (userType == "currencybox") {
+                            var strNum = FL.common.extractContentBetweenFirstAndLastDigit(currentRow[colName]);// - is excluded !!!! IMPORTANT
+                            discoverRadixAndSep(strNum);
+                        } else if (userType == "percentbox") {
+                            var strNum = FL.common.extractContentBetweenFirstAndLastDigit(currentRow[colName]);// - is excluded !!!! IMPORTANT
+                            discoverRadixAndSep(strNum);
+                        }
+                    }
+                });
+            }
+        });
         var arrOfTypes = [];
         _.each(arrOfKeys, function (element, index) {
             if (element) {
                 var dataType = FL.common.typeOf((rows[0][element]));//one of  "number","string","email","boolean","object","array","null","undefined","date"
                 //note about numbers: if dataType is number no doubt about it. But...it could be a string representing a number
+                var arrOfSampleRowValues = _.pluck(rowsSample, element);
                 var userType = null;
                 var enumerable = null;
+                var fieldType = null;
                 var obj = {};
                 if (dataType == "string") {
                     //From possible user types: textbox,numberbox,currencybox,integerbox,percentbox,urlbox,areabox,combobox,checkbox,phonebox,datetimebox,emailbox,lookupbox
                     //  we only try to recognize: textbox,numberbox,currencybox,combobox,checkbox,datetimebox,emailbox -->later on: integerbox,percentbox,urlbox,phonebox
                     //analysis of the first 50 elements or all if length<50
-                    var arrOfSampleRowValues = _.pluck(rowsSample, element);
-                    userType = FL.common.getArrUserType(arrOfSampleRowValues);//one of textbox,numberbox,currencybox,urlbox,checkbox,datetimebox,emailbox
+                    var fieldType = "string";
+                    userType = FL.common.getArrUserType(arrOfSampleRowValues);//one of textbox,numberbox,integerbox,currencybox,percentbox,urlbox,checkbox,datetimebox,emailbox
                     if (userType == "textbox") {//it may be a combobox
                         if (FL.common.is_enumerableArr(arrOfSampleRowValues, percent)) {//It is an enumerable we will prepare the enumerable content
                             var arrOfAllRowValues = _.pluck(rows, element);
@@ -231,10 +271,17 @@ FL["grid"] = (function () {//name space FL.grid
                         }
                     }
                 } else {
-                    userType = "numberbox"
+                    //because arrOfSampleRowValues is an array of numbers we must convert it to string before discovering the type
+                    var arrOfSamplesStr = [];
+                    _.each(arrOfSampleRowValues, function (rowElement, index) {
+                        var numberStr = '' + rowElement;
+                        arrOfSamplesStr.push(numberStr);
+                    });
+                    userType = FL.common.getArrUserType(arrOfSamplesStr);//one of textbox,numberbox,integerbox,currencybox,urlbox,checkbox,datetimebox,emailbox
+                    fieldType = "number";
                 }
                 obj[element] = {
-                    "fieldType": "string",
+                    "fieldType": fieldType,
                     "fieldTypeUI": userType,
                     //"numberFormat": numberObj.format,
                     enumerable: enumerable,
@@ -286,7 +333,7 @@ FL["grid"] = (function () {//name space FL.grid
         });
         return attributesArr;
     };
-    // var createAttributesArrFromCsvAnalisys = function(rows){//creates the equivalent to a dd entry from a set of rows
+// var createAttributesArrFromCsvAnalisys = function(rows){//creates the equivalent to a dd entry from a set of rows
     var adjustRowsToAttributes = function (rows, arrOfAttributes) {//creates the equivalent to a dd entry from a set of rows
         // rows - an array of objects format [{"colum1Name":col11,"colum2Name":col12,..},{"colum1Name":col21,"colum2Name":col22,..}...{}]
         // arrOfAttributes has analysis format ->[attributeName1:{fieldType":"string","fieldTypeUI":"textbox","numberFormat":null, enumerable:null,label:element},attributeName2{..}]
@@ -338,12 +385,14 @@ FL["grid"] = (function () {//name space FL.grid
         // arrOfAttributes has analysis format ->[attributeName1:{fieldType":"string","fieldTypeUI":"textbox","numberFormat":null, enumerable:null,label:element},attributeName2{..}]
         //arrOfAttributes - array of objects ex: [{name:"address",description:"address to send invoices",label:"Address",type:"string",typeUI:"textbox",enumerable:null,key:false},{}..];
         var rrows = rows;
+        //it may happen that the
+
         //	format of arrOfAttributes {"fieldType":"string","fieldTypeUI":"textbox","numberFormat":null, enumerable:null,label:element};
         _.each(arrOfAttributes, function (element, index) {//for each attributes check if it is necessary to correct all rows from external csv
             var attrName = _.keys(element)[0];//extract keys from first line
             var fieldType = element[attrName].fieldType;
             var fieldTypeUI = element[attrName].fieldTypeUI;
-            var numberFormat = element[attrName].numberFormat;
+            //var numberFormat = element[attrName].numberFormat;
             var label = element[attrName].label;
             var enumerable = null;
             var columnVector = null;
@@ -353,23 +402,29 @@ FL["grid"] = (function () {//name space FL.grid
             if (fieldTypeUI == "numberbox") {
                 _.each(rows, function (rowElement, index) {
                     var numberStr = rowElement[attrName];
-                    numberStr = ''+numberStr;
+                    numberStr = '' + numberStr;
+                    rowElement[attrName] = numberStr.ToNumeric_US(FL.grid.csvRadixpoint);
+                });
+            } else if (fieldTypeUI == "integerbox") {
+                _.each(rows, function (rowElement, index) {
+                    var numberStr = rowElement[attrName];
+                    numberStr = '' + numberStr;
                     rowElement[attrName] = numberStr.ToNumeric_US();
                 });
-            } else if (fieldTypeUI == "currencybox"){
+            } else if (fieldTypeUI == "currencybox") {
                 _.each(rows, function (rowElement, index) {
                     var currencyStr = rowElement[attrName];
-                    var strNum = FL.common.extractContentBetweenFirstAndLastDigit(currencyStr);// - is excluded !!!! IMPORTANT
-                    rowElement[attrName] = strNum.ToNumeric_US();
+                    var numberStr = FL.common.extractContentBetweenFirstAndLastDigit(currencyStr);// - is excluded !!!! IMPORTANT
+                    rowElement[attrName] = numberStr.ToNumeric_US(FL.grid.csvRadixpoint);
                 });
-            }else if (fieldTypeUI == "percentbox"){
+            } else if (fieldTypeUI == "percentbox") {
                 _.each(rows, function (rowElement, index) {
                     var percentStr = rowElement[attrName];
-                    var strNum = FL.common.extractContentBetweenFirstAndLastDigit(percentStr);// - is excluded !!!! IMPORTANT
-                    rowElement[attrName] = strNum.ToNumeric_US();
+                    var numberStr = FL.common.extractContentBetweenFirstAndLastDigit(percentStr);// - is excluded !!!! IMPORTANT
+                    rowElement[attrName] = numberStr.ToNumeric_US(FL.grid.csvRadixpoint);
                 });
             }
-         });
+        });
     };
     var is_ColumnOfSubtype = function (subtype, sampleArr) {//scans all elements of sampleArr and returns true if all non empty elements belongs to subtype
         //example
@@ -1230,6 +1285,8 @@ FL["grid"] = (function () {//name space FL.grid
         csvFile: null,
         csvFileDelimiter: null,
         csvEncoding: null,
+        csvRadixpoint: null,
+        csvThousandsSeparator: null,
         xxxx: function (boxId) {
             var optionsArr = null;
             var fieldName = "field";
@@ -1316,12 +1373,10 @@ FL["grid"] = (function () {//name space FL.grid
                     FL.common.makeModalInfo("Create Grid canceled");
                 }
             });
-        }
-        ,
+        },
         adjustRowsToAttributes: function (rows, arrOfAttributes) {
             adjustRowsToAttributes(rows, arrOfAttributes);
-        }
-        ,
+        },
         verifyPapaFields: function (metaFieldsArr) {
             //Ex  metaFieldsArr has :{aborted: false, cursor: 322587, delimiter: ",",fields: Array[52],linebreak: "↵",truncated: false}
             //This is the place to add some inteligence in evaluation of CSV files.
@@ -1377,8 +1432,7 @@ FL["grid"] = (function () {//name space FL.grid
                 comma_repetitions: comma_repetitions,
                 semi_colon_repetitions: semi_colon_repetitions
             };
-        }
-        ,
+        },
         validateCSV: function (fileObj) {//this is called directly from template id="_importCSV" ->onchange="FL.grid.validateCSV(this.files)"
             // if there is an error FL.grid.csvFile will be null. No error => FL.grid.csvFile = csvFile
             // all this does is to leave a message in FL.grid.csvFile after verifing possible CSV errors !!!!
@@ -1434,8 +1488,7 @@ FL["grid"] = (function () {//name space FL.grid
                     }
                 });
             }
-        }
-        ,
+        },
         importGrid: function () {//call with menu key "uri": "javascript:FL.grid.importGrid()" in Settings
             // The real treatment to the csvFile is done here  - FL.grid.importGrid() -  using FL.grid.csvFile prepared in FL.grid.validateCSV()
             var masterDetailItems = {
@@ -1476,8 +1529,7 @@ FL["grid"] = (function () {//name space FL.grid
                     alert("Create Grid canceled");
                 }
             });
-        }
-        ,
+        },
         csvToStore: function (rows) {//rows is an array of JSON [{},{}...{}]; each JSON  has a key/value = attribute/content
             //feeds the csvStore (memoryCsv.js)  with rows injecting id column and converting other column names to lower case
             var csvrows = [];
@@ -1493,8 +1545,7 @@ FL["grid"] = (function () {//name space FL.grid
                 csvrows.push(element2);
             });
             csvStore.store(csvrows);
-        }
-        ,
+        },
         insertDefaultGridMenu: function (singular, plural) {// Adds a menu with title <plural> and content displayDefaultGrid(<singular>)
             // cursor over menu position <plural> will show: javascript:FL.links.setDefaultGrid('<singular>')
             // if singular has spaces, they will be changed by "_"
@@ -1512,8 +1563,7 @@ FL["grid"] = (function () {//name space FL.grid
             saveTablePromise.fail(function (err) {
                 alert("FLGrid2.js --> insertDefaultGridMenu FAILURE !!! err=" + err);
             });
-        }
-        ,
+        },
         storeCurrentCSVToServerAndInsertMenu: function (entityName, insertMenu) { //(entityName,plural) Adds a menu with title <plural> and content displayDefaultGrid(<singular>)
             // entityName- Name of entity that will be stored
             // insertMenu - true=> create new menu false=>no menu will be created
@@ -1556,8 +1606,7 @@ FL["grid"] = (function () {//name space FL.grid
             //--------------------- old code
             var singularToUseInMenu = entityName.replace(/ /g, "_");
             return def.promise();
-        }
-        ,
+        },
         updateCurrentCSVToServer: function (entityName) { //update all records of entityName Table existing in dictionary
             // entityName- Name of entity that will be stored
             // if entityName has spaces, they will be changed by "_"
@@ -1598,8 +1647,7 @@ FL["grid"] = (function () {//name space FL.grid
                 return def.reject("FL.grid.updateCurrentCSVToServer --> " + entityName + " does not exist in Local Dictionary !");
             }
             return def.promise();
-        }
-        ,
+        },
         csvToGrid: function (csvFile) {//input is a JQuery object (a file representation). Ex var csvFile = $('input[type=file]');
             csvFile.parse({//http://papaparse.com/
                 config: {
@@ -1681,8 +1729,7 @@ FL["grid"] = (function () {//name space FL.grid
                     // utils.mountGridInCsvStore(columnsArr2);//mount backbone views and operates grid - columnsArr must be prepared to backGrid
                 }
             });
-        }
-        ,
+        },
         removeLastRowIfIncomplete: function (data) {
             //by some unknown reason papaparse may leave a last row incomplete....
             //to prevent the existence of an incomplete last line. We will check if last line has the rigth number of columns if not we remove it
@@ -1692,8 +1739,7 @@ FL["grid"] = (function () {//name space FL.grid
             var lastLineCols = ( _.values(lastLineObj) ).length;
             if (lastLineCols != totColsPerRow)
                 data.data.splice(lastRowIndex, 1);
-        }
-        ,
+        },
         csvToGrid2: function (csvFile, delimiter, encoding, entityName) {//input is a file object obtained from DOM	//http://papaparse.com/
             //csvFile - file to load file from local computer
             //delimiter - eventual delimiter to use instead of auto delimiter. This is decided by onchange="FL.grid.validateCSV(this.files)"
@@ -1767,8 +1813,7 @@ FL["grid"] = (function () {//name space FL.grid
                     // spinner.stop();
                 }
             });
-        }
-        ,
+        },
         displayDefaultGrid: function (entityName) { //loads entity from server and display the grid with add,del,edit grid buttons at left and newsletter if a email field exist
             //condition to execute is: FL.API.serverCallBlocked = false;
             entityName = entityName.replace(/_/g, " ");
@@ -1822,8 +1867,7 @@ FL["grid"] = (function () {//name space FL.grid
                 }, function (err) {
                     alert("FL.grid.displayDefaultGrid ERROR: Please try again !" + err);
                 });
-        }
-        ,
+        },
         displayDefaultGrid2: function (entityName) { //loads entity from server and display the grid with add,del,edit grid buttons at left and newsletter if a email field exist
             var def = $.Deferred();
             entityName = entityName.replace(/_/g, " ");
@@ -1883,8 +1927,7 @@ FL["grid"] = (function () {//name space FL.grid
                     return def.reject("FL.grid.displayDefaultGrid2 failure on checkServerCallBlocked() " + err);
                 });
             return def.promise();
-        }
-        ,
+        },
         sendEmailTest: function () {//sends a sample email with eMail/newsletter
             if (FL.login.emailContentTemplate) {
                 // var mailHTML = '<p>Thank you for selecting <a href="http://www.framelink.co"><strong>FrameLink version 8</strong></a> to build your backend site !</p>';
@@ -1912,13 +1955,11 @@ FL["grid"] = (function () {//name space FL.grid
                 var elem = document.getElementById('form__sendNewsletterTemplate_emailTest');
                 elem.parentNode.removeChild(elem);
             }
-        }
-        ,
+        },
         testFunc: function (x) {
             alert("FL.grid.test() -->" + x);
         }
-    }
-        ;
+    };
 })
 ();
 // });

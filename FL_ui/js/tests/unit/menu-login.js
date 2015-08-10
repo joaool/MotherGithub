@@ -364,11 +364,32 @@ $(function () {
         xVar = "1,234,567.89.2";
         ok(!xVar.isNumeric(), "FL.common  ---> (" + xVar + ").isNumeric() -->false");//20
 
-        xVar = "12,00%";
-        ok(xVar.isPercent(), "FL.common  ---> (" + xVar + ").isPercent() -->true");//20
+        xVar = "28-04-1956";
+        ok(!xVar.isNumeric(), "FL.common  ---> (" + xVar + ").isNumeric() -->false");//20
+
+        xVar = "1200";
+        ok(xVar.isInteger(), "FL.common  ---> (" + xVar + ").isInteger() -->true  --------------------------------------------------------- xVar.isInteger()  ");//20
+
+        xVar = "1";
+        ok(xVar.isInteger(), "FL.common  ---> (" + xVar + ").isInteger() -->true ");//20
+
+        xVar = " 1200";
+        ok(xVar.isInteger(), "FL.common  ---> (" + xVar + ").isInteger() -->true");//20
+
+        xVar = " 1200 ";
+        ok(xVar.isInteger(), "FL.common  ---> (" + xVar + ").isInteger() -->true");//20
+
+        xVar = "1200.200";
+        ok(!xVar.isInteger(), "FL.common  ---> (" + xVar + ").isInteger() -->false it has separator or radix");//20
+
+        xVar = "1200,200";
+        ok(!xVar.isInteger(), "FL.common  ---> (" + xVar + ").isInteger() -->false it has separator or radix");//20
+
+        xVar = "1200 200";
+        ok(!xVar.isInteger(), "FL.common  ---> (" + xVar + ").isInteger() -->false it has separator or radix");//20
 
         xVar = " 12,00 %";
-        ok(xVar.isPercent(), "FL.common  ---> (" + xVar + ").isPercent() -->true");//20
+        ok(xVar.isPercent(), "FL.common  ---> (" + xVar + ").isPercent() -->true  --------------------------------------------------------- xVar.isPercent()  ");//20
 
         xVar = "-12,00 %";
         ok(xVar.isPercent(), "FL.common  ---> (" + xVar + ").isPercent() -->true");//20
@@ -381,6 +402,28 @@ $(function () {
 
         xVar = "1%x";
         ok(!xVar.isPercent(), "FL.common  ---> (" + xVar + ").isPercent() -->false");//20
+
+        xVar = "1.234,56";
+        ok(xVar.ToNumeric_US()=="1234.56", "FL.common  ---> (" + xVar + ").ToNumeric_US() -->"+xVar.ToNumeric_US() + " ----------------------------------------------xVar.ToNumeric_US");//20
+
+        xVar = "1,234.56";
+        ok(xVar.ToNumeric_US()=="1234.56", "FL.common  ---> (" + xVar + ").ToNumeric_US() -->"+xVar.ToNumeric_US());//20
+
+        xVar = "1,234";
+        ok(xVar.ToNumeric_US()=="1234", "FL.common  ---> (" + xVar + ").ToNumeric_US() -->"+xVar.ToNumeric_US());//20
+
+        xVar = "1.234";
+        ok(xVar.ToNumeric_US()=="1.234", "FL.common  ---> (" + xVar + ").ToNumeric_US() -->"+xVar.ToNumeric_US());//20
+
+        xVar = "1.234";
+        ok(xVar.ToNumeric_US(".")=="1.234", "FL.common  ---> (" + xVar + ",'.').ToNumeric_US() -->"+xVar.ToNumeric_US("."));//20
+
+        xVar = "1,234";
+        ok(xVar.ToNumeric_US(",")=="1.234", "FL.common  ---> (" + xVar + ",',').ToNumeric_US() -->"+xVar.ToNumeric_US(","));//20
+
+        xVar = "1.234";
+        ok(xVar.ToNumeric_US(",")=="1234", "FL.common  ---> (" + xVar + ",',').ToNumeric_US() -->"+xVar.ToNumeric_US(","));//20
+
 
         xVar = "xx1,234yyy";
         var result = FL.common.extractContentBetweenFirstAndLastDigit(xVar);
@@ -437,6 +480,58 @@ $(function () {
 
         xVar = "$-1,234,567.89 CAD";
         ok(xVar.isCurrency(), "FL.common  ---> (" + xVar + ").isCurrency() -->true");//20
+
+        //----------------------- FL.common.extractRadixFrom
+
+        xVar = "12,345,678.9";
+        var result = FL.common.extractRadixFrom(xVar);
+        ok(result == ".", "FL.common.extractRadixFrom('"+ xVar + "') -->'.' -------------------------------------------------  FL.common.extractRadixFrom");//1
+
+        xVar = "12.345.678,9";
+        var result = FL.common.extractRadixFrom(xVar);
+        ok(result == ",", "FL.common.extractRadixFrom('"+ xVar + "') -->','");
+
+        xVar = "12,345.9";
+        var result = FL.common.extractRadixFrom(xVar);
+        ok(result == ".", "FL.common.extractRadixFrom('"+ xVar + "') -->'.'");
+
+        xVar = "12.345,9";
+        var result = FL.common.extractRadixFrom(xVar);
+        ok(result == ",", "FL.common.extractRadixFrom('"+ xVar + "') -->','");
+
+        xVar = "12,345";
+        var result = FL.common.extractRadixFrom(xVar);
+        ok(result === null, "FL.common.extractRadixFrom('"+ xVar + "') -->null because we dont know if is 12,345.00(US) or 12,345(Europe)");
+
+        xVar = "12.345";
+        var result = FL.common.extractRadixFrom(xVar);
+        ok(result == null, "FL.common.extractRadixFrom('"+ xVar + "') -->null because we dont know if is 12.345,00(Europe) or 12.345(US)");
+
+        xVar = "12345";
+        var result = FL.common.extractRadixFrom(xVar);
+        ok(result == null, "FL.common.extractRadixFrom('"+ xVar + "') -->null because it is an integer");
+
+        xVar = "1.234,5";
+        var result = FL.common.extractThousandsSeparatorFrom(xVar);
+        ok(result == ".", "FL.common.extractThousandsSeparatorFrom('"+ xVar + "') -->point ---------------------------------------------FL.common.extractThousandsSeparatorFrom ");
+
+        xVar = "1,234.5";
+        var result = FL.common.extractThousandsSeparatorFrom(xVar);
+        ok(result == ",", "FL.common.extractThousandsSeparatorFrom('"+ xVar + "') -->comma");
+
+        xVar = "1,234,125";
+        var result = FL.common.extractThousandsSeparatorFrom(xVar);
+        ok(result == ",", "FL.common.extractThousandsSeparatorFrom('"+ xVar + "') -->comma");
+
+        xVar = "1.234.125";
+        var result = FL.common.extractThousandsSeparatorFrom(xVar);
+        ok(result == ".", "FL.common.extractThousandsSeparatorFrom('"+ xVar + "') -->point");
+
+        xVar = "12345";
+        var result = FL.common.extractThousandsSeparatorFrom(xVar);
+        ok(result == null, "FL.common.extractThousandsSeparatorFrom('"+ xVar + "') -->null because it is an integer");
+
+
 
         //----------------------- FL.common.isArrOf<XXXX> Currency, number, email, url, check, phone,datetime
         var arrOfRowValues = [

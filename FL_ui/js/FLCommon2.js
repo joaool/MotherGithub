@@ -60,14 +60,35 @@ String.prototype.isNumeric_US = function () {//returns true if a string has the 
     var strNumNoSep = this.replace(/,/g, '');
     return isNumeric_US_NoSep(strNumNoSep)
 };
-String.prototype.ToNumeric_US = function () {//tries to convert a string to Numeric US format (radix="." and no separators) - if unable returns null
+String.prototype.ToNumeric_US = function (radix) {//tries to convert a string to Numeric US format (radix="." and no separators) - if unable returns null
+    // radix is a optional paramenter - if missing assumes radix= "." US
+    // all radix diferent from "," will be discarded
+    // returns  string with US format or null if input is not a valid number or is a valid number with a impossible radix (ex (1,234,5)ToNUmeric_US(",") =>null
+    // (12,00).ToNumeric_US() =>1200 - comma is assumed as a thousands separator
+    // (12,00).ToNumeric_US(",") =>12.00 - comma us assumed has radixpoint - radix only accepts "," or "." has a value
     if (this.isNumeric()) {
+        var thisNum = this;
+        if(radix){
+            if(radix == ","){//tbd
+                var comma = thisNum.match(/,/g);//searches comma (s)
+                if (comma) {
+                    var numberOfCommas = comma.length;
+                    if (numberOfCommas > 1)//if comma is the radix it is an error to have more than one
+                        return null;
+                    // he have one or zero comma
+                    thisNum = thisNum.replace(/\./g, '');//remove points (separators)
+                    thisNum = thisNum.replace(/,/g, '.');//replace , by .
+                }else{
+                    thisNum = thisNum.replace(/\./g, '');//remove points (separators)
+                }
+            }
+        }
         var strNum = null;
-        if (this.isNumeric_US()) {
-            strNum = this.replace(/,/g, '');//remove ,
+        if (thisNum.isNumeric_US()) {
+            strNum = thisNum.replace(/,/g, '');//remove ,
             return strNum;
         } else {//format may be 123.456,78 or 123 456,78
-            strNum = this.replace(/\./g, '');//remove .
+            strNum = thisNum.replace(/\./g, '');//remove .
             strNum = strNum.replace(/ /g, '');//remove spaces
             strNum = strNum.replace(/,/g, '.');//replace the comma by a point
             return strNum;
@@ -151,6 +172,18 @@ String.prototype.isPercent = function () {//returns true if a string has the for
         }
     }
     return false;
+};
+String.prototype.isInteger = function () {//returns true if a string has the format of Integer without separators. Ex."12345"
+    // Notice that "12,345" is an integer in US and  "12.345"  or "12 345" is an integer in Europe - this method check integer without separators
+    var numberStr = this.trim();
+    if (!numberStr.isNumeric())
+        return false;
+    var pointPos = numberStr.indexOf(".");
+    var commaPos = numberStr.indexOf(",");
+    var spacePos = numberStr.indexOf(" ");
+    if(pointPos>0 || commaPos>0 || spacePos>0)
+        return false
+    return true;
 };
 FL["common"] = (function () {//name space FL.common
     var loadCSS = function (fileCss) {
@@ -1476,13 +1509,15 @@ FL["common"] = (function () {//name space FL.common
                 xRet = {"number": false, "format": null};
             return xRet;
         },
-        getArrUserType: function (arrOfRowValues) {//given an array of strings returns one of textbox,percentbox,numberbox,currencybox,checkbox,datetimebox,emailbox,urlbox
+        getArrUserType: function (arrOfRowValues) {//given an array of strings returns one of textbox,percentbox,numberbox,integerbox, currencybox,checkbox,datetimebox,emailbox,urlbox
             // NOTE combobox must be resolved outside - phonebox TBD
             var userType = "textbox";
             if (FL.common.isArrOfCurrency(arrOfRowValues)) {
                 userType = "currencybox";
             } else if (FL.common.isArrOfPercent(arrOfRowValues)) {
                 userType = "percentbox";
+            } else if (FL.common.isArrOfInteger(arrOfRowValues)) {
+                userType = "integerbox";
             } else if (FL.common.isArrOfNumber(arrOfRowValues)) {
                 userType = "numberbox";
             } else if (FL.common.isArrOfEmail(arrOfRowValues)) {
@@ -1521,6 +1556,14 @@ FL["common"] = (function () {//name space FL.common
             if (!_.isUndefined(failElement))//not an array of percent
                 return false;
             return true;//it is an array of percent
+        },
+        isArrOfInteger: function (arrOfRowValues) {//given an array of strings returns true if it is a integer representation, false if not
+            var failElement = _.find(arrOfRowValues, function (element) { //if failElement is undefined => all elements are a valid number format
+                return !element.isInteger();
+            });
+            if (!_.isUndefined(failElement))//not an array of integer
+                return false;
+            return true;//it is an array of integer
         },
         isArrOfEmail: function (arrOfRowValues) {//given an array of strings returns true if it is a valid email representation, false if not
             var failElement = _.find(arrOfRowValues, function (element) { //if failElement is undefined => all elements are a valid number format
@@ -1979,6 +2022,59 @@ FL["common"] = (function () {//name space FL.common
             var doc = document.createElement('div');
             doc.innerHTML = html;
             return ( doc.innerHTML === html );
+        },
+        extractRadixFrom: function (numberStr) {//Given a string representing a number returns its radix point if any (note that 12,345,678 => radix=".")
+            // - null if not a number representation
+            // - null if or no radix point or if inconclusive (example "12,00" can be US 1200 or European 12,0)
+            if (!numberStr.isNumeric())
+                return null;
+            var numberOfCommas = 0;
+            var numberOfPoints = 0;
+            var point = numberStr.match(/\./g);//searches point
+            var comma = numberStr.match(/,/g);//searches comma
+            if (comma) {
+                numberOfCommas = comma.length;
+                if (numberOfCommas > 1)//comma is the separator therefore point is the radix ->it has zero or 1 point for sure ex:1,234,567.8
+                    return ".";
+            }
+            if (point) {
+                numberOfPoints = point.length;
+                if (numberOfPoints > 1)//point  is the separator therefore comma is the radix ->it has zero or 1 point for sure ex:1.234.567,8
+                    return ",";
+            }
+            // cases 1 - (one comma, one point), 2 - (no comma and no point)
+            if (numberOfPoints == numberOfCommas) {//(one comma, one point) is solvable =>last is radix
+                var pointPos = numberStr.indexOf(".");
+                var commaPos = numberStr.indexOf(",");
+                if (pointPos>=0) {
+                    if (pointPos > commaPos)
+                        return ".";
+                    else
+                        return ",";
+                }
+            }
+            return null;
+        },
+        extractThousandsSeparatorFrom: function (numberStr) {//Given a string representing a number returns its ThousandsSeparator if any - null if not a number representation or no Separator
+            // return null or "." or "," or "space"
+            // - null if not a number representation
+            // - null if or no separator or inconclusive (example "12,000" can be US 12000 or European 12,0)
+            var radix = this.extractRadixFrom(numberStr);
+            if (!radix)
+                return null;
+            if (radix == ".")
+                return ",";
+            //Separator may be "." or space
+            numberStr = numberStr.replace(/,/g);//remove comma radix
+            var point = numberStr.match(/\./g);//searches point
+            if (point) {
+                return ".";
+            }
+            var space = numberStr.trim().match(/ /g);//searches space
+            if (point) {
+                return "space";
+            }
+            return null;
         },
         testFunc: function (x) {
             alert("FL.common.test() -->" + x);
