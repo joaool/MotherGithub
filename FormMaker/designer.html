@@ -34,15 +34,12 @@
     <script src="../FL_ui/flClient/flClient.js"></script>
     <script src="../FL_ui/flClient/ajaxBrowser.js"></script>
     <script src="../FL_ui/js/FLAPI.js"></script>
-<!--    <script src="../FL_ui/js/FLTestDictionary.js"></script>-->
-
 
     <script src="js/FormDesigner.js"></script>
     <script src="../mailer/js/DragNDrop.js"></script>
     <script src="js/common.js"></script>
     <script src="js/FormMaker.js"></script>
     <script src="js/LabelElement.js"></script>
-
 
     <script src="js/models/designer_model.js"></script>
     <script src="js/models/element_model.js"></script>
@@ -55,42 +52,7 @@
     <script src="js/views/element_holder.js"></script>
     <script src="js/views/property_panel.js"></script>
 
-    <!--        <script type="text/javascript" src="https://rawgithub.com/powmedia/backbone.bootstrap-modal/master/src/backbone.bootstrap-modal.js"></script>-->
-    <!-- <script id="tempTemplate" type="text/template">
-        <tr>
-            <td class="ui-draggable" data-name="text" cname="1" >
-                <a href="" class="">Name</a>
-            </td>
-            <td class="ui-draggable" data-name="textarea" cname="2">
-                <a href="" class="">Phone number</a>
-            </td>
-        </tr>
-        <tr>
-            <td class="ui-draggable" data-name="text" cname="9">
-                <a href="" class="">Feedback</a>
-            </td>
-            <td class="ui-draggable" data-name="textarea" cname="6">
-                <a href="" class="">Female</a>
-            </td>
-        </tr>
-        <tr>
-            <td class="ui-draggable" data-name="radio" cname="5">
-                <a href="" class="">Male</a>
-            </td>
-            <td class="ui-draggable" data-name="text" cname="3">
-                <a href="" class="">Email Address</a>
-            </td>
-        </tr>
-        <tr>
-            <td class="ui-draggable" data-name="select" cname="10">
-                <a href="" class="">Profile Pic</a>
-            </td>
-            <td class="ui-draggable" data-name="number" cname="8">
-                <a href="" class=" field-number">Date</a>
-            </td>
-        </tr>
-    </script> -->
-</head>
+    </head>
 
 <body>
     <div id="wrapper">
@@ -100,7 +62,7 @@
             <ul class="sidebar-nav">
                 <li class="sidebar-brand">
                     <a href=#>Entity Fields</a>
-                    <div id="Add" class="ui-draggable" cname="new"></div>
+                    <div id="Add" class="ui-draggable"></div>
                 </li>
             </ul>
             <div class="scroller">
@@ -126,7 +88,7 @@
 
             </div>
             <div id="type">
-                <label class="btn">
+                <!--<label class="btn">
                     <input name="fieldType" type="radio" id="TypeTextLabel" value="TextLabel" /> Label
                 </label>
                 <label class="btn">
@@ -153,7 +115,7 @@
                 <label class="btn">
                     <input name="fieldType" type="radio" id="TypeImage" value="Image" /> Image
                 </label>
-
+            -->
             </div>
 
 
@@ -273,6 +235,13 @@
                     {{/each}}
                 </select>
             </div>
+        </script>
+        <script id="typeTemplate" type="text/x-handlebars-template">
+            {{#each this}}
+            <label class="btn">
+                <input name="fieldType" type="radio" id="{{typeId}}" value="{{typeValue}}" /> {{displayLabel}}
+            </label>
+            {{/each}}
         </script>
     </div>
     <div id="contextMenu" style="display:none">

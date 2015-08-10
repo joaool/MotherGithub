@@ -30,6 +30,7 @@
             } 
         });
         
+        
         var mainView = new FormDesigner.Views.MainView({el : "body"});
         mainView.loadEntities();
         
