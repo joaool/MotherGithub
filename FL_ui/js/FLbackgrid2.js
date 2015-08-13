@@ -170,7 +170,6 @@ FL["bg"] = (function () {//name space FL.common
                         if (tail.length < decimals) {
                             tail = tail.pad(decimals, "0", 1);
                         }
-                        ;
                         xRet = intValueStr + radixpoint + tail;
                     }
                     return xRet
@@ -178,24 +177,36 @@ FL["bg"] = (function () {//name space FL.common
                 var cellVal = $(this).val();
                 var paddedCell = paddedValue(cellVal, decimals);
                 console.log('------------->on focus ==>' + $(this).val() + " -->" + paddedCell);
+                var cellNoPre_NoPos = FL.common.minusAndPointInEmbededDigit(paddedCell) + FL.common.extractContentBetweenFirstAndLastDigit(paddedCell);
+                $(this).val(cellNoPre_NoPos);
+                //$(this).FLnumeric("JOJO",true,",");
+                $(this).mask(mask, options);//modified https://github.com/igorescobar/jQuery-Mask-Plugin   1234512345 123
 
-                $(this).val(paddedCell);
                 $(this).select();
             });
+            //http://www.mredkj.com/javascript/numberFormat.html
             var options = {
                 reverse: true,
                 maxlength: false,
                 onKeyPress: function (val, event, currentField, options) {
-                    console.log('------------->An key was pressed!:', val, ' event: ', event, 'currentField: ', currentField, ' options: ', options);
-                    console.log('------------->current value=' + val);
+                    FL.common.printToConsole('------------->A key was pressed! currentValue=' + val, "bg");
+                    //console.log('------------->An key was pressed!:', val, ' event: ', event, 'currentField: ', currentField, ' options: ', options);
+                    //console.log('------------->current value=' + val);
                 }
             };
-            $(this.el).mask(mask, options);//https://github.com/igorescobar/jQuery-Mask-Plugin
+            //$(this.el).mask(mask, options);//https://github.com/igorescobar/jQuery-Mask-Plugin   1234512345 123
+            //$(this.el).FLnumeric("JOJO",true,",");
+            //var z= this.$el.find("selector");
+            //$("#display2").val("11111111");
+            //$("#display2").FLnumeric("JOJO",true,",");
+            //this.$el.val("111111");
+            //this.render();
         },
         render: function (model) {
             var cellVal = this.model.get(this.column.get("name"));//extracts from model
             cellVal = this.formatter.fromRaw(cellVal);//converts to cell
             this.$el.val(cellVal);
+            //this.$el.FLnumeric("JOJO",true,",");
             console.log("render number....<" + cellVal + ">-->" + JSON.stringify(this.model.toJSON()));
             this.delegateEvents();
             return this;
@@ -682,7 +693,25 @@ FL["bg"] = (function () {//name space FL.common
                 });
                 retObj["cell"] = comboCell;
             } else if (typeUI == "checkbox") {
+                var checkboxFormatter = {
+                    fromRaw: function (rawValue) {
+                        if (FL.common.typeOf(rawValue) == "boolean") {///Only to prevent old logical values in the database
+                            alert("FL.bg --->cellType for typeUI=checkbox ERROR old logical value in database -->press OK to correct");
+                            rawValue = ( (rawValue) ? "TRUE" : "FALSE");
+                        }
+                        var bool = ( (rawValue.toUpperCase() == "TRUE") ? true : false );
+                        return bool;
+                        //return rawValue;
+                    },
+                    toRaw: function (formattedData) {
+                        //var z = formattedData;
+                        //return formattedData;
+                        var boolStr = ( (formattedData) ? "TRUE" : "FALSE" );
+                        return boolStr;
+                    }
+                };
                 var BooleanCell = Backgrid.BooleanCell.extend({
+                    formatter: checkboxFormatter,
                     editor: Backgrid.BooleanCellEditor.extend({
                         render: function () {
                             var model = this.model;
@@ -692,7 +721,9 @@ FL["bg"] = (function () {//name space FL.common
                              * Toggle checked property since a click is what triggered enterEditMode
                              */
                             this.$el.prop("checked", !val);
-                            model.set(columnName, !val);
+                            var dataToModel = this.formatter.toRaw(!val);
+                            //model.set(columnName, !val);
+                            model.set(columnName, dataToModel);
                             return this;
                         }
                     })

@@ -68,148 +68,12 @@ FL["grid"] = (function () {//name space FL.grid
         });
         return {empties: empties, uniqueArr: uniqueArr};
     };
-    var dataRowAnalisys = function (rows, percent) {
-        // this methods decides the date type of every single column in rows by analysing a sample (rows).
-        // returns an array of attributes (one element per column) each element  with  format:
-        //		{"fieldType":"string","fieldTypeUI":"textbox","numberFormat":null, enumerable:null,label:element};
-        //
-        // assumes that all rows have the same json pattern with same type in the whole array - assumes type of row = type of first row
-        // If column row type is "string" search for enumerables within that column
-        //    if [(total number of groups)/(number of rows) < percent ] assumes enumerable and identifies an array of enumerables
-        // returns
-        //   [ {name:{fieldType:"string", label:"Name"}}, ...., {service:{fieldType:"enumerable", label:"Name", enumerable:[*]}} ]
-        //      if fieldType="enumerable" the property enumerable has an array with the enumerable options.
-        var numOfRows = rows.length;
-        var rowsSample = FL.common.makeFirstElementsSample(rows, 50); //reduces max size of array to 50
-        var numOfSampleRows = rowsSample.length;
-        var arrOfKeys = _.keys(rows[0]);//at least row[0] must exist
-        var arrOfTypes = [];
-        _.each(arrOfKeys, function (element, index) {
-            var obj = {};
-            var dataType = utils.typeOf((rows[0][element]));//one of  "number","string","email","boolean","object","array","null","undefined","date"
-            //note about numbers: if dataType is number no doubt about it. But...it could be a string representing a number
-            if (dataType == "string") {//possible datatypes:string, integer, number, boolean, date, or json
-                //analysis of the first 50 elements or all if length<50
-                var arrOfSampleRowValues = _.pluck(rowsSample, element);
-                //the base javascript is of type "string" but it can be:
-                //    a date in string format
-                //    an enumerable
-                var numberObj = FL.common.getArrNumberFormat(arrOfSampleRowValues);
-                if (numberObj.number) {//this string is a number in string format
-                    obj[element] = {
-                        //"fieldType": "number",
-                        "fieldType": "string",
-                        "fieldTypeUI": "numberbox",
-                        "numberFormat": numberObj.format,
-                        enumerable: null,
-                        label: element
-                    };
-                    //now the whole column must be converted from string to numeric
-                    // var arrOfColumnToConvert = _.pluck(rows,element);
-                    // FL.common.convertStringVectorToNumber(arrOfColumnToConvert,numberObj.format);
-                } else if (FL.common.is_dateArrInStringFormat(arrOfSampleRowValues)) {//values are in string format but are they a deguised date column ?
-                    obj[element] = {
-                        //"fieldType": "date",
-                        "fieldType": "string",
-                        //"fieldTypeUI": "datetextbox",
-                        "fieldTypeUI": "datetimebox",
-                        "numberFormat": null,
-                        enumerable: null,
-                        label: element
-                    };
-                } else if (FL.common.is_enumerableArr(arrOfSampleRowValues, percent)) {//It is an enumerable we will prepare the enumerable content
-                    var arrOfAllRowValues = _.pluck(rows, element);
-                    var fullUniqueObj = FL.common.extractUniqueFromArray(arrOfAllRowValues);
-                    obj[element] = {
-                        "fieldType": "string",
-                        "fieldTypeUI": "combobox",
-                        "numberFormat": null,
-                        enumerable: fullUniqueObj.uniqueArr,
-                        label: element
-                    };
-                } else {//not a string number, note a string date and  not an enumerable
-                    var uniqueObj = FL.common.extractUniqueFromArray(arrOfSampleRowValues);
-                    obj[element] = {
-                        "fieldType": "string",
-                        "fieldTypeUI": "textbox",
-                        "numberFormat": null,
-                        enumerable: null,
-                        label: element
-                    };
-                    if (is_ColumnOfSubtype("email", uniqueObj.uniqueArr)) //checks that all sample objects are of subtype
-                        obj[element]["fieldTypeUI"] = "emailbox";
-                    else if (is_ColumnOfSubtype("url", uniqueObj.uniqueArr))
-                        obj[element]["fieldTypeUI"] = "urlbox";
-                    else if (is_ColumnOfSubtype("phone", uniqueObj.uniqueArr))
-                        obj[element]["fieldTypeUI"] = "phonebox";
-                }
-            } else {
-                if (dataType == "number") {//possible datatypes:string, integer, number, boolean, date, or json
-                    obj[element] = {
-                        //"fieldType": "number",
-                        "fieldType": "string",
-                        "fieldTypeUI": "numberbox",
-                        "numberFormat": null,
-                        enumerable: null,
-                        label: element
-                    };
-                } else if (dataType == "email") {
-                    obj[element] = {
-                        "fieldType": "string",
-                        "fieldTypeUI": "emailbox",
-                        "numberFormat": null,
-                        enumerable: null,
-                        label: element
-                    };
-                } else if (dataType == "boolean") {
-                    obj[element] = {
-                        //"fieldType": "boolean",
-                        "fieldType": "string",
-                        "fieldTypeUI": "checkbox",
-                        "numberFormat": null,
-                        enumerable: null,
-                        label: element
-                    };
-                } else if (dataType == "date") {
-                    obj[element] = {
-                        //"fieldType": "date",
-                        "fieldType": "string",
-                        "fieldTypeUI": "datetextbox",
-                        "numberFormat": null,
-                        enumerable: null,
-                        label: element
-                    };
-                } else {
-                    obj[element] = {
-                        "fieldType": "string",
-                        "fieldTypeUI": "textbox",
-                        "numberFormat": null,
-                        enumerable: null,
-                        label: element
-                    };
-                }
-            }
-            arrOfTypes.push(obj);
-        });
-        return arrOfTypes;
-    };
-    var dataRowAnalysis2 = function (rows, percent) {
-        // this methods decides the userType of every single column in rows by analysing a sample (rows).
-        // It also defines the probable radixpoint and data separator among all columns
-        //     setting FL.grid.csvRadixpoint to "." or "," and FL.grid.csvThousandsSeparator to "." or ","  or "space"
-        // returns an array of attributes (one element per column) each element  with  format:
-        //		{"fieldType":<"string" or "number">,"fieldTypeUI":< one of typeUIs>,enumerable:null,label:element};
-        //   fills FL.grid.csvRadixpoint with "." or "," and fills FL.grid.csvThousandsSeparator with "." "," or "space" according to csv analysis
-        //
-        // assumes that all rows have the same json pattern with same type in the whole array - assumes type of row = type of first row
-        // If column row type is "string" search for enumerables within that column
-        //    if [(total number of groups)/(number of rows) < percent ] assumes enumerable and identifies an array of enumerables
-        // returns
-        //   [ {name:{fieldType:"string", label:"Name"}}, ...., {service:{fieldType:"enumerable", label:"Name", enumerable:[*]}} ]
-        //      if fieldType="enumerable" the property enumerable has an array with the enumerable options.
-        var flagFormatDiscovered = false; //as soon as radix and separator format are dicovered flag is set to true - no more research needeed to
+    var identifyRadixAndSeparator = function (rows) {
+        // it is possible that some numeric formats are ambiguous (like 1,234 US (the same as 1234) and 1,234 Europe (the same as 1.234 US))
+        // to resolve that ambiguity identifyRadixAndSeparator tries to find among sample rows a numeric cell that solves ambiguity if not takes the receiving appSettings
         FL.grid.csvRadixpoint = FL.common.appsettings.radixpoint; //initially assumes CSV comes with receptor radixpoint
         FL.grid.csvThousandsSeparator = FL.common.appsettings.thousandsSeparator; //initially assumes CSV comes with receptor thousandsSeparator}}
+        var flagFormatDiscovered = false; //as soon as radix and separator format are dicovered flag is set to true - no more research needeed
         function discoverRadixAndSep(numStr) {
             var radix = FL.common.extractRadixFrom(numStr);
             var sep = FL.common.extractThousandsSeparatorFrom(numStr);
@@ -221,13 +85,7 @@ FL["grid"] = (function () {//name space FL.grid
                 }
             }
         };
-        var numOfRows = rows.length;
-        var rowsSample = FL.common.makeFirstElementsSample(rows, 50); //reduces max size of array to 50
-        var numOfSampleRows = rowsSample.length;
-
         var arrOfKeys = _.keys(rows[0]);//at least row[0] must exist
-        // it is possible that some numeric formats are ambiguous (like 1,234 US (the same as 1234) and 1,234 Europe (the same as 1.234 US))
-        // to resolve that ambiguity dataRowAnalysis tries to find among sample rows a numeric cell that solves ambiguity if not takes the receiving appSettinhs
         _.each(rows, function (currentRow, index) {
             if (!flagFormatDiscovered) {
                 _.each(arrOfKeys, function (colName, index) {
@@ -246,6 +104,21 @@ FL["grid"] = (function () {//name space FL.grid
                 });
             }
         });
+    };
+    var dataRowAnalysis = function (rows, percent) {//returns an array with {fieldType:x1, fieldTypeUI:x2, enumerable:x3, label;x4} for each column
+        // fieldType <"string" or "number">, fieldTypeUI:<userType> and enumerable:<array or null> are discoverd from a sample of input rows
+        //      userTyoes:"textbox","numberbox","currencybox","integerbox","percentbox", "urlbox","combobox","datetimebox","emailbox","checkbox"
+        //          to be done later: "phonebox","areabox","lookupbox"
+        // It also defines the probable radixpoint and data separator among all columns to be used on adjustCSVRowsToTypeUI to solve ambiguities
+        //     setting FL.grid.csvRadixpoint to "." or "," and FL.grid.csvThousandsSeparator to "." or ","  or "space"
+        // assumes that all rows have the same json pattern with same type in the whole array - assumes type of row = type of first row
+        // If column row type is "string" search for enumerables within that column
+        //    if [(total number of groups)/(number of rows) < percent ] assumes enumerable and identifies an array of enumerables
+        identifyRadixAndSeparator(rows);
+        var numOfRows = rows.length;
+        var rowsSample = FL.common.makeFirstElementsSample(rows, 50); //reduces max size of array to 50
+        var numOfSampleRows = rowsSample.length;
+        var arrOfKeys = _.keys(rows[0]);//at least row[0] must exist
         var arrOfTypes = [];
         _.each(arrOfKeys, function (element, index) {
             if (element) {
@@ -271,19 +144,17 @@ FL["grid"] = (function () {//name space FL.grid
                         }
                     }
                 } else {
-                    //because arrOfSampleRowValues is an array of numbers we must convert it to string before discovering the type
-                    var arrOfSamplesStr = [];
+                    var arrOfSamplesStr = [];//because arrOfSampleRowValues is an array of numbers we must convert it to string before discovering the type
                     _.each(arrOfSampleRowValues, function (rowElement, index) {
                         var numberStr = '' + rowElement;
                         arrOfSamplesStr.push(numberStr);
                     });
-                    userType = FL.common.getArrUserType(arrOfSamplesStr);//one of textbox,numberbox,integerbox,currencybox,urlbox,checkbox,datetimebox,emailbox
+                    userType = FL.common.getArrUserType(arrOfSamplesStr);//arrOfSamplesStr is an array with a single element
                     fieldType = "number";
                 }
                 obj[element] = {
                     "fieldType": fieldType,
                     "fieldTypeUI": userType,
-                    //"numberFormat": numberObj.format,
                     enumerable: enumerable,
                     label: element
                 };
@@ -292,26 +163,7 @@ FL["grid"] = (function () {//name space FL.grid
         });
         return arrOfTypes;
     };
-    var translateToDDFormat = function (arrOfAttributes) {//translates arrOfAttributes format to dd format
-        // format of array [attributeName1:{fieldType":"string","fieldTypeUI":"textbox","numberFormat":null, enumerable:null,label:element},attributeName2:{..}]
-        // returns  - array of objects in dd format [{name:"address",description:"address to send invoices",label:"Address",type:"string",typeUI:"textbox",enumerable:null,key:false},{}..];
-        var attributesArr = [];
-        var attrName = null;
-        _.each(arrOfAttributes, function (element, index) {
-            attrName = _.keys(element)[0];
-            attributesArr.push({
-                "name": attrName,
-                description: "description of " + attrName,
-                label: element[attrName].label,
-                type: element[attrName].fieldType,
-                typeUI: element[attrName].fieldTypeUI,
-                enumerable: element[attrName].enumerable,
-                key: false
-            });
-        });
-        return attributesArr;
-    };
-    var translateToDDFormat2 = function (arrOfAttributes) {//translates arrOfAttributes format to dd format and includes info for setupGridColumnsArrNoDict
+    var translateToDDFormat = function (arrOfAttributes) {//translates arrOfAttributes format to dd format and includes info for setupGridColumnsArrNoDict
         // format of array [attributeName1:{fieldType":"string","fieldTypeUI":"textbox","numberFormat":null, enumerable:null,label:element},attributeName2:{..}]
         // returns  - array of objects in dd format [{name:"address",description:"address to send invoices",label:"Address",type:"string",typeUI:"textbox",enumerable:null,key:false},{}..];
         var attributesArr = [];
@@ -333,61 +185,11 @@ FL["grid"] = (function () {//name space FL.grid
         });
         return attributesArr;
     };
-// var createAttributesArrFromCsvAnalisys = function(rows){//creates the equivalent to a dd entry from a set of rows
-    var adjustRowsToAttributes = function (rows, arrOfAttributes) {//creates the equivalent to a dd entry from a set of rows
-        // rows - an array of objects format [{"colum1Name":col11,"colum2Name":col12,..},{"colum1Name":col21,"colum2Name":col22,..}...{}]
-        // arrOfAttributes has analysis format ->[attributeName1:{fieldType":"string","fieldTypeUI":"textbox","numberFormat":null, enumerable:null,label:element},attributeName2{..}]
-        //arrOfAttributes - array of objects ex: [{name:"address",description:"address to send invoices",label:"Address",type:"string",typeUI:"textbox",enumerable:null,key:false},{}..];
-        // returns an array with the same format as dd dictionary array of attributes. Each element has the following format:
-        //      ex: {name:"address",description:"address to send invoices",label:"Address",type:"string",enumerable:null,key:false});
-        // var attributesArr = [];
-        // var arrOfAttributes = dataRowAnalisys(rows, 0.5);//returns an array of attributes (one element per column)
-        var rrows = rows;
-        //	format of arrOfAttributes {"fieldType":"string","fieldTypeUI":"textbox","numberFormat":null, enumerable:null,label:element};
-        _.each(arrOfAttributes, function (element, index) {
-            var attrName = _.keys(element)[0];//extract keys from first line
-            var fieldType = element[attrName].fieldType;
-            var fieldTypeUI = element[attrName].fieldTypeUI;
-            var numberFormat = element[attrName].numberFormat;
-            var label = element[attrName].label;
-            var enumerable = null;
-            var columnVector = null;
-            var rows = rrows;
-            // if(fieldType=="enumerable"){
-            //     enumerable = element[attrName].enumerable;
-            // }
-            if (fieldType == "string" && fieldTypeUI == "combobox") {
-                enumerable = element[attrName].enumerable;
-            } else if (fieldType == "number") {
-                // columnVector = _.pluck(rows,attrName);
-                var numberVal = null;
-                // FL.common.convertStringVectorToNumber(columnVector,numberFormat);
-                _.each(rows, function (rowElement, index) {
-                    numberVal = rowElement[attrName];
-                    rowElement[attrName] = FL.common.localeStringToNumber(numberVal, numberFormat);
-                });
-                FL.common.printToConsole("createAttributesArrFromCsvAnalisys NUMERIC attrName=" + attrName + " is complete........");
-                var z = 32;
-            } else if (fieldType == "date") {
-                //we will see
-                // columnVector = _.pluck(rows,attrName);
-                _.each(rows, function (rowElement, index) {
-                    if (typeof rowElement[attrName] != "date") {//if is a string containing a date must be converted
-                        rowElement[attrName] = new Date(rowElement[attrName]);//old content in string is converted to date
-                    }
-                });
-                FL.common.printToConsole("createAttributesArrFromCsvAnalisys DATE attrName=" + attrName + " is complete........", "grid");
-            }
-        });
-    };
-    var adjustRowsToAttributes2 = function (rows, arrOfAttributes) {//correct each row content from external csv to framelink fieldTypeUI identified by dataRowAnalysis2
+    var adjustCSVRowsToTypeUI = function (rows, arrOfAttributes) {//correct each row content from external csv to framelink fieldTypeUI identified by dataRowAnalysis2
         // rows - an array of objects format [{"colum1Name":col11,"colum2Name":col12,..},{"colum1Name":col21,"colum2Name":col22,..}...{}]
         // arrOfAttributes has analysis format ->[attributeName1:{fieldType":"string","fieldTypeUI":"textbox","numberFormat":null, enumerable:null,label:element},attributeName2{..}]
         //arrOfAttributes - array of objects ex: [{name:"address",description:"address to send invoices",label:"Address",type:"string",typeUI:"textbox",enumerable:null,key:false},{}..];
         var rrows = rows;
-        //it may happen that the
-
-        //	format of arrOfAttributes {"fieldType":"string","fieldTypeUI":"textbox","numberFormat":null, enumerable:null,label:element};
         _.each(arrOfAttributes, function (element, index) {//for each attributes check if it is necessary to correct all rows from external csv
             var attrName = _.keys(element)[0];//extract keys from first line
             var fieldType = element[attrName].fieldType;
@@ -397,8 +199,6 @@ FL["grid"] = (function () {//name space FL.grid
             var enumerable = null;
             var columnVector = null;
             var rows = rrows;
-            //  “textbox”,"numberbox","currencybox","integerbox","percentbox", "urlbox", ”areabox”, ”combobox”, ”checkbox”, “phonebox”, “datetimebox”, "emailbox", "lookupbox"“
-            // must be changed: "numberbox","currencybox","integerbox","percentbox" --->to string in US format (radix=. no separators)
             if (fieldTypeUI == "numberbox") {
                 _.each(rows, function (rowElement, index) {
                     var numberStr = rowElement[attrName];
@@ -415,18 +215,20 @@ FL["grid"] = (function () {//name space FL.grid
                 _.each(rows, function (rowElement, index) {
                     var currencyStr = rowElement[attrName];
                     var numberStr = FL.common.extractContentBetweenFirstAndLastDigit(currencyStr);// - is excluded !!!! IMPORTANT
+                    numberStr = FL.common.minusInEmbededDigit(currencyStr)+numberStr;
                     rowElement[attrName] = numberStr.ToNumeric_US(FL.grid.csvRadixpoint);
                 });
             } else if (fieldTypeUI == "percentbox") {
                 _.each(rows, function (rowElement, index) {
                     var percentStr = rowElement[attrName];
                     var numberStr = FL.common.extractContentBetweenFirstAndLastDigit(percentStr);// - is excluded !!!! IMPORTANT
+                    numberStr = FL.common.minusInEmbededDigit(percentStr)+numberStr;
                     rowElement[attrName] = numberStr.ToNumeric_US(FL.grid.csvRadixpoint);
                 });
             }
         });
     };
-    var is_ColumnOfSubtype = function (subtype, sampleArr) {//scans all elements of sampleArr and returns true if all non empty elements belongs to subtype
+    var Xis_ColumnOfSubtype = function (subtype, sampleArr) {//scans all elements of sampleArr and returns true if all non empty elements belongs to subtype
         //example
         //		if( is_ColumnOfSubtype("email",arrOfRowValues) )
         //		if( is_ColumnOfSubtype("url",arrOfRowValues) )
@@ -1287,47 +1089,6 @@ FL["grid"] = (function () {//name space FL.grid
         csvEncoding: null,
         csvRadixpoint: null,
         csvThousandsSeparator: null,
-        xxxx: function (boxId) {
-            var optionsArr = null;
-            var fieldName = "field";
-            var boxCurrent = "Please Choose";
-            var buffer = FL.common.generalParametersObj["_" + fieldName];
-            if (buffer) {
-                optionsArr = FL.common.generalParametersObj["_" + fieldName].alternativeOptions;
-                var $dropDownSelect = $("#" + boxId);
-                //$dropDownSelect.parents('.btn-group').find('.dropdown-toggle').html(boxCurrent + ' <span class="caret"></span>');//shows current value
-                ////... and we load the select box with the current available values
-
-                //$dropDownSelect.empty();//removes the child elements of the dropdown.
-                _.each(optionsArr, function (element) {
-                    var id = boxId + "_" + element.text;
-                    console.log("--->" + id);
-                    $dropDownSelect.append("<li id='" + id + "'><a href='#'>" + element.text + "</a></li>");
-                });
-
-                $("#" + boxId + " li a").click(function () {
-                    var detailLine = -1; //assumes master
-                    var detailLineStr = FL.common.stringAfterLast(boxId, "__f");//"_dictEditEntityTemplate__f4_userType_options"
-                    if (detailLineStr) {
-                        detailLineStr = FL.common.stringBeforeFirst(detailLineStr, "_");//"4_userType_options" =>"4"
-                        detailLine = parseInt(detailLineStr, 10) - 1;//to convert to base 0
-                    }
-                    var selText = $(this).text();
-                    var list = $("#" + boxId + " li a");
-                    var index = list.index(this);
-
-                    var elObj = optionsArr[index]; //exchanged by test
-
-
-                    $dropDownSelect.parents('.btn-group').find('.dropdown-toggle').html(selText + ' <span class="caret"></span>');
-                    // onSelection(selText);//runs the callback function
-                    onSelection(elObj, detailLine);//runs the callback function with the element object as argument and the detail line (-1 =>master)
-                });
-
-            }
-            console.log("FL.gridxxxx() -->" + boxId);
-            return true;
-        },
         createGrid: function () {//call with menu key "uri": "javascript:FL.grid.createGrid()"
             var masterDetailItems = {
                 master: {entityName: "sample", headerString: ""},
@@ -1773,12 +1534,10 @@ FL["grid"] = (function () {//name space FL.grid
                     //  ->Store csvStore to Serverr and place menu titem to acess data from server.
 
                     thiz.removeLastRowIfIncomplete(data);//to remove eventual incomplete last line
-                    //var arrOfAttributes = dataRowAnalisys(data.data, 0.5);//row analisys returning array of attributes (one element per column)
-                    var arrOfAttributes = dataRowAnalysis2(data.data, 0.5);//row analisys returning array of attributes (one element per column)
-                    adjustRowsToAttributes2(data.data, arrOfAttributes);//here we will adjust data.data according with the analisys feedback in arrOfColumns
-                    var arrOfColumns = translateToDDFormat2(arrOfAttributes);//translates arrOfAttributes format to dd format
-                    // returns an array with the same format as dd dictionary array of attributes. Each element has the following format:
-                    //   ex: {name:"address",description:"address to send invoices",label:"Address",type:"string",enumerable:null,key:false});
+                     var arrOfAttributes = dataRowAnalysis(data.data, 0.5);//row analisys returning array of attributes (one element per column)
+                    adjustCSVRowsToTypeUI(data.data, arrOfAttributes);//here we will adjust data.data according with the analisys feedback in arrOfColumns
+                    var arrOfColumns = translateToDDFormat(arrOfAttributes);//translates arrOfAttributes format to dd format
+                    // arrOfColumns has for each col:   ex: {name:"address",description:"address to send invoices",label:"Address",type:"string",enumerable:null,key:false});
                     //injectId("#", arrOfColumns); //now the first column is an "id" column
                     csvStore.setAttributesArr(arrOfColumns);
                     FL.grid.csvToStore(data.data); //feeds the csvStore data store object. It inserts id element and converts keys to lowercase

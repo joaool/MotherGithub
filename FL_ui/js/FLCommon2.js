@@ -185,6 +185,74 @@ String.prototype.isInteger = function () {//returns true if a string has the for
         return false
     return true;
 };
+(function( $ ){//a jquery plugin !!!
+    $.fn.FLnumeric = function(par1,minus,radix) {
+        //var sel = this.selector;//the current selector
+        var sel = $(this).selector;//the current selector
+        //var currVal = $(sel).val();
+        var currVal = $(this).val();
+        var specialKeys = new Array();
+        var radixCode = 46;//default is point - ","=>44 "."=>46,
+        var sepCode = 44;//default is comma
+        var sep = ",";//default
+        if(radix){
+            if(radix==","){
+                radixCode = 44;
+                sep = ".";
+                sepCode = 46;
+                extraAllowedKeys = [44];// ","=>44
+            }
+        }else{
+            var radix = ".";//default
+            sep = ",";
+        }
+        var extraAllowedKeys = [radixCode];
+        //var minus = true;//"-"=>45
+        var that = this;
+        specialKeys.push(8); //Backspace=>8
+        //$(this.selector).bind("keypress", function (e) {
+        $(this).bind("keypress", function (e) {
+            var keyCode = e.which ? e.which : e.keyCode;
+            var pos=document.getElementById(this.id).selectionStart;
+            console.log(par1+" FL-->"+keyCode);
+            console.log(par1+" FL----->"+extraAllowedKeys.indexOf(keyCode));
+            if(keyCode==13){//return
+                alert("****************"+this.value + " start:"+pos);
+                var finalNum = $(sel).val();
+                return finalNum;
+            }
+            if(minus){
+                if(keyCode==45){
+                    if(pos===0)
+                        return true;//accepts minus is at the beginning
+                    else
+                        return false;
+                }
+      1      }
+            if(keyCode==radixCode){//checks if radix is acceptable
+                var radixPos =  $(sel).val().indexOf(radix);
+                if(radixPos>0){//removes previous radix an sets new radix
+                    var currNum = $(sel).val();
+                    if(radix==".")
+                        currNum = currNum.replace(/\./g, '');//remove point
+                    else
+                        currNum = currNum.replace(/,/g, '');//remove comma
+                    currNum = currNum.substr(0,pos-1) + radix + currNum.substr(pos);
+                    $(sel).val(currNum);
+                    return false;//radix was inserted inprevious code
+                    //return false;//radix already exists on string
+                }
+            }
+            var ret = ((keyCode >= 48 && keyCode <= 57) || extraAllowedKeys.indexOf(keyCode) != -1 || specialKeys.indexOf(keyCode) != -1);//1-9 =>49-57
+            $(".error").css("display", ret ? "none" : "inline");
+            var num=$(sel).val();
+            console.log("FLnumeric:"+num);
+            return ret;
+        });                    var num=$(sel).val();
+        //alert("****-->" + num );
+        return this;
+    };
+})( jQuery );
 FL["common"] = (function () {//name space FL.common
     var loadCSS = function (fileCss) {
         var cssLink = $("<link rel='stylesheet' type='text/css' href='FL_ui/css/" + fileCss + "'>");
@@ -444,7 +512,25 @@ FL["common"] = (function () {//name space FL.common
             var strOut = currencyStr.replace(/[^0-9.,-]/g, "");
             return strOut;
         },
-        preDigit: function (str) {//from a string input return the content before the first digit or - sign - or null if no digit exists
+        minusAndPointInEmbededDigit:function(str){//returns "-" if there is a minus sign before the first digit embeded in a string or "" no minus sign before first digit or no first digit
+            // example
+            //   var cellNoPre_NoPos = FL.common.minusInEmbededDigit(paddedCell) + FL.common.extractContentBetweenFirstAndLastDigit(paddedCell);
+            var firstDigit = str.match(/\d/);
+            if (firstDigit) {
+                var firstPos = str.indexOf(firstDigit);
+                if (firstPos > 0) {//checks if previous char is "-"
+                    var prevChar = str.substring(firstPos - 1, firstPos);
+                    if (prevChar == "-")
+                        return "-";
+                    if (prevChar == "-.")
+                        return "-.";
+                    if (prevChar == ".")
+                        return ".";
+                }
+            }
+            return "";
+        },
+        preDigit: function (str) {//from a string input return the content before the first digit or - sign <-> or null if no digit exists
             var strOut = null;
             str = str.replace(/-/g, '');//remove -
             var firstDigit = str.match(/\d/);
