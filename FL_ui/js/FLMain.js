@@ -63,7 +63,7 @@ var FL = FL || {};
     $(document).ready(function () {
         //FL.common.debugFilter = false;//it was
         FL.common.debug = false; ////if true shows all FL.common.printToConsole() independentely of filters  ->fallsback to console.log - if false =>only debugFilterToShow will appear
-        FL.common.debugFiltersToShow = ["API", "util","bg", "checkServerCall", "abc", "grid","apigee", "login", "dump", "dd","modalIn"];//note that "dump" is a reserved word for FL.dd.displayEntities()
+        FL.common.debugFiltersToShow = ["API", "util","bg","memoryCsv", "checkServerCall", "abc", "grid","apigee", "login", "dump", "dd","modalIn"];//note that "dump" is a reserved word for FL.dd.displayEntities()
         FL.API.fl.setTraceClient(2);
         //alert("xuxu_all");
         FL.common.printToConsole("joakimX1X1", "abc");

@@ -215,14 +215,14 @@ FL["grid"] = (function () {//name space FL.grid
                 _.each(rows, function (rowElement, index) {
                     var currencyStr = rowElement[attrName];
                     var numberStr = FL.common.extractContentBetweenFirstAndLastDigit(currencyStr);// - is excluded !!!! IMPORTANT
-                    numberStr = FL.common.minusInEmbededDigit(currencyStr)+numberStr;
+                    numberStr = FL.common.digitPrefixInEmbededDigit(currencyStr)+numberStr;
                     rowElement[attrName] = numberStr.ToNumeric_US(FL.grid.csvRadixpoint);
                 });
             } else if (fieldTypeUI == "percentbox") {
                 _.each(rows, function (rowElement, index) {
                     var percentStr = rowElement[attrName];
                     var numberStr = FL.common.extractContentBetweenFirstAndLastDigit(percentStr);// - is excluded !!!! IMPORTANT
-                    numberStr = FL.common.minusInEmbededDigit(percentStr)+numberStr;
+                    numberStr = FL.common.digitPrefixInEmbededDigit(percentStr)+numberStr;
                     rowElement[attrName] = numberStr.ToNumeric_US(FL.grid.csvRadixpoint);
                 });
             }
@@ -815,7 +815,7 @@ FL["grid"] = (function () {//name space FL.grid
         getTemplatesPromise.done(function (data) {
             FL.common.printToConsole(">>>>>FLGrid2.js prepareNewsletterEmission  SUCCESS <<<<<");
             if (data.length === 0) {
-                FL.common.makeModalInfo('No templates available. You must have at least one template saved.');
+                FL.common.makeModalInfo('No templates available. You must have at least one template saved.<br><br>Please use "Settings->emails/NewsLetter->NewsLetter templates" to define your first template.');
             } else {
                 // aGrid2nulinks2.js prepareNewsletterEmission =>\n" + JSON.stringify(data));//data array of objects
                 var emissionPromise = newsletterEmissionUI(data, entityName, grid, emailAttributeName);
@@ -853,100 +853,6 @@ FL["grid"] = (function () {//name space FL.grid
             return def.reject("FLmenulink2.js getMailchimpHTML ->ERROR: token is empty");
         }
         return def.promise();
-    };
-    var getMailchimpTemplates = function () {
-        var def = $.Deferred();
-        var arr = null;
-        var fl = FL.fl;
-        if (fl) {
-            var mc = new fl.mailChimp();
-            mc.campaignList({data: 1}, function (err, data) {
-                // FL.common.printToConsole("campaignlist returns no error data="+JSON.stringify(data.data));
-                if (!err) {
-                    var arrOfObj = [];
-                    var item = null;
-                    _.each(data.data, function (element, index) {
-                        item = {value: index, text: element.title, cId: element.id};
-                        arrOfObj.push(item);
-                    });
-                    // arrCid = _.pluck(data.data,"id");
-                    // arrTitles = _.pluck(data.data,"title");
-                    def.resolve(arrOfObj);
-                    // oneCampaign=data.data[data.data.length-1];
-                    // FL.common.printToConsole("requesting content for cid: " + oneCampaign.id);
-                } else {
-                    return def.reject("FLmenulink2.js getTemplates -ERROR:" + err);
-                }
-            });
-        } else {
-            return def.reject("FLmenulink2.js getTemplates ->ERROR: token is empty");
-        }
-        return def.promise();
-    };
-    var prepareNewsletterMCEmission = function (entityName) {
-        //collects all data to send a newsletter to the current grid. Including the template to use.
-        FL.login.emailTemplateName = null;//cleans any previous template name
-        var pos = FL.login.token.userName.indexOf("@");
-        var shortUserName = FL.login.token.userName.substring(0, pos);
-        var masterDetailItems = {
-            master: {
-                toEmail: shortUserName,
-                email: FL.login.token.userName,
-                subject: "",
-                testEmail: FL.login.token.userName
-            },
-            detail: {} //no detail
-        };
-        // prepares FL.common.editMasterDetail options (including the templates dropdown)
-        FL.login.emailContentTemplate = null;
-        var getTemplatesPromise = getMailchimpTemplates();
-        getTemplatesPromise.done(function (arrOfObj) {
-            // alert("getTemplatesPromise done getTemplates-->"+_.pluck(arrOfObj,"text"));
-            var options = {
-                type: "primary",
-                icon: "send",
-                button1: "Cancel",
-                button2: "Send MC Newsletter",
-                dropdown: {
-                    "_sendNewsletter_template": {
-                        arr: arrOfObj,//titles,
-                        default: "No template",
-                        onSelect: function (objSelected) {// FL.common.printToConsole("Template choice was "+objSelected.text + " cId=" + objSelected.cId);
-                            //now we will get the html for the selected cId saving it in FL.login.emailContentTemplate for future consummation
-                            var getMailchimpHTMLPromise = getMailchimpHTML(objSelected.cId);
-                            getMailchimpHTMLPromise.done(function (data) {
-                                // alert("getMailchimpHTMLPromise OK =>"+JSON.stringify(data));
-                                FL.login.emailContentTemplate = data;
-                                FL.login.emailTemplateName = objSelected.text;
-                            });
-                            getMailchimpHTMLPromise.fail(function (err) {
-                                FL.common.printToConsole(">>>>>FLGrid2.js prepareNewsletterMCEmission onSelect inside dropdown FAILURE <<<<<" + err);
-                            });
-                        }
-                    }
-                }
-            };
-            FL.common.editMasterDetail("B", " Send MC email/Newsletter", "_sendNewsletterTemplate", masterDetailItems, options, function (result) {
-                if (result) {//user choosed button2 ==>Send Newsletter button
-                    // FL.links.testEmail();
-                    var senderObj = extractSenderObjFromModal();//var senderObj = {from_name:name,from_email:email,subject:subject,testEmail:testEmail};
-                    var toArr = csvStore.extractEmailArray();//to arr becomes: [{"email":"e1@live.com"},{"email":"email2@gmail.com"}..]
-                    var mailHTML = FL.login.emailContentTemplate;
-                    // alert("before calling checkDuplicate ->"+FL.login.emailTemplateName);
-                    if (FL.login.emailTemplateName !== null)
-                        checkDuplicateEmission(entityName, FL.login.emailTemplateName, toArr, senderObj);//CURRENTLY var IN FLmenulinks2.js
-                    else
-                        FL.common.makeModalInfo("Canceled !!! No template selected.");
-                } else {
-                    // alert("newsletter canceled");
-                    FL.common.makeModalInfo("Canceled !!! you can always send these emails later...");
-                }
-            });
-            return;
-        });
-        getTemplatesPromise.fail(function (err) {
-            FL.common.printToConsole(">>>>>FLGrid2.js prepareNewsletterMCEmission  FAILURE <<<<<" + err);
-        });
     };
     var checkDuplicateEmission = function (entityName, NName, toSend, senderObj) {
         // Assumes that NNAme is not null
@@ -1037,7 +943,7 @@ FL["grid"] = (function () {//name space FL.grid
         // alert("mountGridFromColumnsArr ->" + JSON.stringify(columnsArr));
         // return;
         var entityName = FL.dd.getEntityByCName(eCN);
-        FL.common.printToConsole("New &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&& entity=" + entityName);
+        FL.common.printToConsole("mountGridFromColumnsArr ---> entity=" + entityName,"grid");
         FL.common.printToConsole("show columnsArr=" + JSON.stringify(columnsArr));
         // FL.common.spin(false);
         // spinner.stop();
@@ -1066,12 +972,6 @@ FL["grid"] = (function () {//name space FL.grid
                 });
             });
             $('#_newsletter').show();
-            $('#_newsletterMC').off('click');
-            $("#_newsletterMC").click(function () {
-                prepareNewsletterMCEmission(entityName);
-            });
-            $('#_newsletterMC').show();
-            $("#_newsletterMC").html(" MC");
         }
         var grid = utils.mountGridInCsvStore(columnsArr);//mount backbone views and operates grid -
         FL.API.serverCallBlocked = false;
