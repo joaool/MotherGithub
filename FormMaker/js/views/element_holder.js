@@ -30,7 +30,7 @@ FormDesigner.Views.ElementHolder = Backbone.View.extend({
         oDragNDrop.setDraggableObject({draggableSelectors : [{
 											   draggable : ".ui-draggable"
 										  }],
-										 helper : "clone",
+										 helper : "original",
 										 helperCss : '',
 										 revert : this.OnRevert,
 										 OnStartCallBack : this.OnStart.bind(this),
@@ -63,6 +63,7 @@ FormDesigner.Views.ElementHolder = Backbone.View.extend({
     $( ".sortable" ).sortable();
     $( ".sortable" ).sortable("destroy");
 		$( ".sortable" ).sortable({
+            
 			connectWith : ".sortable",
 		 	placeholder: "ui-state-highlight",
 			tolerance: "pointer",
@@ -98,6 +99,10 @@ FormDesigner.Views.ElementHolder = Backbone.View.extend({
 	},
     onDrop : function(target,droppedObject){
         if ($(droppedObject).hasClass("dropped")) return;
+        /*if($(droppedObject).hasClass("draggable")){
+            $(droppedObject).removeClass("draggable");
+            $(droppedObject).draggable('disable');
+        }*/
         var cname = $(droppedObject).attr("cname");
         var elementType =  FormMaker.DBElements[$(droppedObject).data("type")];
         var inputType = FormMaker.DBType[$(droppedObject).data("input-type")];

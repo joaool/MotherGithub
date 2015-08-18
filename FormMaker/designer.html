@@ -67,14 +67,8 @@
             </ul>
             <div class="scroller">
               <table class="sidebar-nav fields" id="fields">
-
               </table>
             </div>
-            <!-- <table class="sidebar-nav" id="fieldstemp">
-
-
-
-            </table> -->
 
             <ul class="sidebar-nav">
                 <li class="sidebar-brand">
@@ -83,39 +77,9 @@
             </ul>
             <div id="properties">
             <div class="sidebar-nav">
-
-                    <a href=#>Type</a>
-
+                <a href=#>Type</a>
             </div>
             <div id="type">
-                <!--<label class="btn">
-                    <input name="fieldType" type="radio" id="TypeTextLabel" value="TextLabel" /> Label
-                </label>
-                <label class="btn">
-                    <input name="fieldType" type="radio" id="TypeText" value="Text"> Textbox
-                </label>
-                <label class="btn">
-                    <input name="fieldType" type="radio" id="TypeButton" value="Button" /> Button
-                </label>
-                <label class="btn">
-                    <input name="fieldType" type="radio" id="TypeCheckbox" value="Checkbox" /> Checkbox
-                </label>
-                <label class="btn">
-                    <input name="fieldType" type="radio" id="TypeRadio" value="Radio" /> Radio
-                </label>
-                <label class="btn">
-                    <input name="fieldType" type="radio" id="TypeCombo" value="Combo" /> Combo
-                </label>
-                <label class="btn">
-                    <input name="fieldType" type="radio" id="TypeDate" value="Date" /> Date
-                </label>
-                <label class="btn">
-                    <input name="fieldType" type="radio" id="TypeTextArea" value="TextArea" /> Text area
-                </label>
-                <label class="btn">
-                    <input name="fieldType" type="radio" id="TypeImage" value="Image" /> Image
-                </label>
-            -->
             </div>
 
 
@@ -167,19 +131,16 @@
                 <div class="row">
                     <div class="col-lg-12">
                         <h3>Form Designer</h3>
-                        <div class="entities">
+                            <button id="_editGrid" class="edit btn btn-success glyphicon glyphicon-pencil" title="edit grid columns" style="float: left; margin-left: 1px; display: block;"> table</button>
+                            
+                        <div class="entities text-center">
                             Entities :
                             <div class="selectbox" id="entities">
-                                <div class="selectedOption">Entity 1</div>
+                                <div class="selectedOption">select an entity</div>
                                 <ul class="options">
 
                                 </ul>
                             </div>
-                            Name :
-                            <input type="text" value="" id="entityName" placeholder="entity name" /> Description :
-                            <textarea id="entityDesc" placeholder="entity description"></textarea>
-
-
                         </div>
                         <div id="droppable">
                             <div id="designerCol1" class="ui-dropppable sortable"></div><div id="designerCol2" class="ui-dropppable sortable"></div>
@@ -190,6 +151,7 @@
             <div class="toggleBtn">
                 <a href="#menu-toggle" class="btn btn-primary" id="menu-toggle"></a>
             </div>
+            
         </div>
 
         <!-- /#page-content-wrapper -->
