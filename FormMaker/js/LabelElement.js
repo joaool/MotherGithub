@@ -229,7 +229,8 @@ FormMaker.Date = FormMaker.BaseElement.extend({
 		"change .datePicker" : "onDatePickerValueChange"
 	},
 	onDatePickerValueChange : function(){
-		
+		this.model.set("value",this.$(".datePicker").val());
+        this.trigger(FormMaker.Events.ValueChange,this.model.toJSON());
 	},
 	onRender: function(){
 		$(".datePicker").datetimepicker({

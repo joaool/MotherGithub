@@ -300,3 +300,12 @@ div#formRight,#formLeft {
 .datePicker {
     height: 35px;
 }
+
+.ui-draggable-disabled {
+    background-color: red;
+}
+
+.ui-draggable-disabled:hover {
+    background-color: red!important;
+    color: black!important;
+}

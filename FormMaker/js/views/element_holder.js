@@ -30,7 +30,7 @@ FormDesigner.Views.ElementHolder = Backbone.View.extend({
         oDragNDrop.setDraggableObject({draggableSelectors : [{
 											   draggable : ".ui-draggable"
 										  }],
-										 helper : "original",
+										 helper : "clone",
 										 helperCss : '',
 										 revert : this.OnRevert,
 										 OnStartCallBack : this.OnStart.bind(this),
@@ -43,7 +43,7 @@ FormDesigner.Views.ElementHolder = Backbone.View.extend({
         if (e.currentTarget.id == "delete"){
             if (FormMaker.CurrentElement){
                 this.removeElement(FormMaker.CurrentElement);
-
+                $("[field_id='"+FormMaker.CurrentElement.model.get('fieldId')+"']").draggable("enable");
             }
         }
     },
@@ -53,6 +53,9 @@ FormDesigner.Views.ElementHolder = Backbone.View.extend({
 	OnStop : function(event, ui){
 		console.log("Drop End");
         //this.onDrop(event.target,ui.item[0]);
+        
+        $(ui.helper.context).draggable('disable');
+        
 	},
 	OnRevert : function(dropped){
 		console.log(dropped);
@@ -63,7 +66,7 @@ FormDesigner.Views.ElementHolder = Backbone.View.extend({
     $( ".sortable" ).sortable();
     $( ".sortable" ).sortable("destroy");
 		$( ".sortable" ).sortable({
-            
+            revert: true,
 			connectWith : ".sortable",
 		 	placeholder: "ui-state-highlight",
 			tolerance: "pointer",
@@ -99,10 +102,7 @@ FormDesigner.Views.ElementHolder = Backbone.View.extend({
 	},
     onDrop : function(target,droppedObject){
         if ($(droppedObject).hasClass("dropped")) return;
-        /*if($(droppedObject).hasClass("draggable")){
-            $(droppedObject).removeClass("draggable");
-            $(droppedObject).draggable('disable');
-        }*/
+        
         var cname = $(droppedObject).attr("cname");
         var elementType =  FormMaker.DBElements[$(droppedObject).data("type")];
         var inputType = FormMaker.DBType[$(droppedObject).data("input-type")];
@@ -112,7 +112,7 @@ FormDesigner.Views.ElementHolder = Backbone.View.extend({
         var description = $(droppedObject).data("description");
         var id = this.getNextId();
         var alignment = target.id == "designerCol1" ? "left" : "right";
-        
+        var fieldId = $(droppedObject).attr("field_id");
         var element = {
             "element" : elementType || FormMaker.Elements.Text,
             "leftLabel" : leftLabel,
@@ -120,7 +120,8 @@ FormDesigner.Views.ElementHolder = Backbone.View.extend({
             "type" : inputType,
             "value" : dropDownEnum,
             "id" : id,
-            "fieldName" : ""
+            "fieldName" : "",
+            "fieldId" : fieldId
         };
         if (cname){
             var fieldName = FL.dd.t.entities[this.entityLoaded.csingular].getFieldCName(name);
@@ -181,6 +182,7 @@ FormDesigner.Views.ElementHolder = Backbone.View.extend({
     },
     removeElement: function(element){
         element.remove()
+        
         delete this.droppedElements[element.model.get("id")];
         this.modelsCollection.remove(element.model);
         this.propertiesPanel.setElementProperties({});
