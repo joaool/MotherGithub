@@ -259,7 +259,7 @@
 					if (child.closed) {// we need this to show the new home page
 						// alert("FrameLink Page Editor was closed \nconnectionString="+connectionString);
 						clearInterval(timer);
-						FL.login.home();
+						//FL.login.home();
 					}else{
 						// child.focus();
 					}

@@ -25,8 +25,9 @@ Number.prototype.toFormattedString = function (decimals) {
         });
     }
 
-    var intNum = Math.floor(num);
+    var intNum = Math.floor(Math.abs(num));
     var intStr = format(intNum);
+    intStr = (num < 0) ? "-" + intStr : intStr;
     var tail = FL.common.getTail(strNumber, ".");
     if (thousandsSeparator == ".")
         intStr = intStr.replace(/,/g, '.');
@@ -60,14 +61,35 @@ String.prototype.isNumeric_US = function () {//returns true if a string has the 
     var strNumNoSep = this.replace(/,/g, '');
     return isNumeric_US_NoSep(strNumNoSep)
 };
-String.prototype.ToNumeric_US = function () {//tries to convert a string to Numeric US format (radix="." and no separators) - if unable returns null
+String.prototype.ToNumeric_US = function (radix) {//tries to convert a string to Numeric US format (radix="." and no separators) - if unable returns null
+    // radix is a optional paramenter - if missing assumes radix= "." US
+    // all radix diferent from "," will be discarded
+    // returns  string with US format or null if input is not a valid number or is a valid number with a impossible radix (ex (1,234,5)ToNUmeric_US(",") =>null
+    // (12,00).ToNumeric_US() =>1200 - comma is assumed as a thousands separator
+    // (12,00).ToNumeric_US(",") =>12.00 - comma us assumed has radixpoint - radix only accepts "," or "." has a value
     if (this.isNumeric()) {
+        var thisNum = this;
+        if (radix) {
+            if (radix == ",") {//tbd
+                var comma = thisNum.match(/,/g);//searches comma (s)
+                if (comma) {
+                    var numberOfCommas = comma.length;
+                    if (numberOfCommas > 1)//if comma is the radix it is an error to have more than one
+                        return null;
+                    // he have one or zero comma
+                    thisNum = thisNum.replace(/\./g, '');//remove points (separators)
+                    thisNum = thisNum.replace(/,/g, '.');//replace , by .
+                } else {
+                    thisNum = thisNum.replace(/\./g, '');//remove points (separators)
+                }
+            }
+        }
         var strNum = null;
-        if (this.isNumeric_US()) {
-            strNum = this.replace(/,/g, '');//remove ,
+        if (thisNum.isNumeric_US()) {
+            strNum = thisNum.replace(/,/g, '');//remove ,
             return strNum;
         } else {//format may be 123.456,78 or 123 456,78
-            strNum = this.replace(/\./g, '');//remove .
+            strNum = thisNum.replace(/\./g, '');//remove .
             strNum = strNum.replace(/ /g, '');//remove spaces
             strNum = strNum.replace(/,/g, '.');//replace the comma by a point
             return strNum;
@@ -112,9 +134,15 @@ String.prototype.isCurrency = function () {//returns true if a string has the fo
         "¥": true,
     };
     var strCurr = this.trim();
-    var preStr = FL.common.preDigit(strCurr);//string till first digit or minus sign
+    var preStr = FL.common.preDigit(strCurr);//string till first digit -
+    var preStrBeforeExclusion = null;
+    if(preStr)
+        preStrBeforeExclusion = preStr.trim();
+    preStr = FL.common.excludeDigitPrefixFromStringEnd(preStr);
     if (preStr) {
         preStr = preStr.trim();
+        if (preStrBeforeExclusion == "S/.")//exception because for currency "S/." preStr comes "S/"
+            preStr = "S/.";
         if (!symbolsTable[preStr])
             return false;// pre string exist and is not any of the possible symbols
     }
@@ -139,6 +167,7 @@ String.prototype.isCurrency = function () {//returns true if a string has the fo
 String.prototype.isPercent = function () {//returns true if a string has the format of Percentage number. Ex."12,34%" or "12,45 %"
     var strCurr = this.trim();
     var preStr = FL.common.preDigit(strCurr);
+    preStr = FL.common.excludeDigitPrefixFromStringEnd(preStr);
     if (preStr) {
         return false;// Percent cannot have preString
     }
@@ -152,6 +181,88 @@ String.prototype.isPercent = function () {//returns true if a string has the for
     }
     return false;
 };
+String.prototype.isInteger = function () {//returns true if a string has the format of Integer without separators. Ex."12345"
+    // Notice that "12,345" is an integer in US and  "12.345"  or "12 345" is an integer in Europe - this method check integer without separators
+    var numberStr = this.trim();
+    if (!numberStr.isNumeric())
+        return false;
+    var pointPos = numberStr.indexOf(".");
+    var commaPos = numberStr.indexOf(",");
+    var spacePos = numberStr.indexOf(" ");
+    if (pointPos > 0 || commaPos > 0 || spacePos > 0)
+        return false
+    return true;
+};
+(function ($) {//a jquery plugin !!!
+    $.fn.FLnumeric = function (par1, minus, radix) {
+        //var sel = this.selector;//the current selector
+        var sel = $(this).selector;//the current selector
+        //var currVal = $(sel).val();
+        var currVal = $(this).val();
+        var specialKeys = new Array();
+        var radixCode = 46;//default is point - ","=>44 "."=>46,
+        var sepCode = 44;//default is comma
+        var sep = ",";//default
+        if (radix) {
+            if (radix == ",") {
+                radixCode = 44;
+                sep = ".";
+                sepCode = 46;
+                extraAllowedKeys = [44];// ","=>44
+            }
+        } else {
+            var radix = ".";//default
+            sep = ",";
+        }
+        var extraAllowedKeys = [radixCode];
+        //var minus = true;//"-"=>45
+        var that = this;
+        specialKeys.push(8); //Backspace=>8
+        //$(this.selector).bind("keypress", function (e) {
+        $(this).bind("keypress", function (e) {
+            var keyCode = e.which ? e.which : e.keyCode;
+            var pos = document.getElementById(this.id).selectionStart;
+            console.log(par1 + " FL-->" + keyCode);
+            console.log(par1 + " FL----->" + extraAllowedKeys.indexOf(keyCode));
+            if (keyCode == 13) {//return
+                alert("****************" + this.value + " start:" + pos);
+                var finalNum = $(sel).val();
+                return finalNum;
+            }
+            if (minus) {
+                if (keyCode == 45) {
+                    if (pos === 0)
+                        return true;//accepts minus is at the beginning
+                    else
+                        return false;
+                }
+                1
+            }
+            if (keyCode == radixCode) {//checks if radix is acceptable
+                var radixPos = $(sel).val().indexOf(radix);
+                if (radixPos > 0) {//removes previous radix an sets new radix
+                    var currNum = $(sel).val();
+                    if (radix == ".")
+                        currNum = currNum.replace(/\./g, '');//remove point
+                    else
+                        currNum = currNum.replace(/,/g, '');//remove comma
+                    currNum = currNum.substr(0, pos - 1) + radix + currNum.substr(pos);
+                    $(sel).val(currNum);
+                    return false;//radix was inserted inprevious code
+                    //return false;//radix already exists on string
+                }
+            }
+            var ret = ((keyCode >= 48 && keyCode <= 57) || extraAllowedKeys.indexOf(keyCode) != -1 || specialKeys.indexOf(keyCode) != -1);//1-9 =>49-57
+            $(".error").css("display", ret ? "none" : "inline");
+            var num = $(sel).val();
+            console.log("FLnumeric:" + num);
+            return ret;
+        });
+        var num = $(sel).val();
+        //alert("****-->" + num );
+        return this;
+    };
+})(jQuery);
 FL["common"] = (function () {//name space FL.common
     var loadCSS = function (fileCss) {
         var cssLink = $("<link rel='stylesheet' type='text/css' href='FL_ui/css/" + fileCss + "'>");
@@ -411,16 +522,98 @@ FL["common"] = (function () {//name space FL.common
             var strOut = currencyStr.replace(/[^0-9.,-]/g, "");
             return strOut;
         },
-        preDigit: function (str) {//from a string input return the content before the first digit or - sign - or null if no digit exists
+        excludeDigitPrefixFromStringEnd: function (str) {//number prefix can be "-", ".", "," ,"-.", "-,"
+            // Excludes number prefix chars from bottom of string - Normally to be used with FL.common.preDigit
+            //      number prefix can be "-", ".", "," ,"-.", "-,"
+            // Note that this is radix independent - it will exclude comma if radix is point and it will exclude point if radix is comma
+            // example
+            //     FL.common.excludeDigitPrefixFromStringEnd("abc-,") =>"abc" digit prefix is "-,"
+            //     FL.common.excludeDigitPrefixFromStringEnd("abc-.") =>"abc"
+            //     FL.common.excludeDigitPrefixFromStringEnd("abc.-") =>"abc." digit prefix is "-"
+            //     FL.common.excludeDigitPrefixFromStringEnd("abc,-") =>"abc," digit prefix is "-"
+            //     FL.common.excludeDigitPrefixFromStringEnd("abc-") =>"abc"
+            //     FL.common.excludeDigitPrefixFromStringEnd("abc.") =>"abc"
+            //     FL.common.excludeDigitPrefixFromStringEnd("abc--") =>"abc-" digit prefix is "-"
+            //     FL.common.excludeDigitPrefixFromStringEnd("S/.") =>"S/" <--- for currency "S/." this would generate an error
+            var retStr = str;
+            if (str && str.length > 0) {
+                var lastPosChar = str.substring(str.length - 1, str.length);
+                if (lastPosChar == "-") {
+                    return str.substring(0, str.length - 1);//all chars before - do not belong to number prefix
+                } else {
+                    if (str.length == 1) {
+                        if (lastPosChar == "." || lastPosChar == ",")
+                            return "";
+                    } else {//str.length>1
+                        var beforeLastChar = str.substring(str.length - 2, str.length - 1);
+                        if (lastPosChar == ".") {
+                            if (beforeLastChar == "-")
+                                return str.substring(0, str.length - 2);//number prefix is "-."
+                            else
+                                return str.substring(0, str.length - 1);//number prefix is "."
+                        } else if (lastPosChar == ",") {
+                            if (beforeLastChar == "-")
+                                return str.substring(0, str.length - 2);//number prefix is "-,"
+                            else
+                                return str.substring(0, str.length - 1);//number prefix is ","
+                        }
+                    }
+                }
+            }
+            return retStr;
+        },
+        digitPrefixInEmbededDigit: function (str, radix) {//returns "-" or "-<radixpoint>" if there is a minus sign and/orradix before the first digit embeded in a string or "" no minus sign before first digit or no first digit
+            // if no radix assumes radix="."
+            // example
+            //     FL.common.digitPrefixInEmbededDigit("abc-,123",",") =>"-,"
+            //     FL.common.digitPrefixInEmbededDigit("abc-.123") =>"-."
+            //     FL.common.digitPrefixInEmbededDigit("abc--123") =>"-"
+            //     FL.common.digitPrefixInEmbededDigit("abc..123") =>"."
+            //     FL.common.digitPrefixInEmbededDigit("-.11") =>"-."
+            //     FL.common.digitPrefixInEmbededDigit("-,11",",") =>"-,"
+            //     FL.common.digitPrefixInEmbededDigit("£-912") =>"-"
+            //   var cellNoPre_NoPos = FL.common.minusInEmbededDigit(paddedCell) + FL.common.extractContentBetweenFirstAndLastDigit(paddedCell);
+            if (!radix)
+                radix = ".";
+            var pre = this.preDigit(str);
+            if (pre && pre.length > 0) {
+                var lastCharInPre = pre.substring(pre.length - 1, pre.length);
+                if (lastCharInPre == "-" || lastCharInPre == radix) {
+                    if (pre.length > 1) {//it can be "-" or "-." or "-," or "--" or ".." or ",,"
+                        var charBeforeLastCharInPre = pre.substring(pre.length - 2, pre.length - 1);
+                        if (charBeforeLastCharInPre == "-") {
+                            if (lastCharInPre == radix)
+                                return "-" + radix;
+                            if (lastCharInPre == "-")
+                                return "-";
+                        }
+                        if (charBeforeLastCharInPre == radix) {//this was unecessary - just for clear code
+                            if (lastCharInPre == radix)//".."=>"."
+                                return radix;
+                            if (lastCharInPre == "-")//".-" =>"-"
+                                return "-";
+                        } else {
+                            return lastCharInPre;
+                        }
+                    } else {// pre is a single Char
+                        return lastCharInPre;
+                    }
+                }
+            }
+            return "";
+        }
+        ,
+        preDigit: function (str) {//from a string input return the content before the first digit (removed:or - sign) <-> or null if no digit exists
             var strOut = null;
-            str = str.replace(/-/g, '');//remove -
+            //str = str.replace(/-/g, '');//remove -
             var firstDigit = str.match(/\d/);
             if (firstDigit) {
                 var firstPos = str.indexOf(firstDigit);
                 strOut = str.substring(0, firstPos);
             }
             return strOut;
-        },
+        }
+        ,
         posDigit: function (str) {//from a string inout return the content after the last digit - or null if no digit exists
             var strOut = null;
             var lastDigit = str.match(/\D{1,}$/);
@@ -429,7 +622,8 @@ FL["common"] = (function () {//name space FL.common
                 strOut = str.substring(lastPos);
             }
             return strOut;
-        },
+        }
+        ,
         extractContentBetweenFirstAndLastDigit: function (str) {//http://www.javascriptkit.com/javatutors/re2.shtml
             // signs like + or - are not digits
             var strOut = str;
@@ -444,27 +638,36 @@ FL["common"] = (function () {//name space FL.common
                 strOut = strOut.substring(0, lastPos);
             }
             return strOut;
-        },
+        }
+        ,
         currencyToStringNumber: function (currencyStr) {
             //converts a currency string ex "€ 12345,67" to a string representing a number ex:"12345.67" using appsettings
             //  "kr. 9.734.123,45" =>"9734123.45", "Din. 1,235.45"=>"1235.45"
             var radixpoint = this.appsettings.radixpoint;
             var thousandsSeparator = this.appsettings.thousandsSeparator;
-            var regexSep = "\\" + thousandsSeparator;
-            var reSep = new RegExp(regexSep, "g");
-            var regex = "[^0-9\\" + radixpoint + "]+";//exclude all chars except numbers and radix
-            var re = new RegExp(regex, "g");
-            var strNumber = currencyStr.replace(re, "");
-            // if(radixpoint == ",")
-            //     strNumber=strNumber.replace(/,/g,'.');
-            var regexSetRadix = radixpoint;
-            var reSetRadix = new RegExp(regexSetRadix, "g");
-            strNumber = strNumber.replace(regexSetRadix, '.');
+            var pre = FL.common.preDigit(currencyStr);
+            var numPrefix = FL.common.digitPrefixInEmbededDigit(currencyStr, radixpoint);
+            strNum = numPrefix + this.extractContentBetweenFirstAndLastDigit(currencyStr);
+            return strNum.ToNumeric_US(radixpoint);
 
-            if (strNumber.indexOf(radixpoint) != strNumber.lastIndexOf(radixpoint))
-                strNumber = strNumber.substr(0, strNumber.indexOf(radixpoint)) + strNumber.substr(strNumber.indexOf(radixpoint) + 1);
-            return strNumber;
-        },
+
+            //var regexSep = "\\" + thousandsSeparator;
+            //var reSep = new RegExp(regexSep, "g");
+            //var regex = "[^0-9\\" + radixpoint + "]+";//exclude all chars except numbers and radix
+            ////newVal = newVal.replace(/[^0-9$.,-]/g, '');
+            //var re = new RegExp(regex, "g");
+            //var strNumber = currencyStr.replace(re, "");
+            //// if(radixpoint == ",")
+            ////     strNumber=strNumber.replace(/,/g,'.');
+            //var regexSetRadix = radixpoint;
+            //var reSetRadix = new RegExp(regexSetRadix, "g");
+            //strNumber = strNumber.replace(regexSetRadix, '.');
+            //
+            //if (strNumber.indexOf(radixpoint) != strNumber.lastIndexOf(radixpoint))
+            //    strNumber = strNumber.substr(0, strNumber.indexOf(radixpoint)) + strNumber.substr(strNumber.indexOf(radixpoint) + 1);
+            //return strNumber;
+        }
+        ,
         formatStringNumberWithMask: function (strNumber, mask) {
             //converts a string number ex"12345.67" into a currency string ex "€ 12345,67" using appsettings
             //  "9734123.45"=>"kr. 9.734.123,45" , "1235.45"=>"Din. 1,235.45"
@@ -484,7 +687,8 @@ FL["common"] = (function () {//name space FL.common
             // alert("input="+strNumber+" -->"+retStr);
             $("#_tempSlot").remove();//remove temporary slot from dom
             return retStr;
-        },
+        }
+        ,
         editMasterDetail: function (id, title, templateName, masterDetailJson, options, editMasterDetailCB) {
             // returns masterDetailJson with new values collected from modal dialog  with title and templateName - options like makeModa()
             //  EXEMPLE OF FORMAT FOR masterDetailJson:
@@ -506,14 +710,14 @@ FL["common"] = (function () {//name space FL.common
             //              "#dropdownId1":{ arr:['a','b','c','d','e'],
             //                                  default:"c",
             //                                  onSelect:function(selected){
-            //                                        FL.common.printToConsole("The choice was "+selected);    
+            //                                        FL.common.printToConsole("The choice was "+selected);
             //                                  }
-            //                             },                                   
+            //                             },
             //              "#dropdownId2":{ arr:['a1','a2','a3','a4','a5'],
             //                                  default:"a3",
             //                                  onSelect:function(selected){
-            //                                        FL.common.printToConsole("For id2 the choice was "+selected);    
-            //                                  }                                   
+            //                                        FL.common.printToConsole("For id2 the choice was "+selected);
+            //                                  }
             //                            }
             //               }
             //          }
@@ -528,7 +732,8 @@ FL["common"] = (function () {//name space FL.common
                     return editMasterDetailCB(false);
                 }
             }, masterDetailJson);
-        },
+        }
+        ,
         makeModalInfo: function (message, makeModalInfoCB, stackLevel) {
             if (FL.common.getBrowser() == "Xie") {
                 alert(message);
@@ -539,14 +744,16 @@ FL["common"] = (function () {//name space FL.common
                     button2: null
                 }, makeModalInfoCB, stackLevel);//OK
             }
-        },
+        }
+        ,
         makeModalConfirm: function (message, btn1, btn2, makeModalConfirmCB, stackLevel) {//button 2 is the default
             this.makeModal2("Confirmation", "<p>" + message + "</p>", {
                 type: "primary",
                 button1: btn1,
                 button2: btn2
             }, makeModalConfirmCB, stackLevel);//OK
-        },
+        }
+        ,
         makeModal2: function (title, message, options, makeModalCB, stackLevel) {
             // version specific for makeModalInfo and makeModal confirm - does not use parsley
             // CONDITIONS NECESSARY FOR makeModal() to work:
@@ -555,8 +762,8 @@ FL["common"] = (function () {//name space FL.common
             //	message - Dialog content
             //	options  - JSON with icon and type
             //      icon - termination of http://getbootstrap.com/components/ -
-            //          ex: glyphicon glyphicon-thumbs-up   =>"thumbs-up" 
-            //              glyphicon glyphicon-search      =>"search" 
+            //          ex: glyphicon glyphicon-thumbs-up   =>"thumbs-up"
+            //              glyphicon glyphicon-search      =>"search"
             //              glyphicon glyphicon-ok          =>"ok"   etc...
             //      type - success, primary, info, warning and danger
             //      button1 - name of first button
@@ -581,7 +788,7 @@ FL["common"] = (function () {//name space FL.common
             var $modal = $('#' + modalId);
             if (makeModalCB) {
                 $modal.on("click", "#__FLDialog_button1", function () {
-                    // alert("makeModal - You clicked button1"); 
+                    // alert("makeModal - You clicked button1");
                     $modal.off('hidden.bs.modal');
                     $modal.modal('hide');
                     return makeModalCB(false);
@@ -596,27 +803,28 @@ FL["common"] = (function () {//name space FL.common
                     return makeModalCB(false);
                 });
             } else {
-                // $modal.off('hidden.bs.modal');              
+                // $modal.off('hidden.bs.modal');
                 FL.common.printToConsole("makeModal ----->No callback");
                 $modal.modal('hide');
                 $('body').removeClass('modal-open');
                 $('.modal-backdrop').remove();
             }
             // $('#' + modalId ).modal('show');//to launch it immediatly when calling makeModal
-            $modal.modal('show');//to launch it immediatly when calling makeModal	
-        },
+            $modal.modal('show');//to launch it immediatly when calling makeModal
+        }
+        ,
         makeModal: function (id, title, templateName, options, makeModalCB, dataStructureForSubstitution) {
             //id = "A" or "B" followed by an optional number that indicates the stack level. If number=1 is ignored if number =2 z-index=2000
             //  if number =3 =>z-index=3000   suporting a modal inside a modal
             //CONDITIONS NECESSARY FOR makeModal() to work:
             //      1 - THE BODY MUST HAVE A DEDICATED SLOT: <div id="_modalDialog"+{id}></div>
             // title - Model window title
-            // templateName - normally is a html template defined with  <script id="templateName" type="text/template"> 
+            // templateName - normally is a html template defined with  <script id="templateName" type="text/template">
             //     it can be a direct html string if first char is "<".
             // options  - JSON with icon and type
             //      icon - termination of http://getbootstrap.com/components/ -
-            //          ex: glyphicon glyphicon-thumbs-up   =>"thumbs-up" 
-            //              glyphicon glyphicon-search      =>"search" 
+            //          ex: glyphicon glyphicon-thumbs-up   =>"thumbs-up"
+            //              glyphicon glyphicon-search      =>"search"
             //              glyphicon glyphicon-ok          =>"ok"   etc...
             //      type - success, primary, info, warning and danger
             //      button1 - name of first button
@@ -637,7 +845,7 @@ FL["common"] = (function () {//name space FL.common
             var masterDetailItems = null;
             if (dataStructureForSubstitution)
                 window.masterDetailItems = dataStructureForSubstitution;//HACK for _.template()
-            var stackLevel = 0; //this is used  to define z-Index allowing to place modals inside modals 0 or 1 => first level          
+            var stackLevel = 0; //this is used  to define z-Index allowing to place modals inside modals 0 or 1 => first level
             if (id.length > 1) {
                 stackLevel = parseInt(id.substr(1, 1), 10);//"A2" => 2
                 id = id.substr(0, 1);
@@ -755,11 +963,13 @@ FL["common"] = (function () {//name space FL.common
             }
             // $('#' + modalId ).modal('show');//to launch it immediatly when calling makeModal
             $modal.modal('show');//to launch it immediatly when calling makeModal
-        },
+        }
+        ,
         setStyleAndFont: function (styleName, fontName) {//the css files FL<styleName>.css and FLfont_<fontName>.css must exist in FL_ui/css
             loadCSS("FL" + styleName + ".css");
             loadCSS("FLfont_" + fontName + ".css");
-        },
+        }
+        ,
         getTag: function (str, tagName, tagTerminator) {//returns the content of str after the last separator character or string - no separator found  =>null
             //get tag with name tagName embeded in string str - if several exist it takes the last one
             //ex. FL.common.getTag(fullUrl,"connectionString","#") -->returns  "abc" for fullUrl="#connectionString=abc#pag=home"
@@ -773,7 +983,8 @@ FL["common"] = (function () {//name space FL.common
                 }
             }
             return retTag;
-        },
+        }
+        ,
         stringAfterLast: function (str, separator) {//returns the content of str after the last separator character or string - no separator found  =>null
             //ex. FL.common.stringAfterLast("http://www.framelink.co/app?d=myDomain1","=") -->returns  "myDomain1"
             var retStr = null;
@@ -784,7 +995,8 @@ FL["common"] = (function () {//name space FL.common
                     retStr = str.substring(pos + separatorLen);
             }
             return retStr;
-        },
+        }
+        ,
         stringBeforeLast: function (str, separator) {//simply returns the content of str before the last separator character or string - no separator found  =>null
             //ex. FL.common.stringBeforeLast("this is (one) or (two) values","(") -->returns  "this is (one) or "
             var retStr = null;
@@ -794,7 +1006,8 @@ FL["common"] = (function () {//name space FL.common
                     retStr = str.substring(0, pos);
             }
             return retStr;
-        },
+        }
+        ,
         stringBeforeFirst: function (str, separator) {//simply returns the content of str before the first separator character or string - no separator found  =>null
             //ex. FL.common.stringBeforeFirst("this is (one) or (two) values","(") -->returns  "this is "
             var retStr = null;
@@ -804,7 +1017,8 @@ FL["common"] = (function () {//name space FL.common
                     retStr = str.substring(0, pos);
             }
             return retStr;
-        },
+        }
+        ,
         stringAfterFirst: function (str, separator) {//returns the content of str after the first separator character or string - no separator found  =>null
             //ex. FL.common.stringAfterafter("http://www.framelink.co/app?d=myDomain1","=") -->returns  "myDomain1"
             var retStr = null;
@@ -815,7 +1029,8 @@ FL["common"] = (function () {//name space FL.common
                     retStr = str.substring(pos + separatorLen);
             }
             return retStr;
-        },
+        }
+        ,
         getLastTagInString: function (str, separator, tagTerminator) {//returns the content after the last separator until end or terminal char
             // str - string that will be processed
             // separator - last ocurrence to be identified in string
@@ -838,13 +1053,15 @@ FL["common"] = (function () {//name space FL.common
                 }
             }
             return retStr;
-        },
+        }
+        ,
         repeat: function (str, n) {//repeat str n times
             n = n || 1;
             if (n < 0)
                 n = 0;
             return Array(n + 1).join(str);
-        },
+        }
+        ,
         getTail: function (strNumber, radixpoint) {//returns the decimal part of a string representing a number.
             //radixpoint is the decimal separator. If missing uses the appsettings radixpoint
             if (!radixpoint)
@@ -854,11 +1071,13 @@ FL["common"] = (function () {//name space FL.common
             if (posDecimal > 0)
                 tail = strNumber.substr(posDecimal + 1);
             return tail;
-        },
+        }
+        ,
         validateEmail: function (email) {
             var re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
             return re.test(email);
-        },
+        }
+        ,
         clearSpaceBelowMenus: function () {
             $("#_placeHolder").empty();
             $("#personContent").empty();
@@ -874,7 +1093,8 @@ FL["common"] = (function () {//name space FL.common
 
             // $("#_belowMenus").hide();
             $("#templateHolder").hide();
-        },
+        }
+        ,
         buildDiff: function (arrOfObjA, arrOfObjB, pivotKey) {
             //given two arrays of objects A and B, both containing key pivotKey, returns an array with all the elements
             //  existing in A whose pivotKey exists in A and not in B.
@@ -892,11 +1112,13 @@ FL["common"] = (function () {//name space FL.common
                 });
                 return arrOfObjA[index - 1];
             });
-        },
+        }
+        ,
         shortEmailName: function (email) {
             var pos = email.indexOf("@");
             return email.substring(0, pos);
-        },
+        }
+        ,
         enc: function (str, incr) {//FL.common.enc("o gato patolinas",1) =>fuzzy => FL.common.enc(fuzzy,-1))=>"o gato patolinas"
             //'H'.charCodeAt(0) =>72 , String.fromCharCode(72) =H
             // var encoded =  FL.common.enc('{Patolinas},:',1);
@@ -911,7 +1133,8 @@ FL["common"] = (function () {//name space FL.common
             }
             encoded = encoded.replace(/'/g, '"');
             return encoded;
-        },
+        }
+        ,
         loaderAnimationON: function (div) {
             var opts = {
                 lines: 13, // The number of lines to draw
@@ -934,7 +1157,8 @@ FL["common"] = (function () {//name space FL.common
             var target = document.getElementById(div);
             var spinner = new Spinner(opts).spin(target);
             return spinner;
-        },
+        }
+        ,
         makeFirstElementsSample: function (arr, sampleSize) {//returns a similar array with max size of sampleSize
             var sample = [];
             var len = arr.length;
@@ -944,13 +1168,16 @@ FL["common"] = (function () {//name space FL.common
                 sample.push(arr[i]);
             }
             return sample;
-        },
+        }
+        ,
         selectBox: function (options, onSelection) {
             selectBox(options, onSelection);
-        },
+        }
+        ,
         setDropdown: function (options) {
             setDropdown(options);
-        },
+        }
+        ,
         typeOf: function (xVar) {//given a variable, returns one of :  "number","string","boolean","object","array","null","undefined","date"
             //exemple of undefined: a variable declared but never defined -->var foo; alert(foo); //undefined.
             var xRet = typeof xVar;
@@ -963,7 +1190,8 @@ FL["common"] = (function () {//name space FL.common
                     xRet = "null";
             }
             return xRet;
-        },
+        }
+        ,
         typeUIOf: function (xVar) {//for string type returns one of the typeUI "email", "url", "phone"etc. If not string returns null
             // used in FL.grid   private function  is_ColumnOfSubtype(subtype,sampleArr)
             var subtype = null;
@@ -977,11 +1205,13 @@ FL["common"] = (function () {//name space FL.common
                     subtype = "phone";
             }
             return subtype;
-        },
+        }
+        ,
         is_email: function (email) {
             var re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
             return re.test(email);
-        },
+        }
+        ,
         is_url: function (url) {
             // var re = /(ftp|http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?/;
             // var re = /((([A-Za-z]{3,9}:(?:\/\/)?)(?:[-;:&=\+\$,\w]+@)?[A-Za-z0-9.-]+|(?:www.|[-;:&=\+\$,\w]+@)[A-Za-z0-9.-]+)((?:\/[\+~%\/.\w-_]*)?\??(?:[-\+=&;%@.\w_]*)#?(?:[\w]*))?)/;
@@ -989,13 +1219,15 @@ FL["common"] = (function () {//name space FL.common
             // var re = /^(ht|f)tps?:\/\/[a-z0-9-\.]+\.[a-z]{2,4}\/?([^\s<>\#%"\,\{\}\\|\\\^\[\]`]+)?$/;
             var re = /^(?:(?:https?|ftp):\/\/)(?:\S+(?::\S*)?@)?(?:(?!10(?:\.\d{1,3}){3})(?!127(?:\.\d{1,3}){3})(?!169\.254(?:\.\d{1,3}){2})(?!192\.168(?:\.\d{1,3}){2})(?!172\.(?:1[6-9]|2\d|3[0-1])(?:\.\d{1,3}){2})(?:[1-9]\d?|1\d\d|2[01]\d|22[0-3])(?:\.(?:1?\d{1,2}|2[0-4]\d|25[0-5])){2}(?:\.(?:[1-9]\d?|1\d\d|2[0-4]\d|25[0-4]))|(?:(?:[a-z\u00a1-\uffff0-9]+-?)*[a-z\u00a1-\uffff0-9]+)(?:\.(?:[a-z\u00a1-\uffff0-9]+-?)*[a-z\u00a1-\uffff0-9]+)*(?:\.(?:[a-z\u00a1-\uffff]{2,})))(?::\d{2,5})?(?:\/[^\s]*)?$/i;
             return re.test(url);
-        },
+        }
+        ,
         is_check: function (str) {
             strUpper = str.trim().toUpperCase();
             if (strUpper == "TRUE" || strUpper == "FALSE")
                 return true;
             return false;
-        },
+        }
+        ,
         is_phone: function (phone) {//validates formatted phone number
             //http://stackoverflow.com/questions/4338267/validate-phone-number-with-javascript - we ignore format and validate numeric content only
             var phoneRe = /^[2-9]\d{2}[2-9]\d{2}\d{4}/;//^begins by one of [2-9] folowed by {2} occurences of any d (digit),folowed by one [2-9] and follwed by 6 digits
@@ -1003,7 +1235,8 @@ FL["common"] = (function () {//name space FL.common
             if (digits.length > 12)
                 return false;
             return (digits.match(phoneRe) !== null);
-        },
+        }
+        ,
         forceToString: function (xVar) {//convert a variable of any type to string
             var type = this.typeOf(xVar);
             if (type != "string") {
@@ -1015,7 +1248,8 @@ FL["common"] = (function () {//name space FL.common
                     xVar = "NULL"
             }
             return xVar;
-        },
+        }
+        ,
         formatShortLocalToISODate: function (dateTimeString, sourceFormat) {//return ISO Date for a local dateTimeString "<shortdate> hh:mm <pm|am>"
             //ex:FL.common.formatToISODate("6/25/2015 11:21 am");==>2015-06-25T10:21:00.000Z for PC with -1 hour of time zone difference
             function z(n) {
@@ -1048,7 +1282,8 @@ FL["common"] = (function () {//name space FL.common
             isoDate += z(d.getUTCHours() + 1 + difHrs) + ":" + z(d.getUTCMinutes() + difMin) + ":" + z(d.getUTCSeconds()) + '.';
             isoDate += p(d.getUTCMilliseconds()) + "Z";
             return isoDate;
-        },
+        }
+        ,
         timeTo24: function (timeString) {//converts a time string "hh:mm <pm|am>" to "hh:mm" where hh=[0-24] if formnat incorret returns null
             //FL.common("11:00 pm") -->"23:00"
             //FL.common("12:00 pm") -->null
@@ -1068,7 +1303,8 @@ FL["common"] = (function () {//name space FL.common
             hrs = z(hrs);//2-->"02"  13-->"13"
             var min = timeString.substr(3, 2);
             return hrs + ":" + min;
-        },
+        }
+        ,
         toISODate: function (dateTimeString, sourceFormat) {//returns ISO date from a dateTimeString "<shortdate> hh:mm <pm|am>" and a format DMY or MDY
             //<shortdate> may be:yyyy/mm/dd, dd/mm/yyyy or mm/dd/yyyy
             //examples:
@@ -1104,7 +1340,8 @@ FL["common"] = (function () {//name space FL.common
                 }
             }
             return isoDate;
-        },
+        }
+        ,
         fromISODateToShortdate: function (isoDate, outFormat) {//returs a dateTimeString shortdate> may be:yyyy/mm/dd, dd/mm/yyyy or mm/dd/yyyy from ISO date
             // if isoDate is not acceptable it will return null
             //sourceFormat may be "YMD","MDY" or "DMY"
@@ -1132,7 +1369,8 @@ FL["common"] = (function () {//name space FL.common
             else
                 alert("FL.common.fromISODateToShortdate outFormat=" + outFormat + " is invalid!");
             return shortDate;
-        },
+        }
+        ,
         fromISODateToTime: function (isoDate) {//returs a time string "hh:mm <pm|am>"" from ISO date
             //examples:
             //   FL.common.fromISODateToTime("2015-12-06T05:00:00.000Z") ==>"06:00 am"
@@ -1162,7 +1400,8 @@ FL["common"] = (function () {//name space FL.common
             if (!shortDate)
                 return null;
             return shortDate + " " + this.fromISODateToTime(isoDate);
-        },
+        }
+        ,
         is_validShortDate: function (shortDate) {//validate  xx-xx-xx or xx/xx/xx or xx.xx.xx where year can be xxxx
             //->accepts DMY(europe), MDY(US), YMD(China - the default accepted by Date.Parse)
             // YMD accepts "2014/12/30","2014-12-30","2014.12.30" -> rejects "14/12/30"
@@ -1185,7 +1424,8 @@ FL["common"] = (function () {//name space FL.common
                 bRet = true;
             }
             return bRet;
-        },
+        }
+        ,
         is_ValidDate: function (dateString) {
             // returns true - if dateString has an acceptable format for a date. Ex
             //      ex:"March 21, 2012", "2015/06/24", "2015-06-24"
@@ -1252,7 +1492,8 @@ FL["common"] = (function () {//name space FL.common
                 // }
             }
             return is_date;
-        },
+        }
+        ,
         is_dateArrInStringFormat: function (arrOfRowValues) {//returns true if all array elements are a valid string format
             //var d = Date.parse("March 21, 2012");//1332288000000
             //var d = Date.parse("03-21-12");//1332288000000
@@ -1287,7 +1528,8 @@ FL["common"] = (function () {//name space FL.common
             } else if (_.isUndefined(failElement))
                 is_date = true;
             return is_date;
-        },
+        }
+        ,
         is_jsonString: function (str) {
             try {
                 JSON.parse(str);
@@ -1295,7 +1537,8 @@ FL["common"] = (function () {//name space FL.common
                 return false;
             }
             return true;
-        },
+        }
+        ,
         is_enumerableArr: function (arrOfRowValues, percent) {//returns true arrOfRowValues can colapse to less than percent with unique values
             //normally arrOfRowValues is a sample of the whole array, only to decide if it is enumerable or not
             var is_enumerable = false;
@@ -1305,7 +1548,8 @@ FL["common"] = (function () {//name space FL.common
             if (columnPercent < percent)
                 is_enumerable = true;
             return is_enumerable;
-        },
+        }
+        ,
         extractUniqueFromArray: function (arr) {//returns object with {empties:no_of empties,uniqueArr:uniqueArr}
             //returns an object {empties:no_of empties,uniqueArr:uniqueArr} where:
             //      empties - number of empties ocurrences in arr
@@ -1327,13 +1571,15 @@ FL["common"] = (function () {//name space FL.common
                 return element[0];
             });
             return {empties: empties, uniqueArr: uniqueArr};
-        },
+        }
+        ,
         getLocalLanguage: function () {
             var language = navigator.languages ? navigator.languages[0] : (navigator.language || navigator.userLanguage);
             if (_.isUndefined(language))
                 language = window.navigator.userLanguage || window.navigator.language;
             return language;
-        },
+        }
+        ,
         is_decimal_US: function (strNumber) {
             is_US = false;
             var lastDotIndex = strNumber.lastIndexOf(".");
@@ -1342,7 +1588,8 @@ FL["common"] = (function () {//name space FL.common
                 if (lastDotIndex == firstDotIndex)
                     is_us = true; // (0.123) or (4,294.00) or (4,294,967.00)
             }
-        },
+        }
+        ,
         is_oneOfCharsInString: function (str, charList) {//returns true if any of the chars in par2 exists in par1.
             //ex FL.common.is_oneOfCharsInString("anc 1002,3","* ") =>true because space exists in string
             var is = false;
@@ -1357,7 +1604,8 @@ FL["common"] = (function () {//name space FL.common
                 }
             }
             return is;
-        },
+        }
+        ,
         isNumberSep: function (strNumber, sep) {//sep is thousands sep - returns true if string is a valid number with that thousand separator
             var isNumber = false;
             //case strNumber "1.000,3" with sep="," =>should return false. Without the "special if" it would return true =>1.0002 is valid
@@ -1401,7 +1649,8 @@ FL["common"] = (function () {//name space FL.common
                 }
             }
             return isNumber;
-        },
+        }
+        ,
         getArrNumberFormat: function (arrOfRowValues) {//given an array of strings returns if it is a number representation and if yes returns the format
             //Possible formats : us,de,fr
             //returns {number:false, format:null} or {number:true, format:"us"} or (if all integers){number:true, format:null}
@@ -1475,14 +1724,17 @@ FL["common"] = (function () {//name space FL.common
             if (!_.isUndefined(failElement))
                 xRet = {"number": false, "format": null};
             return xRet;
-        },
-        getArrUserType: function (arrOfRowValues) {//given an array of strings returns one of textbox,percentbox,numberbox,currencybox,checkbox,datetimebox,emailbox,urlbox
+        }
+        ,
+        getArrUserType: function (arrOfRowValues) {//given an array of strings returns one of textbox,percentbox,numberbox,integerbox, currencybox,checkbox,datetimebox,emailbox,urlbox
             // NOTE combobox must be resolved outside - phonebox TBD
             var userType = "textbox";
             if (FL.common.isArrOfCurrency(arrOfRowValues)) {
                 userType = "currencybox";
             } else if (FL.common.isArrOfPercent(arrOfRowValues)) {
                 userType = "percentbox";
+            } else if (FL.common.isArrOfInteger(arrOfRowValues)) {
+                userType = "integerbox";
             } else if (FL.common.isArrOfNumber(arrOfRowValues)) {
                 userType = "numberbox";
             } else if (FL.common.isArrOfEmail(arrOfRowValues)) {
@@ -1497,7 +1749,8 @@ FL["common"] = (function () {//name space FL.common
                 userType = "datetimebox";
             }
             return userType;
-        },
+        }
+        ,
         isArrOfNumber: function (arrOfRowValues) {//given an array of strings returns true if it is a number representation, false if not
             var failElement = _.find(arrOfRowValues, function (element) { //if failElement is undefined => all elements are a valid number format
                 return !element.isNumeric();
@@ -1505,7 +1758,8 @@ FL["common"] = (function () {//name space FL.common
             if (!_.isUndefined(failElement))//not an array of numbers
                 return false;
             return true;//it is an array of numbers
-        },
+        }
+        ,
         isArrOfCurrency: function (arrOfRowValues) {//given an array of strings returns true if it is a currency representation, false if not
             var failElement = _.find(arrOfRowValues, function (element) { //if failElement is undefined => all elements are a valid number format
                 return !element.isCurrency();
@@ -1513,7 +1767,8 @@ FL["common"] = (function () {//name space FL.common
             if (!_.isUndefined(failElement))//not an array of currency
                 return false;
             return true;//it is an array of currency
-        },
+        }
+        ,
         isArrOfPercent: function (arrOfRowValues) {//given an array of strings returns true if it is a percent representation, false if not
             var failElement = _.find(arrOfRowValues, function (element) { //if failElement is undefined => all elements are a valid number format
                 return !element.isPercent();
@@ -1521,7 +1776,17 @@ FL["common"] = (function () {//name space FL.common
             if (!_.isUndefined(failElement))//not an array of percent
                 return false;
             return true;//it is an array of percent
-        },
+        }
+        ,
+        isArrOfInteger: function (arrOfRowValues) {//given an array of strings returns true if it is a integer representation, false if not
+            var failElement = _.find(arrOfRowValues, function (element) { //if failElement is undefined => all elements are a valid number format
+                return !element.isInteger();
+            });
+            if (!_.isUndefined(failElement))//not an array of integer
+                return false;
+            return true;//it is an array of integer
+        }
+        ,
         isArrOfEmail: function (arrOfRowValues) {//given an array of strings returns true if it is a valid email representation, false if not
             var failElement = _.find(arrOfRowValues, function (element) { //if failElement is undefined => all elements are a valid number format
                 var is_email = FL.common.is_email(element);
@@ -1530,7 +1795,8 @@ FL["common"] = (function () {//name space FL.common
             if (!_.isUndefined(failElement))//not an array of numbers
                 return false;
             return true;//it is an array of emails
-        },
+        }
+        ,
         isArrOfURL: function (arrOfRowValues) {//given an array of strings returns true if it is a valid URL representation, false if not
             var failElement = _.find(arrOfRowValues, function (element) { //if failElement is undefined => all elements are a valid number format
                 var is_url = FL.common.is_url(element);
@@ -1539,7 +1805,8 @@ FL["common"] = (function () {//name space FL.common
             if (!_.isUndefined(failElement))//not an array of numbers
                 return false;
             return true;//it is an array of urls
-        },
+        }
+        ,
         isArrOfCheck: function (arrOfRowValues) {//given an array of strings returns true if it is a valid true/false representation, false if not
             var failElement = _.find(arrOfRowValues, function (element) { //if failElement is undefined => all elements are a valid number format
                 var is_check = FL.common.is_check(element);
@@ -1548,7 +1815,8 @@ FL["common"] = (function () {//name space FL.common
             if (!_.isUndefined(failElement))//not an array of numbers
                 return false;
             return true;//it is an array of true/false
-        },
+        }
+        ,
         isArrOfPhone: function (arrOfRowValues) {//given an array of strings returns true if it is a valid phone representation, false if not
             var failElement = _.find(arrOfRowValues, function (element) { //if failElement is undefined => all elements are a valid number format
                 var is_phone = FL.common.is_phone(element);
@@ -1557,7 +1825,8 @@ FL["common"] = (function () {//name space FL.common
             if (!_.isUndefined(failElement))//not an array of numbers
                 return false;
             return true;//it is an array of phone numbers
-        },
+        }
+        ,
         localeStringToNumber: function (str, format) {//returns number or 0 if is unable to convert
             // str - str to convert to number
             // format - us, de or fr -->all other formats return 0
@@ -1586,12 +1855,14 @@ FL["common"] = (function () {//name space FL.common
                     n = 0;
             }
             return n;
-        },
+        }
+        ,
         convertStringVectorToNumber: function (arr, format) {//given an array of strings and a format converts that string to a number to numeric according to string format
             return _.map(arr, function (element) {
                 return FL.common.localeStringToNumber(element, format);
             });
-        },
+        }
+        ,
         getServerName: function () {//return server name form url. if server is local host =>test.framelink.co
             //extracts content from url in browser (after // and before the first /)
             //example (in FL.API _login):fl.serverName(FL.common.getServerName());
@@ -1604,7 +1875,8 @@ FL["common"] = (function () {//name space FL.common
                 server = "test.framelink.co";
             FL.common.printToConsole("FL.common.getServerName() -->" + server);
             return server;
-        },
+        }
+        ,
         getMandrillKey: function () {
             var server = this.getServerName();
             var key = "S8_4ExqKlIdZiSBqgiLBUw"; //assume
@@ -1612,7 +1884,8 @@ FL["common"] = (function () {//name space FL.common
                 key = "vVC6R5SZJEHq2hjEZfUwRg";
             }
             return key;
-        },
+        }
+        ,
         debug: false, //if true shows all FL.common.printToConsole() independentely of filters  ->fallsback to console.log - if false =>only debugFilterToShow will appear
         debugFiltersToShow: null,
         debugFilter: null,//an object with all  filters collected from the app. Each key is a filter with value true or false. To be created by printToConsole()
@@ -1640,7 +1913,9 @@ FL["common"] = (function () {//name space FL.common
             }
             // FL.API.debug = debugStatus;
             // FL.API.debugStyle = debugStyleStatus;
-        },
+        }
+
+        ,
         masterDetailItems: null,//used by modalIn
         getBrowserWidth: function () {
             if (window.innerWidth) {
@@ -1654,6 +1929,7 @@ FL["common"] = (function () {//name space FL.common
             }
             return 0;
         }
+
         ,
         getBase64Width: function (imageData) {
             $("body").append("<img id='hiddenImage' src='" + imageData + "' />");
@@ -1920,7 +2196,8 @@ FL["common"] = (function () {//name space FL.common
                     currency: "$"
                 };//'dd/MM/yyyy';
             return formatMask;
-        },
+        }
+        ,
         setApplicationSettingsFromSystem: function () {
             this.appsettings.radixpoint = this.getLocaleSettings().radix; //this.getDecimalSeparator();//":";
             thousandsSeparator = this.getLocaleSettings().thousands;
@@ -1931,7 +2208,8 @@ FL["common"] = (function () {//name space FL.common
             this.appsettings.thousandsSeparator = thousandsSeparator;
             this.appsettings.dateformat = this.getLocaleSettings().ymdFormat;
             this.appsettings.currency = this.getLocaleSettings().currency;
-        },
+        }
+        ,
         getDOMContentFromId: function (id) {
             var content = null;
             var domTarget = "#" + id;
@@ -1946,7 +2224,8 @@ FL["common"] = (function () {//name space FL.common
             else
                 content = $domTarget.text();
             return content;
-        },
+        }
+        ,
         setDOMContentToId: function (id, value) {
             var content = null;
             var domTarget = "#" + id;
@@ -1974,12 +2253,69 @@ FL["common"] = (function () {//name space FL.common
                 }
             }
             return content;
-        },
+        }
+        ,
         checkHTML: function (html) {
             var doc = document.createElement('div');
             doc.innerHTML = html;
             return ( doc.innerHTML === html );
-        },
+        }
+        ,
+        extractRadixFrom: function (numberStr) {//Given a string representing a number returns its radix point if any (note that 12,345,678 => radix=".")
+            // - null if not a number representation
+            // - null if or no radix point or if inconclusive (example "12,00" can be US 1200 or European 12,0)
+            if (!numberStr.isNumeric())
+                return null;
+            var numberOfCommas = 0;
+            var numberOfPoints = 0;
+            var point = numberStr.match(/\./g);//searches point
+            var comma = numberStr.match(/,/g);//searches comma
+            if (comma) {
+                numberOfCommas = comma.length;
+                if (numberOfCommas > 1)//comma is the separator therefore point is the radix ->it has zero or 1 point for sure ex:1,234,567.8
+                    return ".";
+            }
+            if (point) {
+                numberOfPoints = point.length;
+                if (numberOfPoints > 1)//point  is the separator therefore comma is the radix ->it has zero or 1 point for sure ex:1.234.567,8
+                    return ",";
+            }
+            // cases 1 - (one comma, one point), 2 - (no comma and no point)
+            if (numberOfPoints == numberOfCommas) {//(one comma, one point) is solvable =>last is radix
+                var pointPos = numberStr.indexOf(".");
+                var commaPos = numberStr.indexOf(",");
+                if (pointPos >= 0) {
+                    if (pointPos > commaPos)
+                        return ".";
+                    else
+                        return ",";
+                }
+            }
+            return null;
+        }
+        ,
+        extractThousandsSeparatorFrom: function (numberStr) {//Given a string representing a number returns its ThousandsSeparator if any - null if not a number representation or no Separator
+            // return null or "." or "," or "space"
+            // - null if not a number representation
+            // - null if or no separator or inconclusive (example "12,000" can be US 12000 or European 12,0)
+            var radix = this.extractRadixFrom(numberStr);
+            if (!radix)
+                return null;
+            if (radix == ".")
+                return ",";
+            //Separator may be "." or space
+            numberStr = numberStr.replace(/,/g);//remove comma radix
+            var point = numberStr.match(/\./g);//searches point
+            if (point) {
+                return ".";
+            }
+            var space = numberStr.trim().match(/ /g);//searches space
+            if (point) {
+                return "space";
+            }
+            return null;
+        }
+        ,
         testFunc: function (x) {
             alert("FL.common.test() -->" + x);
         }

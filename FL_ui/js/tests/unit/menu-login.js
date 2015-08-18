@@ -307,8 +307,100 @@ $(function () {
         success = FL.common.typeUIOf(xVar);
         ok(success === null, "FL.common.typeUIOf('951219244558') -->'invalid phone'");//14
 
+        xVar = "abc-.123def";
+        var result = FL.common.digitPrefixInEmbededDigit(xVar);
+        ok(result =="-.", "FL.common.digitPrefixInEmbededDigit('" + xVar + "') -->'-.' -------------------------------------------FL.common.digitPrefixInEmbededDigit()");//15
+
+        xVar = "£-9.734.123,45 GBP";
+        var result = FL.common.digitPrefixInEmbededDigit(xVar);
+        ok(result =="-", "FL.common.digitPrefixInEmbededDigit('" + xVar + "') -->'-'");//15
+
+        xVar = "£.945 GBP";
+        var result = FL.common.digitPrefixInEmbededDigit(xVar);
+        ok(result ==".", "FL.common.digitPrefixInEmbededDigit('" + xVar + "') -->'.'");//15
+
+        xVar = "£,945 GBP";
+        var result = FL.common.digitPrefixInEmbededDigit(xVar,",");
+        ok(result ==",", "FL.common.digitPrefixInEmbededDigit('" + xVar + "',',') -->','");//15
+
+        xVar = "abc-q123def";
+        var result = FL.common.digitPrefixInEmbededDigit(xVar);
+        ok(result =="", "FL.common.digitPrefixInEmbededDigit('" + xVar + "') -->''");
+
+        xVar = "abc--123";
+        var result = FL.common.digitPrefixInEmbededDigit(xVar);
+        ok(result =="-", "FL.common.digitPrefixInEmbededDigit('" + xVar + "') -->'-'");
+
+        xVar = "abc..123";
+        var result = FL.common.digitPrefixInEmbededDigit(xVar);
+        ok(result ==".", "FL.common.digitPrefixInEmbededDigit('" + xVar + "') -->'.'");
+
+        xVar = "-.11";
+        var result = FL.common.digitPrefixInEmbededDigit(xVar);
+        ok(result =="-.", "FL.common.digitPrefixInEmbededDigit('" + xVar + "') -->'-.'");
+
+        xVar = "-,11";
+        var result = FL.common.digitPrefixInEmbededDigit(xVar,",");
+        ok(result =="-,", "FL.common.digitPrefixInEmbededDigit('" + xVar + "') -->'-,'");
+
+        xVar = "abc-,123";
+        var result = FL.common.digitPrefixInEmbededDigit(xVar,",");
+        ok(result =="-,", "FL.common.digitPrefixInEmbededDigit('" + xVar + ",',') -->'-,'");
+
+        xVar = "abc.-123";
+        var result = FL.common.digitPrefixInEmbededDigit(xVar,".");
+        ok(result =="-", "FL.common.digitPrefixInEmbededDigit('" + xVar + ",'.') -->'-'");
+
+        xVar = "abc,-123";
+        var result = FL.common.digitPrefixInEmbededDigit(xVar,",");
+        ok(result =="-", "FL.common.digitPrefixInEmbededDigit('" + xVar + ",',') -->'-'");
+
+        xVar = "abc..123";
+        var result = FL.common.digitPrefixInEmbededDigit(xVar,".");
+        ok(result ==".", "FL.common.digitPrefixInEmbededDigit('" + xVar + ",'.') -->'.'");
+
+        xVar = "£-9.734.123,45 GBP";
+        var result = FL.common.digitPrefixInEmbededDigit(xVar,".");
+        ok(result =="-", "FL.common.digitPrefixInEmbededDigit('" + xVar + ",'.') -->'.'");
+
+        xVar = "abc,,123";
+        var result = FL.common.digitPrefixInEmbededDigit(xVar,",");
+        ok(result ==",", "FL.common.digitPrefixInEmbededDigit('" + xVar + ",',') -->','");
+
+        xVar = "abc,,def";
+        var result = FL.common.digitPrefixInEmbededDigit(xVar,",");
+        ok(result =="", "FL.common.digitPrefixInEmbededDigit('" + xVar + ",',') -->''");
+
+        xVar = "abc";
+        var result = FL.common.excludeDigitPrefixFromStringEnd(xVar);
+        ok(result =="abc", "FL.common.excludeDigitPrefixFromStringEnd('" + xVar + "') -->'abc' -------------------------------------------FL.common.excludeDigitPrefixFromStringEnd()");//15
+
+        xVar = "abc-";
+        var result = FL.common.excludeDigitPrefixFromStringEnd(xVar);
+        ok(result =="abc", "FL.common.excludeDigitPrefixFromStringEnd('" + xVar + "') -->abc''");
+
+        xVar = "abc.";
+        var result = FL.common.excludeDigitPrefixFromStringEnd(xVar);
+        ok(result =="abc", "FL.common.excludeDigitPrefixFromStringEnd('" + xVar + "') -->'abc'");
+
+        xVar = "abc,";
+        var result = FL.common.excludeDigitPrefixFromStringEnd(xVar);
+        ok(result =="abc", "FL.common.excludeDigitPrefixFromStringEnd('" + xVar + "') -->'abc'");
+
+        xVar = "abc ,";
+        var result = FL.common.excludeDigitPrefixFromStringEnd(xVar);
+        ok(result =="abc ", "FL.common.excludeDigitPrefixFromStringEnd('" + xVar + "') -->'abc '");
+
+        xVar = "S/. ";
+        var result = FL.common.excludeDigitPrefixFromStringEnd(xVar);
+        ok(result =="S/. ", "FL.common.excludeDigitPrefixFromStringEnd('" + xVar + "') -->'S/. '");
+
+        xVar = "S/.";
+        var result = FL.common.excludeDigitPrefixFromStringEnd(xVar);
+        ok(result =="S/", "FL.common.excludeDigitPrefixFromStringEnd('" + xVar + "') -->'S/'");
+
         xVar = "351,2,19244,5582";
-        ok(xVar.getOcurrencesOf(",") === 3, "FL.common  ---> (" + xVar + ").getOcurrencesOf(',') -->3");//15
+        ok(xVar.getOcurrencesOf(",") === 3, "FL.common  ---> (" + xVar + ").getOcurrencesOf(',') -->3 --------------------------------------------(xVar).getOcurrencesOf(',') ");//15
 
         xVar = "351xx2xx19244xx5582";
         ok(xVar.getOcurrencesOf("xx") === 3, "FL.common  ---> (" + xVar + ").getOcurrencesOf('xx') -->3");//16
@@ -364,11 +456,32 @@ $(function () {
         xVar = "1,234,567.89.2";
         ok(!xVar.isNumeric(), "FL.common  ---> (" + xVar + ").isNumeric() -->false");//20
 
-        xVar = "12,00%";
-        ok(xVar.isPercent(), "FL.common  ---> (" + xVar + ").isPercent() -->true");//20
+        xVar = "28-04-1956";
+        ok(!xVar.isNumeric(), "FL.common  ---> (" + xVar + ").isNumeric() -->false");//20
+
+        xVar = "1200";
+        ok(xVar.isInteger(), "FL.common  ---> (" + xVar + ").isInteger() -->true  --------------------------------------------------------- xVar.isInteger()  ");//20
+
+        xVar = "1";
+        ok(xVar.isInteger(), "FL.common  ---> (" + xVar + ").isInteger() -->true ");//20
+
+        xVar = " 1200";
+        ok(xVar.isInteger(), "FL.common  ---> (" + xVar + ").isInteger() -->true");//20
+
+        xVar = " 1200 ";
+        ok(xVar.isInteger(), "FL.common  ---> (" + xVar + ").isInteger() -->true");//20
+
+        xVar = "1200.200";
+        ok(!xVar.isInteger(), "FL.common  ---> (" + xVar + ").isInteger() -->false it has separator or radix");//20
+
+        xVar = "1200,200";
+        ok(!xVar.isInteger(), "FL.common  ---> (" + xVar + ").isInteger() -->false it has separator or radix");//20
+
+        xVar = "1200 200";
+        ok(!xVar.isInteger(), "FL.common  ---> (" + xVar + ").isInteger() -->false it has separator or radix");//20
 
         xVar = " 12,00 %";
-        ok(xVar.isPercent(), "FL.common  ---> (" + xVar + ").isPercent() -->true");//20
+        ok(xVar.isPercent(), "FL.common  ---> (" + xVar + ").isPercent() -->true  --------------------------------------------------------- xVar.isPercent()  ");//20
 
         xVar = "-12,00 %";
         ok(xVar.isPercent(), "FL.common  ---> (" + xVar + ").isPercent() -->true");//20
@@ -382,9 +495,31 @@ $(function () {
         xVar = "1%x";
         ok(!xVar.isPercent(), "FL.common  ---> (" + xVar + ").isPercent() -->false");//20
 
+        xVar = "1.234,56";
+        ok(xVar.ToNumeric_US()=="1234.56", "FL.common  ---> (" + xVar + ").ToNumeric_US() -->"+xVar.ToNumeric_US() + " ----------------------------------------------xVar.ToNumeric_US");//20
+
+        xVar = "1,234.56";
+        ok(xVar.ToNumeric_US()=="1234.56", "FL.common  ---> (" + xVar + ").ToNumeric_US() -->"+xVar.ToNumeric_US());//20
+
+        xVar = "1,234";
+        ok(xVar.ToNumeric_US()=="1234", "FL.common  ---> (" + xVar + ").ToNumeric_US() -->"+xVar.ToNumeric_US());//20
+
+        xVar = "1.234";
+        ok(xVar.ToNumeric_US()=="1.234", "FL.common  ---> (" + xVar + ").ToNumeric_US() -->"+xVar.ToNumeric_US());//20
+
+        xVar = "1.234";
+        ok(xVar.ToNumeric_US(".")=="1.234", "FL.common  ---> (" + xVar + ",'.').ToNumeric_US() -->"+xVar.ToNumeric_US("."));//20
+
+        xVar = "1,234";
+        ok(xVar.ToNumeric_US(",")=="1.234", "FL.common  ---> (" + xVar + ",',').ToNumeric_US() -->"+xVar.ToNumeric_US(","));//20
+
+        xVar = "1.234";
+        ok(xVar.ToNumeric_US(",")=="1234", "FL.common  ---> (" + xVar + ",',').ToNumeric_US() -->"+xVar.ToNumeric_US(","));//20
+
+
         xVar = "xx1,234yyy";
         var result = FL.common.extractContentBetweenFirstAndLastDigit(xVar);
-        ok(result == "1,234", "FL.common.extractContentBetweenFirstAndLastDigit('" + xVar + "') -->" + result);//20
+        ok(result == "1,234", "FL.common.extractContentBetweenFirstAndLastDigit('" + xVar + "') -->" + result + "-----------------------------------FL.common.extractContentBetweenFirstAndLastDigit(");//20
 
         xVar = "xx-1,234yyy";
         var result = FL.common.extractContentBetweenFirstAndLastDigit(xVar);
@@ -400,7 +535,7 @@ $(function () {
         ok(result == "1.253,45", "FL.common.extractContentBetweenFirstAndLastDigit('" + xVar + "') -->" + result);//20
 
         xVar = "US$1.253,45";
-        ok(xVar.isCurrency(), "FL.common  ---> (" + xVar + ").isCurrency() -->true");//20
+        ok(xVar.isCurrency(), "FL.common  ---> (" + xVar + ").isCurrency() -->true ----------------------------------------------------xVar.isCurrency()");//20
 
         xVar = "S/. 1.250,45   ";
         ok(xVar.isCurrency(), "FL.common  ---> (" + xVar + ").isCurrency() -->true");//20
@@ -437,6 +572,64 @@ $(function () {
 
         xVar = "$-1,234,567.89 CAD";
         ok(xVar.isCurrency(), "FL.common  ---> (" + xVar + ").isCurrency() -->true");//20
+
+        xVar = "S/.-1,234,567.89 ";
+        ok(xVar.isCurrency(), "FL.common  ---> (" + xVar + ").isCurrency() -->true");//20
+
+        xVar = "S/.1,234,567.89 ";
+        ok(xVar.isCurrency(), "FL.common  ---> (" + xVar + ").isCurrency() -->true");//20
+
+        //----------------------- FL.common.extractRadixFrom
+
+        xVar = "12,345,678.9";
+        var result = FL.common.extractRadixFrom(xVar);
+        ok(result == ".", "FL.common.extractRadixFrom('"+ xVar + "') -->'.' -------------------------------------------------  FL.common.extractRadixFrom");//1
+
+        xVar = "12.345.678,9";
+        var result = FL.common.extractRadixFrom(xVar);
+        ok(result == ",", "FL.common.extractRadixFrom('"+ xVar + "') -->','");
+
+        xVar = "12,345.9";
+        var result = FL.common.extractRadixFrom(xVar);
+        ok(result == ".", "FL.common.extractRadixFrom('"+ xVar + "') -->'.'");
+
+        xVar = "12.345,9";
+        var result = FL.common.extractRadixFrom(xVar);
+        ok(result == ",", "FL.common.extractRadixFrom('"+ xVar + "') -->','");
+
+        xVar = "12,345";
+        var result = FL.common.extractRadixFrom(xVar);
+        ok(result === null, "FL.common.extractRadixFrom('"+ xVar + "') -->null because we dont know if is 12,345.00(US) or 12,345(Europe)");
+
+        xVar = "12.345";
+        var result = FL.common.extractRadixFrom(xVar);
+        ok(result == null, "FL.common.extractRadixFrom('"+ xVar + "') -->null because we dont know if is 12.345,00(Europe) or 12.345(US)");
+
+        xVar = "12345";
+        var result = FL.common.extractRadixFrom(xVar);
+        ok(result == null, "FL.common.extractRadixFrom('"+ xVar + "') -->null because it is an integer");
+
+        xVar = "1.234,5";
+        var result = FL.common.extractThousandsSeparatorFrom(xVar);
+        ok(result == ".", "FL.common.extractThousandsSeparatorFrom('"+ xVar + "') -->point ---------------------------------------------FL.common.extractThousandsSeparatorFrom ");
+
+        xVar = "1,234.5";
+        var result = FL.common.extractThousandsSeparatorFrom(xVar);
+        ok(result == ",", "FL.common.extractThousandsSeparatorFrom('"+ xVar + "') -->comma");
+
+        xVar = "1,234,125";
+        var result = FL.common.extractThousandsSeparatorFrom(xVar);
+        ok(result == ",", "FL.common.extractThousandsSeparatorFrom('"+ xVar + "') -->comma");
+
+        xVar = "1.234.125";
+        var result = FL.common.extractThousandsSeparatorFrom(xVar);
+        ok(result == ".", "FL.common.extractThousandsSeparatorFrom('"+ xVar + "') -->point");
+
+        xVar = "12345";
+        var result = FL.common.extractThousandsSeparatorFrom(xVar);
+        ok(result == null, "FL.common.extractThousandsSeparatorFrom('"+ xVar + "') -->null because it is an integer");
+
+
 
         //----------------------- FL.common.isArrOf<XXXX> Currency, number, email, url, check, phone,datetime
         var arrOfRowValues = [
@@ -628,7 +821,7 @@ $(function () {
         FL.common.appsettings.thousandsSeparator = ".";
         var x = 12345.567;
         var result = x.toFormattedString();
-        ok(result == "12.345,567", "Numeric x=" + x + "   x.toFormattedString() -->'" + result + "' with radixpoint=',' thousandsSeparator='.')");//1
+        ok(result == "12.345,567", "Numeric x=" + x + "   x.toFormattedString() -->'" + result + "' with radixpoint=',' thousandsSeparator='.') -----------------------(<Number>).toFormattedString()");//1
 
         x = 123456789;
         var result = x.toFormattedString();
@@ -649,6 +842,21 @@ $(function () {
         var result = x.toFormattedString(decimals);
         ok(result == "12.346", "Numeric x=" + x + "   x.toFormattedString('" + decimals + "') -->'" + result + "' with radixpoint=',' thousandsSeparator='.')");//1
 
+        var x = Number("-1234567.25");
+        var result = x.toFormattedString();
+        ok(result == "-1.234.567,25", "Numeric x=" + x + "   x.toFormattedString(" + x + ") -->'" + result + "' with radixpoint='.' thousandsSeparator=',')");//1
+
+        var x = Number("-1.25");
+        var result = x.toFormattedString();
+        ok(result == "-1,25", "Numeric x=" + x + "   x.toFormattedString(" + x + ") -->'" + result + "' with radixpoint='.' thousandsSeparator=',')");//1
+
+        var x = Number("-0.25");
+        var result = x.toFormattedString();
+        ok(result == "-0,25", "Numeric x=" + x + "   x.toFormattedString(" + x + ") -->'" + result + "' with radixpoint='.' thousandsSeparator=',')");//1
+
+        var x = Number("-.25");
+        var result = x.toFormattedString();
+        ok(result == "-0,25", "Numeric x=" + x + "   x.toFormattedString(" + x + ") -->'" + result + "' with radixpoint='.' thousandsSeparator=',')");//1
 
         FL.common.appsettings.radixpoint = ".";
         FL.common.appsettings.thousandsSeparator = ",";
@@ -682,6 +890,15 @@ $(function () {
         var x = Number("12A23");
         var result = x.toFormattedString();
         ok(result === null, "Numeric x=" + x + "   x.toFormattedString(" + x + ") -->'" + result + "' with radixpoint='.' thousandsSeparator=',')");//1
+
+        var x = Number("-1234567.25");
+        var result = x.toFormattedString();
+        ok(result == "-1,234,567.25", "Numeric x=" + x + "   x.toFormattedString(" + x + ") -->'" + result + "' with radixpoint='.' thousandsSeparator=',')");//1
+
+        var x = Number("-1.25");
+        var result = x.toFormattedString();
+        ok(result == "-1.25", "Numeric x=" + x + "   x.toFormattedString(" + x + ") -->'" + result + "' with radixpoint='.' thousandsSeparator=',')");//1
+
 
         //----------------------- String.pad()
         var xVar = "567";
@@ -953,7 +1170,7 @@ $(function () {
         FL.common.appsettings.radixpoint = ",";
         xVar = "€ 12345,67";
         var result = FL.common.currencyToStringNumber(xVar);
-        ok(result == "12345.67", "FL.common.currencyToStringNumber('" + xVar + "') -->radixpoint=','-->" + result + "'");//67
+        ok(result == "12345.67", "FL.common.currencyToStringNumber('" + xVar + "') -->radixpoint=','-->" + result + "' --------------------------->FL.common.currencyToStringNumber");//67
         xVar = "kr. 9.734.123,45";
         result = FL.common.currencyToStringNumber(xVar);
         ok(result == "9734123.45", "FL.common.currencyToStringNumber('" + xVar + "') -->radixpoint=','-->" + result + "'");
@@ -961,23 +1178,26 @@ $(function () {
         result = FL.common.currencyToStringNumber(xVar);
         ok(result == "9734123.45", "FL.common.currencyToStringNumber('" + xVar + "') -->radixpoint=','-->" + result + "'");
 
+        xVar = "-9.734.123,45 kr.";
+        result = FL.common.currencyToStringNumber(xVar);
+        ok(result == "-9734123.45", "FL.common.currencyToStringNumber('" + xVar + "') -->radixpoint=','-->" + result + "' --- negative value");
+
+        xVar = "£-9.734.123,45 GBP";
+        result = FL.common.currencyToStringNumber(xVar);
+        ok(result == "-9734123.45", "FL.common.currencyToStringNumber('" + xVar + "') -->radixpoint=','-->" + result + "' --- negative value");
+
+        xVar = "-11,33";
+        result = FL.common.currencyToStringNumber(xVar);
+        ok(result == "-11.33", "FL.common.currencyToStringNumber('" + xVar + "') -->radixpoint=','-->" + result + "'");
+
         FL.common.appsettings.radixpoint = ":";
         xVar = "€ 12345:67";
         var result = FL.common.currencyToStringNumber(xVar);
-        ok(result == "12345.67", "FL.common.currencyToStringNumber('" + xVar + "') -->radixpoint=':'-->" + result + "'");//67
+        ok(result ===null, "FL.common.currencyToStringNumber('" + xVar + "') -->radixpoint=':'-->" + result + "'  not a valid number");//67
 
-        FL.common.appsettings.radixpoint = ":";
-        FL.common.appsettings.thousandsSeparator = ".";
-        xVar = "€ 12345:67";
-        var result = FL.common.currencyToStringNumber(xVar);
-        ok(result == "12345.67", "FL.common.currencyToStringNumber('" + xVar + "') -->radixpoint=':'-->" + result + "'");//67
-
-        xVar = "€ 12.345:67";
-        var result = FL.common.currencyToStringNumber(xVar);
-        ok(result == "12345.67", "FL.common.currencyToStringNumber('" + xVar + "') -->radixpoint=':'-->" + result + "'");//67
-
-        FL.common.appsettings.thousandsSeparator = "_";
-        xVar = "€ 12_345:67";
+        FL.common.appsettings.radixpoint = ",";
+        //FL.common.appsettings.thousandsSeparator = "_";
+        xVar = "€ 12345,67";
         var result = FL.common.currencyToStringNumber(xVar);
         ok(result == "12345.67", "FL.common.currencyToStringNumber('" + xVar + "') -->radixpoint=':'-->" + result + "'");//67
 

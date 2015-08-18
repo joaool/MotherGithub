@@ -102,8 +102,6 @@ FL["bg"] = (function () {//name space FL.common
         initialize: function (options) {
             Backgrid.InputCellEditor.prototype.initialize.apply(this, arguments);
             var decimals = NumberCellEditor.prototype.decimals;//4;
-            var decimalMask = ("0000000000000000000").substr(0, decimals);
-            var mask = "#" + FL.common.appsettings.thousandsSeparator + "##0" + FL.common.appsettings.radixpoint + decimalMask;//ex."#.##0,00"
             var cellVal = $(this.el).val();
             $(this.el).focus(function () {
                 var paddedValue = function (cellValStr, decimals) {
@@ -116,7 +114,6 @@ FL["bg"] = (function () {//name space FL.common
                         if (tail.length < decimals) {
                             tail = tail.pad(decimals, "0", 1);
                         }
-                        ;
                         xRet = intValueStr + radixpoint + tail;
                     }
                     return xRet
@@ -124,19 +121,16 @@ FL["bg"] = (function () {//name space FL.common
                 var cellVal = $(this).val();
                 var paddedCell = paddedValue(cellVal, decimals);
                 console.log('------------->on focus ==>' + $(this).val() + " -->" + paddedCell);
-
-                $(this).val(paddedCell);
+                var cellNoPre_NoPos = FL.common.digitPrefixInEmbededDigit(paddedCell) + FL.common.extractContentBetweenFirstAndLastDigit(paddedCell);
+                $(this).val(cellNoPre_NoPos);
+                var options = {
+                    minus: true,
+                    radix: FL.common.appsettings.radixpoint,
+                    sep: FL.common.appsettings.thousandsSeparator,
+                };
+                $(this).numberValidator(options);//modified https://github.com/igorescobar/jQuery-Mask-Plugin   1234512345 123
                 $(this).select();
             });
-            var options = {
-                reverse: true,
-                maxlength: false,
-                onKeyPress: function (val, event, currentField, options) {
-                    console.log('------------->An key was pressed!:', val, ' event: ', event, 'currentField: ', currentField, ' options: ', options);
-                    console.log('------------->current value=' + val);
-                }
-            };
-            $(this.el).mask(mask, options);//https://github.com/igorescobar/jQuery-Mask-Plugin
         },
         render: function (model) {
             var cellVal = this.model.get(this.column.get("name"));//extracts from model
@@ -150,14 +144,11 @@ FL["bg"] = (function () {//name space FL.common
     var CurrencyCellEditor = Backgrid.InputCellEditor.extend({
         initialize: function (options) {
             Backgrid.InputCellEditor.prototype.initialize.apply(this, arguments);
-            //alert("CurrencyCellEditor.initialize ");
             var decimals = CurrencyCellEditor.prototype.decimals;
             var currency = CurrencyCellEditor.prototype.currency;
             var thousandsSeparator = FL.common.appsettings.thousandsSeparator;
             if (thousandsSeparator == "space")
                 thousandsSeparator = " ";
-            var decimalMask = ("0000000000000000000").substr(0, decimals);
-            var mask = "#" + thousandsSeparator + "##0" + FL.common.appsettings.radixpoint + decimalMask;//ex."#.##0,00"
             var cellVal = $(this.el).val();
             $(this.el).focus(function () {
                 var paddedValue = function (cellValStr, decimals) {
@@ -170,27 +161,34 @@ FL["bg"] = (function () {//name space FL.common
                         if (tail.length < decimals) {
                             tail = tail.pad(decimals, "0", 1);
                         }
-                        ;
                         xRet = intValueStr + radixpoint + tail;
                     }
                     return xRet
                 };
                 var cellVal = $(this).val();
                 var paddedCell = paddedValue(cellVal, decimals);
-                console.log('------------->on focus ==>' + $(this).val() + " -->" + paddedCell);
-
-                $(this).val(paddedCell);
+                var cellNoPre_NoPos = FL.common.digitPrefixInEmbededDigit(paddedCell) + FL.common.extractContentBetweenFirstAndLastDigit(paddedCell);
+                $(this).val(cellNoPre_NoPos);
+                var options = {
+                    minus: true,
+                    radix: FL.common.appsettings.radixpoint,
+                    sep: FL.common.appsettings.thousandsSeparator,
+                    onKeyPress: function (val, event, currentField, options) {
+                        FL.common.printToConsole('------------->A key was pressed! currentValue=' + val, "bg");
+                    },
+                    onChange: function (val, event, currentField, options) {
+                        FL.common.printToConsole('------------->onChange !!! currentValue=' + val, "bg");
+                    },
+                    onInvalid: function (val, event, currentField, options) {
+                        FL.common.printToConsole('------------->onInvalid !!! currentValue=' + val, "bg");
+                    },
+                    onComplete: function (val, event, currentField, options) {
+                        FL.common.printToConsole('------------->onComplete !!! final value=' + val, "bg");
+                    }
+                };
+                $(this).numberValidator(options);//modified https://github.com/igorescobar/jQuery-Mask-Plugin   1234512345 123
                 $(this).select();
             });
-            var options = {
-                reverse: true,
-                maxlength: false,
-                onKeyPress: function (val, event, currentField, options) {
-                    console.log('------------->An key was pressed!:', val, ' event: ', event, 'currentField: ', currentField, ' options: ', options);
-                    console.log('------------->current value=' + val);
-                }
-            };
-            $(this.el).mask(mask, options);//https://github.com/igorescobar/jQuery-Mask-Plugin
         },
         render: function (model) {
             var cellVal = this.model.get(this.column.get("name"));//extracts from model
@@ -208,17 +206,15 @@ FL["bg"] = (function () {//name space FL.common
             var mask = "#" + FL.common.appsettings.thousandsSeparator + "##0";//ex."#.##0"
             var cellVal = $(this.el).val();
             $(this.el).focus(function () {
+                var cellVal = $(this).val();
+                var options = {
+                    minus: true,
+                    radix: null,
+                    sep: FL.common.appsettings.thousandsSeparator,
+                };
+                $(this).numberValidator(options);//modified https://github.com/igorescobar/jQuery-Mask-Plugin   1234512345 123
                 $(this).select();
             });
-            var options = {
-                reverse: true,
-                maxlength: false,
-                onKeyPress: function (val, event, currentField, options) {
-                    console.log('------------->An key was pressed!:', val, ' event: ', event, 'currentField: ', currentField, ' options: ', options);
-                    console.log('------------->current value=' + val);
-                }
-            };
-            $(this.el).mask(mask, options);//https://github.com/igorescobar/jQuery-Mask-Plugin
         },
         render: function (model) {
             var cellVal = this.model.get(this.column.get("name"));//extracts from model
@@ -233,10 +229,6 @@ FL["bg"] = (function () {//name space FL.common
         initialize: function (options) {
             Backgrid.InputCellEditor.prototype.initialize.apply(this, arguments);
             var decimals = CurrencyCellEditor.prototype.decimals;
-            // var currency = CurrencyCellEditor.prototype.currency;
-
-            var decimalMask = ("0000000000000000000").substr(0, decimals);
-            var mask = "#" + FL.common.appsettings.thousandsSeparator + "##0" + FL.common.appsettings.radixpoint + decimalMask;//ex."#.##0,00"
             var cellVal = $(this.el).val();
             $(this.el).focus(function () {
                 var paddedValue = function (cellValStr, decimals) {
@@ -249,7 +241,6 @@ FL["bg"] = (function () {//name space FL.common
                         if (tail.length < decimals) {
                             tail = tail.pad(decimals, "0", 1);
                         }
-                        ;
                         xRet = intValueStr + radixpoint + tail;
                     }
                     return xRet
@@ -257,19 +248,16 @@ FL["bg"] = (function () {//name space FL.common
                 var cellVal = $(this).val();
                 var paddedCell = paddedValue(cellVal, decimals);
                 console.log('------------->on focus ==>' + $(this).val() + " -->" + paddedCell);
-
-                $(this).val(paddedCell);
+                var cellNoPre_NoPos = FL.common.digitPrefixInEmbededDigit(paddedCell) + FL.common.extractContentBetweenFirstAndLastDigit(paddedCell);
+                $(this).val(cellNoPre_NoPos);
+                var options = {
+                    minus: true,
+                    radix: FL.common.appsettings.radixpoint,
+                    sep: FL.common.appsettings.thousandsSeparator,
+                };
+                $(this).numberValidator(options);//modified https://github.com/igorescobar/jQuery-Mask-Plugin   1234512345 123
                 $(this).select();
             });
-            var options = {
-                reverse: true,
-                maxlength: false,
-                onKeyPress: function (val, event, currentField, options) {
-                    console.log('------------->An key was pressed!:', val, ' event: ', event, 'currentField: ', currentField, ' options: ', options);
-                    console.log('------------->current value=' + val);
-                }
-            };
-            $(this.el).mask(mask, options);//https://github.com/igorescobar/jQuery-Mask-Plugin
         },
         render: function (model) {
             var cellVal = this.model.get(this.column.get("name"));//extracts from model
@@ -612,10 +600,13 @@ FL["bg"] = (function () {//name space FL.common
                         var num = Number(rawValue);
                         // var numStr = accounting.formatMoney(num,"€",2,FL.common.appsettings.thousandsSeparator,FL.common.appsettings.radixpoint);
                         // return numStr;
+                        var z = currency + num.toFormattedString(decimals);
+                        FL.common.printToConsole("*************fromRaw****************** z=" + z, "bg");
                         return currency + num.toFormattedString(decimals);
                     },
                     toRaw: function (formattedData) {
                         var z = FL.common.currencyToStringNumber(formattedData);
+                        FL.common.printToConsole("*************ToRaw************************************** z=" + z, "bg");
                         return FL.common.currencyToStringNumber(formattedData);
                     }
                 };
@@ -661,7 +652,7 @@ FL["bg"] = (function () {//name space FL.common
                     }
                 };
                 var percentCell = Backgrid.StringCell.extend({
-                    className: "_fl_percent-cell",
+                    className: "_fl_numeric-cell",
                     formatter: percentFormatter,
                     editor: PercentCellEditor,
                 });
@@ -682,7 +673,27 @@ FL["bg"] = (function () {//name space FL.common
                 });
                 retObj["cell"] = comboCell;
             } else if (typeUI == "checkbox") {
+                var checkboxFormatter = {
+                    fromRaw: function (rawValue) {
+                        if (FL.common.typeOf(rawValue) == "boolean") {///Only to prevent old logical values in the database
+                            alert("FL.bg --->cellType for typeUI=checkbox ERROR old logical value in database -->press OK to correct");
+                            rawValue = ( (rawValue) ? "TRUE" : "FALSE");
+                        }
+                        var bool = "FALSE";
+                        if(rawValue)
+                            bool = ( (rawValue.toUpperCase() == "TRUE") ? true : false );//by any reason rawValue can be undefined =>error on toUpperCase()
+                        return bool;
+                        //return rawValue;
+                    },
+                    toRaw: function (formattedData) {
+                        //var z = formattedData;
+                        //return formattedData;
+                        var boolStr = ( (formattedData) ? "TRUE" : "FALSE" );
+                        return boolStr;
+                    }
+                };
                 var BooleanCell = Backgrid.BooleanCell.extend({
+                    formatter: checkboxFormatter,
                     editor: Backgrid.BooleanCellEditor.extend({
                         render: function () {
                             var model = this.model;
@@ -692,7 +703,9 @@ FL["bg"] = (function () {//name space FL.common
                              * Toggle checked property since a click is what triggered enterEditMode
                              */
                             this.$el.prop("checked", !val);
-                            model.set(columnName, !val);
+                            var dataToModel = this.formatter.toRaw(!val);
+                            //model.set(columnName, !val);
+                            model.set(columnName, dataToModel);
                             return this;
                         }
                     })

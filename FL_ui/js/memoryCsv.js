@@ -1,94 +1,102 @@
 // The in-memory Store. Encapsulates logic to access wine data.
 window.csvStore = {
-    csvRows:{}, //a JSON of JSONs  {1:{},2:{}...n:{}}; //NOTE:each row  should have a boolean sync field to work in offline mode
-    numberOfRows:0,
+    csvRows: {}, //a JSON of JSONs  {1:{},2:{}...n:{}}; //NOTE:each row  should have a boolean sync field to work in offline mode
+    numberOfRows: 0,
     attributesArr: null,
-    setAttributesArr: function(attributesArr){
+    setAttributesArr: function (attributesArr) {
         //format [{label:"xx",name:fieldName,description:xDescription,type:xtype,typeUI:xTypeUI,enumerable:xEnumerable,key:xKey},{col2}...{}]
         this.attributesArr = attributesArr;
     },
-    getAttributesArr: function(){
+    getAttributesArr: function () {
         return this.attributesArr;
     },
-    getAttributesArrNoId: function(){//return [{attr1:x11,attr2:x21.,..attrN:xN1},{attr1:x12,attr2:x22.,..attrN:xN2}...{}]
+    getAttributesArrNoId: function () {//return [{attr1:x11,attr2:x21.,..attrN:xN1},{attr1:x12,attr2:x22.,..attrN:xN2}...{}]
         var retArr = [];
-        _.each(this.attributesArr, function(element,index){
-            if (element.name!="id")
+        _.each(this.attributesArr, function (element, index) {
+            if (element.name != "id")
                 retArr.push(element);
         });
         return retArr;
     },
-    setEntityName: function(entityName){//sets entity name and csvStore.attributesArr
+    setEntityName: function (entityName) {//sets entity name and csvStore.attributesArr
         this.entityName = entityName;
         // defines attributesArr to set in setAttributesArr(attributesArr)  -->format [{label:"xx",name:fieldName,description:xDescription,type:xtype,enumerable:xEnumerable},{col2}...{}]
         var oEntity = FL.dd.getEntityBySingular(entityName);
         this.setAttributesArr(oEntity.attributes);
     },
-    getEntityName: function(){
+    getEntityName: function () {
         return this.entityName;
     },
-    setEnumerableForAttribute: function(attribute, arrOfValues){
-        _.each(this.attributesArr, function(element){
-            if (element.name== attribute)
+    setEnumerableForAttribute: function (attribute, arrOfValues) {
+        _.each(this.attributesArr, function (element) {
+            if (element.name == attribute)
                 element.enumerable = arrOfValues;
         });
     },
-    getEnumerableFromAttribute: function(attribute){//returns the content of enumerable or null if attribute does not exist
+    getEnumerableFromAttribute: function (attribute) {//returns the content of enumerable or null if attribute does not exist
         var xRet = null;
-        var elementWithEnum = _.find(this.attributesArr, function(element){ return element.name == attribute;});
-        if(elementWithEnum)
+        var elementWithEnum = _.find(this.attributesArr, function (element) {
+            return element.name == attribute;
+        });
+        if (elementWithEnum)
             xRet = elementWithEnum.enumerable;
         return xRet;
-    },    
-    extractEmailArray: function(){//returns an array of emails with format [{"email":"e1@live.com"},{"email":"email2@gmail.com"}..]
+    },
+    extractEmailArray: function () {//returns an array of emails with format [{"email":"e1@live.com"},{"email":"email2@gmail.com"}..]
         //only retrieves valid email formats
         var attrArr = this.getAttributesArr();
         // FL.common.printToConsole("-xxxx-->"+JSON.stringify(attrArr));
-        var attrEl = _.find(attrArr,function(element){return element.typeUI == "email";});//find first email among fields
-        if(typeof attrEl =="undefined")
-            attrEl = _.find(attrArr,function(element){return element.typeUI == "emailbox";});//find first email among fields old format
-        if(typeof attrEl =="undefined"){
+        var attrEl = _.find(attrArr, function (element) {
+            return element.typeUI == "email";
+        });//find first email among fields
+        if (typeof attrEl == "undefined")
+            attrEl = _.find(attrArr, function (element) {
+                return element.typeUI == "emailbox";
+            });//find first email among fields old format
+        if (typeof attrEl == "undefined") {
             alert("memoryCsv.js extractEmailArray NO FIELD WITH typUI = email !!!!");
         }
         // FL.common.printToConsole("-zzz-->"+JSON.stringify(attrEl));
         var nameOfFirstEmailField = attrEl.name;
         // FL.common.printToConsole("-name-->"+nameOfFirstEmailField);
-        var arrOfEmails = _.map(this.csvRows,function(value,key){
-            return {"email":value[nameOfFirstEmailField]}; 
+        var arrOfEmails = _.map(this.csvRows, function (value, key) {
+            return {"email": value[nameOfFirstEmailField]};
         });
-        var arrOfEmails = _.filter(arrOfEmails,function(element){
+        var arrOfEmails = _.filter(arrOfEmails, function (element) {
             return utils.is_email(element.email); //filters only valid emails
         });
 
         // FL.common.printToConsole("-www-->"+JSON.stringify(arrOfEmails));
         return arrOfEmails
     },
-    getAttributesOfType: function(typeToSelect){//from this.attributesArr return a subset with type= typeToSelect
-        var retArr = _.filter(this.attributesArr, function(element){
+    getAttributesOfType: function (typeToSelect) {//from this.attributesArr return a subset with type= typeToSelect
+        var retArr = _.filter(this.attributesArr, function (element) {
             //attributesArr format [{label:"xx",name:fieldName,description:xDescription,type:xtype,typeUI:xTypeUI,enumerable:xEnumerable,key:xKey},{col2}...{}]
             return element["type"] == typeToSelect;
         });
-        if(_.isUndefined(retArr))
+        if (_.isUndefined(retArr))
             retArr = null;
         return retArr;
     },
-    extractFromCsvStore: function(){//get arr of objects
+    extractFromCsvStore: function () {//get arr of objects
         //Ex: from csvStore.csvRows = {"1":{"id":1,"shipped":true,"product":"Prod 1",_id:"55d3.."},"2":{"id":2,"shipped":false,"product":"Prod 2",_id:"55d3.."}}
-        var retArr=_.map(csvStore.csvRows, function(value,key){return value;});
+        var retArr = _.map(csvStore.csvRows, function (value, key) {
+            return value;
+        });
         return retArr;
     },
-    extractFromCsvStoreWith_Id: function(){
+    extractFromCsvStoreWith_Id: function () {
         //Ex: from csvStore.csvRows = {"1":{"id":1,"shipped":true,"product":"Prod 1",_id:"55d3.."},"2":{"id":2,"shipped":false,"product":"Prod 2",_id:"55d3.."}}
         var entityName = this.getEntityName();
-        var retArr=_.map(csvStore.csvRows, function(value,key){
+        var retArr = _.map(csvStore.csvRows, function (value, key) {
             var _id = value["_id"];
-            var recordEl = FL.API.convertOneRecordTo_arrToSend(entityName,value);////Converts format: {"name":cli1,"city":"Lx","country":"Pt"} to {"d":{"51":"cli1","52":"Lx","53":"Pt"}} 
+            var recordEl = FL.API.convertOneRecordTo_arrToSend(entityName, value);////Converts format: {"name":cli1,"city":"Lx","country":"Pt"} to {"d":{"51":"cli1","52":"Lx","53":"Pt"}}
             recordEl["_id"] = _id;
             return recordEl;//returns {_id:x1,d:{"51":"cliente 1","52":"Lisboa","53":"Portugal"}
-        },this);
+        }, this);
         return retArr;
     },
-    transformStoreTo: function(newAttributesArr,changedNamesArr,changedTypeArr){//transform the store content according to newAttributesArr and changedNamesArr and  changedTypeArr
+    transformStoreTo: function (newAttributesArr, changedNamesArr, changedTypeArr) {//transform the store content according to newAttributesArr and changedNamesArr and  changedTypeArr
         //newAttributesArr - new format of attributes in csvStore.
         //       must have keys attr1..7 = name,description,label,type,typeUI,enumerable and key
         //       [{attr1:x11,attr2:x21.,..attrN:xN1},{attr1:x12,attr2:x22.,..attrN:xN2}...{}]
@@ -99,92 +107,92 @@ window.csvStore = {
         var loseInfo = false;
         var attributesArrNoId = this.getAttributesArrNoId();//we retrieve all except name="id"
         //   ex: {name:"address",description:"address to send invoices",label:"Address",type:"string",typeUI:"textbox",enumerable:null,key:false});                     
-        _.each(this.csvRows, function(rowObj,key){//scans each row (an Object) {1:{},2:{}...n:{}} - rowObj is the object
-            _.each(changedTypeArr, function(element){
+        _.each(this.csvRows, function (rowObj, key) {//scans each row (an Object) {1:{},2:{}...n:{}} - rowObj is the object
+            _.each(changedTypeArr, function (element) {
                 var name = element[0];
                 var oldType = element[1];
                 var newType = element[2];
-                if(oldType == "string" && newType == "number"){
+                if (oldType == "string" && newType == "number") {
                     var numberVal = rowObj[name];
-                    this.csvRows[key][name]= FL.common.localeStringToNumber(numberVal,null);
+                    this.csvRows[key][name] = FL.common.localeStringToNumber(numberVal, null);
                     loseInfo = true;
-                }else if(newType == "date"){//covers string->date, number->date
-                    if(typeof rowObj[name] != "date" ){//if is a string containing a date must be converted
-                        this.csvRows[key][name] = new Date( rowObj[name] );//old content in string is converted to date
+                } else if (newType == "date") {//covers string->date, number->date
+                    if (typeof rowObj[name] != "date") {//if is a string containing a date must be converted
+                        this.csvRows[key][name] = new Date(rowObj[name]);//old content in string is converted to date
                         loseInfo = true;
                     }
-                }else if(oldType == "date" && newType == "number"){
+                } else if (oldType == "date" && newType == "number") {
                     this.csvRows[key][name] = 0;
                     loseInfo = true;
-                }else if(oldType == "number" && newType == "string"){
-                     this.csvRows[key][name] = rowObj[name].toString();
+                } else if (oldType == "number" && newType == "string") {
+                    this.csvRows[key][name] = rowObj[name].toString();
                 }
-            },this);
-            _.each(changedNamesArr, function(element){
+            }, this);
+            _.each(changedNamesArr, function (element) {
                 this.csvRows[key][element[1]] = this.csvRows[key][element[0]];//creates a new name key with the content of the old key
                 delete this.csvRows[key][element[0]];
-            },this);
-            var z=32;
-        },this);//this is necessary to refer to window.csvStore instead of window
+            }, this);
+            var z = 32;
+        }, this);//this is necessary to refer to window.csvStore instead of window
         this.setAttributesArr(newAttributesArr);
         return loseInfo;
     },
-    Xis_dictionaryUpdateLoseInformation: function(changedTypeArr){//transform the store content according to newAttributesArr and changedNamesArr and  changedTypeArr
+    Xis_dictionaryUpdateLoseInformation: function (changedTypeArr) {//transform the store content according to newAttributesArr and changedNamesArr and  changedTypeArr
         //similar to transformStoreTo but nothing is changed ->Returns true if dictionary change will impact entity loosing info. False otherwise
         var loseInfo = false;
-            _.each(changedTypeArr, function(element){
-                var name = element[0];
-                var oldType = element[1];
-                var newType = element[2];
-                if(oldType == "string" && newType == "number"){
-                    loseInfo = true;
-                }else if(newType == "date"){//covers string->date, number->date
-                    loseInfo = true;
-                }else if(oldType == "date" && newType == "number"){
-                    loseInfo = true;
-                }else if(oldType == "number" && newType == "string"){
-                     //information will be in the string format
-                }
-            },this);
+        _.each(changedTypeArr, function (element) {
+            var name = element[0];
+            var oldType = element[1];
+            var newType = element[2];
+            if (oldType == "string" && newType == "number") {
+                loseInfo = true;
+            } else if (newType == "date") {//covers string->date, number->date
+                loseInfo = true;
+            } else if (oldType == "date" && newType == "number") {
+                loseInfo = true;
+            } else if (oldType == "number" && newType == "string") {
+                //information will be in the string format
+            }
+        }, this);
         return loseInfo;
     },
-    store: function( arrToStore ) {//arrToStore is an array of objects [{},{},....{}] where id field is mandatory inside {}
+    store: function (arrToStore) {//arrToStore is an array of objects [{},{},....{}] where id field is mandatory inside {}
         // this.csvRows = _.object(arrOfIds,arrToStore); //becomes ->{1:arrToStore[1],2:arrToSAtore[2]....} 
         this.csvRows = {};
         var arrOfDateAttributes = this.getAttributesOfType("date");
-        _.each(arrToStore,function(element,index){//scans each row (an Object)
-            var id = (index+1)+"";//the json key is a string
-            element.id = index+1;//to rename the id sequence - id is anumber
+        _.each(arrToStore, function (element, index) {//scans each row (an Object)
+            var id = (index + 1) + "";//the json key is a string
+            element.id = index + 1;//to rename the id sequence - id is anumber
             this.csvRows[id] = element;
-            
+
             //code to convert dateInStringFormat (if any) to date in Javascript date format
             // if(arrOfDateAttributes){
-                _.each(arrOfDateAttributes, function(elementCol){
-                    if(typeof element[elementCol.name] != "date" ){
-                        // element[elementCol.name] = new Date(Date.parse(element[elementCol.name]));//old content in string is converted to date
-                        element[elementCol.name] = new Date( element[elementCol.name] );//old content in string is converted to date
-                    }
-                });
+            _.each(arrOfDateAttributes, function (elementCol) {
+                if (typeof element[elementCol.name] != "date") {
+                    // element[elementCol.name] = new Date(Date.parse(element[elementCol.name]));//old content in string is converted to date
+                    element[elementCol.name] = new Date(element[elementCol.name]);//old content in string is converted to date
+                }
+            });
             // }
             //-------------------
 
-        },this);//this is necessary to refer to window.csvStore instead of window
+        }, this);//this is necessary to refer to window.csvStore instead of window
         this.numberOfRows = arrToStore.length;
     },
-    changeNameInRows: function(oldName, newName){//updates the key oldname (old attribute name) to newname of all csvRows
-        _.each(this.csvRows, function(rowObj,key){//scans each row (an Object) {1:{},2:{}...n:{}} - rowObj is the object
+    changeNameInRows: function (oldName, newName) {//updates the key oldname (old attribute name) to newname of all csvRows
+        _.each(this.csvRows, function (rowObj, key) {//scans each row (an Object) {1:{},2:{}...n:{}} - rowObj is the object
             this.csvRows[newName] = rowObj[oldName];
             delete this.csvRows[oldName];
-             var z=32;
-        },this);//this is necessary to refer to window.csvStore 
+            var z = 32;
+        }, this);//this is necessary to refer to window.csvStore
     },
-    getRowsInArrFormat: function(){//retrieves csvRows object ({1:{},2:{}...n:{}}) in a array format [{},{}...{}]
-        var arr =_.map(this.csvRows,function(value,key){//scans each key inside csvRows object
+    getRowsInArrFormat: function () {//retrieves csvRows object ({1:{},2:{}...n:{}}) in a array format [{},{}...{}]
+        var arr = _.map(this.csvRows, function (value, key) {//scans each key inside csvRows object
             return value;
         });
-        return arr;   
+        return arr;
     },
-    addOneEmptyRow:function(){//adds one line to csvRrows with empty fields of this.entityName and _id="-1"
+    addOneEmptyRow: function () {//adds one line to csvRrows with empty fields of this.entityName and _id="-1"
         var nextId = this.getNextId();
         //we will extract form dictionary the fields with empty values
         // var oEntity = FL.dd.getEntityBySingular(this.entityName);
@@ -199,19 +207,21 @@ window.csvStore = {
         this.csvRows[nextId]["_id"] = "-1";//this means a new line that must be inserted in the server
         var z = 32;
     },
-    getNextId: function(){//returns a number with the id of the last element + 1 
+    getNextId: function () {//returns a number with the id of the last element + 1
         var arrOfKeys = _.keys(this.csvRows);
         // arrOfKeys[3] = "101";// to test
-        var last = _.max(arrOfKeys,function(element){ return  parseInt(element,10); });
-        if(arrOfKeys.length === 0 ){
+        var last = _.max(arrOfKeys, function (element) {
+            return parseInt(element, 10);
+        });
+        if (arrOfKeys.length === 0) {
             last = 0;
-        }else{
-            if( isNaN( this.csvRows[last].id ) )
+        } else {
+            if (isNaN(this.csvRows[last].id))
                 last = 0;
         }
-        return parseInt(last,10)+1;
+        return parseInt(last, 10) + 1;
     },
-    getNumberOfLines: function(){//returns a number with the id of the last element + 1 
+    getNumberOfLines: function () {//returns a number with the id of the last element + 1
         var arrOfKeys = _.keys(this.csvRows);
         var numberOfLines = arrOfKeys.length;
         return numberOfLines;
@@ -250,10 +260,10 @@ window.csvStore = {
         return _.values(this.csvRows);//it is used !!!
     },
 
-    create: function (model) {       
+    create: function (model) {
         this.numberOfRows++;
         // model.set('id', this.numberOfRows);
-        FL.common.printToConsole("memoryCsv.js create new line --->"+JSON.stringify(model));
+        FL.common.printToConsole("memoryCsv.js create new line --->" + JSON.stringify(model));
         model["_id"] = "-1";
         this.csvRows[this.numberOfRows] = model;//it is used !!!
         return model;
@@ -262,20 +272,20 @@ window.csvStore = {
     update: function (model) {
         var def = $.Deferred();
         // alert("memoryCsv.js Update was called !!!");
-    // this.csvRows[model.id] = model;//it is used !!!
+        // this.csvRows[model.id] = model;//it is used !!!
         //alert("memoryCsv.js update modelUpdate !!!! --->"+ model.get("id") + " _id="+ model.get("_id") + " nome="+model.get("nome"));
-        FL.common.printToConsole("memoryCsv.js update modelUpdate !!!! --->"+JSON.stringify(model));
+        FL.common.printToConsole("memoryCsv.js update modelUpdate !!!! --->" + JSON.stringify(model), "memoryCsv");
         var rowToSave = model.attributes;
         rowToSave = _.omit(rowToSave, "_id");//we exclude the _id key
         var promise = null;
-    //if(model.attributes._id == "-1"){//this is an update over a new line =>insert in db
+        //if(model.attributes._id == "-1"){//this is an update over a new line =>insert in db
         var thiz = this;
-        if(this.csvRows[model.id]._id == "-1"){//this is an update over a new line =>insert in db
+        if (this.csvRows[model.id]._id == "-1") {//this is an update over a new line =>insert in db
             // promise=FL.API.addRecordsToTable(this.entityName,[model.attributes]);
-            promise=FL.API.addRecordsToTable(this.entityName,[rowToSave]);
-            promise.done(function(data){
-                FL.common.printToConsole(">>>>>memoryCsv update addRecordsToTable  SUCCESS <<<<<");
-                FL.common.printToConsole("memoryCsv.js update addRecordsToTable !!!! --->"+JSON.stringify(data));
+            promise = FL.API.addRecordsToTable(this.entityName, [rowToSave]);
+            promise.done(function (data) {
+                FL.common.printToConsole(">>>>>memoryCsv update addRecordsToTable  SUCCESS <<<<<", "memoryCsv");
+                FL.common.printToConsole("memoryCsv.js update addRecordsToTable !!!! --->" + JSON.stringify(data), "memoryCsv");
                 //data format:
                 // [  {"d": {"51":"Nome do cliente","52":"Cascais","53":"Portugal",
                 //        "54":["cliente@sapo.pt","clienteportugese@gmail.com"]},
@@ -283,24 +293,31 @@ window.csvStore = {
                 //     "v":0,
                 //     "_id":"53e1bf93f9b224b302c2a572"}
                 // ]
-            // return model;
-                model.attributes._id =  data[0]._id;
+                // return model;
+                model.attributes._id = data[0]._id;
                 thiz.csvRows[model.id] = model.attributes;//copy of server database _id to memory copy
                 return def.resolve(model);
             });
-            promise.fail(function(err){FL.common.printToConsole(">>>>>memoryCsv update addRecordsToTable FAILURE <<<<<"+err);return def.reject(err);});
-        }else if(model.attributes._id){//this is an update over an existing line =>update in db
+            promise.fail(function (err) {
+                FL.common.printToConsole(">>>>>memoryCsv update addRecordsToTable FAILURE <<<<<" + err,"memoryCsv");
+                return def.reject(err);
+            });
+        } else if (model.attributes._id) {//this is an update over an existing line =>update in db
             FL.API.serverCallBlocked = true;//HACK to prevent server call (menu calling a grid) before this promise is resolved
-            promise = FL.API.updateRecordToTable(this.entityName,model.attributes);
-            promise.done(function(data){
-                FL.common.printToConsole(">>>>>memoryCsv update updateRecordToTable  SUCCESS <<<<< -->"+JSON.stringify(data));
+            promise = FL.API.updateRecordToTable(this.entityName, model.attributes);
+            promise.done(function (data) {
+                FL.common.printToConsole(">>>>>memoryCsv update updateRecordToTable  SUCCESS <<<<< -->" + JSON.stringify(data), "memoryCsv");
                 thiz.csvRows[model.id] = model.attributes;
                 FL.API.serverCallBlocked = false;
                 return def.resolve(model);
             });
-            promise.fail(function(err){FL.common.printToConsole(">>>>>memoryCsv update updateRecordToTable FAILURE <<<<<"+err); FL.API.serverCallBlocked = false; return def.reject(err);});
-        }else{
-            FL.common.printToConsole(">>>>>memoryCsv update updateRecordToTable  NOP Nothing was done !!!! <<<<< -->model.attributes._id="+model.attributes._id);
+            promise.fail(function (err) {
+                FL.common.printToConsole(">>>>>memoryCsv update updateRecordToTable FAILURE <<<<<" + err,"memoryCsv");
+                FL.API.serverCallBlocked = false;
+                return def.reject(err);
+            });
+        } else {
+            FL.common.printToConsole(">>>>>memoryCsv update updateRecordToTable  NOP Nothing was done !!!! <<<<< -->model.attributes._id=" + model.attributes._id, "memoryCsv");
             return def.reject("memoryCsv update error - missing attribute _id in model");
         }
         // return model;
@@ -308,7 +325,7 @@ window.csvStore = {
     },
 
     destroy: function (model) {
-        FL.common.printToConsole("memoryCsv.js - delete row "+JSON.stringify(model.attributes));
+        FL.common.printToConsole("memoryCsv.js - delete row " + JSON.stringify(model.attributes));
         // var promise=FL.API.removeRecordFromTable(this.entityName,model.attributes);
         // promise.done(function(){
         //     FL.common.printToConsole(">>>>>memoryCsv destroy removeRecordFromTable SUCCESS <<<<<");
@@ -324,12 +341,12 @@ window.csvStore = {
         // FL.common.printToConsole("Backbone.sync ---------------->"+method+" id="+model.id);
         FL.common.printToConsole("----------------- debug before------------------------------------------");
 
-        FL.common.printToConsole("csvStore.csvRows[1]:\n"+JSON.stringify(csvStore.csvRows[1]));
-        FL.common.printToConsole("csvStore.csvRows[2]:\n"+JSON.stringify(csvStore.csvRows[2]));
-        FL.common.printToConsole("csvStore.csvRows[3]:\n"+JSON.stringify(csvStore.csvRows[3]));
-        var last = csvStore.getNextId()-1;
-        FL.common.printToConsole("LastId= "+last);
-        FL.common.printToConsole("csvStore.csvRows[last]:\n"+JSON.stringify(csvStore.csvRows[last]));
+        FL.common.printToConsole("csvStore.csvRows[1]:\n" + JSON.stringify(csvStore.csvRows[1]));
+        FL.common.printToConsole("csvStore.csvRows[2]:\n" + JSON.stringify(csvStore.csvRows[2]));
+        FL.common.printToConsole("csvStore.csvRows[3]:\n" + JSON.stringify(csvStore.csvRows[3]));
+        var last = csvStore.getNextId() - 1;
+        FL.common.printToConsole("LastId= " + last);
+        FL.common.printToConsole("csvStore.csvRows[last]:\n" + JSON.stringify(csvStore.csvRows[last]));
         FL.common.printToConsole("----------------- debug fim ------------------------------------------");
         // alert("Backbone.sync ---------------->"+method+" ---> id="+model.id);
 
@@ -342,9 +359,9 @@ window.csvStore = {
                 break;
             case "update":
                 // resp = csvStore.update(model);
-                csvStore.update(model).then(function(resp){
-                        FL.common.printToConsole("memoryCsv.js sync update --->"+JSON.stringify(resp.attributes));
-                    },function(err){
+                csvStore.update(model).then(function (resp) {
+                        FL.common.printToConsole("memoryCsv.js sync update --->" + JSON.stringify(resp.attributes));
+                    }, function (err) {
                         FL.common.printToConsole("memoryCsv.js sync update ERROR --->");
                     }
                 );
@@ -354,7 +371,7 @@ window.csvStore = {
                 break;
         }
 
-        if(options) {
+        if (options) {
             if (resp) {
                 options.success(resp);
             } else {
@@ -364,12 +381,12 @@ window.csvStore = {
         // FL.common.printToConsole("csvStore.csvRows:\n"+JSON.stringify(csvStore.csvRows));
         FL.common.printToConsole("----------------- debug after------------------------------------------");
 
-        FL.common.printToConsole("csvStore.csvRows[1]:\n"+JSON.stringify(csvStore.csvRows[1]));
-        FL.common.printToConsole("csvStore.csvRows[2]:\n"+JSON.stringify(csvStore.csvRows[2]));
-        FL.common.printToConsole("csvStore.csvRows[3]:\n"+JSON.stringify(csvStore.csvRows[3]));
-        last = csvStore.getNextId()-1;
-        FL.common.printToConsole("LastId= "+last);
-        FL.common.printToConsole("csvStore.csvRows[last]:\n"+JSON.stringify(csvStore.csvRows[last]));
+        FL.common.printToConsole("csvStore.csvRows[1]:\n" + JSON.stringify(csvStore.csvRows[1]),"memoryCsv");
+        FL.common.printToConsole("csvStore.csvRows[2]:\n" + JSON.stringify(csvStore.csvRows[2]));
+        FL.common.printToConsole("csvStore.csvRows[3]:\n" + JSON.stringify(csvStore.csvRows[3]));
+        last = csvStore.getNextId() - 1;
+        FL.common.printToConsole("LastId= " + last);
+        FL.common.printToConsole("csvStore.csvRows[last]:\n" + JSON.stringify(csvStore.csvRows[last]));
 
         FL.common.printToConsole("----------------- debug fim ------------------------------------------");
 
@@ -377,13 +394,15 @@ window.csvStore = {
 
     },
     // currentGridCandidate:'',
-    currentGridCandidate:{fileName:'',entityName:null},
+    currentGridCandidate: {fileName: '', entityName: null},
     arrayOfGrids: [],//array with pairs [[entitySingularName,{a JSON of JSONs with csvRows}],[xxx,{}],.....]
-    insertInArrayOfGrids: function(singularEntityName) {//inserts current JSON of JSONs in an pair array with first element = singular
-        this.arrayOfGrids.push([singularEntityName,csvStore.csvRows]);
+    insertInArrayOfGrids: function (singularEntityName) {//inserts current JSON of JSONs in an pair array with first element = singular
+        this.arrayOfGrids.push([singularEntityName, csvStore.csvRows]);
     },
-    setGrid: function(singular){
-        var arrPair = _.find(this.arrayOfGrids, function(element) {return element[0] == singular;});
+    setGrid: function (singular) {
+        var arrPair = _.find(this.arrayOfGrids, function (element) {
+            return element[0] == singular;
+        });
         this.csvRows = arrPair[1];
     }
 };
