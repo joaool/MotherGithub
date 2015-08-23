@@ -44,7 +44,7 @@ window.MailerTemplate = {
 		fontSize : "16px",
 		fontWeight : "initial",
 		lineHeight : "initial",
-		textAlign : "center",
+		textAlign : "left",
 		imageAlign : "center",
 		imageMargin : "0px",
 		imagePadding : "10px",
