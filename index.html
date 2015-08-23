@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width">
-    <title>version 13.55</title>
+    <title>version 13.56</title>
     <!--
         testApigee
     -->
@@ -176,9 +176,10 @@
     <script src="FL_ui/js/backbone.paginator.js"></script>
     <script src="FL_ui/js/backgrid.js"></script>
     <script src="FL_ui/js/backgrid-paginator.js"></script>
-    <script src="FL_ui/js/backgrid-select-all.min.js"></script>
+    <!--<script src="FL_ui/js/backgrid-select-all.min.js"></script>-->
+    <script src="FL_ui/js/backgrid-select-all.js"></script>
     <script src="FL_ui/js/backgrid-filter.min.js"></script>
-    <script src="FL_ui/js/backgrid-text-cell.js"></script>
+    <!--<script src="FL_ui/js/backgrid-text-cell.js"></script>-->
 
     <!--  searchbox awesomplete  -->
     <!--<script src="FL_ui/js/awesomplete.js"></script>-->
@@ -222,6 +223,8 @@
     <!-- <script src="FL_ui/js/objectid.js"></script> -->
 
     <script type="text/javascript" src="https://js.stripe.com/v2/"></script>
+    <!--<script type="text/javascript" src="http://cdn.pubnub.com/pubnub.min.js/"></script>-->
+    <script src="https://cdn.pubnub.com/pubnub-dev.js"></script>
     <!--<script type="text/javascript" src="https://widget.cloudinary.com/global/all.js"></script>-->
     <!--
     <script src='FL_ui/js/jquery.ui.widget.js' type='text/javascript'></script>
@@ -577,6 +580,7 @@
         text-align: right;
         width: 50px;
     }
+
     .backgrid-container {
         position: relative;
         display: block;
@@ -587,6 +591,7 @@
         overflow: auto;
         border: 0;
     }
+
     div ximg {
         /* FrameLink specific to adjust logo size line 638*/
         max-height: 218px;
@@ -833,6 +838,83 @@
                                placeholder="eCN,fCN" value="<%= masterDetailItems.master.special %>" name="list"
                                data-parsley-trigger="change" required>
                         <span class="input-group-addon"><span class="glyphicon glyphicon-th-list"></span></span>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</script>
+<script id="columnEdition" type="text/template">
+    <div class="columnEdition" style="margin-top:0px;">
+        <form id="form_columnEdition">
+            <legend>Please define the column:</legend>
+            <div class="row">
+                <div class="col-xs-12">
+                    <div class="input-group" style="line-height:0px;">
+                        <span class="input-group-addon">Column title:</span>
+                        <input type="text" class="form-control" id="columnEdition_colTitle"
+                               name="colTitle" placeholder="Ex. name, address, email, phone..."
+                               value="<%= master.colTitle %>">
+                        <!--required onkeyup="FL.slidePanels.dictTemplateChangeWhatIsLabel(this.form)">-->
+                    </div>
+                    <div class="input-group" style="line-height:0px;">
+                        <span class="input-group-addon">Attribute:</span>
+                        <input type="text" class="form-control" id="columnEdition_fieldName"
+                               name="fieldName" placeholder="Ex. name, address, email, phone..."
+                               value="<%= master.fieldName %>">
+                        <!--required onkeyup="FL.slidePanels.dictTemplateChangeWhatIsLabel(this.form)">-->
+                    </div>
+                    <label class="control-label" for="columnEdition_fieldDescription"
+                           id="columnEdition_whatIsLabel">What is a </label>
+
+                    <div class="input-group" style="line-height:0px;">
+                        <span class="input-group-addon">Description:</span>
+                        <input type="text" class="form-control" id="columnEdition_fieldDescription"
+                               name="fieldName" placeholder="Ex. descripton..."
+                               value="<%= master.fieldDescription %>">
+                    </div>
+                    <div>
+                        <h4 id="columnEdition_plural"></h4>
+                    </div>
+                    <div class="input-group" style="line-height:0px;">
+                        <span class="input-group-addon">User Type:</span>
+
+                        <div class="btn-group" style="width:100%">
+                            <a class="btn btn-default btn-block dropdown-toggle" data-toggle="dropdown"
+                               style="font-size:14px;font-weight:bold;margin-right:-4.0em;display:inline-block;height:100%;"
+                               id="columnEdition_userType" href="#"><%= master.userType %> <span
+                                    class="caret"></span></a>
+                            <ul id="columnEdition_userType_options" class="dropdown-menu"></ul>
+                        </div>
+                        <span class="input-group-addon"><span class="glyphicon glyphicon-th-list"></span></span>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</script>
+<script id="sendMessage" type="text/template">
+    <div class="sendMessage" style="margin-top:0px;">
+        <form id="form_sendMessage">
+            <legend>Send a message:</legend>
+            <div class="row">
+                <div class="col-xs-12">
+                    <div class="input-group" style="line-height:0px;">
+                        <span class="input-group-addon">To whom the message will be send:</span>
+                        <div class="btn-group" style="width:100%">
+                            <a class="btn btn-default btn-block dropdown-toggle" data-toggle="dropdown"
+                               style="font-size:14px;font-weight:bold;margin-right:-4.0em;display:inline-block;height:100%;"
+                               id="sendMessage_toWhom" href="#"><%= master.toWhom %> <span
+                                    class="caret"></span></a>
+                            <ul id="sendMessage_toWhom_options" class="dropdown-menu"></ul>
+                        </div>
+                        <span class="input-group-addon"><span class="glyphicon glyphicon-th-list"></span></span>
+                    </div>
+                    <div class="input-group" style="line-height:0px;">
+                        <span class="input-group-addon">Message content:</span>
+                        <input type="text" class="form-control" id="sendMessage_content"
+                               name="content" placeholder="Ex. please take care with security"
+                               value="<%= master.content %>">
                     </div>
                 </div>
             </div>
@@ -1335,6 +1417,8 @@
                             title="delete selected rows" style="float:left;margin-left:1px"></button>
                     <button id="_editGrid" class="edit btn btn-success glyphicon glyphicon-pencil"
                             title="edit grid columns" style="float:left;margin-left:1px"></button>
+                    <button id="_editGridCol" class="edit btn btn-success glyphicon glyphicon-pencil"
+                            title="edit grid columns" style="float:left;margin-left:1px"></button>
                     <button id="_newsletter" class="edit btn btn-success glyphicon glyphicon-envelope"
                             title="send mail/newsletter to selected rows" style="float:right;margin-left:1px"></button>
                     <button id="_newsletterMC" class="edit btn btn-success glyphicon glyphicon-star"
@@ -1445,7 +1529,9 @@
 //   })();
 // </script>
 -->
-</body>
 <div id="_freeSlots">
+    <button id="pubnub_button">Send Message</button>
+    <div><img id="pubnub_img"></div>
     <div>
+</body>
 </html>

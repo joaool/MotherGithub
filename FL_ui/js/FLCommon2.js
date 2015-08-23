@@ -136,7 +136,7 @@ String.prototype.isCurrency = function () {//returns true if a string has the fo
     var strCurr = this.trim();
     var preStr = FL.common.preDigit(strCurr);//string till first digit -
     var preStrBeforeExclusion = null;
-    if(preStr)
+    if (preStr)
         preStrBeforeExclusion = preStr.trim();
     preStr = FL.common.excludeDigitPrefixFromStringEnd(preStr);
     if (preStr) {
@@ -601,8 +601,7 @@ FL["common"] = (function () {//name space FL.common
                 }
             }
             return "";
-        }
-        ,
+        },
         preDigit: function (str) {//from a string input return the content before the first digit (removed:or - sign) <-> or null if no digit exists
             var strOut = null;
             //str = str.replace(/-/g, '');//remove -
@@ -612,8 +611,7 @@ FL["common"] = (function () {//name space FL.common
                 strOut = str.substring(0, firstPos);
             }
             return strOut;
-        }
-        ,
+        },
         posDigit: function (str) {//from a string inout return the content after the last digit - or null if no digit exists
             var strOut = null;
             var lastDigit = str.match(/\D{1,}$/);
@@ -622,8 +620,7 @@ FL["common"] = (function () {//name space FL.common
                 strOut = str.substring(lastPos);
             }
             return strOut;
-        }
-        ,
+        },
         extractContentBetweenFirstAndLastDigit: function (str) {//http://www.javascriptkit.com/javatutors/re2.shtml
             // signs like + or - are not digits
             var strOut = str;
@@ -638,8 +635,7 @@ FL["common"] = (function () {//name space FL.common
                 strOut = strOut.substring(0, lastPos);
             }
             return strOut;
-        }
-        ,
+        },
         currencyToStringNumber: function (currencyStr) {
             //converts a currency string ex "€ 12345,67" to a string representing a number ex:"12345.67" using appsettings
             //  "kr. 9.734.123,45" =>"9734123.45", "Din. 1,235.45"=>"1235.45"
@@ -666,8 +662,7 @@ FL["common"] = (function () {//name space FL.common
             //if (strNumber.indexOf(radixpoint) != strNumber.lastIndexOf(radixpoint))
             //    strNumber = strNumber.substr(0, strNumber.indexOf(radixpoint)) + strNumber.substr(strNumber.indexOf(radixpoint) + 1);
             //return strNumber;
-        }
-        ,
+        },
         formatStringNumberWithMask: function (strNumber, mask) {
             //converts a string number ex"12345.67" into a currency string ex "€ 12345,67" using appsettings
             //  "9734123.45"=>"kr. 9.734.123,45" , "1235.45"=>"Din. 1,235.45"
@@ -687,8 +682,7 @@ FL["common"] = (function () {//name space FL.common
             // alert("input="+strNumber+" -->"+retStr);
             $("#_tempSlot").remove();//remove temporary slot from dom
             return retStr;
-        }
-        ,
+        },
         editMasterDetail: function (id, title, templateName, masterDetailJson, options, editMasterDetailCB) {
             // returns masterDetailJson with new values collected from modal dialog  with title and templateName - options like makeModa()
             //  EXEMPLE OF FORMAT FOR masterDetailJson:
@@ -732,8 +726,7 @@ FL["common"] = (function () {//name space FL.common
                     return editMasterDetailCB(false);
                 }
             }, masterDetailJson);
-        }
-        ,
+        },
         makeModalInfo: function (message, makeModalInfoCB, stackLevel) {
             if (FL.common.getBrowser() == "Xie") {
                 alert(message);
@@ -811,8 +804,7 @@ FL["common"] = (function () {//name space FL.common
             }
             // $('#' + modalId ).modal('show');//to launch it immediatly when calling makeModal
             $modal.modal('show');//to launch it immediatly when calling makeModal
-        }
-        ,
+        },
         makeModal: function (id, title, templateName, options, makeModalCB, dataStructureForSubstitution) {
             //id = "A" or "B" followed by an optional number that indicates the stack level. If number=1 is ignored if number =2 z-index=2000
             //  if number =3 =>z-index=3000   suporting a modal inside a modal
@@ -963,13 +955,11 @@ FL["common"] = (function () {//name space FL.common
             }
             // $('#' + modalId ).modal('show');//to launch it immediatly when calling makeModal
             $modal.modal('show');//to launch it immediatly when calling makeModal
-        }
-        ,
+        },
         setStyleAndFont: function (styleName, fontName) {//the css files FL<styleName>.css and FLfont_<fontName>.css must exist in FL_ui/css
             loadCSS("FL" + styleName + ".css");
             loadCSS("FLfont_" + fontName + ".css");
-        }
-        ,
+        },
         getTag: function (str, tagName, tagTerminator) {//returns the content of str after the last separator character or string - no separator found  =>null
             //get tag with name tagName embeded in string str - if several exist it takes the last one
             //ex. FL.common.getTag(fullUrl,"connectionString","#") -->returns  "abc" for fullUrl="#connectionString=abc#pag=home"
@@ -983,8 +973,7 @@ FL["common"] = (function () {//name space FL.common
                 }
             }
             return retTag;
-        }
-        ,
+        },
         stringAfterLast: function (str, separator) {//returns the content of str after the last separator character or string - no separator found  =>null
             //ex. FL.common.stringAfterLast("http://www.framelink.co/app?d=myDomain1","=") -->returns  "myDomain1"
             var retStr = null;
@@ -995,8 +984,7 @@ FL["common"] = (function () {//name space FL.common
                     retStr = str.substring(pos + separatorLen);
             }
             return retStr;
-        }
-        ,
+        },
         stringBeforeLast: function (str, separator) {//simply returns the content of str before the last separator character or string - no separator found  =>null
             //ex. FL.common.stringBeforeLast("this is (one) or (two) values","(") -->returns  "this is (one) or "
             var retStr = null;
@@ -1006,8 +994,7 @@ FL["common"] = (function () {//name space FL.common
                     retStr = str.substring(0, pos);
             }
             return retStr;
-        }
-        ,
+        },
         stringBeforeFirst: function (str, separator) {//simply returns the content of str before the first separator character or string - no separator found  =>null
             //ex. FL.common.stringBeforeFirst("this is (one) or (two) values","(") -->returns  "this is "
             var retStr = null;
@@ -1017,8 +1004,7 @@ FL["common"] = (function () {//name space FL.common
                     retStr = str.substring(0, pos);
             }
             return retStr;
-        }
-        ,
+        },
         stringAfterFirst: function (str, separator) {//returns the content of str after the first separator character or string - no separator found  =>null
             //ex. FL.common.stringAfterafter("http://www.framelink.co/app?d=myDomain1","=") -->returns  "myDomain1"
             var retStr = null;
@@ -1029,8 +1015,7 @@ FL["common"] = (function () {//name space FL.common
                     retStr = str.substring(pos + separatorLen);
             }
             return retStr;
-        }
-        ,
+        },
         getLastTagInString: function (str, separator, tagTerminator) {//returns the content after the last separator until end or terminal char
             // str - string that will be processed
             // separator - last ocurrence to be identified in string
@@ -1053,15 +1038,13 @@ FL["common"] = (function () {//name space FL.common
                 }
             }
             return retStr;
-        }
-        ,
+        },
         repeat: function (str, n) {//repeat str n times
             n = n || 1;
             if (n < 0)
                 n = 0;
             return Array(n + 1).join(str);
-        }
-        ,
+        },
         getTail: function (strNumber, radixpoint) {//returns the decimal part of a string representing a number.
             //radixpoint is the decimal separator. If missing uses the appsettings radixpoint
             if (!radixpoint)
@@ -1071,13 +1054,11 @@ FL["common"] = (function () {//name space FL.common
             if (posDecimal > 0)
                 tail = strNumber.substr(posDecimal + 1);
             return tail;
-        }
-        ,
+        },
         validateEmail: function (email) {
             var re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
             return re.test(email);
-        }
-        ,
+        },
         clearSpaceBelowMenus: function () {
             $("#_placeHolder").empty();
             $("#personContent").empty();
@@ -1088,13 +1069,13 @@ FL["common"] = (function () {//name space FL.common
             $("#addGrid").hide();
             $("#_delete").hide();
             $("#_editGrid").hide();
+            $("#_editGridCol").hide();
             $("#_newsletterMC").hide();
             $("#_newsletter").hide();
 
             // $("#_belowMenus").hide();
             $("#templateHolder").hide();
-        }
-        ,
+        },
         buildDiff: function (arrOfObjA, arrOfObjB, pivotKey) {
             //given two arrays of objects A and B, both containing key pivotKey, returns an array with all the elements
             //  existing in A whose pivotKey exists in A and not in B.
@@ -1112,13 +1093,11 @@ FL["common"] = (function () {//name space FL.common
                 });
                 return arrOfObjA[index - 1];
             });
-        }
-        ,
+        },
         shortEmailName: function (email) {
             var pos = email.indexOf("@");
             return email.substring(0, pos);
-        }
-        ,
+        },
         enc: function (str, incr) {//FL.common.enc("o gato patolinas",1) =>fuzzy => FL.common.enc(fuzzy,-1))=>"o gato patolinas"
             //'H'.charCodeAt(0) =>72 , String.fromCharCode(72) =H
             // var encoded =  FL.common.enc('{Patolinas},:',1);
@@ -1133,8 +1112,7 @@ FL["common"] = (function () {//name space FL.common
             }
             encoded = encoded.replace(/'/g, '"');
             return encoded;
-        }
-        ,
+        },
         loaderAnimationON: function (div) {
             var opts = {
                 lines: 13, // The number of lines to draw
@@ -1157,8 +1135,7 @@ FL["common"] = (function () {//name space FL.common
             var target = document.getElementById(div);
             var spinner = new Spinner(opts).spin(target);
             return spinner;
-        }
-        ,
+        },
         makeFirstElementsSample: function (arr, sampleSize) {//returns a similar array with max size of sampleSize
             var sample = [];
             var len = arr.length;
@@ -1168,16 +1145,13 @@ FL["common"] = (function () {//name space FL.common
                 sample.push(arr[i]);
             }
             return sample;
-        }
-        ,
+        },
         selectBox: function (options, onSelection) {
             selectBox(options, onSelection);
-        }
-        ,
+        },
         setDropdown: function (options) {
             setDropdown(options);
-        }
-        ,
+        },
         typeOf: function (xVar) {//given a variable, returns one of :  "number","string","boolean","object","array","null","undefined","date"
             //exemple of undefined: a variable declared but never defined -->var foo; alert(foo); //undefined.
             var xRet = typeof xVar;
@@ -1190,8 +1164,7 @@ FL["common"] = (function () {//name space FL.common
                     xRet = "null";
             }
             return xRet;
-        }
-        ,
+        },
         typeUIOf: function (xVar) {//for string type returns one of the typeUI "email", "url", "phone"etc. If not string returns null
             // used in FL.grid   private function  is_ColumnOfSubtype(subtype,sampleArr)
             var subtype = null;
@@ -1205,13 +1178,11 @@ FL["common"] = (function () {//name space FL.common
                     subtype = "phone";
             }
             return subtype;
-        }
-        ,
+        },
         is_email: function (email) {
             var re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
             return re.test(email);
-        }
-        ,
+        },
         is_url: function (url) {
             // var re = /(ftp|http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?/;
             // var re = /((([A-Za-z]{3,9}:(?:\/\/)?)(?:[-;:&=\+\$,\w]+@)?[A-Za-z0-9.-]+|(?:www.|[-;:&=\+\$,\w]+@)[A-Za-z0-9.-]+)((?:\/[\+~%\/.\w-_]*)?\??(?:[-\+=&;%@.\w_]*)#?(?:[\w]*))?)/;
@@ -1219,15 +1190,13 @@ FL["common"] = (function () {//name space FL.common
             // var re = /^(ht|f)tps?:\/\/[a-z0-9-\.]+\.[a-z]{2,4}\/?([^\s<>\#%"\,\{\}\\|\\\^\[\]`]+)?$/;
             var re = /^(?:(?:https?|ftp):\/\/)(?:\S+(?::\S*)?@)?(?:(?!10(?:\.\d{1,3}){3})(?!127(?:\.\d{1,3}){3})(?!169\.254(?:\.\d{1,3}){2})(?!192\.168(?:\.\d{1,3}){2})(?!172\.(?:1[6-9]|2\d|3[0-1])(?:\.\d{1,3}){2})(?:[1-9]\d?|1\d\d|2[01]\d|22[0-3])(?:\.(?:1?\d{1,2}|2[0-4]\d|25[0-5])){2}(?:\.(?:[1-9]\d?|1\d\d|2[0-4]\d|25[0-4]))|(?:(?:[a-z\u00a1-\uffff0-9]+-?)*[a-z\u00a1-\uffff0-9]+)(?:\.(?:[a-z\u00a1-\uffff0-9]+-?)*[a-z\u00a1-\uffff0-9]+)*(?:\.(?:[a-z\u00a1-\uffff]{2,})))(?::\d{2,5})?(?:\/[^\s]*)?$/i;
             return re.test(url);
-        }
-        ,
+        },
         is_check: function (str) {
             strUpper = str.trim().toUpperCase();
             if (strUpper == "TRUE" || strUpper == "FALSE")
                 return true;
             return false;
-        }
-        ,
+        },
         is_phone: function (phone) {//validates formatted phone number
             //http://stackoverflow.com/questions/4338267/validate-phone-number-with-javascript - we ignore format and validate numeric content only
             var phoneRe = /^[2-9]\d{2}[2-9]\d{2}\d{4}/;//^begins by one of [2-9] folowed by {2} occurences of any d (digit),folowed by one [2-9] and follwed by 6 digits
@@ -1235,8 +1204,7 @@ FL["common"] = (function () {//name space FL.common
             if (digits.length > 12)
                 return false;
             return (digits.match(phoneRe) !== null);
-        }
-        ,
+        },
         forceToString: function (xVar) {//convert a variable of any type to string
             var type = this.typeOf(xVar);
             if (type != "string") {
@@ -1248,8 +1216,7 @@ FL["common"] = (function () {//name space FL.common
                     xVar = "NULL"
             }
             return xVar;
-        }
-        ,
+        },
         formatShortLocalToISODate: function (dateTimeString, sourceFormat) {//return ISO Date for a local dateTimeString "<shortdate> hh:mm <pm|am>"
             //ex:FL.common.formatToISODate("6/25/2015 11:21 am");==>2015-06-25T10:21:00.000Z for PC with -1 hour of time zone difference
             function z(n) {
@@ -1282,8 +1249,7 @@ FL["common"] = (function () {//name space FL.common
             isoDate += z(d.getUTCHours() + 1 + difHrs) + ":" + z(d.getUTCMinutes() + difMin) + ":" + z(d.getUTCSeconds()) + '.';
             isoDate += p(d.getUTCMilliseconds()) + "Z";
             return isoDate;
-        }
-        ,
+        },
         timeTo24: function (timeString) {//converts a time string "hh:mm <pm|am>" to "hh:mm" where hh=[0-24] if formnat incorret returns null
             //FL.common("11:00 pm") -->"23:00"
             //FL.common("12:00 pm") -->null
@@ -1303,8 +1269,7 @@ FL["common"] = (function () {//name space FL.common
             hrs = z(hrs);//2-->"02"  13-->"13"
             var min = timeString.substr(3, 2);
             return hrs + ":" + min;
-        }
-        ,
+        },
         toISODate: function (dateTimeString, sourceFormat) {//returns ISO date from a dateTimeString "<shortdate> hh:mm <pm|am>" and a format DMY or MDY
             //<shortdate> may be:yyyy/mm/dd, dd/mm/yyyy or mm/dd/yyyy
             //examples:
@@ -1340,8 +1305,7 @@ FL["common"] = (function () {//name space FL.common
                 }
             }
             return isoDate;
-        }
-        ,
+        },
         fromISODateToShortdate: function (isoDate, outFormat) {//returs a dateTimeString shortdate> may be:yyyy/mm/dd, dd/mm/yyyy or mm/dd/yyyy from ISO date
             // if isoDate is not acceptable it will return null
             //sourceFormat may be "YMD","MDY" or "DMY"
@@ -1369,8 +1333,7 @@ FL["common"] = (function () {//name space FL.common
             else
                 alert("FL.common.fromISODateToShortdate outFormat=" + outFormat + " is invalid!");
             return shortDate;
-        }
-        ,
+        },
         fromISODateToTime: function (isoDate) {//returs a time string "hh:mm <pm|am>"" from ISO date
             //examples:
             //   FL.common.fromISODateToTime("2015-12-06T05:00:00.000Z") ==>"06:00 am"
@@ -1389,8 +1352,7 @@ FL["common"] = (function () {//name space FL.common
             hrs = z(hrs);//2-->"02"  13-->"01"
             var min = z(d.getUTCMinutes());
             return hrs + ":" + min + " " + amPm;
-        }
-        ,
+        },
         fromISODateToShortdateTime: function (isoDate, sourceFormat) {//returs a dateTimeString "<shortdate> hh:mm <pm|am>" from ISO date
             //sourceFormat may be "YMD","MDY" or "DMY"
             //examples:
@@ -1400,8 +1362,7 @@ FL["common"] = (function () {//name space FL.common
             if (!shortDate)
                 return null;
             return shortDate + " " + this.fromISODateToTime(isoDate);
-        }
-        ,
+        },
         is_validShortDate: function (shortDate) {//validate  xx-xx-xx or xx/xx/xx or xx.xx.xx where year can be xxxx
             //->accepts DMY(europe), MDY(US), YMD(China - the default accepted by Date.Parse)
             // YMD accepts "2014/12/30","2014-12-30","2014.12.30" -> rejects "14/12/30"
@@ -1424,8 +1385,7 @@ FL["common"] = (function () {//name space FL.common
                 bRet = true;
             }
             return bRet;
-        }
-        ,
+        },
         is_ValidDate: function (dateString) {
             // returns true - if dateString has an acceptable format for a date. Ex
             //      ex:"March 21, 2012", "2015/06/24", "2015-06-24"
@@ -1492,8 +1452,7 @@ FL["common"] = (function () {//name space FL.common
                 // }
             }
             return is_date;
-        }
-        ,
+        },
         is_dateArrInStringFormat: function (arrOfRowValues) {//returns true if all array elements are a valid string format
             //var d = Date.parse("March 21, 2012");//1332288000000
             //var d = Date.parse("03-21-12");//1332288000000
@@ -1528,8 +1487,7 @@ FL["common"] = (function () {//name space FL.common
             } else if (_.isUndefined(failElement))
                 is_date = true;
             return is_date;
-        }
-        ,
+        },
         is_jsonString: function (str) {
             try {
                 JSON.parse(str);
@@ -1537,8 +1495,7 @@ FL["common"] = (function () {//name space FL.common
                 return false;
             }
             return true;
-        }
-        ,
+        },
         is_enumerableArr: function (arrOfRowValues, percent) {//returns true arrOfRowValues can colapse to less than percent with unique values
             //normally arrOfRowValues is a sample of the whole array, only to decide if it is enumerable or not
             var is_enumerable = false;
@@ -1548,8 +1505,7 @@ FL["common"] = (function () {//name space FL.common
             if (columnPercent < percent)
                 is_enumerable = true;
             return is_enumerable;
-        }
-        ,
+        },
         extractUniqueFromArray: function (arr) {//returns object with {empties:no_of empties,uniqueArr:uniqueArr}
             //returns an object {empties:no_of empties,uniqueArr:uniqueArr} where:
             //      empties - number of empties ocurrences in arr
@@ -1571,15 +1527,13 @@ FL["common"] = (function () {//name space FL.common
                 return element[0];
             });
             return {empties: empties, uniqueArr: uniqueArr};
-        }
-        ,
+        },
         getLocalLanguage: function () {
             var language = navigator.languages ? navigator.languages[0] : (navigator.language || navigator.userLanguage);
             if (_.isUndefined(language))
                 language = window.navigator.userLanguage || window.navigator.language;
             return language;
-        }
-        ,
+        },
         is_decimal_US: function (strNumber) {
             is_US = false;
             var lastDotIndex = strNumber.lastIndexOf(".");
@@ -1588,8 +1542,7 @@ FL["common"] = (function () {//name space FL.common
                 if (lastDotIndex == firstDotIndex)
                     is_us = true; // (0.123) or (4,294.00) or (4,294,967.00)
             }
-        }
-        ,
+        },
         is_oneOfCharsInString: function (str, charList) {//returns true if any of the chars in par2 exists in par1.
             //ex FL.common.is_oneOfCharsInString("anc 1002,3","* ") =>true because space exists in string
             var is = false;
@@ -1604,8 +1557,7 @@ FL["common"] = (function () {//name space FL.common
                 }
             }
             return is;
-        }
-        ,
+        },
         isNumberSep: function (strNumber, sep) {//sep is thousands sep - returns true if string is a valid number with that thousand separator
             var isNumber = false;
             //case strNumber "1.000,3" with sep="," =>should return false. Without the "special if" it would return true =>1.0002 is valid
@@ -1649,8 +1601,7 @@ FL["common"] = (function () {//name space FL.common
                 }
             }
             return isNumber;
-        }
-        ,
+        },
         getArrNumberFormat: function (arrOfRowValues) {//given an array of strings returns if it is a number representation and if yes returns the format
             //Possible formats : us,de,fr
             //returns {number:false, format:null} or {number:true, format:"us"} or (if all integers){number:true, format:null}
@@ -1724,8 +1675,7 @@ FL["common"] = (function () {//name space FL.common
             if (!_.isUndefined(failElement))
                 xRet = {"number": false, "format": null};
             return xRet;
-        }
-        ,
+        },
         getArrUserType: function (arrOfRowValues) {//given an array of strings returns one of textbox,percentbox,numberbox,integerbox, currencybox,checkbox,datetimebox,emailbox,urlbox
             // NOTE combobox must be resolved outside - phonebox TBD
             var userType = "textbox";
@@ -1758,8 +1708,7 @@ FL["common"] = (function () {//name space FL.common
             if (!_.isUndefined(failElement))//not an array of numbers
                 return false;
             return true;//it is an array of numbers
-        }
-        ,
+        },
         isArrOfCurrency: function (arrOfRowValues) {//given an array of strings returns true if it is a currency representation, false if not
             var failElement = _.find(arrOfRowValues, function (element) { //if failElement is undefined => all elements are a valid number format
                 return !element.isCurrency();
@@ -1767,8 +1716,7 @@ FL["common"] = (function () {//name space FL.common
             if (!_.isUndefined(failElement))//not an array of currency
                 return false;
             return true;//it is an array of currency
-        }
-        ,
+        },
         isArrOfPercent: function (arrOfRowValues) {//given an array of strings returns true if it is a percent representation, false if not
             var failElement = _.find(arrOfRowValues, function (element) { //if failElement is undefined => all elements are a valid number format
                 return !element.isPercent();
@@ -1785,8 +1733,7 @@ FL["common"] = (function () {//name space FL.common
             if (!_.isUndefined(failElement))//not an array of integer
                 return false;
             return true;//it is an array of integer
-        }
-        ,
+        },
         isArrOfEmail: function (arrOfRowValues) {//given an array of strings returns true if it is a valid email representation, false if not
             var failElement = _.find(arrOfRowValues, function (element) { //if failElement is undefined => all elements are a valid number format
                 var is_email = FL.common.is_email(element);
@@ -1805,8 +1752,7 @@ FL["common"] = (function () {//name space FL.common
             if (!_.isUndefined(failElement))//not an array of numbers
                 return false;
             return true;//it is an array of urls
-        }
-        ,
+        },
         isArrOfCheck: function (arrOfRowValues) {//given an array of strings returns true if it is a valid true/false representation, false if not
             var failElement = _.find(arrOfRowValues, function (element) { //if failElement is undefined => all elements are a valid number format
                 var is_check = FL.common.is_check(element);
@@ -1815,8 +1761,7 @@ FL["common"] = (function () {//name space FL.common
             if (!_.isUndefined(failElement))//not an array of numbers
                 return false;
             return true;//it is an array of true/false
-        }
-        ,
+        },
         isArrOfPhone: function (arrOfRowValues) {//given an array of strings returns true if it is a valid phone representation, false if not
             var failElement = _.find(arrOfRowValues, function (element) { //if failElement is undefined => all elements are a valid number format
                 var is_phone = FL.common.is_phone(element);
@@ -1825,8 +1770,7 @@ FL["common"] = (function () {//name space FL.common
             if (!_.isUndefined(failElement))//not an array of numbers
                 return false;
             return true;//it is an array of phone numbers
-        }
-        ,
+        },
         localeStringToNumber: function (str, format) {//returns number or 0 if is unable to convert
             // str - str to convert to number
             // format - us, de or fr -->all other formats return 0
@@ -1855,14 +1799,12 @@ FL["common"] = (function () {//name space FL.common
                     n = 0;
             }
             return n;
-        }
-        ,
+        },
         convertStringVectorToNumber: function (arr, format) {//given an array of strings and a format converts that string to a number to numeric according to string format
             return _.map(arr, function (element) {
                 return FL.common.localeStringToNumber(element, format);
             });
-        }
-        ,
+        },
         getServerName: function () {//return server name form url. if server is local host =>test.framelink.co
             //extracts content from url in browser (after // and before the first /)
             //example (in FL.API _login):fl.serverName(FL.common.getServerName());
@@ -1875,8 +1817,7 @@ FL["common"] = (function () {//name space FL.common
                 server = "test.framelink.co";
             FL.common.printToConsole("FL.common.getServerName() -->" + server);
             return server;
-        }
-        ,
+        },
         getMandrillKey: function () {
             var server = this.getServerName();
             var key = "S8_4ExqKlIdZiSBqgiLBUw"; //assume
@@ -1884,8 +1825,7 @@ FL["common"] = (function () {//name space FL.common
                 key = "vVC6R5SZJEHq2hjEZfUwRg";
             }
             return key;
-        }
-        ,
+        },
         debug: false, //if true shows all FL.common.printToConsole() independentely of filters  ->fallsback to console.log - if false =>only debugFilterToShow will appear
         debugFiltersToShow: null,
         debugFilter: null,//an object with all  filters collected from the app. Each key is a filter with value true or false. To be created by printToConsole()
@@ -1913,9 +1853,7 @@ FL["common"] = (function () {//name space FL.common
             }
             // FL.API.debug = debugStatus;
             // FL.API.debugStyle = debugStyleStatus;
-        }
-
-        ,
+        },
         masterDetailItems: null,//used by modalIn
         getBrowserWidth: function () {
             if (window.innerWidth) {
@@ -1928,9 +1866,7 @@ FL["common"] = (function () {//name space FL.common
                 return document.body.clientWidth;
             }
             return 0;
-        }
-
-        ,
+        },
         getBase64Width: function (imageData) {
             $("body").append("<img id='hiddenImage' src='" + imageData + "' />");
             var w = $('#hiddenImage').width();
@@ -1939,8 +1875,7 @@ FL["common"] = (function () {//name space FL.common
             console.log("width:" + w + " height:" + h);
             FL.common.printToConsole("getBase64Width before exit w=" + w + " h=" + h, "abc");
             return w;
-        }
-        ,
+        },
         getBrowser: function () {
             var isChrome = /Chrome/.test(navigator.userAgent) && /Google Inc/.test(navigator.vendor);
             if (isChrome)
@@ -1960,14 +1895,12 @@ FL["common"] = (function () {//name space FL.common
                 browser = "ie";
             }
             return browser;
-        }
-        ,
+        },
         getDecimalSeparator: function () {//http://stackoverflow.com/questions/1074660/with-a-browser-how-do-i-know-which-decimal-separator-does-the-client-use
             var n = 1.1;
             n = n.toLocaleString().substring(1, 2);
             return n;
-        }
-        ,
+        },
         getLocaleSettings: function () {//http://stackoverflow.com/questions/2388115/get-locale-short-date-format-using-javascript
             var formats = {
                 "ar-SA": {mask: "dd/MM/yy", ymdFormat: "DMY", radix: ",", thousands: ".", currency: "$"},
@@ -2196,8 +2129,7 @@ FL["common"] = (function () {//name space FL.common
                     currency: "$"
                 };//'dd/MM/yyyy';
             return formatMask;
-        }
-        ,
+        },
         setApplicationSettingsFromSystem: function () {
             this.appsettings.radixpoint = this.getLocaleSettings().radix; //this.getDecimalSeparator();//":";
             thousandsSeparator = this.getLocaleSettings().thousands;
@@ -2224,8 +2156,7 @@ FL["common"] = (function () {//name space FL.common
             else
                 content = $domTarget.text();
             return content;
-        }
-        ,
+        },
         setDOMContentToId: function (id, value) {
             var content = null;
             var domTarget = "#" + id;
@@ -2259,8 +2190,7 @@ FL["common"] = (function () {//name space FL.common
             var doc = document.createElement('div');
             doc.innerHTML = html;
             return ( doc.innerHTML === html );
-        }
-        ,
+        },
         extractRadixFrom: function (numberStr) {//Given a string representing a number returns its radix point if any (note that 12,345,678 => radix=".")
             // - null if not a number representation
             // - null if or no radix point or if inconclusive (example "12,00" can be US 1200 or European 12,0)
@@ -2292,8 +2222,7 @@ FL["common"] = (function () {//name space FL.common
                 }
             }
             return null;
-        }
-        ,
+        },
         extractThousandsSeparatorFrom: function (numberStr) {//Given a string representing a number returns its ThousandsSeparator if any - null if not a number representation or no Separator
             // return null or "." or "," or "space"
             // - null if not a number representation
