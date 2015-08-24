@@ -482,6 +482,10 @@ jQuery(document).ready(function ($) {
                                         "title": "Send a Message",//0
                                         "uri": "javascript:FL.links.sendMessage()"
                                     },
+                                    {
+                                        "title": "Communities enroll/create",//0
+                                        "uri": "javascript:FL.links.enrollInCommunities()"
+                                    }
                                 ]
                             }
                         ]

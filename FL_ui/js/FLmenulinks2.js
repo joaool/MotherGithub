@@ -141,6 +141,22 @@ FL["links"] = (function () {//name space FL.dd
             internalTest(x);
             alert("Fl.link.test(x) x=" + x);
         },
+        enrollInCommunities: function () {
+            var boxData = {
+                master: {
+                    existingCommunities: "Choose among existing communities",
+                    existingCommunities_options: [{value: 0, text: "All Framelink users", op: "A"}],
+                    communityName: "",
+                }
+            };
+            var boxOptions = {type: "primary",icon: "send",button1: "Cancel",button2: "Confirm"};
+            var enrollInCommunitiesModal = new FL.modal.Box(" Community Regitration", "enrollInCommunities", boxData, boxOptions, function (result, data) {
+                if (result) {
+                    alert("sendMessageModal Master  " + JSON.stringify(data.master));
+                }
+            });
+            enrollInCommunitiesModal.show();
+        },
         sendMessage: function () {
             var boxData = {
                 master: {
@@ -153,17 +169,12 @@ FL["links"] = (function () {//name space FL.dd
                     content: "",
                 }
             };
-            var boxOptions = {
-                type: "primary",
-                icon: "send",
-                button1: "Cancel",
-                button2: "Confirm message to send"
-            };
+            var boxOptions = {type: "primary",icon: "send",button1: "Cancel",button2: "Confirm message to send"};
             var sendMessageModal = new FL.modal.Box(" Send a message", "sendMessage", boxData, boxOptions, function (result, data) {
                 if (result) {
                     //alert("sendMessageModal Master  " + JSON.stringify(data.master));
                     var msg = "Message from " + FL.login.token.userName + " : " + data.master.content;
-                    FL.services.msgSend('my_channel',msg);
+                    FL.services.msgSend('my_channel', msg);
                     $("#_FL_totUsers").text(msg);
                 }
             });

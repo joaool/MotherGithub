@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width">
-    <title>version 13.57</title>
+    <title>version 13.58</title>
     <!--
         testApigee
     -->
@@ -888,6 +888,37 @@
                         </div>
                         <span class="input-group-addon"><span class="glyphicon glyphicon-th-list"></span></span>
                     </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</script>
+<script id="enrollInCommunities" type="text/template">
+    <div class="enrollInCommunities" style="margin-top:0px;">
+        <form id="form_enrollInCommunities"  class="form-inline">
+            <legend>Enroll in an existing community or create a new one:</legend>
+            <div class="row">
+                <div class="col-xs-12">
+                    <div class="input-group" style="line-height:0px;">
+                        <span class="input-group-addon">Select a community to enroll:</span>
+                        <div class="btn-group" style="width:100%">
+                            <a class="btn btn-default btn-block dropdown-toggle" data-toggle="dropdown"
+                               style="font-size:14px;font-weight:bold;margin-right:-4.0em;display:inline-block;height:100%;"
+                               id="enrollInCommunities_existingCommunities" href="#"><%= master.existingCommunities %> <span
+                                    class="caret"></span></a>
+                            <ul id="enrollInCommunities_existingCommunities_options" class="dropdown-menu"></ul>
+                        </div>
+                        <span class="input-group-addon"><span class="glyphicon glyphicon-th-list"></span></span>
+                    </div>
+                    <div class="input-group" style="line-height:0px;">
+                        <span class="input-group-addon">Name a new community:</span>
+                        <input type="text" class="form-control" id="enrollInCommunities_communityName"
+                               name="communityName" placeholder="Ex. paper suppliers"
+                               value="<%= master.communityName %>">
+                    </div>
+                    <label class="checkbox">
+                        <input type="checkbox" name="Private" value="__option__"> Private
+                    </label>
                 </div>
             </div>
         </form>
