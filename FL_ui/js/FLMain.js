@@ -63,7 +63,7 @@ var FL = FL || {};
     $(document).ready(function () {
         //FL.common.debugFilter = false;//it was
         FL.common.debug = false; ////if true shows all FL.common.printToConsole() independentely of filters  ->fallsback to console.log - if false =>only debugFilterToShow will appear
-        FL.common.debugFiltersToShow = ["API", "util","bg","memoryCsv", "checkServerCall", "abc", "grid","apigee", "login", "dump", "dd","modalIn"];//note that "dump" is a reserved word for FL.dd.displayEntities()
+        FL.common.debugFiltersToShow = ["xAPI", "util", "bg", "memoryCsv", "checkServerCall", "abc", "grid", "apigee", "login", "xdump", "dd", "modalIn"];//note that "dump" is a reserved word for FL.dd.displayEntities()
         FL.API.fl.setTraceClient(2);
         //alert("xuxu_all");
         FL.common.printToConsole("joakimX1X1", "abc");
@@ -213,13 +213,46 @@ var FL = FL || {};
         // promise.fail(function(err){
         // 	alert("queueManager - PROMISE FAIL!!! err="+err);
         // });
+        var button = PUBNUB.$("pubnub_button");
+        var image = PUBNUB.$("pubnub_img");
+        //var pubnub = PUBNUB.init({
+        //    publish_key: 'pub-c-04ba4469-fe37-4fb2-b4ec-4c3e4a48e194',
+        //    subscribe_key: 'sub-c-d629b394-498c-11e5-81b5-02ee2ddab7fe'
+        //});
+        //var pubnub = FL.login.messageInit();
+        FL.services.msgInit();
+        var pubnub = FL.services.msg;//Message services available from now on
+        //pubnub.subscribe({
+        //    channel: 'my_channel',
+        //    //message :  received_button_click //function(m){console.log(m)}
+        //    message: function (m) {
+        //        //console.log(m);
+        //        alert("You received the message:" + m);
+        //    }
+        //});
+        FL.services.msgSubscribe('my_channel', function (m) {
+            alert("You received the message:" + m);
+        });
 
+        function received_button_click(message) {
+            img.src = "http://www.pubnub.com/static/images/illustrations/data-streams.png"
+        };
+        pubnub.bind("click", button, function () {
+            pubnub.publish({
+                channel: 'my_channel',
+                message: FL.login.messageToPublish,
+            });
+        });
     });
     // FL.login.token = {};
     // connectAdHocUser = function(connectAdHocUserCB) {//
     // FL.login.token has all information about the user and the current applications the user is using
     // connectAdHocUser = function(connectAdHocUserCB) {//
     // GlobalUserName = null;
+    //pubnub.publish({
+    //    channel : 'my_channel',
+    //    message : "Hey message"
+    //});
     //-------- PROMISE WRAPPERS ------------------
     var separator = function () {
         var def = $.Deferred();

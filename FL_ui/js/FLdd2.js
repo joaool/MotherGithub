@@ -1347,6 +1347,7 @@ FL["dd"] = (function () {//name space FL.dd
             //given a pair type an typeUI of a local dictionary field, returns the corresponding userType - inversion of FL.dd.userType
             //this method is a centralization of userType attributes. For the user an email is diferent form a textbox or a phone.
             // for a pair type,typeUI returns a single userType
+            // example: var userType = FL.dd.userType({type:"string",typeUI:"textbox"}) =>"text"
             var userType = null;
             if (attributesElement.type == "string") {//type is one of: string, integer, number, boolean, date, or json (Nico's field "M")
                 var typeUIConverterInsideString = {

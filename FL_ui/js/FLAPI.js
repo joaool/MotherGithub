@@ -453,16 +453,15 @@ FL["API"] = (function () {//name space FL.API
         var def = $.Deferred();
         var fl = FL.fl; //new flMain();
         if (!fl) {
-            // FL.common.printToConsole("======================>ERROR ON _getFullDictionary ->no connection");
             return def.reject("ERROR: no connection available");
         }
         var fEnt = new fl.entity();
         fEnt.update(json, function (err, data) {
-            FL.common.printToConsole(".............................fEnt.update ON _getFullDictionary");
+            FL.common.printToConsole(".............................fEnt.update ON _entity_update");
             // err = "abc";
             if (err) {
-                // alert("ERROR ON _getFullDictionary err="+err);
-                FL.common.printToConsole("======================>ERROR ON _getFullDictionary err=" + err);
+                // alert("ERROR ON _entity_update err="+err);
+                FL.common.printToConsole("======================>ERROR ON _entity_update err=" + err);
                 return def.reject(err);
             } else {
                 FL.common.printToConsole("=====================================>_entity_update: OK ");
@@ -2138,6 +2137,34 @@ FL["API"] = (function () {//name space FL.API
             loadPromise.fail(function (err) {
                 FL.common.printToConsole(">>>>> openTable FAILURE <<<<<" + err);
                 def.reject(err);
+            });
+            return def.promise();
+        },
+        openDictionary: function () {
+            // opens dictionary from server synchronizes it to local returning an object allowing full dictionary editions
+            FL.common.printToConsole("....................................>beginning openDictionary....with appToken=" + JSON.stringify(FL.login.appToken));
+            var def = $.Deferred();
+            var syncLocalDictionary = _getFullDictionary();
+            syncLocalDictionary.done(function (entities) {
+                FL.common.printToConsole(">>>>> syncLocalDictionary SUCCESS <<<<< entities=" + entities,"API");
+                FL.dd.clear();
+                FL.common.printToConsole(">>>>> syncLocalDictionary -> does temporaryRebuildsLocalDictionaryFromServer(entities)");
+                rebuildsLocalDictionaryFromServer(entities);//interprets entity JSON received from server to local dd
+                // FL.common.printToConsole("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% after rebuildsLocalDictionaryFromServer %%%%%%%%%%%%%%%%%");
+                FL.dd.init_t();//to init the temporary subsystem reversing entityNames to eCN
+                var dictionaryObj = {
+                    getCEntity: function (entityName) {//returns the compressed entity name of a logical entity name
+                        var eCN = FL.dd.getCEntity(entityName);
+                        return eCN;
+                    },
+                    entities: FL.dd.t.entities,
+                };
+                //FL.dd.displayEntities("FL.API.syncLocalDictionary inside FL.API.openDictionary");
+                def.resolve(dictionaryObj);
+            });
+            syncLocalDictionary.fail(function (err) {
+                FL.common.printToConsole(">>>>> FL.API.openDictionary FAILURE <<<<< " + err);
+                def.reject();
             });
             return def.promise();
         },

@@ -211,7 +211,7 @@ FL["modal"] = (function () {//name space FL.modalIn
                 var options = this.options;
                 var master = this.data.master; //to pass to _each by closure
                 _.each(this.data.master, function (value, key) {
-//                    FL.common.printToConsole("Loading events for field:" + key, "modalIn");
+                    FL.common.printToConsole("Loading events for field:" + key, "modalIn");
                     var selector = templateName + "_" + key;
                     var $field = $("#" + selector);
                     var options = this.options;

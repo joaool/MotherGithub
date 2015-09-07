@@ -98,9 +98,256 @@ FL["bg"] = (function () {//name space FL.common
             oRet = {datetimepicker: "dd/mm/yy", format: "DMY"};
         return oRet;
     };
+    var openColumnClick = false;
+    //var editColumn = function (options,description,typeUI) {//called by focus of every single widget
+    var editColumn = function (options, field) {//field has all dictionary info that may be necessary
+        var columnLabel = options.column.attributes.label;
+        var description = field.description; //to force clousure
+        var typeUI = field.typeUI; //to force clousure
+        $("#_editGridCol").html(" Col." + columnLabel);
+        $('#_editGridCol').off('click');
+        $("#_editGridCol").click(function () {
+            //alert("Edit Column " + columnLabel);
+            var boxOptions = {
+                type: "primary",
+                icon: "th-list",
+                button1: "Cancel",
+                button2: "Confirm column data",
+                posField: {
+                    colTitle: function (Box) {
+                        //alert("You are leaving the column title field");
+                        var openPromise = FL.API.openDictionary();
+                        openPromise.done(function (dictObj) {
+                            FL.common.printToConsole(">>>>>displayDefaultGrid openDictionary SUCCESS <<<<< ", "bg");
+                            //spinner.stop();
+                            var currentTitle = Box.getFieldFromDisplay("colTitle");//get("fieldName");
+                            var previousTitle = Box.get("colTitle");
+                            var currentFieldName = Box.get("fieldName");//get("fieldName");
+                            //var eCN = dictObj.getCEntity(currentEntityName);
+                            var eCN = Box.data.eCN;
+                            var fCN = dictObj.entities[eCN].getCName(currentFieldName);
+                            //dictObj.set("label",Box.get("colTitle"));
+                        });
+                        openPromise.fail(function (err) {
+                            FL.common.printToConsole(">>>>>editColumn openDictionary FAILURE <<<<<" + err, "API");
+                            def.reject(err);
+                        });
+                    },
+                    fieldName: function (Box) {
+                        alert("You are leaving the fieldName field");
+                    }
+                },
+                preField: {
+                    fieldDescription: function (Box) {
+                        alert("You are entering the column description field");
+                    }
+                },
+                option: {
+                    userType_options: function (Box, selected) {
+                        alert("You clicked in option " + selected.text);
+                        FL.common.printToConsole("%%%%%%%%>user code typeUI_options --> content=" + JSON.stringify(selected), "modalIn");
+                    }
+                }
+            };
+            var arrOfObj = FL.dd.arrOfUserTypesForDropdown();
+            //	var arrOfObj=[{value:1,text:"number",something:"abc"},{value:2,text:"text",something:"abc"},{value:3,text:"email",something:"abc"},{value:4,text:"phone",something:"abc"},{value:5,text:"enumerable",something:"abc"},{value:6,text:"date",something:"abc"}];
+            var dataItems = {
+                master: {
+                    colTitle: columnLabel,
+                    fieldName: options.column.attributes.name,
+                    fieldDescription: description,
+                    userType: FL.dd.userType({type: "string", typeUI: typeUI}),
+                    userType_options: arrOfObj
+                },
+                eCN: field.parentECN,
+            };
+            var MyModal = new FL.modal.Box(" " + columnLabel, "columnEdition", dataItems, boxOptions, function (result, data) {
+                if (result) {
+                    alert("MyModal Master  " + JSON.stringify(data.master));
+                }
+                exitColumn();
+            });
+            MyModal.show();
+        });
+        $("#_editGrid").hide();
+        $("#_editGridCol").show();
+        $("#_editGridCol").hover(function () {
+            $("#_editGridCol").html(" Col." + columnLabel + "*");
+            openColumnClick = true;
+        }, function () {
+            $("#_editGridCol").html(" Col." + columnLabel);
+            openColumnClick = false;
+        });
+    };
+    var exitColumn = function (options) {
+        if (!openColumnClick) {
+            $('#_editGridCol').off('click');
+            $("#_editGridCol").hide();
+            $("#_editGrid").show();
+        }
+    };
+    var TextCellEditor = Backgrid.InputCellEditor.extend({
+        initialize: function (options) {
+            Backgrid.InputCellEditor.prototype.initialize.apply(this, arguments);
+            var field = TextCellEditor.prototype.field;
+            editColumn(options, field);//description,typeUI);
+            var cellVal = $(this.el).val();
+            $(this.el).focus(function () {
+                var cellVal = $(this).val();
+                console.log('------------->text on focus ==>' + $(this).val());
+                //$(this).select();
+            });
+            $(this.el).blur(function () {
+                var cellVal = $(this).val();
+                console.log('------------->text on blur ==>' + $(this).val());
+                exitColumn(options);
+            });
+        }
+    });
+    var URLCellEditor = Backgrid.InputCellEditor.extend({
+        initialize: function (options) {
+            Backgrid.InputCellEditor.prototype.initialize.apply(this, arguments);
+            var field = URLCellEditor.prototype.field;
+            editColumn(options, field);//description,typeUI);
+            var cellVal = $(this.el).val();
+            $(this.el).focus(function () {
+                var cellVal = $(this).val();
+                console.log('------------->url on focus ==>' + $(this).val());
+                $(this).select();
+            });
+            $(this.el).blur(function () {
+                var cellVal = $(this).val();
+                console.log('------------->url on blur ==>' + $(this).val());
+                exitColumn(options);
+            });
+        }
+    });
+    var EmailCellEditor = Backgrid.InputCellEditor.extend({
+        initialize: function (options) {
+            Backgrid.InputCellEditor.prototype.initialize.apply(this, arguments);
+            var field = EmailCellEditor.prototype.field;
+            editColumn(options, field);
+            var cellVal = $(this.el).val();
+            $(this.el).focus(function () {
+                var cellVal = $(this).val();
+                console.log('------------->email on focus ==>' + $(this).val());
+                //$(this).select();
+            });
+            $(this.el).blur(function () {
+                var cellVal = $(this).val();
+                console.log('------------->email on blur ==>' + $(this).val());
+                exitColumn(options);
+            });
+        }
+    });
+    var ComboCellEditor = Backgrid.SelectCellEditor.extend({
+        initialize: function (options) {
+            Backgrid.SelectCellEditor.prototype.initialize.apply(this, arguments);
+            var field = ComboCellEditor.prototype.field;
+            editColumn(options, field);
+            var cellVal = $(this.el).val();
+            $(this.el).focus(function () {
+                var cellVal = $(this).val();
+                console.log('------------->combo on focus ==>' + $(this).val());
+                //$(this).select();
+            });
+            $(this.el).blur(function () {
+                var cellVal = $(this).val();
+                console.log('------------->combo on blur ==>' + $(this).val());
+                exitColumn(options);
+            });
+        },
+        //render: function (model) {
+        //    var cellVal = this.model.get(this.column.get("name"));//extracts from model
+        //    cellVal = this.formatter.fromRaw(cellVal);//converts to cell
+        //    this.$el.val(cellVal);
+        //    console.log("render combo....<" + cellVal + ">-->" + JSON.stringify(this.model.toJSON()));
+        //    this.delegateEvents();
+        //    return this;
+        //}
+    });
+    var AreaCellEditor = Backgrid.Extension.TextareaEditor = Backgrid.CellEditor.extend({//from Jimmy Yuen Ho Wong and contributors - http://github.com/wyuenho/backgrid
+        tagName: "div",
+        className: "modal fade",
+        template: function (data) {
+            return '<div class="modal-dialog"><div class="modal-content"><form><div class="modal-header"><button type="button" class="close" data-dismiss="modal">&times;</button><h3>' + data.column.get("label") + '</h3></div><div class="modal-body"><textarea cols="' + data.cols + '" rows="' + data.rows + '">' + data.content + '</textarea></div><div class="modal-footer"><input class="btn btn-primary" type="submit" value="JO Save"/></div></form></div></div>';
+        },
+        cols: 80,
+        rows: 10,
+        events: {
+            "keydown textarea": "clearError",
+            "submit": "saveOrCancel",
+            "hide.bs.modal": "saveOrCancel",
+            "hidden.bs.modal": "close",
+            "shown.bs.modal": "focus"
+        },
+        modalOptions: {//The options passed to Bootstrap's modal plugin.
+            backdrop: false
+        },
+        render: function () {//Renders a modal form dialog with a textarea, submit button and a close button.
+            this.$el.html($(this.template({
+                column: this.column,
+                cols: this.cols,
+                rows: this.rows,
+                content: this.formatter.fromRaw(this.model.get(this.column.get("name")))
+            })));
+            this.delegateEvents();
+            this.$el.modal(this.modalOptions);
+            return this;
+        },
+        saveOrCancel: function (e) {
+            if (e && e.type == "submit") {
+                e.preventDefault();
+                e.stopPropagation();
+            }
+            var model = this.model;
+            var column = this.column;
+            var val = this.$el.find("textarea").val();
+            var newValue = this.formatter.toRaw(val);
+            if (_.isUndefined(newValue)) {
+                model.trigger("backgrid:error", model, column, val);
+
+                if (e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                }
+            }
+            else if (!e || e.type == "submit" ||
+                (e.type == "hide" &&
+                newValue !== (this.model.get(this.column.get("name")) || '').replace(/\r/g, '') &&
+                confirm("Would you like to save your changes in Framelink TextArea ?"))) {
+
+                model.set(column.get("name"), newValue);
+                this.$el.modal("hide");
+            }
+            else if (e.type != "hide") this.$el.modal("hide");
+            exitColumn(options);
+        },
+        clearError: _.debounce(function () {
+            if (!_.isUndefined(this.formatter.toRaw(this.$el.find("textarea").val()))) {
+                this.$el.parent().removeClass("error");
+            }
+        }, 150),
+        close: function (e) {
+            var model = this.model;
+            model.trigger("backgrid:edited", model, this.column,
+                new Backgrid.Command(e));
+        },
+        focus: function () {
+            this.$el.find("textarea").focus();
+        },
+        initialize: function (options) {
+            Backgrid.CellEditor.prototype.initialize.apply(this, arguments);
+            editColumn(options);
+            var cellVal = $(this.el).val();
+            //console.log('------------->areatext entering.... ==>' + $(this).val());
+        }
+    });
     var NumberCellEditor = Backgrid.InputCellEditor.extend({
         initialize: function (options) {
             Backgrid.InputCellEditor.prototype.initialize.apply(this, arguments);
+            var field = NumberCellEditor.prototype.field;
+            editColumn(options, field);
             var decimals = NumberCellEditor.prototype.decimals;//4;
             var cellVal = $(this.el).val();
             $(this.el).focus(function () {
@@ -131,6 +378,11 @@ FL["bg"] = (function () {//name space FL.common
                 $(this).numberValidator(options);//modified https://github.com/igorescobar/jQuery-Mask-Plugin   1234512345 123
                 $(this).select();
             });
+            $(this.el).blur(function () {
+                var cellVal = $(this).val();
+                console.log('------------->number on blur ==>' + $(this).val());
+                exitColumn(options);
+            });
         },
         render: function (model) {
             var cellVal = this.model.get(this.column.get("name"));//extracts from model
@@ -144,6 +396,8 @@ FL["bg"] = (function () {//name space FL.common
     var CurrencyCellEditor = Backgrid.InputCellEditor.extend({
         initialize: function (options) {
             Backgrid.InputCellEditor.prototype.initialize.apply(this, arguments);
+            var field = CurrencyCellEditor.prototype.field;
+            editColumn(options, field);
             var decimals = CurrencyCellEditor.prototype.decimals;
             var currency = CurrencyCellEditor.prototype.currency;
             var thousandsSeparator = FL.common.appsettings.thousandsSeparator;
@@ -189,6 +443,11 @@ FL["bg"] = (function () {//name space FL.common
                 $(this).numberValidator(options);//modified https://github.com/igorescobar/jQuery-Mask-Plugin   1234512345 123
                 $(this).select();
             });
+            $(this.el).blur(function () {
+                var cellVal = $(this).val();
+                console.log('------------->currency on blur ==>' + $(this).val());
+                exitColumn(options);
+            });
         },
         render: function (model) {
             var cellVal = this.model.get(this.column.get("name"));//extracts from model
@@ -202,7 +461,8 @@ FL["bg"] = (function () {//name space FL.common
     var IntegerCellEditor = Backgrid.InputCellEditor.extend({
         initialize: function (options) {
             Backgrid.InputCellEditor.prototype.initialize.apply(this, arguments);
-            //alert("IntegerCellEditor.initialize");
+            var field = IntegerCellEditor.prototype.field;
+            editColumn(options, field);
             var mask = "#" + FL.common.appsettings.thousandsSeparator + "##0";//ex."#.##0"
             var cellVal = $(this.el).val();
             $(this.el).focus(function () {
@@ -214,6 +474,11 @@ FL["bg"] = (function () {//name space FL.common
                 };
                 $(this).numberValidator(options);//modified https://github.com/igorescobar/jQuery-Mask-Plugin   1234512345 123
                 $(this).select();
+            });
+            $(this.el).blur(function () {
+                var cellVal = $(this).val();
+                console.log('------------->integer on blur ==>' + $(this).val());
+                exitColumn(options);
             });
         },
         render: function (model) {
@@ -228,6 +493,8 @@ FL["bg"] = (function () {//name space FL.common
     var PercentCellEditor = Backgrid.InputCellEditor.extend({
         initialize: function (options) {
             Backgrid.InputCellEditor.prototype.initialize.apply(this, arguments);
+            var field = PercentCellEditor.prototype.field;
+            editColumn(options, field);
             var decimals = CurrencyCellEditor.prototype.decimals;
             var cellVal = $(this.el).val();
             $(this.el).focus(function () {
@@ -258,6 +525,11 @@ FL["bg"] = (function () {//name space FL.common
                 $(this).numberValidator(options);//modified https://github.com/igorescobar/jQuery-Mask-Plugin   1234512345 123
                 $(this).select();
             });
+            $(this.el).blur(function () {
+                var cellVal = $(this).val();
+                console.log('------------->percent on blur ==>' + $(this).val());
+                exitColumn(options);
+            });
         },
         render: function (model) {
             var cellVal = this.model.get(this.column.get("name"));//extracts from model
@@ -268,9 +540,9 @@ FL["bg"] = (function () {//name space FL.common
             return this;
         }
     });
-    // });
-    //http://jsfiddle.net/bh5nd/
-    //http://jsfiddle.net/Cj7UG/1/
+// });
+//http://jsfiddle.net/bh5nd/
+//http://jsfiddle.net/Cj7UG/1/
     var DateTimeCellEditor = Backgrid.InputCellEditor.extend({
         //http://stackoverflow.com/questions/30115158/check-if-backgrid-cell-was-edited
         events: {
@@ -310,7 +582,8 @@ FL["bg"] = (function () {//name space FL.common
         },
         initialize: function (options) {
             Backgrid.InputCellEditor.prototype.initialize.apply(this, arguments);
-            //alert("DateTimeCellEditor.initialize");
+            var field = DateTimeCellEditor.prototype.field;
+            editColumn(options, field);
             this.column = options.column;
             var input = this;
             var thisView = this;
@@ -327,6 +600,7 @@ FL["bg"] = (function () {//name space FL.common
                     console.log("close !!!->" + newValue + " -->" + inst.id);
                     thisView.render(thisView.model);
                     thisView.onCloseDatepicker(inst);
+                    exitColumn(options);
                 },
                 onSelect: function (selectedDateTime) {
                     console.log("select ->" + selectedDateTime);
@@ -362,8 +636,14 @@ FL["bg"] = (function () {//name space FL.common
                 this.model.trigger("backgrid:edited", this.model, this.column, new Backgrid.Command(event));
             }
         },
-        initialize: function () {
+        initialize: function (options) {
+            //Backgrid.InputCellEditor.prototype.initialize.apply(this, arguments);
+            //var typeUI = DateTimeCellEditor.prototype.typeUI;
+            //var description = DateTimeCellEditor.prototype.description;
+            //editColumn(options,description,typeUI);
             Backgrid.InputCellEditor.prototype.initialize.apply(this, arguments);
+            var field = PhoneCellEditor.prototype.field;
+            editColumn(options, field);
             this.$el.prop("id", "customer_phone");
             this.$el.prop("value", "");
             this.$el.prop("size", "25");
@@ -549,19 +829,39 @@ FL["bg"] = (function () {//name space FL.common
         //                      “phonebox”, “datetimebox”,"emailbox","lookupbox"
         // enumerable - an array with the dropdown field options applicable to typeUI="combobox" - if not combobox =>enumerable = null
         var typeUI = field.typeUI;
+        var description = field.description;
         var enumerable = field.enumerable;
         if (typeUI == "lookupbox") {
             //---> not necessary var fCN = field.specialTypeDef[0].fCN;
             //alert("cellType entry ***********************************  specialTypeDef=" + JSON.stringify(lookupObj.getColumn() + "\n lookupObj.defaultFCN=" + lookupObj.defaultFCN));
         }
-        if (typeUI == "textbox")
-            typeUI = "string";
+        //if (typeUI == "textbox")
+        //    typeUI = "string";
         else if (typeUI == "datebox")
             typeUI = "datetimebox";
         var retObj = {cell: typeUI};
         // if( typeUI!="string" && typeUI!="integer" && typeUI!="number" && typeUI!="date" && typeUI!="uri"){
-        if (typeUI != "string") {
-            if (typeUI == "textUpperbox") {
+        if (typeUI != "Xstring") {
+            if (typeUI == "textbox") {
+                TextCellEditor.prototype.field = field;
+                var textFormatter = {
+                    fromRaw: function (rawValue) {
+                        rawValue += ''; //to convert any value to string
+                        return rawValue;
+                    },
+                    toRaw: function (formattedData) {
+                        return formattedData;
+                    }
+                };
+                var textCell = Backgrid.StringCell.extend({
+                    className: "_fl_text-cell",
+                    formatter: textFormatter,
+                    editor: TextCellEditor,
+                });
+                retObj["cell"] = textCell;
+                //retObj["cell"] = "string";
+                //retObj["formatter"] = textFormatter;
+            } else if (typeUI == "textUpperbox") {
                 var formatterObj = {
                     fromRaw: function (rawValue) {
                         rawValue += ''; //to convert any value to string
@@ -573,6 +873,7 @@ FL["bg"] = (function () {//name space FL.common
             } else if (typeUI == "numberbox") {//http://backbone-paginator.github.io/backbone.paginator/examples/js/extensions/text-cell/backgrid-text-cell.js
                 var decimals = FL.common.appsettings.decimals;
                 NumberCellEditor.prototype.decimals = decimals;
+                NumberCellEditor.prototype.field = field;
                 var decimalFormatter = {
                     fromRaw: function (rawValue) {
                         var num = Number(rawValue);
@@ -595,6 +896,7 @@ FL["bg"] = (function () {//name space FL.common
                 var currency = FL.common.appsettings.currency;
                 CurrencyCellEditor.prototype.decimals = decimals;
                 CurrencyCellEditor.prototype.currency = currency;
+                CurrencyCellEditor.prototype.field = field;
                 var currencyFormatter = {
                     fromRaw: function (rawValue) {
                         var num = Number(rawValue);
@@ -617,6 +919,7 @@ FL["bg"] = (function () {//name space FL.common
                 });
                 retObj["cell"] = currencyCell;
             } else if (typeUI == "integerbox") {//http://backbone-paginator.github.io/backbone.paginator/examples/js/extensions/text-cell/backgrid-text-cell.js
+                IntegerCellEditor.prototype.field = field;
                 var integerFormatter = {
                     fromRaw: function (rawValue) {
                         var num = Number(rawValue);
@@ -638,7 +941,7 @@ FL["bg"] = (function () {//name space FL.common
             } else if (typeUI == "percentbox") {//http://backbone-paginator.github.io/backbone.paginator/examples/js/extensions/text-cell/backgrid-text-cell.js
                 var decimals = FL.common.appsettings.decimals;
                 PercentCellEditor.prototype.decimals = decimals;
-                // PercentCellEditor.prototype.currency = currency;
+                PercentCellEditor.prototype.field = field;
                 var percentFormatter = {
                     fromRaw: function (rawValue) {
                         var num = Number(rawValue);
@@ -657,21 +960,58 @@ FL["bg"] = (function () {//name space FL.common
                     editor: PercentCellEditor,
                 });
                 retObj["cell"] = percentCell;
-            } else if (typeUI == "urlbox") {//http://backbone-paginator.github.io/backbone.paginator/examples/js/extensions/text-cell/backgrid-text-cell.js
-                retObj["cell"] = "uri";
             } else if (typeUI == "areabox") {//http://backbone-paginator.github.io/backbone.paginator/examples/js/extensions/text-cell/backgrid-text-cell.js
-                retObj["cell"] = "text";
+                AreaCellEditor.prototype.typeUI = typeUI;
+                AreaCellEditor.prototype.description = description;
+                var areaFormatter = {
+                    fromRaw: function (rawValue) {
+                        rawValue += ''; //to convert any value to string
+                        return rawValue;
+                    },
+                    toRaw: function (formattedData) {
+                        return formattedData;
+                    }
+                };
+                var areaCell = Backgrid.StringCell.extend({
+                    className: "_fl_area-cell",
+                    formatter: areaFormatter,
+                    editor: AreaCellEditor,
+                });
+                retObj["cell"] = areaCell;
+                //retObj["cell"] = "text";
             } else if (typeUI == "combobox") {
+                ComboCellEditor.prototype.field = field;
+                var comboFormatter = {
+                    fromRaw: function (rawValue, model) {
+                        var cellVal = ["  - - -  "];
+                        if (rawValue) {//we check if value belongs to the array
+                            if (enumerable.indexOf(rawValue) > -1) {
+                                cellVal = [rawValue];
+                            } else {
+                                //enumerable.push("  - - -  ");
+                                //this.$el.append("  - - -  ");//this.$el.append(selectedText.join(this.delimiter));
+                            }
+                        }
+                        if (_.isArray(rawValue))
+                            cellVal = rawValue
+                        return cellVal;
+                        //return _.isArray(rawValue) ? rawValue : rawValue != null ? [rawValue] : [];
+                    },
+                    toRaw: function (formattedData) {
+                        FL.common.printToConsole("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% combo toRaw->" + formattedData, "bg");
+                        return formattedData;
+                    }
+                };
                 var enumArrOfArr = _.map(enumerable, function (element) {
                     return [element, element];
                 });
                 var comboCell = Backgrid.SelectCell.extend({
-                    // It's possible to render an option group or use a
-                    // function to provide option values too.
-                    // optionValues: [["Male", "m"], ["Female", "f"]]
+                    className: "_fl_combo-cell",
+                    formatter: comboFormatter,
+                    editor: ComboCellEditor,
                     optionValues: enumArrOfArr
                 });
-                retObj["cell"] = comboCell;
+                retObj["cell"] = comboCell;//IT ALSO WORKS !!!!
             } else if (typeUI == "checkbox") {
                 var checkboxFormatter = {
                     fromRaw: function (rawValue) {
@@ -680,7 +1020,7 @@ FL["bg"] = (function () {//name space FL.common
                             rawValue = ( (rawValue) ? "TRUE" : "FALSE");
                         }
                         var bool = "FALSE";
-                        if(rawValue)
+                        if (rawValue)
                             bool = ( (rawValue.toUpperCase() == "TRUE") ? true : false );//by any reason rawValue can be undefined =>error on toUpperCase()
                         return bool;
                         //return rawValue;
@@ -712,11 +1052,12 @@ FL["bg"] = (function () {//name space FL.common
                 });
                 retObj["cell"] = BooleanCell;
             } else if (typeUI == "phonebox") {
-                var z = "JOJO";
-                PhoneCellEditor.prototype.z = z;
+                PhoneCellEditor.prototype.field = field;
                 var phoneCell = Backgrid.Cell.extend({
-                    //z:"JOJO",
-                    initialize: function (options) {
+                    className: "_fl_phone-cell",
+                    //formatter: comboFormatter,
+                    editor: PhoneCellEditor,
+                    xinitialize: function (options) {
                         // alert(this.options.z);
                         phoneCell.__super__.initialize.apply(this, arguments);
                         this.listenTo(this.model, "backgrid:editing", function (model, column, command) {
@@ -729,7 +1070,6 @@ FL["bg"] = (function () {//name space FL.common
                         // 	alert("error !!!!!!!!!!!!! ->");
                         // });
                     },
-                    editor: PhoneCellEditor,
                     xrender: function () {
                         //this.$el.html(this.template(this.model.attributes));
                         console.log("render-->" + this.$el.val());
@@ -753,6 +1093,7 @@ FL["bg"] = (function () {//name space FL.common
                 retObj["cell"] = phoneCell;
                 retObj["formatter"] = formatterObj;
             } else if (typeUI == "datetimebox") {
+                DateTimeCellEditor.prototype.field = field;
                 var DateCell = Backgrid.Cell.extend({
                     initialize: function (options) {
                         DateCell.__super__.initialize.apply(this, arguments);
@@ -767,7 +1108,7 @@ FL["bg"] = (function () {//name space FL.common
                         var initial = rawValue;
                         rawValue = FL.common.fromISODateToShortdateTime(rawValue, setDateformat().format);
                         if (!rawValue)
-                            rawValue = "Invalid Datetime";
+                            rawValue = " - - - ";
                         console.log("fromRaw  transformed:" + initial + " into -->" + rawValue);
                         return rawValue;
                     },
@@ -776,7 +1117,7 @@ FL["bg"] = (function () {//name space FL.common
                         if (validateDatetime(formattedData)) {
                             formattedData = FL.common.toISODate(formattedData, setDateformat().format);
                         } else {
-                            return "invalid datetime";
+                            return " - - - ";
                         }
                         console.log("toRaw  transformed:" + initial + " into -->" + formattedData);
                         return formattedData; //+ "X";
@@ -785,8 +1126,23 @@ FL["bg"] = (function () {//name space FL.common
                 retObj["cell"] = DateCell;
                 retObj["formatter"] = formatterObj;
             } else if (typeUI == "emailbox") {
+                EmailCellEditor.prototype.field = field;
+                var emailFormatter = _.extend({}, Backgrid.CellFormatter.prototype, {
+                    fromRaw: function (rawValue) {
+                        if (!FL.common.validateEmail(rawValue))
+                            rawValue = "  - - -  ";
+                        return rawValue;
+                    },
+                    toRaw: function (formattedData) {
+                        if (!FL.common.validateEmail(formattedData))
+                            return undefined;
+                        return formattedData; //+ "X";
+                    }
+                });
                 var EmailCell = Backgrid.EmailCell.extend({
-                    className: "email-cell",
+                    className: "_fl_email-cell",
+                    formatter: emailFormatter,
+                    editor: EmailCellEditor,
                     render: function () {
                         this.$el.empty();
                         var formattedValue = this.formatter.fromRaw(this.model.get(this.column.get("name")));
@@ -798,21 +1154,11 @@ FL["bg"] = (function () {//name space FL.common
                         return this;
                     }
                 });
-                var formatterObj = _.extend({}, Backgrid.CellFormatter.prototype, {
-                    fromRaw: function (rawValue) {
-                        if (!FL.common.validateEmail(rawValue))
-                            rawValue = "Invalid email";
-                        return rawValue;
-                    },
-                    toRaw: function (formattedData) {
-                        if (!FL.common.validateEmail(formattedData))
-                            return undefined;
-                        return formattedData; //+ "X";
-                    }
-                });
                 retObj["cell"] = EmailCell;
-                retObj["formatter"] = formatterObj;
+                retObj["formatter"] = emailFormatter;
             } else if (typeUI == "lookupbox") {
+                AutocompleteCellEditor.prototype.typeUI = typeUI;
+                AutocompleteCellEditor.prototype.description = description;
                 if (!lookupObj) {
                     alert("FL.bg.cellType ERROR missing parameter lookupObj in lookup case !");
                     return null;
@@ -852,8 +1198,49 @@ FL["bg"] = (function () {//name space FL.common
                 retObj["minTermLength"] = 1;
                 retObj["labelProperty"] = "name";
                 retObj["formatter"] = formatterObj;
-            } else if (typeUI == "urllbox") {
-                retObj["cell"] = "uri";
+            } else if (typeUI == "urlbox") {
+                //retObj["cell"] = "uri";
+                URLCellEditor.prototype.field = field;
+                var URLFormatter = _.extend({}, Backgrid.CellFormatter.prototype, {
+                    fromRaw: function (rawValue) {
+                        if (!FL.common.is_url(rawValue))
+                            rawValue = "  - - -  ";
+                        return rawValue;
+                    },
+                    toRaw: function (formattedData) {
+                        //if (!FL.common.validateEmail(formattedData))
+                        //    return undefined;
+                        return formattedData; //+ "X";
+                    }
+                });
+                var URLCell = Backgrid.MyURLCell = Backgrid.Cell.extend({
+                    className: "_fl_url-cell",
+                    title: null,
+                    target: "_blank",
+                    formatter: URLFormatter,
+                    editor: URLCellEditor,
+                    initialize: function (options) {
+                        URLCell.__super__.initialize.apply(this, arguments);
+                        this.title = options.title || this.title;
+                        this.target = options.target || this.target;
+                    },
+                    render: function () {
+                        this.$el.empty();
+                        var rawValue = this.model.get(this.column.get("name"));
+                        var formattedValue = this.formatter.fromRaw(rawValue, this.model);
+                        this.$el.append($("<a>", {
+                            tabIndex: -1,
+                            href: rawValue,
+                            title: this.title || formattedValue,
+                            target: this.target
+                        }).text(formattedValue));
+                        this.delegateEvents();
+                        return this;
+                    }
+                });
+                retObj["cell"] = URLCell;
+                //retObj["cell"] = "uri";
+                //retObj["formatter"] = URLFormatter;
             } else {
                 alert("FL.bg cellType error unknown typeUI !!!-->" + typeUI);
             }
@@ -933,6 +1320,7 @@ FL["bg"] = (function () {//name space FL.common
                 var gridDefinition = {label: element.label, nestingArr: element.nestingArr, width: element.width};
                 //var arrElObj = FL.bg.colDef(name,element.label,element.nestingArr,element.width,typeUI,enumerable);
                 var field = FL.dd.t.entities[oLayout.baseTable].fields[element.fCN];
+                field["parentECN"] = oLayout.baseTable;
                 if (field.typeUI == "lookupbox") {
                     //var fCN = field.specialTypeDef[0].fCN;
                     //alert("setupGridColumnsArr  ***********************************  specialTypeDef=" + JSON.stringify(lookupObj.getColumn() + "\n lookupObj.defaultFCN=" + lookupObj.defaultFCN));
@@ -983,4 +1371,5 @@ FL["bg"] = (function () {//name space FL.common
             return "FL.bg.test() -->" + x;
         }
     };
-})();
+})
+();

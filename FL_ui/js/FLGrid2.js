@@ -215,14 +215,14 @@ FL["grid"] = (function () {//name space FL.grid
                 _.each(rows, function (rowElement, index) {
                     var currencyStr = rowElement[attrName];
                     var numberStr = FL.common.extractContentBetweenFirstAndLastDigit(currencyStr);// - is excluded !!!! IMPORTANT
-                    numberStr = FL.common.digitPrefixInEmbededDigit(currencyStr)+numberStr;
+                    numberStr = FL.common.digitPrefixInEmbededDigit(currencyStr) + numberStr;
                     rowElement[attrName] = numberStr.ToNumeric_US(FL.grid.csvRadixpoint);
                 });
             } else if (fieldTypeUI == "percentbox") {
                 _.each(rows, function (rowElement, index) {
                     var percentStr = rowElement[attrName];
                     var numberStr = FL.common.extractContentBetweenFirstAndLastDigit(percentStr);// - is excluded !!!! IMPORTANT
-                    numberStr = FL.common.digitPrefixInEmbededDigit(percentStr)+numberStr;
+                    numberStr = FL.common.digitPrefixInEmbededDigit(percentStr) + numberStr;
                     rowElement[attrName] = numberStr.ToNumeric_US(FL.grid.csvRadixpoint);
                 });
             }
@@ -250,7 +250,7 @@ FL["grid"] = (function () {//name space FL.grid
     };
     var editGrid = function (entityName) {
         // FL.common.makeModalInfo("Edit " + entityName + " x To be implemented soon");
-        $("#_editGrid").empty();
+        //$("#_editGrid").empty();
         $("#_modalDialogB").empty();
 
         var singular = entityName;
@@ -431,23 +431,10 @@ FL["grid"] = (function () {//name space FL.grid
                 }, this);
                 var singular = masterDetailItems.master.entityName.trim();//to retrieve the header content from the interface
                 var description = masterDetailItems.master.entityDescription.trim();//to retrieve the header content from the interface
-                //if( csvStore.is_dictionaryUpdateLoseInformation( changedTypeArr) ){
-                //	FL.common.makeModalConfirm("You will lose some information. Do you want to continue ?","No, cancel changes","Yes Please",function(result){
-                //		if(result){
-                //			updateDictionaryAndTypesInServer(entityName,singular,description,newAttributesArr,changedAttributesArr,changedTypeArr);
-                //		}else{
-                //			FL.common.makeModalInfo("Nothing was saved. The original grid is going to be restored....");
-                //			FL.grid.displayDefaultGrid(entityName);//loads from server and display
-                //		}
-                //	});
-                //}else{
-                //	updateDictionaryAndTypesInServer(entityName,singular,description,newAttributesArr,changedAttributesArr,changedTypeArr);
-                //}
                 updateDictionaryAndTypesInServer(entityName, singular, description, newAttributesArr, changedAttributesArr, changedTypeArr);
             } else {
                 FL.common.makeModalInfo("Nothing was saved.");
             }
-            ;
         });//OK
     };
     var updateDictionaryAndTypesInServer = function (entityName, newSingularName, description, newAttributesArr, changedAttributesArr, changedTypeArr) {
@@ -943,13 +930,14 @@ FL["grid"] = (function () {//name space FL.grid
         // alert("mountGridFromColumnsArr ->" + JSON.stringify(columnsArr));
         // return;
         var entityName = FL.dd.getEntityByCName(eCN);
-        FL.common.printToConsole("mountGridFromColumnsArr ---> entity=" + entityName,"grid");
+        FL.common.printToConsole("mountGridFromColumnsArr ---> entity=" + entityName, "grid");
         FL.common.printToConsole("show columnsArr=" + JSON.stringify(columnsArr));
         // FL.common.spin(false);
         // spinner.stop();
         FL.common.clearSpaceBelowMenus();
         $("#addGrid").show();
         $("#addGrid").html(" Add Row");
+        $("#_editGrid").html(" Grid");
         $('#_editGrid').off('click');
         $("#_editGrid").click(function () {
             editGrid(entityName);
@@ -1434,7 +1422,7 @@ FL["grid"] = (function () {//name space FL.grid
                     //  ->Store csvStore to Serverr and place menu titem to acess data from server.
 
                     thiz.removeLastRowIfIncomplete(data);//to remove eventual incomplete last line
-                     var arrOfAttributes = dataRowAnalysis(data.data, 0.5);//row analisys returning array of attributes (one element per column)
+                    var arrOfAttributes = dataRowAnalysis(data.data, 0.5);//row analisys returning array of attributes (one element per column)
                     adjustCSVRowsToTypeUI(data.data, arrOfAttributes);//here we will adjust data.data according with the analisys feedback in arrOfColumns
                     var arrOfColumns = translateToDDFormat(arrOfAttributes);//translates arrOfAttributes format to dd format
                     // arrOfColumns has for each col:   ex: {name:"address",description:"address to send invoices",label:"Address",type:"string",enumerable:null,key:false});
