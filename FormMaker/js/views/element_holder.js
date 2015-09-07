@@ -110,6 +110,7 @@ FormDesigner.Views.ElementHolder = Backbone.View.extend({
         var name = $(droppedObject).data("name");
         var dropDownEnum = $(droppedObject).data("enum");
         var description = $(droppedObject).data("description");
+        var fieldName = $(droppedObject).data("fieldname");
         var id = this.getNextId();
         var alignment = target.id == "designerCol1" ? "left" : "right";
         var fieldId = $(droppedObject).attr("field_id");
@@ -120,7 +121,7 @@ FormDesigner.Views.ElementHolder = Backbone.View.extend({
             "type" : inputType,
             "value" : dropDownEnum,
             "id" : id,
-            "fieldName" : "",
+            "fieldName" : fieldName,
             "fieldId" : fieldId
         };
         if (cname){
