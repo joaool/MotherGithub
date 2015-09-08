@@ -160,6 +160,7 @@ FormDesigner.Views.ElementHolder = Backbone.View.extend({
     onElementClick: function(data){
         this.propertiesPanel.setElementProperties(data);
         this.setTypeField(data);
+        this.trigger(FormMaker.Events.ElementClick,data);
     },
     onTypeChange: function(data){
         var elementView = this.droppedElements[data.id];
