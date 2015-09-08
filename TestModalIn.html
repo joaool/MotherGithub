@@ -30,7 +30,7 @@
 
 <script id="getLookupTableAndField3" type="text/template">
     <div class="getLookupTableAndField3" style="margin-top:0px;">
-        <form id="form_getLookupTableAndField3" >
+        <form id="form_getLookupTableAndField3">
             <legend>Please define your lookup:</legend>
             <div class="row">
                 <div class="col-xs-12">
@@ -38,9 +38,12 @@
                         <span class="input-group-addon">Name:</span>
                         <input type="text" class="form-control" id="getLookupTableAndField3_name"
                                placeholder="ex:Client"
-                               value="<%= master.name %>" >
+                               value="<%= master.name %>">
                         <span class="input-group-addon"><span class="glyphicon glyphicon-pencil"></span></span>
+                        <span class="input-group-addon"><input id="getLookupTableAndField3_private" type="checkbox" <%= master.private %> > Private</span>
                     </div>
+                    <br>
+
                     <div class="input-group" style="line-height:0px;">
                         <span class="input-group-addon">Entity for lookup:</span>
 
@@ -53,6 +56,8 @@
                         </div>
                         <span class="input-group-addon"><span class="glyphicon glyphicon-th-list"></span></span>
                     </div>
+                    <br>
+
                     <div class="input-group" style="line-height:0px;">
                         <span class="input-group-addon">Field to lookup:</span>
 
@@ -69,6 +74,24 @@
         </form>
     </div>
 </script>
+<script id="detailList" type="text/template">
+    <div class="detailList" style="margin-top:0px;">
+        <form id="form_detailList">
+            <legend>Please define your lookup:</legend>
+            <div class="row">
+                <div class="col-xs-12">
+                    <div class="input-group" style="line-height:0px;">
+                        <span class="input-group-addon">Selection:</span>
+                        <input type="text" class="form-control" id="detailList_selection"
+                               placeholder="ex:Client"
+                               value="<%= master.selection %>">
+                        <span class="input-group-addon"><span class="glyphicon glyphicon-pencil"></span></span>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</script>
 <script id="getSurname" type="text/template">
     <div class="getSurname" style="margin-top:0px;">
         <form id="form_getSurname" novalidate="novalidate">
@@ -77,6 +100,7 @@
                 <div class="col-xs-12">
                     <div class="input-group" style="line-height:0px;">
                         <span class="input-group-addon">Surname to choose:</span>
+
                         <div class="btn-group" style="width:100%">
                             <a class="btn btn-default btn-block dropdown-toggle" data-toggle="dropdown"
                                style="font-size:14px;font-weight:bold;margin-right:-4.0em;display:inline-block;height:100%;"
@@ -97,32 +121,32 @@
 //         FL.modal.externalTest("Hello");
         FL.common.debug = false; ////if true shows all FL.common.printToConsole() independentely of filters  ->fallsback to console.log - if false =>only debugFilterToShow will appear
         FL.common.debugFiltersToShow = ["modalIn"];
-        var masterDetailItems = {
-            master: {
-                name: "Joakim",
-                table: "table A",
-                table_options: [{value: 0, text: "table A", op: "A"}, {value: 0, text: "table B", op: "B"}],
-                field: "field 1",
-                field_options: [{value: 0, text: "field 1"}, {value: 0, text: "field 2"}],
-            }
-        };
         var options = {
             type: "primary",
             icon: "th-list",
             button1: "Cancel",
             button2: "Confirm lookup data",
+            //width: "45%",
+            //top:"30%",
+            //left:"50%",
             preField: {
                 name: function (thisModalIn) {
+                    //                    alert("the  value for name before entering the field is "+ thisModalIn.get("name"));
                     thisModalIn.test("BEGIN click name");
-                    FL.common.printToConsole("=====================================>user code in preField (name)", "modalIn");
-//                    FL.common.printToConsole("click code for name in options content=" + thisModalIn.getFieldFromStore("name"), "modalIn");
-//                    FL.common.printToConsole("click code for name in options content=" + thisModalIn.getFieldFromStore("table"), "modalIn");
-//                    FL.common.printToConsole("click code for name in options content=" + thisModalIn.getFieldFromStore("field"), "modalIn");
+                    FL.common.printToConsole("=====================================>user code in preField (name) changed=" + thisModalIn.changed, "modalIn");
+                    //                    FL.common.printToConsole("click code for name in options content=" + thisModalIn.getFieldFromStore("name"), "modalIn");
+                    //                    FL.common.printToConsole("click code for name in options content=" + thisModalIn.getFieldFromStore("table"), "modalIn");
+                    //                    FL.common.printToConsole("click code for name in options content=" + thisModalIn.getFieldFromStore("field"), "modalIn");
                     thisModalIn.test("END click name");
+                },
+                private: function (thisModalIn) {
+                    //                    alert("the status for private before entering the field is "+ thisModalIn.get("private"));
+                    FL.common.printToConsole("=====================================>user code in preField (private) changed=" + thisModalIn.changed, "modalIn");
+
                 },
                 table: function (thisModalIn) {
                     FL.common.printToConsole("=====================================>user code in preField (table)", "modalIn");
-//                    var newField_options = [{value: 0, text: "new field 1"}, {value: 1, text: "new field 2"}];
+                    //                    var newField_options = [{value: 0, text: "new field 1"}, {value: 1, text: "new field 2"}];
                 },
                 field: function () {
                     FL.common.printToConsole("=====================================>user code in preField (field)", "modalIn");
@@ -130,8 +154,26 @@
             },
             posField: {
                 name: function (thisModalIn) {
+                    if (thisModalIn.getFieldFromDisplay("name") == "AAA") {
+                        var boxOptions2 = {
+                            type: "warning",
+                            icon: "th-list",
+                            button1: "Cancel",
+                            button2: "Selection Ok",
+                            width: "25%",
+                            top:"30%",
+                            left:"60%"
+                        };
+                        var boxData2 = {master: {selection: "a,b,c,d"}};
+                        var warnModal = new FL.modal.Box(" Detail List", "detailList", boxData2, boxOptions2, function (result, data, changed) {
+                            if (result) {
+                                alert("warnModal Master  changed= " + changed + " content =" + JSON.stringify(data.master));
+                            }
+                        });
+                        warnModal.show();
+                    }
                     thisModalIn.test("BEGIN posField name");
-                    FL.common.printToConsole("=====================================>user code in posField (name)", "modalIn");
+                    FL.common.printToConsole("=====================================>user code in posField (name) changed=" + thisModalIn.changed, "modalIn");
                     var x = thisModalIn.getFieldFromDisplay("name");
                     FL.common.printToConsole("posField code for name in options content=" + x, "modalIn");
                     FL.common.printToConsole("posField code for name in options content=" + thisModalIn.getFieldFromStore("table"), "modalIn");
@@ -157,10 +199,14 @@
                             var md = {
                                 master: {
                                     surname: "select one surname from the list",
-                                    surname_options: [{value: 0, text: "Cuvillier", op: "Cuv"}, {value: 1, text: "Oliveira", op: "Oli"}, {value: 2, text: "Almeida", op: "Al"}],
+                                    surname_options: [{value: 0, text: "Cuvillier", op: "Cuv"}, {
+                                        value: 1,
+                                        text: "Oliveira",
+                                        op: "Oli"
+                                    }, {value: 2, text: "Almeida", op: "Al"}],
                                 }
                             };
-                            var surnameModal = new FL.modal.box("Surname selection", "getSurname", md, options, function (result,data) {
+                            var surnameModal = new FL.modal.box("Surname selection", "getSurname", md, options, function (result, data) {
                                 if (result) {
                                     alert("surname=" + JSON.stringify(data.master));
                                 }
@@ -176,14 +222,20 @@
                     }
                     thisModalIn.test("END posField name");
                 },
-                table: function (thisModalIn) {
-                    FL.common.printToConsole("=====================================>user code in posField (table)", "modalIn");
-                    var xTable = thisModalIn.get("table");
-//                    var newField_options = [{value: 0, text: xTable+" new field 1"}, {value: 1, text: xTable+" new field 2"}];
+                private: function (thisModalIn) {
+                    //                    alert("the status for private after leaving the field is "+ thisModalIn.get("private"));
+                    FL.common.printToConsole("=====================================>user code in posField (private) changed=" + thisModalIn.changed, "modalIn");
                 },
+                table: function (thisModalIn) {
+                    FL.common.printToConsole("=====================================>user code in posField (table) changed=" + thisModalIn.changed, "modalIn");
+                    var xTable = thisModalIn.get("table");
+                    //                    var newField_options = [{value: 0, text: xTable+" new field 1"}, {value: 1, text: xTable+" new field 2"}];
+                }
+                ,
             },
             option: {
                 table_options: function (thisModalIn, selected) {//selected returns the object corresponding to the selected option
+                    //                    alert("the selected option was "+ selected.text);
                     FL.common.printToConsole("=====================================>user code in option (table_options)", "modalIn");
                     var xTable = thisModalIn.get("table");
                     if (selected.op == "A")
@@ -202,19 +254,23 @@
                     FL.common.printToConsole("********************>user code field_options --> content=" + JSON.stringify(selected), "modalIn");
                 },
             },
-         };
-         var masterDetailItems2 = {
+        };
+        var boxData = {
             master: {
                 name: "Afonso d'AlBu Queque",
+                private: "",
                 table: "table AfonsoA",
                 table_options: [{value: 0, text: "tab A", op: "A"}, {value: 1, text: "tab B", op: "B"}],
                 field: "field Afonso1",
                 field_options: [{value: 0, text: "field 1"}, {value: 1, text: "field 2"}]
             }
         };
-        var MyModal = new FL.modal.Box("MODAL 1", "getLookupTableAndField3", masterDetailItems2, options, function (result,data) {
+        var MyModal = new FL.modal.Box("MODAL 1", "getLookupTableAndField3", boxData, options, function (result, data, changed) {
             if (result) {
-                 alert("MyModal Master  " + JSON.stringify(data.master));
+                if (changed)
+                    alert("MyModal Master -->Data was changed :" + JSON.stringify(data.master));
+                else
+                    alert("MyModal Master -->no data changes !!! :" + JSON.stringify(data.master));
             }
         });
         MyModal.show();
@@ -228,7 +284,11 @@
         var md = {
             master: {
                 surname: "select one surname from the list",
-                surname_options: [{value: 0, text: "Cuvillier", op: "Cuv"}, {value: 1, text: "Oliveira", op: "Oli"}, {value: 2, text: "Almeida", op: "Al"}],
+                surname_options: [{value: 0, text: "Cuvillier", op: "Cuv"}, {
+                    value: 1,
+                    text: "Oliveira",
+                    op: "Oli"
+                }, {value: 2, text: "Almeida", op: "Al"}],
             }
         };
 //        var surnameModal = new FL.modal.Box("Surname selection", "getSurname", md, options2, function (result,data) {

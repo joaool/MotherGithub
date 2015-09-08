@@ -116,41 +116,29 @@ FL["bg"] = (function () {//name space FL.common
                 posField: {
                     colTitle: function (Box) {
                         //alert("You are leaving the column title field");
-                        var openPromise = FL.API.openDictionary();
-                        openPromise.done(function (dictObj) {
-                            FL.common.printToConsole(">>>>>displayDefaultGrid openDictionary SUCCESS <<<<< ", "bg");
-                            //spinner.stop();
-                            var currentTitle = Box.getFieldFromDisplay("colTitle");//get("fieldName");
-                            var previousTitle = Box.get("colTitle");
-                            var currentFieldName = Box.get("fieldName");//get("fieldName");
-                            //var eCN = dictObj.getCEntity(currentEntityName);
-                            var eCN = Box.data.eCN;
-                            var fCN = dictObj.entities[eCN].getCName(currentFieldName);
-                            //dictObj.set("label",Box.get("colTitle"));
-                        });
-                        openPromise.fail(function (err) {
-                            FL.common.printToConsole(">>>>>editColumn openDictionary FAILURE <<<<<" + err, "API");
-                            def.reject(err);
-                        });
                     },
                     fieldName: function (Box) {
-                        alert("You are leaving the fieldName field");
+                        //alert("You are leaving the fieldName field");
+                        //var singular = FL.dd.getEntityByCName(Box.data.eCN);
+                        //Box.data.fCN = FL.dd.getFieldCompressedName(singular,Box.get("fieldName"));
                     }
                 },
                 preField: {
                     fieldDescription: function (Box) {
-                        alert("You are entering the column description field");
+                        //alert("You are entering the column description field");
                     }
                 },
                 option: {
                     userType_options: function (Box, selected) {
-                        alert("You clicked in option " + selected.text);
+                        //alert("You clicked in option " + selected.text);
                         FL.common.printToConsole("%%%%%%%%>user code typeUI_options --> content=" + JSON.stringify(selected), "modalIn");
                     }
                 }
             };
             var arrOfObj = FL.dd.arrOfUserTypesForDropdown();
             //	var arrOfObj=[{value:1,text:"number",something:"abc"},{value:2,text:"text",something:"abc"},{value:3,text:"email",something:"abc"},{value:4,text:"phone",something:"abc"},{value:5,text:"enumerable",something:"abc"},{value:6,text:"date",something:"abc"}];
+            var singular = FL.dd.getEntityByCName(field.parentECN);
+            var fCN = FL.dd.getFieldCompressedName(singular,options.column.attributes.name);
             var dataItems = {
                 master: {
                     colTitle: columnLabel,
@@ -160,10 +148,83 @@ FL["bg"] = (function () {//name space FL.common
                     userType_options: arrOfObj
                 },
                 eCN: field.parentECN,
+                fCN: fCN
             };
-            var MyModal = new FL.modal.Box(" " + columnLabel, "columnEdition", dataItems, boxOptions, function (result, data) {
+            //var boxOptions = {
+            //    type: "primary",
+            //    icon: "th-list",
+            //    button1: "Cancel",
+            //    button2: "Confirm field edition",
+            //    posField: {
+            //        fieldLabel: function (Box) {
+            //            //alert("You are leaving the column title field");
+            //        },
+            //        fieldName: function (Box) {
+            //            //alert("You are leaving the fieldName field");
+            //            //var singular = FL.dd.getEntityByCName(Box.data.eCN);
+            //            //Box.data.fCN = FL.dd.getFieldCompressedName(singular,Box.get("fieldName"));
+            //        }
+            //    },
+            //    preField: {
+            //        fieldDescription: function (Box) {
+            //            //alert("You are entering the column description field");
+            //        }
+            //    },
+            //    option: {
+            //        userType_options: function (Box, selected) {
+            //            //alert("You clicked in option " + selected.text);
+            //            FL.common.printToConsole("%%%%%%%%>user code typeUI_options --> content=" + JSON.stringify(selected), "modalIn");
+            //        }
+            //    }
+            //};
+            //var dataItems = {
+            //    master: {
+            //        fieldLabel: columnLabel,
+            //        fieldName: options.column.attributes.name,
+            //        fieldDescription: description,
+            //        userType: FL.dd.userType({type: "string", typeUI: typeUI}),
+            //        userType_options: arrOfObj
+            //    },
+            //    eCN: field.parentECN,
+            //    fCN: fCN
+            //};
+            //var fieldEditorModal = new FL.modal.Box("Field Editor", "fieldEdition", dataItems, boxOptions, function (result, data, changed) {
+            //    if (result) {
+            //        if (changed) {
+            //            alert("fieldEditorModal Master  " + JSON.stringify(data.master));
+            //        }
+            //    }
+            //});
+            //fieldEditorModal.show();
+            var MyModal = new FL.modal.Box(" " + columnLabel, "columnEdition", dataItems, boxOptions, function (result, data, changed) {
                 if (result) {
-                    alert("MyModal Master  " + JSON.stringify(data.master));
+                    if(changed) {
+                        alert("MyModal Master  " + JSON.stringify(data.master));
+                        var spinner = FL.common.loaderAnimationON('spinnerDiv');
+                        var openPromise = FL.API.openDictionary();
+                        openPromise.done(function (dictObj) {
+                            FL.common.printToConsole(">>>>>FLbackgrid2 private editColumn openDictionary SUCCESS <<<<< ", "bg");
+                            var eCN = data.eCN;
+                            var fCN = data.fCN;//dictObj.entities[eCN].getCName(currentFieldName);
+                            var typeUI =(FL.dd.userTypes[data.master.userType]).typeUI;
+                            FL.dd.t.entities[eCN].fields[fCN].setField({name:data.master.fieldName,label:data.master.colTitle, description:data.master.fieldDescription, typeUI:typeUI});
+                            //dictObj.set("label",Box.get("colTitle"));
+                            var promiseUnblock = FL.API.checkServerCallBlocked()//this only occurs when checkServerCallBlocked is resolved//avoid intertwinement
+                                .then(function () {
+                                    FL.API.serverCallBlocked = true;
+                                    FL.links.setDefaultGridByCN2(eCN);
+                                    spinner.stop();
+                                }, function (err) {
+                                    FL.API.serverCallBlocked = false;
+                                    spinner.stop();
+                                    alert("FL.grid.displayDefaultGrid2 failure on checkServerCallBlocked() " + err);
+                                });
+                        });
+                        openPromise.fail(function (err) {
+                            FL.common.printToConsole(">>>>>editColumn openDictionary FAILURE <<<<<" + err, "API");
+                            alert(">>>>>editColumn openDictionary FAILURE <<<<<" + err);
+                        });
+                    }
                 }
                 exitColumn();
             });

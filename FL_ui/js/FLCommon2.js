@@ -2152,7 +2152,14 @@ FL["common"] = (function () {//name space FL.common
             }
             var tagElement = $domTarget.prop("tagName");
             if (tagElement === "INPUT")
-                content = $domTarget.val();
+                if($domTarget.attr("type")=="checkbox") {
+                    content = "off";
+                    var checked = $domTarget.prop('checked');
+                    if (checked)
+                        content = "on";
+                }else {
+                    content = $domTarget.val();
+                }
             else
                 content = $domTarget.text();
             return content;

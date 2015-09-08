@@ -190,7 +190,7 @@ jQuery(document).ready(function ($) {
         var setupApp = function (menuData, homeHTML, loginObject) {
             $.Topic('jsonMenuUpdate').publish(menuData.oMenu);//broadcast that will be received by FL.menu to update jsonMenu
             FL.common.clearSpaceBelowMenus();
-            homeHTML += '<div align="center">Total FrameLink users=<span id="_FL_totUsers" style="background-color:greenyellow;">32</span></div>';
+            homeHTML += '<div align="center">Total FrameLink users=<span id="_FL_totUsers" class="badge"  style="background-color:green;">32</span></div>';
             FL.domInject("_placeHolder", homeHTML);
 
             FL.domain = FL.login.token.appDescription; //test with "jojo"+loginObject.email;
@@ -641,7 +641,7 @@ jQuery(document).ready(function ($) {
                 var loadAppPromise = FL.API.loadAppDataForSignInUser2();//gets data dictionary + main menu + style + fontFamily + home page
                 loadAppPromise.done(function (menuData, homeHTML) {
                     FL.common.printToConsole("FL.login.home ---> homeHTML=" + homeHTML);
-                    homeHTML += '<div align="center">Total FrameLink users=<span id="_FL_totUsers" style="background-color:greenyellow;">32</span></div>';
+                    homeHTML += '<div align="center">Total FrameLink users=<span id="_FL_totUsers" class="badge" style="background-color:green;">32</span></div>';
                     // FL.common.printToConsole("FL.login.home --------------------------------------------->first menu=" + menuData.oMenu.menu[0].title);
                     FL.common.clearSpaceBelowMenus();
                     FL.domInject("_placeHolder", homeHTML);

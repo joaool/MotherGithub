@@ -42,10 +42,12 @@ FL["modal"] = (function () {//name space FL.modalIn
                 var button2HTML = "";
                 if (options.button2) { //this button has the parsley validate (like APPLE ->OK at right)
 //                    button2HTML = '<a href="#" id="__FLDialog_button2" class="btn btn-' + options.type + ' validate">' + options.button2 + '</a>';
-                    button2HTML = '<a href="#" id="' + modalId + '_button2" class="btn btn-' + options.type + ' validate">' + options.button2 + '</a>';
+                    button2HTML = '<a href="#" id="' + modalId + '_button2" class="btn btn-' + options.type + ' ">' + options.button2 + '</a>';
                 }
-                var before = '<div class="modal fade" id="' + modalId + '_modal" style="' + zIndexContent + '">' +
-                    '<div class="modal-dialog">' +
+                var z = '<div class="modal-dialog" style="position:absolute;margin:0;width:'+options.width+';top:'+options.top+';left:'+options.left+';">';
+                //var before = '<div class="modal fade" id="' + modalId + '_modal" style="' + zIndexContent + '">' +
+                var before = '<div class="modal fade" id="' + modalId + '_modal" >' +
+                    '<div class="modal-dialog" style="position:absolute;margin:0;width:'+ options.width +';top:'+ options.top +';left:'+ options.left +';">' +
                     '<div class="modal-content">' +
                     '<div class="modal-header modal-header-' + options.type + '">' +
                     '<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>' +
@@ -92,6 +94,34 @@ FL["modal"] = (function () {//name space FL.modalIn
                     result(false, templateName, modalIn);
                 });
             };
+            var getAllFieldsFromDisplay = function (modalIn) {
+                // returns an object similar to masterJson with current values retrieved from the display
+                var retObj = {};
+                var masterJson = modalIn.data;
+                _.each(masterJson.master, function (value, key) {
+                    if (key.substr(key.length - 8) != "_options") {//dropdown options are excluded
+                        var fieldContent = modalIn.getFieldFromDisplay(key);
+                        retObj[key] = fieldContent;
+                    }
+                }, this);
+                return retObj;
+            };
+            var checkChange = function (modalIn) {
+                // updates modalIn changed status is any field was changed -
+                var beforeObj = modalIn.previousFields;
+                if (!beforeObj)//the first time it runs previousFiels is null (in the constructor) =>nothing to do
+                    return;
+                modalIn.changed = false; //ir is reevaluated each time - allowing a change=true to become change=false
+                var masterJson = modalIn.data;
+                _.each(masterJson.master, function (value, key) {
+                    if (key.substr(key.length - 8) != "_options") {//dropdown options are excluded
+                        var previousFieldContent = beforeObj[key];
+                        var fieldContent = modalIn.getFieldFromDisplay(key);
+                        if (previousFieldContent != fieldContent)
+                            modalIn.changed = true;
+                    }
+                }, this);
+            };
             var fillMasterForTemplate = function (templateName, masterJson, modalIn) {
                 // returns masterJson with new values retrieved from the template for ids corresponding to the keys in masterJson
                 _.each(masterJson, function (value, key) {
@@ -107,12 +137,12 @@ FL["modal"] = (function () {//name space FL.modalIn
                 if (bOk) {//button 2 was pressed
                     //fillMasterForTemplate(templateName, FL.common.masterDetailItems.master, modalIn);
                     fillMasterForTemplate(templateName, FL.modal.getFromBuffer(templateName).master, modalIn);
-                    return makeModalCB(true, FL.modal.getFromBuffer(templateName));
+                    return makeModalCB(true, FL.modal.getFromBuffer(templateName), modalIn.changed);
                 } else {//button1 was pressed
-                    return makeModalCB(false, FL.modal.getFromBuffer(templateName));
+                    return makeModalCB(false, FL.modal.getFromBuffer(templateName), modalIn.changed);
                 }
             };
-            var abc = function () {//test to show access to punlic and private members
+            var abc = function () {//test to show access to public and private members
                 FL.common.printToConsole("INSIDE ABC", "modalIn");
                 //we have access to all var functions and all Box paramenters
                 FL.common.printToConsole("INSIDE ABC--->title=" + title + " templateName=" + templateName, "modalIn");
@@ -134,9 +164,8 @@ FL["modal"] = (function () {//name space FL.modalIn
                         selected: that.data.master[headOfOptionsFieldName + "_options"][index]
                     }, function (e) {
                         var optionText = e.data.selected.text;  // e.data.selected;
-                        FL.common.printToConsole("*******====================>user clicked option event for option =" + value.id + " text=" + optionText, "modalIn");
                         if (_.has(options, "option")) {
-                            FL.common.printToConsole("*******===========================>options have a option key !!!!", "modalIn");
+                            //FL.common.printToConsole("*******===========================>options have a option key !!!!", "modalIn");
                             var fieldName = FL.common.stringBeforeLast(value.id, "_");
                             fieldName = FL.common.stringAfterFirst(fieldName, "_");
                             if (_.has(options.option, fieldName)) {
@@ -146,6 +175,8 @@ FL["modal"] = (function () {//name space FL.modalIn
                             }
                         }
                         var contentOfheadOfOptions = e.data.modalIn.setFieldToDisplay(headOfOptionsFieldName, optionText + " ");
+                        checkChange(e.data.modalIn);//compares displayed fields with previousFields
+                        FL.common.printToConsole("*******====================>user clicked option event for option =" + value.id + " --->changed=" + e.data.modalIn.changed + " --->text=" + optionText, "modalIn");
                     });
                     var z = 32;
                 });
@@ -175,6 +206,15 @@ FL["modal"] = (function () {//name space FL.modalIn
             this.test = function (display) {
                 FL.common.printToConsole("************************ " + display + " test ***************************", "modalIn");
             };
+            this.checkChanged = function (fieldName) {
+                var z1 = this.getFieldFromDisplay(fieldName);
+                var z2 = this.getFieldFromStore(fieldName);
+                if (this.getFieldFromDisplay(fieldName) != this.getFieldFromStore(fieldName))
+                    changed = true;
+            };
+            this.resetChanged = function (fieldName) {
+                changed = false;
+            };
             this.getFieldFromDisplay = function (fieldName) {
                 var id = this.templateName + "_" + fieldName;
                 var content = FL.common.getDOMContentFromId(id).trim();
@@ -191,7 +231,6 @@ FL["modal"] = (function () {//name space FL.modalIn
             };
             this.setFieldToStore = function (fieldName, value) {
                 //FL.common.masterDetailItems.master[fieldName] = value;
-
                 var dataObj = FL.modal.getFromBuffer(this.templateName);
                 dataObj.master[fieldName] = value;
                 FL.modal.setToBuffer(this.templateName, dataObj);
@@ -206,9 +245,10 @@ FL["modal"] = (function () {//name space FL.modalIn
                 this.setFieldToDisplay(fieldName, value);
                 this.setFieldToStore(fieldName, value);
             };
-            this.refreshEvents = function () {
-                FL.common.printToConsole("------------------------------------------------------------ refreshEvents ----------------------------------------------------------------", "modalIn");
+            this.refreshEvents = function () {//prepares click and blur events for all fields (includes dropdown headers, not options)
+                FL.common.printToConsole("---------- refreshEvents ---------------------------------------------------------------->changed=" + this.changed, "modalIn");
                 var options = this.options;
+                //checkChange(this);//compares displayed fields with previousFields
                 var master = this.data.master; //to pass to _each by closure
                 _.each(this.data.master, function (value, key) {
                     FL.common.printToConsole("Loading events for field:" + key, "modalIn");
@@ -237,14 +277,15 @@ FL["modal"] = (function () {//name space FL.modalIn
                         $field.off('blur');
                         $field.on("blur", {modalIn: this}, function (e) {
                             var id = $field.prop("id");
-                            FL.common.printToConsole("====================>user exited (posField event) field " + id, "modalIn");
                             if (_.has(options, "posField")) {
                                 var fieldName = FL.common.stringAfterLast(id, "_");
                                 if (_.has(options.posField, fieldName)) {
                                     options.posField[fieldName](e.data.modalIn);
-                                    e.data.modalIn.refreshEvents();//so that user does not have to do it in posField code
+                                    e.data.modalIn.refreshEvents();//so that coder does not have to do it in posField code
                                 }
                             }
+                            checkChange(e.data.modalIn);//compares displayed fields with previousFields
+                            FL.common.printToConsole("====================>user exited (posField event) field " + id + " changed=" + e.data.modalIn.changed, "modalIn");
                         });
                     }
                 }, this);
@@ -252,7 +293,7 @@ FL["modal"] = (function () {//name space FL.modalIn
             this.show = function () {
                 var dataObj = this.data;
                 //FL.common.masterDetailItems = dataObj;
-                FL.modal.setToBuffer(this.templateName, dataObj);
+                FL.modal.setToBuffer(this.templateName, dataObj);//places the data in a slot accessible via public
                 var fullHTML = this.compiled(dataObj);
                 this.$modalDialog.empty().append(fullHTML);//places final HTML  (with empty dropboxes...) in slot
                 var templateName = this.templateName;
@@ -267,28 +308,44 @@ FL["modal"] = (function () {//name space FL.modalIn
                 var $modal = $('#' + this.modalId + "_modal");
                 form = $("#form_" + this.templateName);
                 //form.parsley();
-                this.refreshEvents();
+                this.refreshEvents();//prepares click and blur events for all fields (includes dropdown headers, not options)
                 //form.parsley().validate();
                 if (makeModalCB) {
                     prepareButtonsClick(makeModalCB, $modal, this.modalId, this.templateName, dataObj, this);
                 } else {
-                    // $modal.off('hidden.bs.modal');
                     FL.common.printToConsole("makeModal ----->No callback");
                     $modal.modal('hide');
                     $('body').removeClass('modal-open');
                     $('.modal-backdrop').remove();
                 }
                 $modal.modal('show');//to launch it immediatly when calling makeModal
+                this.previousFields = getAllFieldsFromDisplay(this);//for all fields (dropdown options not included..) gets the last displayed values
             };
-            // function modalIn(title, templateName, data, options, makeModalCB) {
+            // function modalIn(title, templateName, data, options, makeModalCB) {//the constructor
             this.title = title;
             this.templateName = templateName;
             this.data = data;
-            this.options = _.extend({icon: null, type: "success", button1: "Cancel", button2: "Ok"}, options);
+            this.options = options;
+            if(this.options.width){
+                if(!this.options.left){//because left is missing we will center it
+                    this.options.left = (50-parseInt(this.options.width)/2)+"%";
+                }
+            }
+            this.options = _.extend({
+                icon: null,
+                type: "success",
+                button1: "Cancel",
+                button2: "Ok",
+                width: "35%",
+                top:"10%",
+                left:"33%"
+            }, options);
             this.modalId = "_modalIn_" + templateName;
+            this.changed = false;//gives the form status - true=>changed from beginning or last reset
+            this.previousFields = null; //this will receive an object with the content of all displayed fields (not dropdown options)
             var rawTemplate = $("#" + templateName).html();
             var stackLevel = 2;
-            var modalTemplate = getDialogHTML(this.modalId, stackLevel, title, rawTemplate, options);//adjust htmlIn to modal form adding title and buttons
+            var modalTemplate = getDialogHTML(this.modalId, stackLevel, title, rawTemplate, this.options);//adjust htmlIn to modal form adding title and buttons
             FL.common.printToConsole(modalTemplate, "modalIn");
             this.compiled = _.template(modalTemplate);
             this.$modalDialog = $("#" + this.modalId);

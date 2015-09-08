@@ -25,7 +25,7 @@
     <script src="../FL_ui/js/FLSlidePanels.js"></script>
     <script src="../FL_ui/js/bootstrap.min.js"></script>
     <script src="../FL_ui/js/bootstrap-dialog.js"></script>
-    <script src='../FL_ui/js/dropzone.js'></script>
+    <!--<script src='../FL_ui/js/dropzone.js'></script>-->
     <script src="../FL_ui/js/spin.min.js"></script>
     <script src="../FL_ui/js/FLMenu2.js"></script>
     <script src="../FL_ui/js/FLlogin2.js"></script>
@@ -34,6 +34,8 @@
     <script src="../FL_ui/flClient/flClient.js"></script>
     <script src="../FL_ui/flClient/ajaxBrowser.js"></script>
     <script src="../FL_ui/js/FLAPI.js"></script>
+    <script src="../FL_ui/js/FLmodal2.js"></script>
+
 
     <script src="js/FormDesigner.js"></script>
     <script src="../mailer/js/DragNDrop.js"></script>
@@ -52,7 +54,54 @@
     <script src="js/views/element_holder.js"></script>
     <script src="js/views/property_panel.js"></script>
 
-    </head>
+</head>
+<script id="fieldEdition" type="text/template">
+    <div class="fieldEdition" style="margin-top:0px;">
+        <form id="form_fieldEdition">
+            <legend>Please define the field:</legend>
+            <div class="row">
+                <div class="col-xs-12">
+                    <div class="input-group" style="line-height:0px;">
+                        <span class="input-group-addon">Field label:</span>
+                        <input type="text" class="form-control" id="fieldEdition_fieldLabel"
+                               name="fieldLabel" placeholder="Ex. Your full name, Your address, Your email, Your phone..."
+                               value="<%= master.colTitle %>">
+                    </div>
+                    <div class="input-group" style="line-height:0px;">
+                        <span class="input-group-addon">Attribute:</span>
+                        <input type="text" class="form-control" id="fieldEdition_fieldName"
+                               name="fieldName" placeholder="Ex. name, address, email, phone..."
+                               value="<%= master.fieldName %>">
+                    </div>
+                    <label class="control-label" for="fieldEdition_fieldDescription"
+                           id="fieldEdition_whatIsLabel"> </label>
+
+                    <div class="input-group" style="line-height:0px;">
+                        <span class="input-group-addon">Description:</span>
+                        <input type="text" class="form-control" id="fieldEdition_fieldDescription"
+                               name="fieldDescription" placeholder="Ex. descripton..."
+                               value="<%= master.fieldDescription %>">
+                    </div>
+                    <div>
+                        <h4 id="fieldEdition_plural"></h4>
+                    </div>
+                    <div class="input-group" style="line-height:0px;">
+                        <span class="input-group-addon">User Type:</span>
+
+                        <div class="btn-group" style="width:100%">
+                            <a class="btn btn-default btn-block dropdown-toggle" data-toggle="dropdown"
+                               style="font-size:14px;font-weight:bold;margin-right:-4.0em;display:inline-block;height:100%;"
+                               id="fieldEdition_userType" href="#"><%= master.userType %> <span
+                                    class="caret"></span></a>
+                            <ul id="fieldEdition_userType_options" class="dropdown-menu"></ul>
+                        </div>
+                        <span class="input-group-addon"><span class="glyphicon glyphicon-th-list"></span></span>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</script>
 
 <body>
     <div id="wrapper">

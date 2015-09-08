@@ -150,7 +150,7 @@ FL["links"] = (function () {//name space FL.dd
                 }
             };
             var boxOptions = {type: "primary",icon: "send",button1: "Cancel",button2: "Confirm"};
-            var enrollInCommunitiesModal = new FL.modal.Box(" Community Regitration", "enrollInCommunities", boxData, boxOptions, function (result, data) {
+            var enrollInCommunitiesModal = new FL.modal.Box(" Community Registration", "enrollInCommunities", boxData, boxOptions, function (result, data) {
                 if (result) {
                     alert("sendMessageModal Master  " + JSON.stringify(data.master));
                 }
@@ -363,6 +363,7 @@ FL["links"] = (function () {//name space FL.dd
         },
         setDefaultGridByCN2: function (eCN) {//called with menu key "uri": "javascript:FL.links.setDefaultGridByCN('55')"
             if (FL.dd.isEntityInLocalDictionaryByCN(eCN)) {
+                var entityName = FL.dd.getEntityByCName(eCN);
                 if (FL.dd.isEntityByCNInSync(eCN)) {//eCN exists in local dictionary and is in sync
                     DefaultGridWithNewsLetterAndEditButtons(entityName);
                 } else {//entityName exists but is not in sync - we force synchronization
