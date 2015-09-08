@@ -53,8 +53,8 @@ FormDesigner.Views.ElementHolder = Backbone.View.extend({
 	OnStop : function(event, ui){
 		console.log("Drop End");
         //this.onDrop(event.target,ui.item[0]);
-        
-        $(ui.helper.context).draggable('disable');
+        if ($(ui.helper.context).attr("id")!= "Add")
+            $(ui.helper.context).draggable('disable');
         
 	},
 	OnRevert : function(dropped){
@@ -101,9 +101,9 @@ FormDesigner.Views.ElementHolder = Backbone.View.extend({
 		//this.m_PropertyToolbar.setElement(obj);
 	},
     onDrop : function(target,droppedObject){
-        if ($(droppedObject).hasClass("dropped")) return;
-        
         var cname = $(droppedObject).attr("cname");
+        if ($(droppedObject).hasClass("dropped") && cname != "new") return;
+        
         var elementType =  FormMaker.DBElements[$(droppedObject).data("type")];
         var inputType = FormMaker.DBType[$(droppedObject).data("input-type")];
         var leftLabel = $(droppedObject).data("label");
