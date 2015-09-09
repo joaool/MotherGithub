@@ -58,7 +58,7 @@ FormDesigner.Views.MainView = Backbone.View.extend({
             },
             preField: {
                 fieldDescription: function (Box) {
-                    alert("You are entering the fields description.");
+                    //alert("You are entering the fields description.");
                 }
             },
             option: {
@@ -73,12 +73,12 @@ FormDesigner.Views.MainView = Backbone.View.extend({
             master: {
                 fieldLabel: FL.dd.t.entities[this.elementClickModel.entityName].fields[this.elementClickModel.fieldName].label,
                 fieldName: this.elementClickModel.name,
-                fieldDescription: a = FL.dd.t.entities[this.elementClickModel.entityName].fields[this.elementClickModel.fieldName].description,
-                userType: FL.dd.userType({type: "string", typeUI: this.elementClickModel.typeUI}),
+                fieldDescription: FL.dd.t.entities[this.elementClickModel.entityName].fields[this.elementClickModel.fieldName].description,
+                userType: FL.dd.userType({type: "string", typeUI: FL.dd.t.entities[this.elementClickModel.entityName].fields[this.elementClickModel.fieldName].typeUI}),
                 userType_options: arrOfObj
             }
         };
-        var fieldEditorModal = new FL.modal.Box("Field Editor", "fieldEdition", dataItems, boxOptions, function (result, data, changed) {
+        var fieldEditorModal = new FL.modal.Box(" Field Editor", "fieldEdition", dataItems, boxOptions, function (result, data, changed) {
             if (result) {
                 if (changed) {
                     alert("fieldEditorModal Master  " + JSON.stringify(data.master));

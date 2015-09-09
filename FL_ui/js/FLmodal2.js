@@ -44,10 +44,10 @@ FL["modal"] = (function () {//name space FL.modalIn
 //                    button2HTML = '<a href="#" id="__FLDialog_button2" class="btn btn-' + options.type + ' validate">' + options.button2 + '</a>';
                     button2HTML = '<a href="#" id="' + modalId + '_button2" class="btn btn-' + options.type + ' ">' + options.button2 + '</a>';
                 }
-                var z = '<div class="modal-dialog" style="position:absolute;margin:0;width:'+options.width+';top:'+options.top+';left:'+options.left+';">';
+                var z = '<div class="modal-dialog" style="position:absolute;margin:0;width:' + options.width + ';top:' + options.top + ';left:' + options.left + ';">';
                 //var before = '<div class="modal fade" id="' + modalId + '_modal" style="' + zIndexContent + '">' +
                 var before = '<div class="modal fade" id="' + modalId + '_modal" >' +
-                    '<div class="modal-dialog" style="position:absolute;margin:0;width:'+ options.width +';top:'+ options.top +';left:'+ options.left +';">' +
+                    '<div class="modal-dialog" style="position:absolute;margin:0;width:' + options.width + ';top:' + options.top + ';left:' + options.left + ';">' +
                     '<div class="modal-content">' +
                     '<div class="modal-header modal-header-' + options.type + '">' +
                     '<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>' +
@@ -272,6 +272,7 @@ FL["modal"] = (function () {//name space FL.modalIn
                                 //abc();
                                 setEventsForCombo(key);
                             }
+                            e.preventDefault();
                         });
                         FL.common.printToConsole("Loading posField events for field:" + key, "modalIn");//Load blur events for combo
                         $field.off('blur');
@@ -291,6 +292,7 @@ FL["modal"] = (function () {//name space FL.modalIn
                 }, this);
             };
             this.show = function () {
+                FL.common.debug = true;
                 var dataObj = this.data;
                 //FL.common.masterDetailItems = dataObj;
                 FL.modal.setToBuffer(this.templateName, dataObj);//places the data in a slot accessible via public
@@ -326,9 +328,9 @@ FL["modal"] = (function () {//name space FL.modalIn
             this.templateName = templateName;
             this.data = data;
             this.options = options;
-            if(this.options.width){
-                if(!this.options.left){//because left is missing we will center it
-                    this.options.left = (50-parseInt(this.options.width)/2)+"%";
+            if (this.options.width) {
+                if (!this.options.left) {//because left is missing we will center it
+                    this.options.left = (50 - parseInt(this.options.width) / 2) + "%";
                 }
             }
             this.options = _.extend({
@@ -337,8 +339,8 @@ FL["modal"] = (function () {//name space FL.modalIn
                 button1: "Cancel",
                 button2: "Ok",
                 width: "35%",
-                top:"10%",
-                left:"33%"
+                top: "10%",
+                left: "33%"
             }, options);
             this.modalId = "_modalIn_" + templateName;
             this.changed = false;//gives the form status - true=>changed from beginning or last reset

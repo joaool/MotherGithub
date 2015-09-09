@@ -4,14 +4,31 @@
     <title>Form Designer </title>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 
+    <style>
+        .modal-header-primary {
+            color: #fff;
+            padding: 9px 15px;
+            border-bottom: 1px solid #eee;
+            background-color: #428bca;
+            -webkit-border-top-left-radius: 5px;
+            -webkit-border-top-right-radius: 5px;
+            -moz-border-radius-topleft: 5px;
+            -moz-border-radius-topright: 5px;
+            border-top-left-radius: 5px;
+            border-top-right-radius: 5px;
+        }
+    </style>
     <link rel="stylesheet" href="../mailer/css/jquery-ui-1.10.4.custom.min.css"/>
     <link href="../mailer/css/jquery-ui-timepicker.css" rel="stylesheet" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../mailer/bootstrap/css/bootstrap.min.css" />
     <link rel="stylesheet" type="text/css" href="css/simple-sidebar.css" />
     <link rel="stylesheet" type="text/css" href="css/style.css" />
+
+    <!--<script src="../mailer/js/lib/jquery-1.11.0.js"></script>-->
+    <script src="../FL_ui/js/jquery-1.11.1.js"></script>
+    <script src="../mailer/bootstrap/js/bootstrap.min.js"></script>
     <link href="../FL_ui/css/bootstrap-dialog.css" rel="stylesheet" type="text/css" />
 
-    <script src="../mailer/js/lib/jquery-1.11.0.js"></script>
     <script src="../mailer/js/lib/jquery-ui-1.10.4.js"></script>
     <script src="../mailer/js/lib/jquery-ui-timepicker.js"></script>
 
@@ -19,13 +36,11 @@
     <script src="../mailer/js/lib/underscore.js"></script>
     <script src="../mailer/js/lib/backbone.js"></script>
 
+
     <script src="../mailer/js/lib/handlebars-v1.3.0.js"></script>
-    <script src="../mailer/bootstrap/js/bootstrap.min.js"></script>
 
     <script src="../FL_ui/js/FLSlidePanels.js"></script>
-    <script src="../FL_ui/js/bootstrap.min.js"></script>
-    <script src="../FL_ui/js/bootstrap-dialog.js"></script>
-    <!--<script src='../FL_ui/js/dropzone.js'></script>-->
+    <!--<script src="../FL_ui/js/bootstrap.min.js"></script>-->
     <script src="../FL_ui/js/spin.min.js"></script>
     <script src="../FL_ui/js/FLMenu2.js"></script>
     <script src="../FL_ui/js/FLlogin2.js"></script>
@@ -75,7 +90,6 @@
                     </div>
                     <label class="control-label" for="fieldEdition_fieldDescription"
                            id="fieldEdition_whatIsLabel"> </label>
-
                     <div class="input-group" style="line-height:0px;">
                         <span class="input-group-addon">Description:</span>
                         <input type="text" class="form-control" id="fieldEdition_fieldDescription"
@@ -87,12 +101,9 @@
                     </div>
                     <div class="input-group" style="line-height:0px;">
                         <span class="input-group-addon">User Type:</span>
-
                         <div class="btn-group" style="width:100%">
                             <a class="btn btn-default btn-block dropdown-toggle" data-toggle="dropdown"
-                               style="font-size:14px;font-weight:bold;margin-right:-4.0em;display:inline-block;height:100%;"
-                               id="fieldEdition_userType" href="#"><%= master.userType %> <span
-                                    class="caret"></span></a>
+                               id="fieldEdition_userType" href="#"><%= master.userType %> <span class="caret"></span></a>
                             <ul id="fieldEdition_userType_options" class="dropdown-menu"></ul>
                         </div>
                         <span class="input-group-addon"><span class="glyphicon glyphicon-th-list"></span></span>

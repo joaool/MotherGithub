@@ -150,44 +150,44 @@ FL["bg"] = (function () {//name space FL.common
                 eCN: field.parentECN,
                 fCN: fCN
             };
-            //var boxOptions = {
-            //    type: "primary",
-            //    icon: "th-list",
-            //    button1: "Cancel",
-            //    button2: "Confirm field edition",
-            //    posField: {
-            //        fieldLabel: function (Box) {
-            //            //alert("You are leaving the column title field");
-            //        },
-            //        fieldName: function (Box) {
-            //            //alert("You are leaving the fieldName field");
-            //            //var singular = FL.dd.getEntityByCName(Box.data.eCN);
-            //            //Box.data.fCN = FL.dd.getFieldCompressedName(singular,Box.get("fieldName"));
-            //        }
-            //    },
-            //    preField: {
-            //        fieldDescription: function (Box) {
-            //            //alert("You are entering the column description field");
-            //        }
-            //    },
-            //    option: {
-            //        userType_options: function (Box, selected) {
-            //            //alert("You clicked in option " + selected.text);
-            //            FL.common.printToConsole("%%%%%%%%>user code typeUI_options --> content=" + JSON.stringify(selected), "modalIn");
-            //        }
-            //    }
-            //};
-            //var dataItems = {
-            //    master: {
-            //        fieldLabel: columnLabel,
-            //        fieldName: options.column.attributes.name,
-            //        fieldDescription: description,
-            //        userType: FL.dd.userType({type: "string", typeUI: typeUI}),
-            //        userType_options: arrOfObj
-            //    },
-            //    eCN: field.parentECN,
-            //    fCN: fCN
-            //};
+            var boxOptions = {
+                type: "primary",
+                icon: "th-list",
+                button1: "Cancel",
+                button2: "Confirm field edition",
+                posField: {
+                    fieldLabel: function (Box) {
+                        //alert("You are leaving the column title field");
+                    },
+                    fieldName: function (Box) {
+                        //alert("You are leaving the fieldName field");
+                        //var singular = FL.dd.getEntityByCName(Box.data.eCN);
+                        //Box.data.fCN = FL.dd.getFieldCompressedName(singular,Box.get("fieldName"));
+                    }
+                },
+                preField: {
+                    fieldDescription: function (Box) {
+                        //alert("You are entering the column description field");
+                    }
+                },
+                option: {
+                    userType_options: function (Box, selected) {
+                        //alert("You clicked in option " + selected.text);
+                        FL.common.printToConsole("%%%%%%%%>user code typeUI_options --> content=" + JSON.stringify(selected), "modalIn");
+                    }
+                }
+            };
+            var dataItems = {
+                master: {
+                    fieldLabel: columnLabel,
+                    fieldName: options.column.attributes.name,
+                    fieldDescription: description,
+                    userType: FL.dd.userType({type: "string", typeUI: typeUI}),
+                    userType_options: arrOfObj
+                },
+                eCN: field.parentECN,
+                fCN: fCN
+            };
             //var fieldEditorModal = new FL.modal.Box("Field Editor", "fieldEdition", dataItems, boxOptions, function (result, data, changed) {
             //    if (result) {
             //        if (changed) {
@@ -195,7 +195,7 @@ FL["bg"] = (function () {//name space FL.common
             //        }
             //    }
             //});
-            //fieldEditorModal.show();
+            fieldEditorModal.show();
             var MyModal = new FL.modal.Box(" " + columnLabel, "columnEdition", dataItems, boxOptions, function (result, data, changed) {
                 if (result) {
                     if(changed) {

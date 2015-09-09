@@ -27,6 +27,7 @@
 
 <script src="FL_ui/js/FLCommon2.js"></script>
 <script src="FL_ui/js/FLmodal2.js"></script>
+<script src="FL_ui/js/FLdd2.js"></script>
 
 <script id="getLookupTableAndField3" type="text/template">
     <div class="getLookupTableAndField3" style="margin-top:0px;">
@@ -46,12 +47,9 @@
 
                     <div class="input-group" style="line-height:0px;">
                         <span class="input-group-addon">Entity for lookup:</span>
-
                         <div class="btn-group" style="width:100%">
                             <a class="btn btn-default btn-block dropdown-toggle" data-toggle="dropdown"
-                               style="font-size:14px;font-weight:bold;margin-right:-4.0em;display:inline-block;height:100%;"
-                               id="getLookupTableAndField3_table" href="#"> <%= master.table %> <span
-                                    class="caret"></span></a>
+                               id="getLookupTableAndField3_table" href="#"> <%= master.table %> <span class="caret"></span></a>
                             <ul id="getLookupTableAndField3_table_options" class="dropdown-menu"></ul>
                         </div>
                         <span class="input-group-addon"><span class="glyphicon glyphicon-th-list"></span></span>
@@ -66,6 +64,49 @@
                                id="getLookupTableAndField3_field" href="#"> <%= master.field %> <span
                                     class="caret"></span></a>
                             <ul id="getLookupTableAndField3_field_options" class="dropdown-menu"></ul>
+                        </div>
+                        <span class="input-group-addon"><span class="glyphicon glyphicon-th-list"></span></span>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</script>
+<script id="fieldEdition" type="text/template">
+    <div class="fieldEdition" style="margin-top:0px;">
+        <form id="form_fieldEdition">
+            <legend>Please define this field:</legend>
+            <div class="row">
+                <div class="col-xs-12">
+                    <div class="input-group" style="line-height:0px;">
+                        <span class="input-group-addon">Field label:</span>
+                        <input type="text" class="form-control" id="fieldEdition_fieldLabel"
+                               name="fieldLabel" placeholder="Ex. Your full name, Your address, Your email, Your phone..."
+                               value="<%= master.fieldLabel %>">
+                    </div>
+                    <div class="input-group" style="line-height:0px;">
+                        <span class="input-group-addon">Attribute:</span>
+                        <input type="text" class="form-control" id="fieldEdition_fieldName"
+                               name="fieldName" placeholder="Ex. name, address, email, phone..."
+                               value="<%= master.fieldName %>">
+                    </div>
+                    <label class="control-label" for="fieldEdition_fieldDescription"
+                           id="fieldEdition_whatIsLabel"> </label>
+                    <div class="input-group" style="line-height:0px;">
+                        <span class="input-group-addon">Description:</span>
+                        <input type="text" class="form-control" id="fieldEdition_fieldDescription"
+                               name="fieldDescription" placeholder="Ex. descripton..."
+                               value="<%= master.fieldDescription %>">
+                    </div>
+                    <div>
+                        <h4 id="fieldEdition_plural"></h4>
+                    </div>
+                    <div class="input-group" style="line-height:0px;">
+                        <span class="input-group-addon">User Type:</span>
+                        <div class="btn-group" style="width:100%">
+                            <a class="btn btn-default btn-block dropdown-toggle" data-toggle="dropdown"
+                               id="fieldEdition_userType" href="#"><%= master.userType %> <span class="caret"></span></a>
+                            <ul id="fieldEdition_userType_options" class="dropdown-menu"></ul>
                         </div>
                         <span class="input-group-addon"><span class="glyphicon glyphicon-th-list"></span></span>
                     </div>
@@ -273,7 +314,7 @@
                     alert("MyModal Master -->no data changes !!! :" + JSON.stringify(data.master));
             }
         });
-        MyModal.show();
+        //MyModal.show();
 
         var options2 = {
             type: "primary",
@@ -297,6 +338,52 @@
 //            }
 //        });
 //        surnameModal.show();
+
+        var boxOptions = {
+            type: "primary",
+            icon: "th-list",
+            button1: "Cancel",
+            button2: "Confirm field edition",
+            posField: {
+                fieldLabel: function (Box) {
+                    //alert("You are leaving the column title field");
+                },
+                fieldName: function (Box) {
+                    //alert("You are leaving the fieldName field");
+                    //var singular = FL.dd.getEntityByCName(Box.data.eCN);
+                    //Box.data.fCN = FL.dd.getFieldCompressedName(singular,Box.get("fieldName"));
+                }
+            },
+            preField: {
+                fieldDescription: function (Box) {
+                    //alert("You are entering the fields description.");
+                }
+            },
+            option: {
+                userType_options: function (Box, selected) {
+                    //alert("You clicked in option " + selected.text);
+                    FL.common.printToConsole("%%%%%%%%>user code typeUI_options --> content=" + JSON.stringify(selected), "modalIn");
+                }
+            }
+        };
+        var arrOfObj = FL.dd.arrOfUserTypesForDropdown();
+        var dataItems = {
+            master: {
+                fieldLabel: "User name",
+                fieldName: "Name",
+                fieldDescription: "Description of name",
+                userType: FL.dd.userType({type: "string", typeUI: "textbox"}),
+                userType_options: arrOfObj
+            }
+        };
+        var fieldEditorModal = new FL.modal.Box("Field Editor", "fieldEdition", dataItems, boxOptions, function (result, data, changed) {
+            if (result) {
+                if (changed) {
+                    alert("fieldEditorModal Master  " + JSON.stringify(data.master));
+                }
+            }
+        });
+        fieldEditorModal.show();
 
     });
 </script>
