@@ -122,7 +122,17 @@
             <ul class="sidebar-nav">
                 <li class="sidebar-brand">
                     <a href=#>Entity Fields</a>
-                    <div id="Add" class="ui-draggable"></div>
+	                <div class="ui-draggable" id="addLabel"
+	                        data-inputType="TextLabel"
+	                        data-type="label"
+	                        data-label="new Label"
+	                        data-name="label-name"
+	                        data-enum="null"
+	                        data-description="label-description"
+	                        data-fieldname="lbl"></div>
+	                <div id="Add" class="ui-draggable"
+	                     data-inputType="textbox"
+	                     data-type="text"></div>
                 </li>
             </ul>
             <div class="scroller">
@@ -136,12 +146,6 @@
                 </li>
             </ul>
             <div id="properties">
-            <div class="sidebar-nav">
-                <a href=#>Type</a>
-            </div>
-            <div id="type">
-            </div>
-
 
                 <table>
                     <tr>
@@ -180,6 +184,17 @@
                             <input type="text" value="" id="tooltip" />
                         </td>
                     </tr>
+	                <tr id="labelSettings" style="display:none">
+						<td>Type</td>
+		                <td>
+			                <label>
+								<input type="radio" name="labelType" class="label-column" value="1" checked/>1 column
+		                    </label>
+			                <label>
+				                <input type="radio" name="labelType" class="label-column" value="2"/>2 columns
+			                </label>
+		                </td>
+	                </tr>
                 </table>
             </div>
         </div>

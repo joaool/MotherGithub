@@ -91,7 +91,8 @@ FormMaker.Events = {
     "PropertyChange" : "propChange",
     "ElementClick" : "elementClick",
     "ValueChange" : "valueChange",
-    "TypeChange" : "typeChange"
+    "TypeChange" : "typeChange",
+    "LabelTypeChange" : "labelTypeChange"
 }
 
 FormMaker.Elements = {
@@ -111,7 +112,20 @@ FormMaker.DBElements = {
     textbox : "Text",
     combobox : "Combo",
     email : "Text",
-    emailbox : "Text"
+    emailbox : "Text",
+    "text" : "Text",
+    datetime : "Date",
+    date : "Date",
+    "integerbox": "Text",
+    "percentbox": "Text",
+    "currencybox": "Text",
+    "textUpperbox": "Text",
+    "areabox": "TextArea",
+    "phonebox": "Text",
+    "datetimebox": "Date",
+    "checkbox": "Checkbox",
+    "urlbox": "Text",
+    "lookupbox": "Text"
 }
 
 FormMaker.DBType = {

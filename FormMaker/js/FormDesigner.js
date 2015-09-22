@@ -5,7 +5,8 @@
             "PropertyChange" : "propChange",
             "ElementClick" : "elementClick",
             "ValueChange" : "valueChange",
-            "TypeChange" : "typeChange"
+            "TypeChange" : "typeChange",
+            "LabelTypeChange" : "labelTypeChange"
         }
     }; 
     $(document).ready(function(){

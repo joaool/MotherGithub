@@ -41,6 +41,10 @@ FormDesigner.Views.MainView = Backbone.View.extend({
         $("#editField").html(data.leftLabel); 
     },
     onEditBtnClick: function(){
+        if (this.elementClickModel.element == "TextLabel"){
+            this.openLabelDialog();
+        }
+        var self = this;
         var boxOptions = {
             type: "primary",
             icon: "th-list",
@@ -74,6 +78,8 @@ FormDesigner.Views.MainView = Backbone.View.extend({
                 fieldLabel: FL.dd.t.entities[this.elementClickModel.entityName].fields[this.elementClickModel.fieldName].label,
                 fieldName: this.elementClickModel.name,
                 fieldDescription: FL.dd.t.entities[this.elementClickModel.entityName].fields[this.elementClickModel.fieldName].description,
+                placeholder : "test",
+                icon:"tet",
                 userType: FL.dd.userType({type: "string", typeUI: FL.dd.t.entities[this.elementClickModel.entityName].fields[this.elementClickModel.fieldName].typeUI}),
                 userType_options: arrOfObj
             }
@@ -81,7 +87,19 @@ FormDesigner.Views.MainView = Backbone.View.extend({
         var fieldEditorModal = new FL.modal.Box(" Field Editor", "fieldEdition", dataItems, boxOptions, function (result, data, changed) {
             if (result) {
                 if (changed) {
-                    alert("fieldEditorModal Master  " + JSON.stringify(data.master));
+                    console.log("fieldEditorModal Master  " ,data.master);
+                    self.m_Editor.updateElement(data.master);
+                }
+            }
+        });
+        fieldEditorModal.show();
+    },
+    openLabelDialog: function () {
+        var fieldEditorModal = new FL.modal.Box("Label Editor", "fieldEdition", this.elementClickModel, {}, function (result, data, changed) {
+            if (result) {
+                if (changed) {
+                    console.log("fieldEditorModal Master  " ,data.master);
+                    self.m_Editor.updateElement(data.master);
                 }
             }
         });

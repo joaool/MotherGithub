@@ -33,7 +33,11 @@ a#menu-toggle {
 .sidebar-nav > .sidebar-brand a {
     height: 45px;
     line-height: 45px;
-    color: white;
+    /* color: white; */
+    display: inline-block;
+    vertical-align: top;
+    float: left;
+    width: 141px;
 }
 
 #properties td {
@@ -179,10 +183,10 @@ table#fields {
 #Add {
     display: inline-block;
     position: absolute;
-    width: 30px;
-    height: 30px;
-    top: 2px;
-    right: 5px;
+    width: 24px;
+    height: 24px;
+    top: 5px;
+    right: 9px;
     background-image: url('../images/plus.png');
     background-color: white;
     padding: 5px;
@@ -308,4 +312,23 @@ div#formRight,#formLeft {
 .ui-draggable-disabled:hover {
     background-color: red!important;
     color: black!important;
+}
+
+#addLabel {
+    margin-top: 5px;
+    width: 95px;
+    text-align: left;
+    display: inline-block;
+    line-height: 35px;
+    background-color: white;
+    color: black;
+    border-radius: 3px;
+    text-indent: 10px;
+    cursor: pointer;
+    float: left;
+    height: 35px;
+}
+
+#addLabel:before {
+    content: 'Add label';
 }

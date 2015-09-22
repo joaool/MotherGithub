@@ -25,7 +25,8 @@ FormDesigner.Views.PropertyPanel = Backbone.View.extend({
         "keyup #placeholder" : "onPlaceholderChange",
         "keyup #icon" : "onTconChange",
         "keyup #tooltip" : "onTooltipChange",
-        "change #type input[type='radio']" : "onTypeChange"
+        "change #type input[type='radio']" : "onTypeChange",
+        "change .label-column" : "labelColumnTypeChange"
     },
     onNameChange : function(evt){
         var value = this.name.val();
@@ -98,5 +99,14 @@ FormDesigner.Views.PropertyPanel = Backbone.View.extend({
         this.icon.val(element.icon);
         this.tooltip.val(element.tooltip);
         this.currentId = element.id;
+    },
+    labelColumnTypeChange: function (evt) {
+        var type = $(evt.target).val();
+        var data = {
+            property : "labelType",
+            value : type,
+            id : this.currentId
+        };
+        this.trigger(FormDesigner.Events.LabelTypeChange,data);
     }
 });

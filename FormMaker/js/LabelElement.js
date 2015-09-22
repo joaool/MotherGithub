@@ -14,8 +14,11 @@ FormMaker.BaseElement = Backbone.View.extend({
     
 	initialize : function(options){
         this.model = new ElementModel(options.model);
-        
+        this.listenTo(this.model,"changed",this.OnModelChanged);
 	},
+    OnModelChanged: function(){
+        this.model.saveToDB();
+    },
     getModel: function(){
         return this.model;  
     },
@@ -24,7 +27,7 @@ FormMaker.BaseElement = Backbone.View.extend({
 		"blur input" : "focusOut",
 		"change input" : "valueChange",
 		"keyup input" : "valueChange",
-        "click " : "onElementClick",
+        "click " : "onElementClick"
 	},
     onRightClick: function(e){
         console.log(e);
@@ -75,6 +78,9 @@ FormMaker.BaseElement = Backbone.View.extend({
 	},
     update: function(data){
         this.model.set(data.property,data.value);
+        this.reRender();
+    },
+    reRender: function () {
         var newElement = $.parseHTML(this.m_template(this.model.toJSON()).trim());
         this.$el.replaceWith(newElement);
         this.setElement(newElement);
@@ -83,6 +89,7 @@ FormMaker.BaseElement = Backbone.View.extend({
         this.$el.on("contextmenu", this.onRightClick.bind(this));
     },
     onElementClick: function(evt){
+        FormMaker.CurrentElement = this;
         console.log("Element click");
         this.trigger(FormMaker.Events.ElementClick,this.model.toJSON());
     },
@@ -213,7 +220,7 @@ FormMaker.Image = FormMaker.BaseElement.extend({
 			reader.onload = function(evt){temp.OnImageLoaded(evt,temp)};
 			reader.readAsDataURL     (evt.target.files[0]);
 		}
-	},
+	}
 });
 
 FormMaker.Date = FormMaker.BaseElement.extend({
@@ -225,9 +232,9 @@ FormMaker.Date = FormMaker.BaseElement.extend({
 		this.m_template = Handlebars.compile($("#__date").html());
 		
 	},
-	events : {
+	events : _.extend(FormMaker.BaseElement.prototype.events,{
 		"change .datePicker" : "onDatePickerValueChange"
-	},
+	}),
 	onDatePickerValueChange : function(){
 		this.model.set("value",this.$(".datePicker").val());
         this.trigger(FormMaker.Events.ValueChange,this.model.toJSON());
@@ -236,7 +243,7 @@ FormMaker.Date = FormMaker.BaseElement.extend({
 		$(".datePicker").datetimepicker({
             timeFormat: "hh:mm tt",
             controlType: 'select',
-            oneLine: true,
+            oneLine: true
         });
 	}
 	

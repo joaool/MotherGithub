@@ -7,11 +7,13 @@ FormDesigner.Views.ElementHolder = Backbone.View.extend({
     droppedElements : [],
     entityLoaded : null,
     modelsCollection : null,
-    
+    labelIdCnt : 0,
+
     initialize: function(){
         this.propertiesPanel = new FormDesigner.Views.PropertyPanel({el : "#properties"});
         this.listenTo(this.propertiesPanel,FormMaker.Events.PropertyChange,this.onPropertyChange);
         this.listenTo(this.propertiesPanel,FormMaker.Events.TypeChange,this.onTypeChange);
+        this.listenTo(this.propertiesPanel,FormMaker.Events.LabelTypeChange,this.onLabelTypeChange);
 
         this.model = new FormDesigner.Models.DesignerModel();
         $(".menuItem").on("click",this.onMenuItemClick.bind(this))
@@ -25,7 +27,7 @@ FormDesigner.Views.ElementHolder = Backbone.View.extend({
         oDragNDrop = DragNDrop.getInstance();
         oDragNDrop.setDroppableObject({droppableSelectors : [{
 											droppable : ".ui-dropppable"
-											}],
+											}]
 									  });
         oDragNDrop.setDraggableObject({draggableSelectors : [{
 											   draggable : ".ui-draggable"
@@ -53,7 +55,8 @@ FormDesigner.Views.ElementHolder = Backbone.View.extend({
 	OnStop : function(event, ui){
 		console.log("Drop End");
         //this.onDrop(event.target,ui.item[0]);
-        if ($(ui.helper.context).attr("id")!= "Add")
+        if ($(ui.helper.context).attr("id")!= "Add" &&
+            $(ui.helper.context).attr("id")!= "addLabel")
             $(ui.helper.context).draggable('disable');
         
 	},
@@ -103,7 +106,7 @@ FormDesigner.Views.ElementHolder = Backbone.View.extend({
     onDrop : function(target,droppedObject){
         var cname = $(droppedObject).attr("cname");
         if ($(droppedObject).hasClass("dropped") && cname != "new") return;
-        
+
         var elementType =  FormMaker.DBElements[$(droppedObject).data("type")];
         var inputType = FormMaker.DBType[$(droppedObject).data("input-type")];
         var leftLabel = $(droppedObject).data("label");
@@ -115,7 +118,7 @@ FormDesigner.Views.ElementHolder = Backbone.View.extend({
         var alignment = target.id == "designerCol1" ? "left" : "right";
         var fieldId = $(droppedObject).attr("field_id");
         var element = {
-            "element" : elementType || FormMaker.Elements.Text,
+            "element" : elementType || FormMaker.Elements.Label,
             "leftLabel" : leftLabel,
             "name" : name,
             "type" : inputType,
@@ -132,6 +135,15 @@ FormDesigner.Views.ElementHolder = Backbone.View.extend({
             element.id = id;
             element.cname = cname;
             element.fieldName = fieldName;
+        }
+        if (element.element == "TextLabel") {
+            element.id = "Label"+this.labelIdCnt++;
+            $("#labelSettings").show();
+            $("#editField").hide();
+        }
+        else{
+            $("#labelSettings").hide();
+            $("#editField").hide();
         }
         if(this.entityLoaded)
             element.entityName = this.entityLoaded.csingular;
@@ -160,24 +172,28 @@ FormDesigner.Views.ElementHolder = Backbone.View.extend({
     onElementClick: function(data){
         this.propertiesPanel.setElementProperties(data);
         this.setTypeField(data);
-        this.trigger(FormMaker.Events.ElementClick,data);
+
+        if (data.element == "TextLabel") {
+            $("#labelSettings").show();
+            $("#editField").hide();
+        }
+        else{
+            $("#labelSettings").hide();
+            $("#editField").show();
+            this.trigger(FormMaker.Events.ElementClick,data);
+        }
     },
     onTypeChange: function(data){
-        var elementView = this.droppedElements[data.id];
-        if (!elementView) return;
-        var model = elementView.getModel();
-        model.set("element", data.value);
-
-        var obj =  new FormMaker[data.value]({el : elementView.getParentSelector(),model : model});
-        this.listenTo(obj, FormMaker.Events.ElementClick,this.onElementClick.bind(this));
-        this.listenTo(obj, FormMaker.Events.ValueChange,this.onValueChange.bind(this));
-        obj.loadData(model.toJSON());
-        obj.renderBefore(elementView);
-
-        this.removeElement(elementView)
-        this.droppedElements[data.id] = obj;
-        this.modelsCollection.set(obj.getModel(),{remove:false});
-        this.propertiesPanel.setElementProperties(model.toJSON());
+        this.changeType(data.id,data.value);
+    },
+    onLabelTypeChange: function (data) {
+        if (data.value == 1)
+            $("#"+data.id).css({"white-space":"normal"});
+        else
+            $("#"+data.id).css({
+                "white-space":"nowrap",
+                "width" : $("#"+data.id).parent().width()*2 + "px"
+            });
     },
     setTypeField: function(data){
         this.$("#type #Type" + data.element).prop("checked",true);
@@ -241,5 +257,44 @@ FormDesigner.Views.ElementHolder = Backbone.View.extend({
         $.each(rightElements,(function(i,element){
             this.addElement("designerCol2",element);
         }).bind(this))
+    },
+    updateElement: function (elementData) {
+        var data = {
+            leftLabel : elementData.fieldLabel,
+            name : elementData.fieldName,
+            type : elementData.userType,
+            typeUI : FL.dd.userTypes[elementData.userType].typeUI,
+            description : elementData.fieldDescription
+        };
+        var elementType = FormMaker.CurrentElement.model.get("type");
+        FormMaker.CurrentElement.model.set(data);
+        FormMaker.CurrentElement.model.saveToDB();
+        if(elementType != elementData.userType){
+            this.changeType(FormMaker.CurrentElement.model.id,elementData.userType);
+        }
+        else{
+            FormMaker.CurrentElement.reRender();
+        }
+
+        var description = elementData.fieldDescription;
+
+    },
+    changeType: function (id, type) {
+        var elementView = this.droppedElements[id];
+        if (!elementView) return;
+        var model = elementView.getModel();
+        model.set("element", type);
+        var Class = FormMaker[type] || FormMaker[FormMaker.DBElements[type]];
+        var obj =  new Class({el : elementView.getParentSelector(),model : model.attributes});
+        obj.renderBefore(elementView);
+
+        this.listenTo(obj, FormMaker.Events.ElementClick,this.onElementClick.bind(this));
+        this.listenTo(obj, FormMaker.Events.ValueChange,this.onValueChange.bind(this));
+        obj.loadData(model.toJSON());
+
+        this.removeElement(elementView)
+        this.droppedElements[id] = obj;
+        this.modelsCollection.set(obj.getModel(),{remove:false});
+        this.propertiesPanel.setElementProperties(model.toJSON());
     }
 });
