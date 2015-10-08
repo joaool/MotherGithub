@@ -28,17 +28,17 @@
     z-index: 1000;
     position: fixed;
     left: 250px;
-    width: 0;
+    width: 300px;
     height: 100%;
     margin-left: -250px;
     /* overflow-x: hidden; */
     overflow-y: auto;
     background: #FCFCFC;
     border-right: 1px solid #CACACA;
-    -webkit-transition: all 0.5s ease;
+    /* -webkit-transition: all 0.5s ease; */
     -moz-transition: all 0.5s ease;
     -o-transition: all 0.5s ease;
-    transition: all 0.5s ease;
+    /* transition: all 0.5s ease; */
 }
 
 #wrapper.toggled #sidebar-wrapper {
@@ -60,18 +60,18 @@
 .sidebar-nav {
     /* position: absolute; */
     top: 0;
-    width: 300px;
+    width: 299px;
     margin: 0;
     padding: 0;
     list-style: none;
     /* padding-left: 5px; */
-    background-color: rgb(146, 180, 224);
-    color: white;
+    /* background-color: rgb(146, 180, 224); */
+    color: black;
 }
 
 .sidebar-nav li,.sidebar-nav td {
     text-indent: 20px;
-    line-height: 40px;
+    line-height: 35px;
     width: 135px;
     display: inline-block;
 }
@@ -98,11 +98,11 @@
     font-size: 18px;
     line-height: 60px;
     background-color: rgb(0, 0, 0);
-    width: 300px;
+    width: 100%;
 }
 
 .sidebar-nav > .sidebar-brand a {
-    color: #999999;
+    color: #FFFFFF;
 }
 
 .sidebar-nav > .sidebar-brand a:hover {
@@ -137,8 +137,5 @@
     }
 }
 
-.sidebar-nav td:hover {
-    color: #5E5E5E;    
-    background: rgba(36, 44, 194, 0.25);
-    cursor: pointer;
+.sidebar-nav td div:hover {
 }

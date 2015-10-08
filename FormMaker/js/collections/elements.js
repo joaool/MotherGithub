@@ -3,7 +3,8 @@ Elements = Backbone.Collection.extend({
     
     saveToDB : function(){
         this.models.forEach(function(model){
-            model.saveToDB(); 
+            if(model.get("element") != FormMaker.Elements.Label)
+                model.saveToDB();
         });
     }
 })

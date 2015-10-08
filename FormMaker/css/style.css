@@ -45,7 +45,7 @@ a#menu-toggle {
 }
 
 .sidebar-nav a {
-    color: white;
+    color: #7B7979;
     text-decoration: none;
 }
 
@@ -55,6 +55,7 @@ div#wrapper {
     padding-bottom: 10px;
     overflow-x: auto;
     /* margin-bottom: 40px; */
+    padding-left: 300px;
 }
 
 body {
@@ -171,13 +172,13 @@ h3 {
 }
 
 div#sidebar-wrapper {
-    overflow-y: auto;
+    /* overflow-y: auto; */
     /* overflow-x: hidden; */
 }
 
 table#fields {
     overflow-y: auto;
-    height: 300px;
+    /* height: 300px; */
 }
 
 #Add {
@@ -239,7 +240,7 @@ div#droppable > div {
     height: 100%;
     border: 1px solid #CACACA;
     display: inline-block;
-    width: 50%;
+    width: 100%;
 }
 
 div#contextMenu {
@@ -289,12 +290,14 @@ input#value {
 }
 
 .scroller {
-    max-height: 200px;
+    /* max-height: 200px; */
     overflow-y: auto;
     overflow-x: hidden;
-    height: 200PX;
-    BACKGROUND-COLOR: rgb(146, 180, 224);
-    width: 300px;
+    height: 92%;
+    /* BACKGROUND-COLOR: rgb(146, 180, 224); */
+    width: 299px;
+    margin: 0px;
+    display: inline-block;
 }
 
 div#formRight,#formLeft {
@@ -305,13 +308,16 @@ div#formRight,#formLeft {
     height: 35px;
 }
 
-.ui-draggable-disabled {
-    background-color: red;
+.ui-draggable-disabled > div {
+    background-color: red!important;
+    color: black!important;
+    cursor: default!important;
+    border-bottom: 3px solid #CACACA!important;
 }
 
 .ui-draggable-disabled:hover {
-    background-color: red!important;
-    color: black!important;
+    /* background-color: red!important; */
+    /* color: black!important; */
 }
 
 #addLabel {
@@ -331,4 +337,30 @@ div#formRight,#formLeft {
 
 #addLabel:before {
     content: 'Add label';
+}
+
+button#editField {
+    position: absolute;
+    top: 0px;
+    float: left;
+    margin-left: 1px;
+    display: block;
+}
+
+td.option.field {
+padding: 10px;padding-bottom: 0px;}
+
+td.option.field > div {
+    background-color: #ECECEC;
+    border-radius: 3px;
+    border-bottom: 3px solid #CACACA;
+    color: #5A4E4E;
+    text-decoration: none;
+}
+
+td.option.field > div:hover {
+    cursor: pointer;
+    background-color: #7BACBB;
+    border-bottom: 3px solid #488294;
+    color: #0A4B5F;
 }

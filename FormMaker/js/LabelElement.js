@@ -106,6 +106,9 @@ FormMaker.BaseElement = Backbone.View.extend({
 	},
     getValue : function(){
         return this.model.get("value") || "";
+    },
+    updateLabelStyle : function(){
+
     }
 });
 FormMaker.TextLabel = FormMaker.BaseElement.extend({

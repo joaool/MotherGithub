@@ -88,14 +88,25 @@
                                name="fieldName" placeholder="Ex. name, address, email, phone..."
                                value="<%= master.fieldName %>">
                     </div>
-                    <label class="control-label" for="fieldEdition_fieldDescription"
-                           id="fieldEdition_whatIsLabel"> </label>
+                    <label class="control-label" for="fieldEdition_fieldDescription"id="fieldEdition_whatIsLabel"></label>
                     <div class="input-group" style="line-height:0px;">
                         <span class="input-group-addon">Description:</span>
                         <input type="text" class="form-control" id="fieldEdition_fieldDescription"
                                name="fieldDescription" placeholder="Ex. descripton..."
                                value="<%= master.fieldDescription %>">
                     </div>
+	                <div class="input-group" style="line-height:0px;">
+		                <span class="input-group-addon">Placeholder:</span>
+		                <input type="text" class="form-control" id="fieldEdition_placeholder"
+		                       name="fieldName" placeholder="Enter a placeholder..."
+		                       value="<%= master.placeholder %>">
+	                </div>
+	                <div class="input-group" style="line-height:0px;">
+		                <span class="input-group-addon">Icon:</span>
+		                <input type="text" class="form-control" id="fieldEdition_icon"
+		                       name="fieldName" placeholder="Enter icon name"
+		                       value="<%= master.icon %>">
+	                </div>
                     <div>
                         <h4 id="fieldEdition_plural"></h4>
                     </div>
@@ -113,7 +124,50 @@
         </form>
     </div>
 </script>
-
+<script id="titleEdition" type="text/template">
+    <div class="fieldEdition" style="margin-top:0px;">
+        <form id="form_titleEdition">
+            <legend>Please define this title:</legend>
+            <div class="row">
+                <div class="col-xs-12">
+                    <div class="input-group" style="line-height:0px;">
+                        <span class="input-group-addon">Title Text:</span>
+                        <input type="text" class="form-control" id="titleEdition_titleText"
+                               name="titleText" placeholder="Choose a title for your form."
+                               value="<%= master.titleText %>">
+                    </div>
+                    <div class="input-group" style="line-height:0px;">
+                        <span class="input-group-addon">Font Size:</span>
+                        <div class="btn-group" style="width:100%">
+                            <a class="btn btn-default btn-block dropdown-toggle" data-toggle="dropdown"
+                               id="titleEdition_fontSize" href="#"><%= master.fontSize %> <span class="caret"></span></a>
+                            <ul id="titleEdition_fontSize_options" class="dropdown-menu"></ul>
+                        </div>
+                        <span class="input-group-addon"><span class="glyphicon glyphicon-th-list"></span></span>
+                    </div>
+                    <div class="input-group" style="line-height:0px;">
+	                    <span class="input-group-addon">Font Color:</span>
+	                    <div class="btn-group" style="width:100%">
+                            <a class="btn btn-default btn-block dropdown-toggle" data-toggle="dropdown"
+                               id="titleEdition_fontColor" href="#"><%= master.fontColor %> <span class="caret"></span></a>
+                            <ul id="titleEdition_fontColor_options" class="dropdown-menu"></ul>
+                        </div>
+                        <span class="input-group-addon"><span class="glyphicon glyphicon-th-list"></span></span>
+                    </div>
+                    <div class="input-group" style="line-height:0px;">
+	                    <span class="input-group-addon">Title Alignment:</span>
+	                    <div class="btn-group" style="width:100%">
+                            <a class="btn btn-default btn-block dropdown-toggle" data-toggle="dropdown"
+                               id="titleEdition_titleAlignment" href="#"><%= master.titleAlignment %> <span class="caret"></span></a>
+                            <ul id="titleEdition_titleAlignment_options" class="dropdown-menu"></ul>
+                        </div>
+                        <span class="input-group-addon"><span class="glyphicon glyphicon-th-list"></span></span>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</script>
 <body>
     <div id="wrapper">
 
@@ -140,63 +194,6 @@
               </table>
             </div>
 
-            <ul class="sidebar-nav">
-                <li class="sidebar-brand">
-                    <a href=#>Properties</a>
-                </li>
-            </ul>
-            <div id="properties">
-
-                <table>
-                    <tr>
-                        <td>Name</td>
-                        <td>
-                            <input type="text" value="" id="name" />
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>Value</td>
-                        <td>
-                            <input type="text" value="" id="value" />
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>Left Label</td>
-                        <td>
-                            <input type="text" value="" id="leftLabel" />
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>Placeholder</td>
-                        <td>
-                            <input type="text" value="" id="placeholder" />
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>Icon</td>
-                        <td>
-                            <input type="text" value="" id="icon" />
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>Tooltip</td>
-                        <td>
-                            <input type="text" value="" id="tooltip" />
-                        </td>
-                    </tr>
-	                <tr id="labelSettings" style="display:none">
-						<td>Type</td>
-		                <td>
-			                <label>
-								<input type="radio" name="labelType" class="label-column" value="1" checked/>1 column
-		                    </label>
-			                <label>
-				                <input type="radio" name="labelType" class="label-column" value="2"/>2 columns
-			                </label>
-		                </td>
-	                </tr>
-                </table>
-            </div>
         </div>
         <!-- /#sidebar-wrapper -->
 
@@ -206,7 +203,7 @@
                 <div class="row">
                     <div class="col-lg-12">
                         <h3>Form Designer</h3>
-                            <button id="editField" class="edit btn btn-success glyphicon glyphicon-pencil" title="edit grid columns" style="float: left; margin-left: 1px; display: block;"> table</button>
+                            <button id="editField" class="edit btn btn-success glyphicon glyphicon-pencil span4" title="edit grid columns"> table</button>
                             
                         <div class="entities text-center">
                             Entities :
@@ -218,14 +215,14 @@
                             </div>
                         </div>
                         <div id="droppable">
-                            <div id="designerCol1" class="ui-dropppable sortable"></div><div id="designerCol2" class="ui-dropppable sortable"></div>
+                            <div id="designerCol1" class="ui-dropppable sortable"></div>
                         </div>
                     </div>
                 </div>
             </div>
-            <div class="toggleBtn">
-                <a href="#menu-toggle" class="btn btn-primary" id="menu-toggle"></a>
-            </div>
+            <!--<div class="toggleBtn">-->
+                <!--<a href="#menu-toggle" class="btn btn-primary" id="menu-toggle"></a>-->
+            <!--</div>-->
             
         </div>
 
@@ -258,7 +255,9 @@
                       data-description="{{description}}"
                       data-fieldname="{{fCN}}"
                       cname="{{cname}}">
-                          <a href="" class="">{{label}}</a>
+	                    <div>
+                         {{label}}
+	                    </div>
                   </td>
                 </tr>
             {{/each}}

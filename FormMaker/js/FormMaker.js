@@ -90,6 +90,7 @@ FormMaker = Backbone.View.extend({
 FormMaker.Events = {
     "PropertyChange" : "propChange",
     "ElementClick" : "elementClick",
+    "LabelClick" : "labelClick",
     "ValueChange" : "valueChange",
     "TypeChange" : "typeChange",
     "LabelTypeChange" : "labelTypeChange"

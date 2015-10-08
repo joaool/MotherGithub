@@ -69,7 +69,7 @@ FormDesigner.Views.ElementHolder = Backbone.View.extend({
     $( ".sortable" ).sortable();
     $( ".sortable" ).sortable("destroy");
 		$( ".sortable" ).sortable({
-            revert: true,
+            revert: false,
 			connectWith : ".sortable",
 		 	placeholder: "ui-state-highlight",
 			tolerance: "pointer",
@@ -138,12 +138,6 @@ FormDesigner.Views.ElementHolder = Backbone.View.extend({
         }
         if (element.element == "TextLabel") {
             element.id = "Label"+this.labelIdCnt++;
-            $("#labelSettings").show();
-            $("#editField").hide();
-        }
-        else{
-            $("#labelSettings").hide();
-            $("#editField").hide();
         }
         if(this.entityLoaded)
             element.entityName = this.entityLoaded.csingular;
@@ -160,6 +154,7 @@ FormDesigner.Views.ElementHolder = Backbone.View.extend({
         obj.setParent("#"+id);
         obj.render();
         this.droppedElements[element.id] = obj;
+
         this.modelsCollection.set(obj.getModel(),{remove:false});
         
 		this.propertiesPanel.setElementProperties(element);
@@ -173,15 +168,14 @@ FormDesigner.Views.ElementHolder = Backbone.View.extend({
         this.propertiesPanel.setElementProperties(data);
         this.setTypeField(data);
 
-        if (data.element == "TextLabel") {
-            $("#labelSettings").show();
-            $("#editField").hide();
-        }
+        /*if (data.element == "TextLabel") {*/
+          //  $("#labelSettings").show();
+            this.trigger(FormMaker.Events.ElementClick,data);
+       /* }
         else{
             $("#labelSettings").hide();
-            $("#editField").show();
             this.trigger(FormMaker.Events.ElementClick,data);
-        }
+        }*/
     },
     onTypeChange: function(data){
         this.changeType(data.id,data.value);
@@ -215,7 +209,8 @@ FormDesigner.Views.ElementHolder = Backbone.View.extend({
         this.modelsCollection.set(elementView.getModel(),{remove:false});
     },
     save: function(){
-        this.modelsCollection.saveToDB();
+
+            this.modelsCollection.saveToDB();
         var left = this.modelsCollection.where({"alignment" : "left"})
                     .reduce(function(prev,curr){
                         var json = curr.toJSON();
@@ -258,13 +253,28 @@ FormDesigner.Views.ElementHolder = Backbone.View.extend({
             this.addElement("designerCol2",element);
         }).bind(this))
     },
+    updateLabel : function(elementData){
+        var styleString = ";font-size:"+elementData.fontSize+";color:"+elementData.fontColor+";white-space:"+elementData.titleAlignment+";";
+        var data = {
+            leftLabel : elementData.titleText,
+            fontSize : elementData.fontSize,
+            fontColor : elementData.fontColor,
+            textAlignment : elementData.titleAlignment,
+            style : styleString
+        };
+        var elementType = FormMaker.CurrentElement.model.get("type");
+        FormMaker.CurrentElement.model.set(data);
+        FormMaker.CurrentElement.reRender();
+    },
     updateElement: function (elementData) {
         var data = {
             leftLabel : elementData.fieldLabel,
             name : elementData.fieldName,
             type : elementData.userType,
             typeUI : FL.dd.userTypes[elementData.userType].typeUI,
-            description : elementData.fieldDescription
+            description : elementData.fieldDescription,
+            placeholder : elementData.placeholder,
+            icon : elementData.icon
         };
         var elementType = FormMaker.CurrentElement.model.get("type");
         FormMaker.CurrentElement.model.set(data);

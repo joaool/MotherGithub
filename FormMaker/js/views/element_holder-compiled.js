@@ -24,7 +24,7 @@ FormDesigner.Views.ElementHolder = Backbone.View.extend({
     },
     bindDraggableObject: function bindDraggableObject() {
         this.dragNDropHandler = new DragNDrop();
-        oDragNDrop = DragNDrop.getInstance();
+        var oDragNDrop = DragNDrop.getInstance();
         oDragNDrop.setDroppableObject({ droppableSelectors: [{
                 droppable: ".ui-dropppable"
             }]

@@ -43,6 +43,7 @@ FormDesigner.Views.MainView = Backbone.View.extend({
     onEditBtnClick: function(){
         if (this.elementClickModel.element == "TextLabel"){
             this.openLabelDialog();
+            return;
         }
         var self = this;
         var boxOptions = {
@@ -95,15 +96,72 @@ FormDesigner.Views.MainView = Backbone.View.extend({
         fieldEditorModal.show();
     },
     openLabelDialog: function () {
-        var fieldEditorModal = new FL.modal.Box("Label Editor", "fieldEdition", this.elementClickModel, {}, function (result, data, changed) {
+        var self = this;
+        var titleOptions = {
+            type: "primary",
+            icon: "th-list",
+            button1: "Cancel",
+            button2: "Confirm title edition"
+        };
+        var titleItems = {
+            master: {
+                titleText: this.elementClickModel.leftLabel,
+                fontSize: this.elementClickModel.fontSize || 12,
+                fontColor: this.elementClickModel.fontColor || "black",
+                titleAlignment : this.elementClickModel.textAlignment || "normal",
+                fontSize_options: [
+                    {
+                        "value": 1,
+                        "text": 12
+                    },
+                    {
+                        "value": 2,
+                        "text": 14
+                    },
+                    {
+                        "value": 3,
+                        "text": 16
+                    },
+                    {
+                        "value": 4,
+                        "text": 18
+                    }
+                ],
+                fontColor_options: [
+                    {
+                        "value": 1,
+                        "text": "red"
+                    },
+                    {
+                        "value": 2,
+                        "text": "green"
+                    },
+                    {
+                        "value": 3,
+                        "text": "black"
+                    }
+                ],
+                titleAlignment_options: [
+                    {
+                        "value": 1,
+                        "text": "normal"
+                    },
+                    {
+                        "value": 2,
+                        "text": "nowrap"
+                    }
+                ]
+            }
+        };
+        var titleModal = new FL.modal.Box(" Label Editor", "titleEdition", titleItems, titleOptions, function (result, data, changed) {
             if (result) {
                 if (changed) {
-                    console.log("fieldEditorModal Master  " ,data.master);
-                    self.m_Editor.updateElement(data.master);
+                    console.log("titleModal Master  " ,data.master);
+                    self.m_Editor.updateLabel(data.master);
                 }
             }
         });
-        fieldEditorModal.show();
+        titleModal.show();
     },
     onEntitiesLoaded: function(){
         console.log(this.entityModel.get("entities"));
@@ -118,7 +176,6 @@ FormDesigner.Views.MainView = Backbone.View.extend({
         this.m_Editor.bindDraggableObject();
     },
     saveBtnClick: function(){
-        
         var formData = this.m_Editor.save();  
         window.formData = formData;
         window.open("formMaker.html","_blank");
