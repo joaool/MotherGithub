@@ -364,3 +364,25 @@ td.option.field > div:hover {
     border-bottom: 3px solid #488294;
     color: #0A4B5F;
 }
+
+.delete-icon {
+    position: absolute;
+    top: 0px;
+    right: 0px;
+    z-index: 3;
+    background-color: #D60E0E;
+    width: 20px;
+    height: 20px;
+    text-align: center;
+    padding: 5px;
+    color: white;
+    border-radius: 50%;
+    font-size: 7px;
+    transform: rotate(45deg);
+    cursor: pointer;
+    display: none;
+}
+
+.dropped:hover .delete-icon {
+    display: inline-block;
+}

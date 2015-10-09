@@ -5,6 +5,7 @@
 			 <input id="value" type="{{type}} class="form-control" placeholder="{{placeholder}}" value="{{value}}" data-parsley-trigger="{{trigger}} data-toggle="tooltip" data-placement="top" title="{{tooltip}}">
 			<span class="input-group-addon"><span id="icon" class="glyphicon {{icon}}"></span></span>
 		</div>
+		<div class="delete-icon" data-id="{{id}}"><i class="glyphicon glyphicon-plus" data-id="{{id}}"></i></div>
 	</div>    
 </script>
 <script id="__textLabel" type="text/x-handlebars-template">
@@ -12,27 +13,32 @@
 		<div class="input-group">
             <label style="height:40px">{{leftLabel}}</label>
 		</div>
+		<div class="delete-icon" data-id="{{id}}"><i class="glyphicon glyphicon-plus" data-id="{{id}}"></i></div>
 	</div>
 </script>    
 <script id="inTextareaLabel" type="text/x-handlebars-template"> 
 	<div class="input-group dropped" style="line-height:0px;" id="{{id}}"  cname="{{cname}}">
 		<span class="input-group-addon" id="leftLabel" id="leftLabel">Description:</span>
 		<textarea class="form-control" name="entityDescription" onkeyup="FL.slidePanels.dictTemplateChangeDescription(this.form)" rows="2"></textarea>
+		<div class="delete-icon" data-id="{{id}}"><i class="glyphicon glyphicon-plus" data-id="{{id}}"></i></div>
 	</div>
 </script>
 <script id="__button" type="text/x-handlebars-template"> 
 	<div class="pull-right dropped" style="padding:5px 5px 5px;" id="{{id}}"  cname="{{cname}}">
         <button type="button" class="btn btn-{{btnType}} {{buttonHide}}" onclick="{{onClick}}" data-toggle="tooltip" data-placement="top" title="{{tooltip}}" value="{{value}}">{{leftLabel}}</button>
+		<div class="delete-icon" data-id="{{id}}"><i class="glyphicon glyphicon-plus" data-id="{{id}}"></i></div>
 	</div>
 </script>
 <script id="__checkbox" type="text/x-handlebars-template"> 
 	<div id="{{id}}" class="input-group dropped" style="padding:5px 5px 5px" cname="{{cname}}">
 		<label class="checkbox-inline {{chkHide}}"><input type="checkbox" {{checked}} value="{{value}}">{{value}}</label>
+		<div class="delete-icon" data-id="{{id}}"><i class="glyphicon glyphicon-plus" data-id="{{id}}"></i></div>
 	</div>
 </script>
 <script id="__radiobox" type="text/x-handlebars-template"> 
 	<div id="{{id}}" class="input-group dropped" style="padding:5px 5px 5px" cname="{{cname}}">
 		<label class="radio-inline {{radioHide}}"><input type="radio" {{checked}} name="{{name}}" value="{{value}}">{{value}}</label>
+		<div class="delete-icon" data-id="{{id}}"><i class="glyphicon glyphicon-plus" data-id="{{id}}"></i></div>
 	</div>
 </script>    
 <script id="__combo" type="text/x-handlebars-template">    
@@ -43,7 +49,8 @@
                 <option value="{{value}}">{{label}} </option>
             {{/each}}
         </select>
-	</div>    
+		<div class="delete-icon" data-id="{{id}}"><i class="glyphicon glyphicon-plus" data-id="{{id}}"></i></div>
+	</div>
 </script>
 <script id="__date" type="text/x-handlebars-template">
 	<div class="input-group dropped" style="padding:5px 5px 5px" id="{{id}}" cname="{{cname}}">
@@ -51,12 +58,14 @@
 			<span class="input-group-addon" id="leftLabel">{{leftLabel}}</span>
 			 <input type="{{type}}" class="form-control datePicker {{class}}" placeholder="{{placeholder}}" value="{{value}}" data-parsley-trigger="{{trigger}}" data-toggle="tooltip" data-placement="top" title="{{tooltip}}">
 		</div>
-	</div>    
+		<div class="delete-icon" data-id="{{id}}"><i class="glyphicon glyphicon-plus" data-id="{{id}}"></i></div>
+	</div>
 </script>
 <script id="__textarea" type="text/x-handlebars-template">
     <div class="input-group dropped" style="padding:5px 5px 5px" id="{{id}}" cname="{{cname}}">
         <span class="input-group-addon" id="leftLabel">{{leftLabel}}</span>
-        <textarea placeholder="{{placeholder}}">{{value}}</textarea> 
+        <textarea placeholder="{{placeholder}}">{{value}}</textarea>
+	    <div class="delete-icon" data-id="{{id}}"><i class="glyphicon glyphicon-plus" data-id="{{id}}"></i></div>
     </div>
 </script>
 <script id="__image" type="text/x-handlebars-template">
@@ -64,6 +73,6 @@
         <span class="input-group-addon" id="leftLabel">{{leftLabel}}</span>
         <img id="imagePreview" class="imagePreview" src="">
         <input id="imageUploadBtn" type="file" class="custom-file-input file-loading" id="imageUploadBtn">
-        
+	    <div class="delete-icon" data-id="{{id}}"><i class="glyphicon glyphicon-plus" data-id="{{id}}"></i></div>
     </div>
 </script>

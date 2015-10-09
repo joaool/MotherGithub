@@ -16,11 +16,13 @@ FormDesigner.Views.ElementHolder = Backbone.View.extend({
         this.listenTo(this.propertiesPanel,FormMaker.Events.LabelTypeChange,this.onLabelTypeChange);
 
         this.model = new FormDesigner.Models.DesignerModel();
-        $(".menuItem").on("click",this.onMenuItemClick.bind(this))
 
         this.modelsCollection = new Elements();
         // this.$("#fieldstemp").html((Handlebars.compile($("#tempTemplate").html()))());
         this.bindDraggableObject();
+    },
+    events : {
+        "click .delete-icon" :"onDeleteClick"
     },
     bindDraggableObject : function(){
         this.dragNDropHandler = new DragNDrop();
@@ -41,12 +43,11 @@ FormDesigner.Views.ElementHolder = Backbone.View.extend({
 
         this.ApplySortingEvent();
     },
-    onMenuItemClick: function(e){
-        if (e.currentTarget.id == "delete"){
-            if (FormMaker.CurrentElement){
-                this.removeElement(FormMaker.CurrentElement);
-                $("[field_id='"+FormMaker.CurrentElement.model.get('fieldId')+"']").draggable("enable");
-            }
+    onDeleteClick: function(e){
+        var element = this.droppedElements[$(e.currentTarget).data("id")]
+        if (element){
+            this.removeElement(element);
+            $("[field_id='"+element.model.get('fieldId')+"']").draggable("enable");
         }
     },
     OnStart : function(event, ui){
@@ -209,30 +210,49 @@ FormDesigner.Views.ElementHolder = Backbone.View.extend({
         this.modelsCollection.set(elementView.getModel(),{remove:false});
     },
     save: function(){
-
-            this.modelsCollection.saveToDB();
+        this.modelsCollection.saveToDB();
         var left = this.modelsCollection.where({"alignment" : "left"})
-                    .reduce(function(prev,curr){
-                        var json = curr.toJSON();
-                        var jsonToSave = {
-                            fCN : json.fieldName,
-                            leftLabel : json.leftLabel,
-                            alignment : json.alignment
-                        };
-                        prev.push(jsonToSave);
-                        return prev;
-                    },[]);
+            .reduce(function(prev,curr){
+                var json = curr.toJSON();
+                var jsonToSave = {
+                    fCN : json.fieldName,
+                    leftLabel : json.leftLabel,
+                    alignment : json.alignment
+                };
+                if (json.element == FormMaker.Elements.Label) {
+                    jsonToSave = {
+                        fCN : '',
+                        text : json.leftLabel,
+                        fontSize:json.fontSize || 12,
+                        fontColor:json.fontColor || "black",
+                        textAlignment : json.textAlignment,
+                        alignment : json.alignment
+                    };
+                }
+                prev.push(jsonToSave);
+                return prev;
+            },[]);
         var right = this.modelsCollection.where({"alignment" : "right"})
-                    .reduce(function(prev,curr){
-                        var json = curr.toJSON();
-                        var jsonToSave = {
-                            fCN : json.fieldName,
-                            leftLabel : json.leftLabel,
-                            alignment : json.alignment
-                        };
-                        prev.push(jsonToSave);
-                        return prev;
-                    },[]);
+            .reduce(function(prev,curr){
+                var json = curr.toJSON();
+                var jsonToSave = {
+                    fCN : json.fieldName,
+                    leftLabel : json.leftLabel,
+                    alignment : json.alignment
+                };
+                if (json.element == FormMaker.Elements.Label) {
+                    jsonToSave = {
+                        fCN : '',
+                        text : json.leftLabel,
+                        fontSize:json.fontSize || 12,
+                        fontColor:json.fontColor || "black",
+                        textAlignment : json.textAlignment,
+                        alignment : json.alignment
+                    };
+                }
+                prev.push(jsonToSave);
+                return prev;
+            },[]);
         var form = {
             "eCN" : this.entityLoaded.csingular,
             "left" : left, 
