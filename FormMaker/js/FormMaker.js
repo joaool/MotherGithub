@@ -36,11 +36,11 @@ FormMaker = Backbone.View.extend({
 		$.each(elements,(function(i,item){
 			console.log("--># "+i+" - elementToDisplay="+item.element+" value="+item.value);
             var elementJson = {};
-            if (item.fCN = ""){
-                var styleString = ";font-size:"+elementData.fontSize+";color:"+elementData.fontColor+";white-space:"+elementData.titleAlignment+";";
-                elementJSON = {
-                    "element" : FormMaker.Elements.Text,
-                    leftLabel : item.label,
+            if (item.fCN == ""){
+                var styleString = ";font-size:"+item.fontSize+";color:"+item.fontColor+";white-space:"+item.titleAlignment+";";
+                elementJson = {
+                    "element" : FormMaker.Elements.Label,
+                    leftLabel : item.text,
                     fontSize : item.fontSize,
                     fontColor : item.fontColor,
                     textAlignment : item.textAlignment,
@@ -63,7 +63,7 @@ FormMaker = Backbone.View.extend({
 			{
 				var obj = new FormMaker[item.element]({el : divId});
 				obj.loadData(item);
-				this.arrObjs[item   .fCN] = obj;
+				this.arrObjs[item.fCN] = obj;
 			}
 			else
 			{

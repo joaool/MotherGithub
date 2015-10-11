@@ -41,6 +41,10 @@ FormMaker.BaseElement = Backbone.View.extend({
 	loadData : function(data){
         this.model.set(data);
 	},
+    setMergingElement: function(mergingElementData){
+        var mergingElements = this.model.get("mergingElements");
+        mergingElements.add(mergingElementData);
+    },
     setParent : function(selector){
         this.parentSelector = selector;  
     },

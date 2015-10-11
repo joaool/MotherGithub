@@ -1,31 +1,19 @@
-{
-    "left": [{
-        "element": "Combo",
-        "leftLabel": "LSFA",
-        "name": "LSFA",
-        "type": "text",
-        "value": ",sim",
-        "id": "Element1",
-        "fieldName": "55",
-        "entityName": "53",
-        "alignment": "left",
-        "comboArr": [{
-            "value": "",
-            "label": ""
-        }, {
-            "value": "sim",
-            "label": "sim"
-        }]
-    }],
-    "right": [{
-        "element": "Text",
-        "leftLabel": "COD",
-        "name": "COD",
-        "type": "number",
-        "value": "",
-        "id": "Element2",
-        "fieldName": "56",
-        "entityName": "53",
-        "alignment": "right"
-    }]
-}
+{"eCN": "5E", "left": [
+    {
+        "fCN": "5G",
+        "leftLabel": "First Name/ Surname",
+        "alignment": "left"
+    },
+    {
+        "fCN": "5H",
+        "leftLabel": "address",
+        "alignment": "left"
+    },
+    {
+        "fCN": "",
+        "text": "new Label",
+        "fontSize": 12,
+        "fontColor": "black",
+        "alignment": "left"
+    }
+], "right": []}

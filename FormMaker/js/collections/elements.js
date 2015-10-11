@@ -7,4 +7,4 @@ Elements = Backbone.Collection.extend({
                 model.saveToDB();
         });
     }
-})
+});

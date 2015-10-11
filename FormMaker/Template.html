@@ -2,7 +2,7 @@
 	<div class="input-group dropped" style="padding:5px 5px 5px" id="{{id}}" cname="{{cname}}">
 		<div class="input-group" style="line-height:0px;">
 			<span class="input-group-addon" id="leftLabel">{{leftLabel}}</span>
-			 <input id="value" type="{{type}} class="form-control" placeholder="{{placeholder}}" value="{{value}}" data-parsley-trigger="{{trigger}} data-toggle="tooltip" data-placement="top" title="{{tooltip}}">
+	        <input id="value" type="{{type}} class="form-control" placeholder="{{placeholder}}" value="{{value}}" data-parsley-trigger="{{trigger}} data-toggle="tooltip" data-placement="top" title="{{tooltip}}">
 			<span class="input-group-addon"><span id="icon" class="glyphicon {{icon}}"></span></span>
 		</div>
 		<div class="delete-icon" data-id="{{id}}"><i class="glyphicon glyphicon-plus" data-id="{{id}}"></i></div>
@@ -75,4 +75,37 @@
         <input id="imageUploadBtn" type="file" class="custom-file-input file-loading" id="imageUploadBtn">
 	    <div class="delete-icon" data-id="{{id}}"><i class="glyphicon glyphicon-plus" data-id="{{id}}"></i></div>
     </div>
+</script>
+
+<script id="__text_merge" type="text/x-handlebars-template">
+	<input id="value" type="{{type}}" class="form-control" placeholder="{{placeholder}}" value="{{value}}" data-parsley-trigger="{{trigger}} data-toggle="tooltip" data-placement="top" title="{{tooltip}}">
+</script>
+<script id="inTextareaLabel_merge" type="text/x-handlebars-template">
+	<textarea class="form-control" name="entityDescription" onkeyup="FL.slidePanels.dictTemplateChangeDescription(this.form)" rows="2"></textarea>
+</script>
+<script id="__button_merge" type="text/x-handlebars-template">
+	<button type="button" class="btn btn-{{btnType}} {{buttonHide}}" onclick="{{onClick}}" data-toggle="tooltip" data-placement="top" title="{{tooltip}}" value="{{value}}">{{leftLabel}}</button>
+</script>
+<script id="__checkbox_merge" type="text/x-handlebars-template">
+	<label class="checkbox-inline {{chkHide}}"><input type="checkbox" {{checked}} value="{{value}}">{{value}}</label>
+</script>
+<script id="__radiobox_merge" type="text/x-handlebars-template">
+	<label class="radio-inline {{radioHide}}"><input type="radio" {{checked}} name="{{name}}" value="{{value}}">{{value}}</label>
+</script>
+<script id="__combo_merge" type="text/x-handlebars-template">
+	<select class="form-control" title="{{tooltip}}" value="{{value}}">
+		{{#each comboArr}}
+			<option value="{{value}}">{{label}} </option>
+		{{/each}}
+	</select>
+</script>
+<script id="__date_merge" type="text/x-handlebars-template">
+	<input type="{{type}}" class="form-control datePicker {{class}}" placeholder="{{placeholder}}" value="{{value}}" data-parsley-trigger="{{trigger}}" data-toggle="tooltip" data-placement="top" title="{{tooltip}}">
+</script>
+<script id="__textarea_merge" type="text/x-handlebars-template">
+	<textarea placeholder="{{placeholder}}">{{value}}</textarea>
+</script>
+<script id="__image_merge" type="text/x-handlebars-template">
+	<img id="imagePreview" class="imagePreview" src="">
+	<input id="imageUploadBtn" type="file" class="custom-file-input file-loading" id="imageUploadBtn">
 </script>

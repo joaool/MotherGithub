@@ -194,8 +194,7 @@ FormDesigner.Views.ElementHolder = Backbone.View.extend({
         this.$("#type #Type" + data.element).prop("checked",true);
     },
     removeElement: function(element){
-        element.remove()
-        
+        element.remove();
         delete this.droppedElements[element.model.get("id")];
         this.modelsCollection.remove(element.model);
         this.propertiesPanel.setElementProperties({});
@@ -211,51 +210,32 @@ FormDesigner.Views.ElementHolder = Backbone.View.extend({
     },
     save: function(){
         this.modelsCollection.saveToDB();
-        var left = this.modelsCollection.where({"alignment" : "left"})
-            .reduce(function(prev,curr){
-                var json = curr.toJSON();
-                var jsonToSave = {
-                    fCN : json.fieldName,
-                    leftLabel : json.leftLabel,
+        var self = this;
+        var leftElementsToSave = [];
+        leftElements = $("#designerCol1 .dropped").map(function (prev,element) {
+            var curr = self.modelsCollection.get(element.id);
+            var json = curr.toJSON();
+            var jsonToSave = {
+                fCN : json.fieldName,
+                leftLabel : json.leftLabel,
+                alignment : json.alignment
+            };
+            if (json.element == FormMaker.Elements.Label) {
+                jsonToSave = {
+                    fCN : '',
+                    text : json.leftLabel,
+                    fontSize:json.fontSize || 12,
+                    fontColor:json.fontColor || "black",
+                    textAlignment : json.textAlignment,
                     alignment : json.alignment
                 };
-                if (json.element == FormMaker.Elements.Label) {
-                    jsonToSave = {
-                        fCN : '',
-                        text : json.leftLabel,
-                        fontSize:json.fontSize || 12,
-                        fontColor:json.fontColor || "black",
-                        textAlignment : json.textAlignment,
-                        alignment : json.alignment
-                    };
-                }
-                prev.push(jsonToSave);
-                return prev;
-            },[]);
-        var right = this.modelsCollection.where({"alignment" : "right"})
-            .reduce(function(prev,curr){
-                var json = curr.toJSON();
-                var jsonToSave = {
-                    fCN : json.fieldName,
-                    leftLabel : json.leftLabel,
-                    alignment : json.alignment
-                };
-                if (json.element == FormMaker.Elements.Label) {
-                    jsonToSave = {
-                        fCN : '',
-                        text : json.leftLabel,
-                        fontSize:json.fontSize || 12,
-                        fontColor:json.fontColor || "black",
-                        textAlignment : json.textAlignment,
-                        alignment : json.alignment
-                    };
-                }
-                prev.push(jsonToSave);
-                return prev;
-            },[]);
+            }
+            leftElementsToSave.push(jsonToSave);
+        });
+        var right = [];
         var form = {
             "eCN" : this.entityLoaded.csingular,
-            "left" : left, 
+            "left" : leftElementsToSave,
             "right" : right
         }
         return form;
@@ -264,10 +244,33 @@ FormDesigner.Views.ElementHolder = Backbone.View.extend({
         this.entityLoaded = entity;
     },
     loadJson: function(data){
+        this.entityLoaded = data.eCN;
         var leftElements = data.left;
         var rightElements = data.right;
         $.each(leftElements,(function(i,element){
-            this.addElement("designerCol1",element);
+            if (element.fCN == ""){
+                var styleString = ";font-size:"+element.fontSize+";color:"+element.fontColor+";white-space:"+element.titleAlignment+";";
+                elementJson = {
+                    "element" : FormMaker.Elements.Label,
+                    leftLabel : element.text,
+                    fontSize : element.fontSize,
+                    fontColor : element.fontColor,
+                    textAlignment : element.textAlignment,
+                    style : styleString
+                };
+            }
+            else {
+                var field = FL.dd.t.entities[data.eCN].fields[element.fCN];
+                elementJson = {
+                    "element": FormMaker.DBElements[field.typeUI] || FormMaker.Elements.Text,
+                    "leftLabel": field.label,
+                    "name": field.name,
+                    "type": field.type,
+                    "id": element.fCN
+                }
+            }
+            item = _.extend({},elementJson,element);
+            this.addElement("designerCol1",item);
         }).bind(this));
         $.each(rightElements,(function(i,element){
             this.addElement("designerCol2",element);
@@ -294,7 +297,8 @@ FormDesigner.Views.ElementHolder = Backbone.View.extend({
             typeUI : FL.dd.userTypes[elementData.userType].typeUI,
             description : elementData.fieldDescription,
             placeholder : elementData.placeholder,
-            icon : elementData.icon
+            icon : elementData.icon,
+            mergeWith : elementData.mergeWith
         };
         var elementType = FormMaker.CurrentElement.model.get("type");
         FormMaker.CurrentElement.model.set(data);
@@ -302,12 +306,15 @@ FormDesigner.Views.ElementHolder = Backbone.View.extend({
         if(elementType != elementData.userType){
             this.changeType(FormMaker.CurrentElement.model.id,elementData.userType);
         }
+        else if(data.mergeWith != 'no merge') {
+            var mergedWithElement = this.droppedElements[data.mergeWith];
+            mergedWithElement.setMergingElement(FormMaker.CurrentElement.model.toJSON());
+            mergedWithElement.reRender();
+            FormMaker.CurrentElement.remove();
+        }
         else{
             FormMaker.CurrentElement.reRender();
         }
-
-        var description = elementData.fieldDescription;
-
     },
     changeType: function (id, type) {
         var elementView = this.droppedElements[id];

@@ -74,13 +74,21 @@ FormDesigner.Views.MainView = Backbone.View.extend({
             }
         };
         var arrOfObj = FL.dd.arrOfUserTypesForDropdown();
+//        var mergeElement = [{"value": 1,"text": "no merge"}];
+//        var self = this;
+//        _.each(Object.keys(self.m_Editor.droppedElements), function (element) {
+//            var value = self.m_Editor.droppedElements[element].model.get("leftLabel");
+//            mergeElement.push({"value":element,"text":value});
+//        });
         var dataItems = {
             master: {
                 fieldLabel: FL.dd.t.entities[this.elementClickModel.entityName].fields[this.elementClickModel.fieldName].label,
                 fieldName: this.elementClickModel.name,
                 fieldDescription: FL.dd.t.entities[this.elementClickModel.entityName].fields[this.elementClickModel.fieldName].description,
                 placeholder : "test",
-                icon:"tet",
+                icon:"text",
+//                mergeWith : "no merge",
+//                mergeWith_options : mergeElement,
                 userType: FL.dd.userType({type: "string", typeUI: FL.dd.t.entities[this.elementClickModel.entityName].fields[this.elementClickModel.fieldName].typeUI}),
                 userType_options: arrOfObj
             }
