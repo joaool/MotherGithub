@@ -212,17 +212,7 @@ FormDesigner.Views.ElementHolder = Backbone.View.extend({
         this.propertiesPanel.setElementProperties(data);
     },
     onElementClick: function(data){
-        this.propertiesPanel.setElementProperties(data);
-        this.setTypeField(data);
 
-        /*if (data.element == "TextLabel") {*/
-          //  $("#labelSettings").show();
-            this.trigger(FormMaker.Events.ElementClick,data);
-       /* }
-        else{
-            $("#labelSettings").hide();
-            this.trigger(FormMaker.Events.ElementClick,data);
-        }*/
     },
     onTypeChange: function(data){
         this.changeType(data.id,data.value);
@@ -354,6 +344,18 @@ FormDesigner.Views.ElementHolder = Backbone.View.extend({
             name: elementData.fieldName,
             typeUI: FL.dd.userTypes[elementData.userType].typeUI
         });
+        var model = this.modelsCollection.where({"fieldName":elementData.fCN})[0];
+        if (model) {
+            var elementType = model.get("type");
+            model.set(data);
+            if(elementType != elementData.userType){
+                this.changeType(model.id,elementData.userType);
+            }
+            else{
+                this.droppedElements[model.id].reRender();
+                $("#fields td[data-fieldname="+elementData.fCN+"]").draggable('disable');
+            }
+        }
 
         /*
         var elementType = FormMaker.CurrentElement.model.get("type");
@@ -389,5 +391,6 @@ FormDesigner.Views.ElementHolder = Backbone.View.extend({
         this.droppedElements[id] = obj;
         this.modelsCollection.set(obj.getModel(),{remove:false});
         this.propertiesPanel.setElementProperties(model.toJSON());
+        $("#fields td[data-fieldname="+model.get("fieldName")+"]").draggable('disable');
     }
 });

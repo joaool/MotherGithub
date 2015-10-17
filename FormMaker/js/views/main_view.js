@@ -100,6 +100,10 @@ FormDesigner.Views.MainView = Backbone.View.extend({
                     console.log("fieldEditorModal Master  " ,data.master);
                     data.master.fCN = self.elementClickModel.fieldName;
                     self.m_Editor.updateElement(data.master);
+                    // var fields = FL.dd.t.entities[self.elementClickModel.entityName].fieldsList();
+                    // self.fieldsList.html(self.fieldsTempalate({"fields" : fields}));
+                    // self.m_Editor.setEntity(FL.dd.t.entities[self.elementClickModel.entityName]);
+                    // self.m_Editor.bindDraggableObject();
                 }
             }
         });
