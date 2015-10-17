@@ -348,7 +348,7 @@ button#editField {
 }
 
 td.option.field {
-padding: 10px;padding-bottom: 0px;}
+padding: 10px;padding-bottom: 0px;text-indent: 20px;      line-height: 35px;      width: 300px;      display: inline-block;}
 
 td.option.field > div {
     background-color: #ECECEC;
