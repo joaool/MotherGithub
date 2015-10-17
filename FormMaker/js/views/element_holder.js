@@ -25,7 +25,8 @@ FormDesigner.Views.ElementHolder = Backbone.View.extend({
         "click .delete-icon" :"onDeleteClick",
         "click #fields .ui-draggable" : "onEntityFieldItemClicked",
         "click #addLabel" : "onAddLabelClick",
-        "click #Add" : "onAddClick"
+        "click #Add" : "onAddClick",
+        "click .edit-field" : "onEditFieldIconClick"
     },
     bindDraggableObject : function(){
         this.dragNDropHandler = new DragNDrop();
@@ -59,16 +60,13 @@ FormDesigner.Views.ElementHolder = Backbone.View.extend({
             $("[field_id='"+element.model.get('fieldId')+"']").draggable("enable");
         }
     },
+    onEditFieldIconClick: function(evt){
+    },
     OnStart : function(event, ui){
 		console.log("Drag Started");
 	},
 	OnStop : function(event, ui){
 		console.log("Drop End");
-        //this.onDrop(event.target,ui.item[0]);
-        if ($(event.toElement).hasClass("dropppable") && $(ui.helper.context).attr("id")!= "Add" &&
-            $(ui.helper.context).attr("id")!= "addLabel")
-            $(ui.helper.context).draggable('disable');
-        
 	},
 	OnRevert : function(dropped){
 		console.log(dropped);
@@ -84,7 +82,8 @@ FormDesigner.Views.ElementHolder = Backbone.View.extend({
 		 	placeholder: "ui-state-highlight",
 			tolerance: "pointer",
 			stop : function(event, ui){
-				temp.onDrop(event.target,ui.item[0]);
+                $("#fields [field_id="+ui.item.attr("field_id")+"]").draggable('disable');
+                temp.onDrop(event.target,ui.item[0]);
 			},
 			beforeStop : function(event, ui){
 				temp.DroppedObjectOnMove = ui.helper;

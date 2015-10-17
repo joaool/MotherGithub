@@ -189,18 +189,7 @@
             </ul>
             <div class="scroller">
               <table class="sidebar-nav fields" id="fields">
-              <tr>
-                  <td class="option field ui-draggable"
-                        data-inputType="TextLabel"
-                        data-type="label"
-                        data-label="new Label"
-                        data-name="label-name"
-                        data-enum="null"
-                        data-description="label-description"
-                        data-fieldname="lbl">
-                        asdasda
-                  </td>
-                </tr>
+
               </table>
             </div>
 
@@ -213,8 +202,6 @@
                 <div class="row">
                     <div class="col-lg-12">
                         <h3>Form Designer</h3>
-                            <button id="editField" class="edit btn btn-success glyphicon glyphicon-pencil span4" title="edit grid columns"> table</button>
-                            
                         <div class="entities text-center">
                             Entities :
                             <div class="selectbox" id="entities">
@@ -266,8 +253,9 @@
                       data-fieldname="{{fCN}}"
                       cname="{{cname}}">
 	                    <div>
-                         {{label}}
-	                    </div>
+                         {{label}} 
+                            <div class="edit-field glyphicon glyphicon-pencil pull-right" title="edit field"></div>
+                        </div>
                   </td>
                 </tr>
             {{/each}}
