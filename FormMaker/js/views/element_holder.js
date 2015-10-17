@@ -22,7 +22,10 @@ FormDesigner.Views.ElementHolder = Backbone.View.extend({
         this.bindDraggableObject();
     },
     events : {
-        "click .delete-icon" :"onDeleteClick"
+        "click .delete-icon" :"onDeleteClick",
+        "click #fields .ui-draggable" : "onEntityFieldItemClicked",
+        "click #addLabel" : "onAddLabelClick",
+        "click #Add" : "onAddClick"
     },
     bindDraggableObject : function(){
         this.dragNDropHandler = new DragNDrop();
@@ -39,9 +42,15 @@ FormDesigner.Views.ElementHolder = Backbone.View.extend({
 										 revert : this.OnRevert,
 										 OnStartCallBack : this.OnStart.bind(this),
 										 OnStopCallBack : this.OnStop.bind(this)
-									  });
+							 		  });
 
         this.ApplySortingEvent();
+    },
+    onEntityFieldItemClicked: function(e){
+        var target = e.currentTarget;
+        if (!$(e.currentTarget).hasClass("ui-draggable-disabled")) {
+
+        }
     },
     onDeleteClick: function(e){
         var element = this.droppedElements[$(e.currentTarget).data("id")]
@@ -56,7 +65,7 @@ FormDesigner.Views.ElementHolder = Backbone.View.extend({
 	OnStop : function(event, ui){
 		console.log("Drop End");
         //this.onDrop(event.target,ui.item[0]);
-        if ($(ui.helper.context).attr("id")!= "Add" &&
+        if ($(event.toElement).hasClass("dropppable") && $(ui.helper.context).attr("id")!= "Add" &&
             $(ui.helper.context).attr("id")!= "addLabel")
             $(ui.helper.context).draggable('disable');
         
@@ -65,12 +74,12 @@ FormDesigner.Views.ElementHolder = Backbone.View.extend({
 		console.log(dropped);
 		return dropped;
 	},
+
     ApplySortingEvent : function(){
 		var temp = this;
     $( ".sortable" ).sortable();
     $( ".sortable" ).sortable("destroy");
 		$( ".sortable" ).sortable({
-            revert: false,
 			connectWith : ".sortable",
 		 	placeholder: "ui-state-highlight",
 			tolerance: "pointer",
@@ -104,7 +113,34 @@ FormDesigner.Views.ElementHolder = Backbone.View.extend({
         this.currentHoverElement = obj;
 		//this.m_PropertyToolbar.setElement(obj);
 	},
+    onAddLabelClick: function(){
+        var label = $("#addLabel");
+        var element = {
+            "element" : FormMaker.Elements.Label,
+            "leftLabel" : "new label",
+            "name" : "label",
+            "type" : "TextLabel",
+            "value" : null,
+            "id" : "Label"+this.labelIdCnt++,
+            "fieldName" : "lbl"
+        };
+        if(this.entityLoaded)
+            element.entityName = this.entityLoaded.csingular;
+        element.alignment = "left";
+        this.addElement("designerCol1",element);
+    },
+    onAddClick: function(){
+        FL.dd.t.entities[this.entityLoaded.csingular]
+            .addField( "TextField"+this.labelIdCnt++,
+                "Text Description",
+                "label", 
+                "text", 
+                "text", 
+                null);
+        var fCN = FL.dd.t.entities[this.entityLoaded.csingular].getCName("TextField");    
+    },
     onDrop : function(target,droppedObject){
+
         var cname = $(droppedObject).attr("cname");
         if ($(droppedObject).hasClass("dropped") && cname != "new") return;
 
