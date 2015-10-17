@@ -39,6 +39,7 @@ FormDesigner.Views.MainView = Backbone.View.extend({
     onElementClick: function(data){
         this.elementClickModel = data;
         $("#editField").html(data.leftLabel); 
+        this.onEditBtnClick();
     },
     onEditBtnClick: function(){
         if (this.elementClickModel.element == "TextLabel"){
@@ -97,6 +98,7 @@ FormDesigner.Views.MainView = Backbone.View.extend({
             if (result) {
                 if (changed) {
                     console.log("fieldEditorModal Master  " ,data.master);
+                    data.master.fCN = self.elementClickModel.fieldName;
                     self.m_Editor.updateElement(data.master);
                 }
             }
@@ -165,6 +167,7 @@ FormDesigner.Views.MainView = Backbone.View.extend({
             if (result) {
                 if (changed) {
                     console.log("titleModal Master  " ,data.master);
+                    data.master.fieldName = self.elementClickModel.fieldName;
                     self.m_Editor.updateLabel(data.master);
                 }
             }

@@ -61,6 +61,18 @@ FormDesigner.Views.ElementHolder = Backbone.View.extend({
         }
     },
     onEditFieldIconClick: function(evt){
+        var fCN = $(evt.currentTarget).data("fieldname");
+        var fields = FL.dd.t.entities[this.entityLoaded.csingular].fields[fCN];
+        var element = {
+            "element" : fields.type,
+            "leftLabel" : fields.label,
+            "name" : fields.name,
+            "type" : fields.typeUI,
+            "value" : fields.enumerable,
+            "fieldName" : fCN,
+            "entityName" : this.entityLoaded.csingular
+        };
+        this.trigger(FormMaker.Events.ElementClick,element);
     },
     OnStart : function(event, ui){
 		console.log("Drag Started");
@@ -139,7 +151,6 @@ FormDesigner.Views.ElementHolder = Backbone.View.extend({
         var fCN = FL.dd.t.entities[this.entityLoaded.csingular].getCName("TextField");    
     },
     onDrop : function(target,droppedObject){
-
         var cname = $(droppedObject).attr("cname");
         if ($(droppedObject).hasClass("dropped") && cname != "new") return;
 
@@ -335,6 +346,16 @@ FormDesigner.Views.ElementHolder = Backbone.View.extend({
             icon : elementData.icon,
             mergeWith : elementData.mergeWith
         };
+        FL.dd.t.entities[this.entityLoaded.csingular].
+        fields[elementData.fCN].
+        setField({
+            description: elementData.fieldDescription,
+            label: elementData.fieldLabel,
+            name: elementData.fieldName,
+            typeUI: FL.dd.userTypes[elementData.userType].typeUI
+        });
+
+        /*
         var elementType = FormMaker.CurrentElement.model.get("type");
         FormMaker.CurrentElement.model.set(data);
         FormMaker.CurrentElement.model.saveToDB();
@@ -349,7 +370,7 @@ FormDesigner.Views.ElementHolder = Backbone.View.extend({
         }
         else{
             FormMaker.CurrentElement.reRender();
-        }
+        }*/
     },
     changeType: function (id, type) {
         var elementView = this.droppedElements[id];
