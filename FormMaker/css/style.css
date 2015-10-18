@@ -365,7 +365,11 @@ td.option.field > div:hover {
     border-bottom: 3px solid #488294;
     color: #0A4B5F;
 }
-
+td.option.field.field-hovered > div{
+    background-color: #7BACBB!important;
+    border-bottom: 3px solid #488294!important;
+    color: #0A4B5F!important;
+}
 .delete-icon {
     position: absolute;
     top: 0px;

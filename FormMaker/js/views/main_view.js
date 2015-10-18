@@ -8,6 +8,7 @@ FormDesigner.Views.MainView = Backbone.View.extend({
     initialize: function(){
         this.m_Editor = new FormDesigner.Views.ElementHolder({el : "body"});
         this.listenTo(this.m_Editor, FormMaker.Events.ElementClick,this.onElementClick.bind(this));
+        this.listenTo(this.m_Editor, FormMaker.Events.FormLoaded,this.onFormLoaded.bind(this));
 
         this.setEntityModel(new FormDesigner.Models.EntityModel());
         this.entityTempalate = Handlebars.compile($("#entityOption").html() );
@@ -40,6 +41,12 @@ FormDesigner.Views.MainView = Backbone.View.extend({
         this.elementClickModel = data;
         $("#editField").html(data.leftLabel); 
         this.onEditBtnClick();
+    },
+    onFormLoaded: function(data){
+        var fields = FL.dd.t.entities[data].fieldsList();
+        this.fieldsList.html(this.fieldsTempalate({"fields" : fields}));
+        this.m_Editor.setEntity(FL.dd.t.entities[data]);
+        this.m_Editor.bindDraggableObject();
     },
     onEditBtnClick: function(){
         if (this.elementClickModel.element == "TextLabel"){
@@ -100,10 +107,7 @@ FormDesigner.Views.MainView = Backbone.View.extend({
                     console.log("fieldEditorModal Master  " ,data.master);
                     data.master.fCN = self.elementClickModel.fieldName;
                     self.m_Editor.updateElement(data.master);
-                    // var fields = FL.dd.t.entities[self.elementClickModel.entityName].fieldsList();
-                    // self.fieldsList.html(self.fieldsTempalate({"fields" : fields}));
-                    // self.m_Editor.setEntity(FL.dd.t.entities[self.elementClickModel.entityName]);
-                    // self.m_Editor.bindDraggableObject();
+                    
                 }
             }
         });

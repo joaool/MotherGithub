@@ -94,7 +94,6 @@ FormDesigner.Views.ElementHolder = Backbone.View.extend({
 		 	placeholder: "ui-state-highlight",
 			tolerance: "pointer",
 			stop : function(event, ui){
-                $("#fields [field_id="+ui.item.attr("field_id")+"]").draggable('disable');
                 temp.onDrop(event.target,ui.item[0]);
 			},
 			beforeStop : function(event, ui){
@@ -172,6 +171,7 @@ FormDesigner.Views.ElementHolder = Backbone.View.extend({
             "value" : dropDownEnum,
             "id" : id,
             "fieldName" : fieldName,
+            "fCN" : fieldName,
             "fieldId" : fieldId
         };
         if (cname){
@@ -196,6 +196,8 @@ FormDesigner.Views.ElementHolder = Backbone.View.extend({
     addElement: function(id,element){
         var obj = new FormMaker[element.element]({el : "#"+id,model : element});
         this.listenTo(obj, FormMaker.Events.ElementClick,this.onElementClick.bind(this));
+        this.listenTo(obj, FormMaker.Events.MouseOver,this.onElementHoverIn.bind(this));
+        this.listenTo(obj, FormMaker.Events.MouseOut,this.onElementHoverOut.bind(this));
         this.listenTo(obj, FormMaker.Events.ValueChange,this.onValueChange.bind(this));
         obj.loadData(element);
         obj.setParent("#"+id);
@@ -207,7 +209,17 @@ FormDesigner.Views.ElementHolder = Backbone.View.extend({
 		this.propertiesPanel.setElementProperties(element);
         this.setTypeField(element);
         $("body").css("cursor","default");
+        if (element.fCN != '')
+            $("#fields td[data-fieldname="+element.fCN+"]").draggable('disable');
 	},
+    onElementHoverIn: function(data){
+        if (data.fCN != "")
+            $("#fields td[data-fieldname="+data.fCN+"]").addClass("field-hovered");
+    },
+    onElementHoverOut: function(data){
+        if (data.fCN != "")
+            $("#fields td[data-fieldname="+data.fCN+"]").removeClass("field-hovered");
+    },
     onValueChange: function(data){
         this.propertiesPanel.setElementProperties(data);
     },
@@ -280,9 +292,10 @@ FormDesigner.Views.ElementHolder = Backbone.View.extend({
         this.entityLoaded = entity;
     },
     loadJson: function(data){
-        this.entityLoaded = data.eCN;
-        var leftElements = data.left;
-        var rightElements = data.right;
+        this.entityLoaded = FL.dd.t.entities[data.eCN];
+        this.trigger(FormMaker.Events.FormLoaded,data.eCN);
+        var leftElements = data.left || [];
+        var rightElements = data.right || [];
         $.each(leftElements,(function(i,element){
             if (element.fCN == ""){
                 var styleString = ";font-size:"+element.fontSize+";color:"+element.fontColor+";white-space:"+element.titleAlignment+";";
@@ -310,7 +323,8 @@ FormDesigner.Views.ElementHolder = Backbone.View.extend({
         }).bind(this));
         $.each(rightElements,(function(i,element){
             this.addElement("designerCol2",element);
-        }).bind(this))
+        }).bind(this));
+        
     },
     updateLabel : function(elementData){
         var styleString = ";font-size:"+elementData.fontSize+";color:"+elementData.fontColor+";white-space:"+elementData.titleAlignment+";";
