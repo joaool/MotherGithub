@@ -224,7 +224,8 @@ FormDesigner.Views.ElementHolder = Backbone.View.extend({
         this.propertiesPanel.setElementProperties(data);
     },
     onElementClick: function(data){
-
+        if (data.element == "TextLabel")
+            this.trigger(FormMaker.Events.ElementClick,data);
     },
     onTypeChange: function(data){
         this.changeType(data.id,data.value);
@@ -327,7 +328,7 @@ FormDesigner.Views.ElementHolder = Backbone.View.extend({
         
     },
     updateLabel : function(elementData){
-        var styleString = ";font-size:"+elementData.fontSize+";color:"+elementData.fontColor+";white-space:"+elementData.titleAlignment+";";
+        var styleString = ";font-size:"+elementData.fontSize+";color:"+elementData.fontColor+";text-align:"+elementData.titleAlignment+";";
         var data = {
             leftLabel : elementData.titleText,
             fontSize : elementData.fontSize,

@@ -126,7 +126,7 @@ FormDesigner.Views.MainView = Backbone.View.extend({
                 titleText: this.elementClickModel.leftLabel,
                 fontSize: this.elementClickModel.fontSize || 12,
                 fontColor: this.elementClickModel.fontColor || "black",
-                titleAlignment : this.elementClickModel.textAlignment || "normal",
+                titleAlignment : this.elementClickModel.textAlignment || "left",
                 fontSize_options: [
                     {
                         "value": 1,
@@ -162,11 +162,15 @@ FormDesigner.Views.MainView = Backbone.View.extend({
                 titleAlignment_options: [
                     {
                         "value": 1,
-                        "text": "normal"
+                        "text": "left"
                     },
                     {
                         "value": 2,
-                        "text": "nowrap"
+                        "text": "center"
+                    },
+                    {
+                        "value": 3,
+                        "text": "right"
                     }
                 ]
             }
