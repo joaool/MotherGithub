@@ -737,16 +737,14 @@ FL["common"] = (function () {//name space FL.common
                     button2: null
                 }, makeModalInfoCB, stackLevel);//OK
             }
-        }
-        ,
+        },
         makeModalConfirm: function (message, btn1, btn2, makeModalConfirmCB, stackLevel) {//button 2 is the default
             this.makeModal2("Confirmation", "<p>" + message + "</p>", {
                 type: "primary",
                 button1: btn1,
                 button2: btn2
             }, makeModalConfirmCB, stackLevel);//OK
-        }
-        ,
+        },
         makeModal2: function (title, message, options, makeModalCB, stackLevel) {
             // version specific for makeModalInfo and makeModal confirm - does not use parsley
             // CONDITIONS NECESSARY FOR makeModal() to work:
@@ -1132,6 +1130,33 @@ FL["common"] = (function () {//name space FL.common
                 top: '50%', // Top position relative to parent in px
                 left: '50%' // Left position relative to parent in px
             };
+            var target = document.getElementById(div);
+            var spinner = new Spinner(opts).spin(target);
+            return spinner;
+        },
+        loaderSmallAnimationON: function (div) {
+            var opts = {
+                lines: 11 // The number of lines to draw
+                , length: 8 // The length of each line
+                , width: 5 // The line thickness
+                , radius: 4 // The radius of the inner circle
+                , scale: 1 // Scales overall size of the spinner
+                , corners: 1 // Corner roundness (0..1)
+                , color: '#000' // #rgb or #rrggbb or array of colors
+                , opacity: 0.25 // Opacity of the lines
+                , rotate: 0 // The rotation offset
+                , direction: 1 // 1: clockwise, -1: counterclockwise
+                , speed: 1 // Rounds per second
+                , trail: 60 // Afterglow percentage
+                , fps: 20 // Frames per second when using setTimeout() as a fallback for CSS
+                , zIndex: 2e9 // The z-index (defaults to 2000000000)
+                , className: 'spinner' // The CSS class to assign to the spinner
+                , top: '50%' // Top position relative to parent
+                , left: '50%' // Left position relative to parent
+                , shadow: false // Whether to render a shadow
+                , hwaccel: false // Whether to use hardware acceleration
+                , position: 'absolute' // Element positioning
+            }
             var target = document.getElementById(div);
             var spinner = new Spinner(opts).spin(target);
             return spinner;
@@ -1677,30 +1702,44 @@ FL["common"] = (function () {//name space FL.common
             return xRet;
         },
         getArrUserType: function (arrOfRowValues) {//given an array of strings returns one of textbox,percentbox,numberbox,integerbox, currencybox,checkbox,datetimebox,emailbox,urlbox
-            // NOTE combobox must be resolved outside - phonebox TBD
-            var userType = "textbox";
-            if (FL.common.isArrOfCurrency(arrOfRowValues)) {
-                userType = "currencybox";
-            } else if (FL.common.isArrOfPercent(arrOfRowValues)) {
-                userType = "percentbox";
-            } else if (FL.common.isArrOfInteger(arrOfRowValues)) {
-                userType = "integerbox";
-            } else if (FL.common.isArrOfNumber(arrOfRowValues)) {
-                userType = "numberbox";
-            } else if (FL.common.isArrOfEmail(arrOfRowValues)) {
-                userType = "emailbox";
-            } else if (FL.common.isArrOfURL(arrOfRowValues)) {
-                userType = "urlbox";
-            } else if (FL.common.isArrOfCheck(arrOfRowValues)) {
-                userType = "checkbox";
-                //} else if (FL.common.isArrOfPhone(arrOfRowValues)) { //not working
-                //    userType = "phonebox";
-            } else if (FL.common.is_dateArrInStringFormat(arrOfRowValues)) {//values are in string format but are they a deguised date column ?
-                userType = "datetimebox";
+            // NOTE 1- This method must receive an array of strings. If any element of the array is not a string it returns null
+            // NOTE 2- combobox must be resolved outside - phonebox TBD
+            var userType = null;
+            if (FL.common.isArrOfStrings(arrOfRowValues)) {
+                userType = "textbox";
+                if (FL.common.isArrOfCurrency(arrOfRowValues)) {
+                    userType = "currencybox";
+                } else if (FL.common.isArrOfPercent(arrOfRowValues)) {
+                    userType = "percentbox";
+                } else if (FL.common.isArrOfInteger(arrOfRowValues)) {
+                    userType = "integerbox";
+                } else if (FL.common.isArrOfNumber(arrOfRowValues)) {
+                    userType = "numberbox";
+                } else if (FL.common.isArrOfEmail(arrOfRowValues)) {
+                    userType = "emailbox";
+                } else if (FL.common.isArrOfURL(arrOfRowValues)) {
+                    userType = "urlbox";
+                } else if (FL.common.isArrOfCheck(arrOfRowValues)) {
+                    userType = "checkbox";
+                    //} else if (FL.common.isArrOfPhone(arrOfRowValues)) { //not working
+                    //    userType = "phonebox";
+                } else if (FL.common.is_dateArrInStringFormat(arrOfRowValues)) {//values are in string format but are they a deguised date column ?
+                    userType = "datetimebox";
+                }
             }
             return userType;
-        }
-        ,
+        },
+        isArrOfStrings: function (arrOfRowValues) {//given an array returns true if all its elements are strings
+            var failElement = _.find(arrOfRowValues, function (element) { //if failElement is undefined => all elements are a valid number format
+                if(FL.common.typeOf(element)!="string")
+                    return true;
+                else
+                    return false;
+            });
+            if (!_.isUndefined(failElement))//at least one element is not a string. Therefdore not an array of strings
+                return false;
+            return true;//it is an array of strings
+        },
         isArrOfNumber: function (arrOfRowValues) {//given an array of strings returns true if it is a number representation, false if not
             var failElement = _.find(arrOfRowValues, function (element) { //if failElement is undefined => all elements are a valid number format
                 return !element.isNumeric();
@@ -1711,7 +1750,7 @@ FL["common"] = (function () {//name space FL.common
         },
         isArrOfCurrency: function (arrOfRowValues) {//given an array of strings returns true if it is a currency representation, false if not
             var failElement = _.find(arrOfRowValues, function (element) { //if failElement is undefined => all elements are a valid number format
-                return !element.isCurrency();
+                 return !element.isCurrency();
             });
             if (!_.isUndefined(failElement))//not an array of currency
                 return false;

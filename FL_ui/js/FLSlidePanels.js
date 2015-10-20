@@ -139,7 +139,7 @@ jQuery(document).ready(function($){
 				});
 			},
 			dictTemplateChangeWhatIsLabel: function(form){
-				// alert('saiu to dictTemplateExitingSingular with -->'+ form.singular.value);
+				alert('saiu to dictTemplateExitingSingular with -->'+ form.singular.value);
 				var articleAndWord = FL.dd.preArticle(form.entityName.value,"En");
 				var plural = FL.dd.plural(form.entityName.value,"En");
 				// var article = "a";
@@ -151,7 +151,7 @@ jQuery(document).ready(function($){
 				// 	$("#_dictEditEntityTemplate_plural").html("FrameLink will import a table of " + plural + " with " + csvStore.getNumberOfLines() + " lines, each one with a single " + form.singular.value + ".");
 			},
 			dictTemplateChangeDescription: function(form){
-				// alert('saiu to dictTemplateExitingSingular with -->'+ form.singular.value);
+				alert('saiu to dictTemplateExitingSingular with -->'+ form.singular.value);
 				var articleAndWord = FL.dd.preArticle(form.entityName.value,"En");
 				var plural = FL.dd.plural(form.entityName.value,"En");
 				var description = form.entityDescription.value;
@@ -161,6 +161,7 @@ jQuery(document).ready(function($){
 				// $("#_dictEditEntityTemplate_whatIsLabel").html("What is " + articleAndWord + " " + form.singular.value + " ?");
 				// $("#_dictEditEntityTemplate_whatIsLabel").html("What is " + articleAndWord + " ?");
 				$("#_dictEditEntityTemplate_whatIsLabel").html(articleAndWord +" is " + description);
+				//$("#_dictEditEntityTemplate_whatIsLabel").html(description+" of "+form.entityName.value);
 			},
 			dictTemplateAttributeValidation: function(form,order){
 				// var statementId = "stat" + order;
@@ -180,7 +181,8 @@ jQuery(document).ready(function($){
 				var description = form.entityDescription.value;
 				var descriptionBeginning = FL.dd.preArticle(description,"En");
 				description = descriptionBeginning;
-				var statement = "The " + attribute + " of " + articleAndWord + " is the " +  attributeDescription;
+				//var statement = "The " + attribute + " of " + articleAndWord + " is the " +  attributeDescription;
+				var statement = attributeDescription + " of "+form.entityName.value;
 				// FL.common.printToConsole("FLSlidePanel.js dictTemplateAttributeValidation statement=" + statement);
 				$("#" + statementId ).html(statement);
 			},

@@ -16,6 +16,11 @@ FL["modal"] = (function () {//name space FL.modalIn
         getFromBuffer: function (bufferName) {//used to send parameters (only once) from any module to any module via global window
             return this.bufferObj[bufferName];
         },
+        IconBar: function (iconMenu,nameOfTemplateEl,slotId) {//array of JSONs, template name of Element ---->also  needs iconBar.css
+            //iconMenu - ex:  [{icon:"K",iconCall:"#",items:[]}, {icon:"@",iconCall:"#",items:[{label:"Google",href:"http://www.google.com"}, {label:"abc",href:"javascript:f1('Not available')"}]
+            //nameOfTemplateEl - name of template in launching html ex: "_iconBarElement"
+            //slotId - slot to place the html ex:"_iconBarSlot"
+        },
         Box: function (title, templateName, data, options, makeModalCB) {
             var that = this;//This is a workaround for an error in the ECMAScript Language Specification which causes this to be set incorrectly for inner functions.
             var getDialogHTML = function (modalId, stackLevel, title, htmlIn, options) {

@@ -614,6 +614,7 @@ FL["dd"] = (function () {//name space FL.dd
                                 var xLabel = xArr[i].label;
                                 var xType = xArr[i].type;
                                 var xTypeUI = xArr[i].typeUI;
+                                var xUserType = FL.dd.userType({type:xArr[i].type, typeUI:xArr[i].typeUI});
                                 var xMask = xArr[i].mask;
                                 var xSpecialTypeDef = xArr[i].specialTypeDef;
                                 if (FL.common.typeOf(xSpecialTypeDef) == "array") {
@@ -624,8 +625,8 @@ FL["dd"] = (function () {//name space FL.dd
                                 }
                                 var xKey = xArr[i].key;
                                 var xEnumerable = xArr[i].enumerable;
-                                // FL.common.printToConsole("-----> attribute["+i+"]="+xName+"/"+xDescr+"/"+xCName+",key="+xKey+",type="+xType);
-                                FL.common.printToConsole("-----> attribute[" + i + "]=" + xName + "/" + xDescr + "/" + xCName + ",label=" + xLabel + ",key=" + xKey + ",type=" + xType + ",typeUI=" + xTypeUI + ",mask=" + xMask + ",specialTypeDef=" + xSpecialTypeDef, "dump");
+                                //FL.common.printToConsole("-----> attribute[" + i + "]=" + xName + "/" + xDescr + "/" + xCName + ",label=" + xLabel + ",key=" + xKey + ",type=" + xType + ",typeUI=" + xTypeUI + ",mask=" + xMask + ",specialTypeDef=" + xSpecialTypeDef, "dump");
+                                FL.common.printToConsole("-----> attribute[" + i + "]=" + xName + "/" + xDescr + "/" + xCName + ",label=" + xLabel + ",key=" + xKey + ",userType=" + xUserType + ",mask=" + xMask + ",specialTypeDef=" + xSpecialTypeDef, "dump");
                                 if (xEnumerable) {
                                     for (var j = 0; j < xEnumerable.length; j++) {
                                         FL.common.printToConsole("------------> enumerable[" + j + "]=" + xEnumerable[j], "dump");
@@ -763,6 +764,27 @@ FL["dd"] = (function () {//name space FL.dd
             }
             // return xRet;
             return def.promise();
+        },
+        updateLocalEntityBySingular: function (xSingular, xOptions) {//updates an existing entity. It can uodate the entity key "singular"
+            //Ex: updateEntityBySingular("client",{singular:"client",plural:"clients",description:"company that buys from us"});
+            //This method updates the server dictionary !!!! - it needs a working connection
+            var oEntity = null;
+            var oEntityUpdate = null;
+            var xRet = false;
+            if (this.entities[xSingular]) {//xSingular exists in dictionary
+                var eCN = this.getCEntity(xSingular);
+                oEntity = this.entities[xSingular];
+                oEntityUpdate = _.extend(oEntity, xOptions);
+                if (oEntityUpdate.singular != xSingular) {
+                    delete this.entities[xSingular];//now that all relations are gone we can delete the entity
+                    this.entities[oEntityUpdate.singular] = oEntityUpdate;
+                } else {
+                    this.entities[xSingular] = oEntityUpdate;
+                }
+                oEntity.sync = false;
+                xRet = true;
+            }
+            return xRet;
         },
         updateEntityByCName: function (xCName, xOptions) {//updates entity with compressed name = xCName with xOptions object
             //Ex: updateEntityByCName("02",false,{plural:"clients",description:"company that buys from us"});
@@ -1026,6 +1048,39 @@ FL["dd"] = (function () {//name space FL.dd
                 return def.reject(err);
             }
             return def.promise();
+        },
+        updateLocalAttribute: function (xSingular, xAttribute, changeObj) {
+            //changeObj is an object with keys corresponding to xAttribute (old name - notice that the name itself can be changed).
+            // May have any key or key combination of:{name:xName,description:xDescription,label:xLabel,type:xType,typeUI:xTypeUI,enumerable:xEnumerable}
+            var err = null;
+            var oEntity = this.entities[xSingular];
+            if (oEntity) {
+                var xIndex = attributeIndex(xSingular, xAttribute);
+                if (xIndex >= 0) {//if attribute exists
+                    var attributesCopy = getDictAttributesBackup(oEntity.attributes);//it is an overkill- we only need one attribute
+                    var attrCopy = attributesCopy[xIndex];
+                    // var oAttributes = _.extend(oEntity.attributes[xIndex], changeObj);//notice that the attribute name may also belong to changeObj
+                    var oAttributes = _.extend(attrCopy, changeObj);//notice that the attribute name may also belong to changeObj
+                    if (oAttributes.name != xAttribute) {//attribute name was changed. It is necessary to update L2C and C2L
+                        var compressedAttr = oEntity.L2C[xAttribute];
+                        oEntity.C2L[compressedAttr] = oAttributes.name;//Compressed to Logical is updated
+                        oEntity.C2L[compressedAttr] = oAttributes.name;//Compressed to Logical is updated
+                        delete oEntity.L2C[xAttribute];
+                        oEntity.L2C[oAttributes.name] = compressedAttr;
+                    }
+                    oEntity.attributes[xIndex] = _.omit(oAttributes, "oldname", "singular");
+                    var fCN = oEntity.L2C[oAttributes.name];
+                    oEntity.sync = false;
+                    //var eCN = oEntity.csingular;
+                } else {
+                    err = "FL.dd.updateAttribute Error: impossible to update attribute " + xAttribute + ". It does not exist in entity " + xSingular;
+                    return def.reject(err);
+                }
+            } else {
+                err = "FL.dd.updateAttribute Error: you tried to update attribute " + xAttribute + " to a non existing entity " + xSingular;
+                return def.reject(err);
+            }
+            return;
         },
         addRelation: function (xSingular, withEntityName, verb, cardinality, side, storedHere, xLanguage) {//adds a new relation to the array of relations of entity xSingular
             //xLanguage --> En, Fr, Nl, Pt
@@ -1334,6 +1389,7 @@ FL["dd"] = (function () {//name space FL.dd
             "check": {type: "string", typeUI: "checkbox"},
             "url": {type: "string", typeUI: "urlbox"},
             "lookup": {type: "string", typeUI: "lookupbox"},
+            "lookup link": {type: "string", typeUI: "lookupbox"},
         },
         arrOfUserTypesForDropdown: function () {//returns an array of objects with keys value and text, mandatory for dropdowns.
             //	var arrOfObj=[{value:1,text:"number",something:"abc"},{value:2,text:"text",something:"abc"},{value:3,text:"email",something:"abc"},{value:4,text:"phone",something:"abc"},{value:5,text:"enumerable",something:"abc"},{value:6,text:"date",something:"abc"}];
@@ -1366,6 +1422,7 @@ FL["dd"] = (function () {//name space FL.dd
                     "checkbox": "check",
                     "urlbox": "url",
                     "lookupbox": "lookup",
+                    "lookuplinkbox": "lookup link",
                 };
                 userType = typeUIConverterInsideString[attributesElement.typeUI];
             } else {
@@ -1543,21 +1600,43 @@ FL["dd"] = (function () {//name space FL.dd
                         element["disp"] = function (x) {
                             return "hello " + x;
                         };
-                        element["setField"] = function (options) {//options:(name,description,label,type,typeUI,enumerable)
+                        //element["setField"] = function (options) {//options:(name,description,label,type,typeUI,enumerable)
+                        //    var entityName = this.parent;
+                        //    var fieldName = this.name;
+                        //    FL.common.printToConsole("--> saves -->FL.dd.t.entities[" + value.csingular + "].fields[" + fCN + "].setField(" + JSON.stringify(options) + ")", "dd");
+                        //
+                        //    var promise = FL.dd.updateAttribute(entityName, fieldName, options);
+                        //    promise.done(function (dataArray) {
+                        //        FL.dd.init_t();//update changes to FL.dd.t.entities
+                        //        FL.API.serverCallBlocked = false;
+                        //        return;
+                        //    });
+                        //    promise.fail(function (err) {
+                        //        alert("FL.dd.t.entities[].fields[].setField() error impossible to update field attributes");
+                        //        return;
+                        //    });
+                        //};
+                        element["set"] = function (options) {//options: JSON with properties (name,description,label,userType,enumerable)
+                            //saves in local dictionary only
+                            //	FL.dd.t.entities[eCN].fields[fCN].set({name:"titleOfSkill",label:"Professional title"});
                             var entityName = this.parent;
                             var fieldName = this.name;
-                            FL.common.printToConsole("--> saves -->FL.dd.t.entities[" + value.csingular + "].fields[" + fCN + "].setField(" + JSON.stringify(options) + ")", "dd");
-
-                            var promise = FL.dd.updateAttribute(entityName, fieldName, options);
-                            promise.done(function (dataArray) {
+                            if (options.userType) {//to convert options:(name,description,label,userType,enumerable) to (name,description,label,type,typeUI,enumerable) used by updateLocalAttribute
+                                var typeObj = FL.dd.userTypes[options.userType];
+                                if (typeObj) {
+                                    var changeObj = _.extend({type: typeObj.type, typeUI: typeObj.typeUI}, options);
+                                } else {
+                                    alert("Error in FL.dd.t.entities[eCN].fields[fCN].set() userType:" + options.userType + " is unknown !");
+                                    changeObj = null;
+                                }
+                            } else {
+                                changeObj = options;//userType not in options
+                            }
+                            if (changeObj) {
+                                FL.common.printToConsole("--> saves -->FL.dd.t.entities[" + value.csingular + "].fields[" + fCN + "].setField(" + JSON.stringify(changeObj) + ")", "dd");
+                                FL.dd.updateLocalAttribute(entityName, fieldName, changeObj);
                                 FL.dd.init_t();//update changes to FL.dd.t.entities
-                                FL.API.serverCallBlocked = false;
-                                return;
-                            });
-                            promise.fail(function (err) {
-                                alert("FL.dd.t.entities[].fields[].setField() error impossible to update field attributes");
-                                return;
-                            });
+                            }
                         };
                         fieldsObj[fCN] = element;
                         // fieldsObj["disp"] = function(x){return "hello "+x;};
@@ -1566,15 +1645,16 @@ FL["dd"] = (function () {//name space FL.dd
                     properties["fields"] = fieldsObj;
                     properties["set"] = function (options) {
                         var entityName = this.singular;
-                        FL.dd.updateEntityBySingular(entityName, options);
+                        FL.dd.updateLocalEntityBySingular(entityName, options);
                         FL.dd.init_t();//update changes to FL.dd.t.entities
                     };
                     properties["getFieldCName"] = function (fieldName) {//if field name does not exist returns null
+                        //	var fCN = FL.dd.t.entities[eCN].getFieldCName("petName");
                         var entityName = this.singular;
                         return FL.dd.getFieldCompressedName(entityName, fieldName);//returns null if entity name does not exist
                     };
-                    properties["fieldsList"] = function () {
-                        var fieldsListArr = [];
+                    properties["fieldList"] = function () {
+                        var fieldListArr = [];
                         var oEntity = FL.dd.entities[this.singular];
                         var L2C = oEntity.L2C;
                         if (oEntity) {//if entity exists
@@ -1586,25 +1666,55 @@ FL["dd"] = (function () {//name space FL.dd
                                     el["description"] = element.description;
                                     el["label"] = element.label;
                                     el["statement"] = attributeSemantics(element.name, element.description, oEntity, "En");
-                                    el["type"] = element.type;
+                                    //el["type"] = element.type;
+                                    var xUserType = FL.dd.userType({type:element.type, typeUI:element.typeUI});
+                                    el["userType"] =xUserType
                                     el["enumerable"] = element.enumerable;
-                                    el["typeUI"] = element.typeUI;
+                                    //el["typeUI"] = element.typeUI;
                                     el["mask"] = element.mask;
                                     el["specialTypeDef"] = element.specialTypeDef;
                                     // ----
-                                    fieldsListArr.push(el);
+                                    fieldListArr.push(el);
                                 }
                             }, this);
                         } else {
                             return null;
                         }
-                        return fieldsListArr;
+                        return fieldListArr;
                     };
-                    properties["addField"] = function (name, description, label, type, typeUI, arrEnumerable) {//if it exists update it otherwise a new is created
-                        FL.dd.addAttribute(this.singular, name, description, label, type, typeUI, arrEnumerable);
-                        // FL.dd.upsertAttribute(this.singular,name,options);
+                    //properties["addField"] = function (name, description, label, type, typeUI, arrEnumerable) {//if it exists update it otherwise a new is created
+                    properties["addField"] = function (name, description, label, userType, arrEnumerable) {//if it exists update it otherwise a new is created
+                        //example	FL.dd.t.entities[eCN].addField("petName","name assigned to pet","your pet name","text");
+                        var typeObj = FL.dd.userTypes[userType];
+                        if (typeObj) {
+                            FL.dd.addAttribute(this.singular, name, description, label, typeObj.type, typeObj.typeUI, arrEnumerable);
+                            // FL.dd.upsertAttribute(this.singular,name,options);
+                            FL.dd.init_t();//update changes to FL.dd.t.entities
+                        } else {
+                            alert("Error in FL.dd.t.entities[eCN].addField() 4th paramenter userType=" + userType + " is unknown !");
+                        }
                         //   options = {description:description,label:label,type:type, typeUI:typeUI,mask:mask,specialTypeDef:specialTypeDef,enumerable:arrEnumerable}
-                        FL.dd.init_t();//update changes to FL.dd.t.entities
+                        return FL.dd.getFieldCompressedName(this.singular, name);//return null name does not exist
+                    };
+                    properties["save"] = function () {//it will commit entity eCN (local name) to server, returning the new eCN
+                        //	var promiseSave = FL.dd.t.entities[eCN].save();//fieldsList()
+                        var def = $.Deferred();
+                        var eCN = this.csingular;
+                        var entityName = FL.dd.getEntityByCName(eCN);
+                        if (FL.dd.isEntityByCNInSync(eCN)) {
+                            return def.resolve(eCN);
+                        } else {
+                            FL.API.syncLocalDictionaryToServer(entityName)
+                                .then(function () {
+                                    eCN = FL.dd.getCEntity(entityName);
+                                    FL.dd.init_t();//update changes to FL.dd.t.entities
+                                    return def.resolve(eCN);
+                                }
+                                , function (err) {
+                                    return def.reject("FLdd2 FL.dd.t.entities[<eCN>].save() ERROR: unable to synch " + entityName + "/" + eCN + " to server! ERROR->" + err);
+                                });
+                        }
+                        return def.promise();
                     };
                     properties["getCName"] = function (fieldName) {//if field name does not exist returns null
                         // var entityName = "sub";//this.singular;
@@ -1626,15 +1736,37 @@ FL["dd"] = (function () {//name space FL.dd
                 }
             });
             z["add"] = function (singular, description) {
+                //example FL.dd.t.entities.add({singular:"dog",description: "pet cared by a family");
                 FL.dd.createEntity(singular, description);
                 //now we need to replicate it to the mockup structure - creating a new entry with the compressed name
                 var oEntity = FL.dd.entities[singular];
                 var eCN = FL.dd.getCEntity(singular);
                 FL.dd.init_t();//update changes to FL.dd.t.entities
-                // var newEntry = {};
-                // newEntry[eCN] = {singular:oEntity.singular,csingular:oEntity.csingular,plural:oEntity.plural,description:oEntity.description,sync:oEntity.sync};
-                // _.extend(FL.dd.t.entities,newEntry);
+                return eCN;
             };
+            //z["add"] = function (singular, description) {
+            //    //example FL.dd.t.entities.add({singular:"dog",description:"pet cared by a family"},callback);
+            //    var def = $.Deferred();
+            //    var singular = options.singular;
+            //    if(!singular)
+            //        return def.reject("error: missing singular");
+            //    var options = _.extend( {description:singular+"'s description" },options);
+            //    FL.dd.createEntity(singular,options.description);
+            //    //now we need to replicate it to the mockup structure - creating a new entry with the compressed name
+            //    var oEntity = FL.dd.entities[singular];
+            //    var eCN = null;
+            //    FL.API.syncLocalDictionaryToServer(entityName)
+            //        .then(function () {
+            //            eCN = FL.dd.getCEntity(singular);
+            //            FL.dd.init_t();//update changes to FL.dd.t.entities
+            //            return def.resolve(eCN);
+            //        }
+            //        , function (err) {
+            //            //alert("FLdd2 FL.dd.t.entities.add(<entityName>,<entityDescription>) ERROR: cannot sync " + entityName + " to server!");
+            //            return def.reject("FLdd2 FL.dd.t.entities.add(<entityName>,<entityDescription>) ERROR: cannot sync " + entityName + " to server!");
+            //        });
+            //    return def.promise();
+            //};
             z["dumpToConsole"] = function () {
                 FL.dd.displayEntities();
             };

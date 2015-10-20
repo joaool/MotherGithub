@@ -523,7 +523,6 @@ FL["API"] = (function () {//name space FL.API
             FL.common.printToConsole("............................._fieldUpdate....");
             // err = "abc";
             if (err) {
-                // alert("ERROR ON _addWithFields err="+err);
                 FL.common.printToConsole("======================>ERROR ON _fieldUpdate err=" + err);
                 def.reject("ERROR: _fieldUpdate err=" + err);
             } else {
@@ -615,7 +614,6 @@ FL["API"] = (function () {//name space FL.API
             FL.common.printToConsole("............................._restoreMainMenuStyleANDfontFamily....");
             // err = "abc";
             if (err) {
-                // alert("ERROR ON _addWithFields err="+err);
                 FL.login.appToken.error = "_restoreMainMenuStyleANDfontFamily err=" + err;
                 FL.common.printToConsole("======================>ERROR ON " + FL.login.appToken.error);
                 def.reject("ERROR: " + FL.login.appToken.error);
@@ -674,7 +672,6 @@ FL["API"] = (function () {//name space FL.API
             FL.common.printToConsole("............................._restorePage....");
             // err = "abc";
             if (err) {
-                // alert("ERROR ON _addWithFields err="+err);
                 FL.common.printToConsole("======================>ERROR ON _restorePage err=" + err);
                 def.reject("ERROR: _restorePage err=" + err);
             } else {
@@ -760,7 +757,6 @@ FL["API"] = (function () {//name space FL.API
             FL.common.printToConsole("............................._saveHomePage....");
             // err = "abc";
             if (err) {
-                // alert("ERROR ON _addWithFields err="+err);
                 FL.common.printToConsole("======================>ERROR ON _saveHomePage err=" + err);
                 def.reject("ERROR: _saveHomePage err=" + err);
             } else {
@@ -1521,17 +1517,17 @@ FL["API"] = (function () {//name space FL.API
         },
         syncLocalDictionaryToServer: function (entityName) {//synch table entityName existing in local dictionary with server dict
             // entityName - singular name as it is in local dd
-            FL.common.printToConsole("....................................>beginning syncLocalDictionaryToServer....with token=" + JSON.stringify(FL.login.token));
+            FL.common.printToConsole("....................................>beginning syncLocalDictionaryToServer....with token=" + JSON.stringify(FL.login.token),"API");
             var def = $.Deferred();
             var entityJSON = this.prepareJSONFromLocalEntity(entityName);
             // alert("entityJSON = "+JSON.stringify(entityJSON));
             var addWithFields = _addWithFields(entityJSON);
             addWithFields.done(function () {
-                FL.common.printToConsole(">>>>> syncLocalDictionaryToServer SUCCESS <<<<<");
+                FL.common.printToConsole(">>>>> syncLocalDictionaryToServer SUCCESS <<<<<","API");
                 return def.resolve();
             });
             addWithFields.fail(function (err) {
-                FL.common.printToConsole(">>>>> syncLocalDictionaryToServer FAILURE <<<<< " + err);
+                FL.common.printToConsole(">>>>> syncLocalDictionaryToServer FAILURE <<<<< " + err,"API");
                 return def.reject();
             });
             return def.promise();
@@ -2199,8 +2195,7 @@ FL["API"] = (function () {//name space FL.API
                 def.reject(err);
             });
             return def.promise();
-        }
-        ,
+        },
         syncLocalStoreToServer: function () {//saves menu,style and font to server, retrieving them from localStore
             var def = $.Deferred();
             var lastMenuStr = localStorage.storedMenu
@@ -2225,8 +2220,7 @@ FL["API"] = (function () {//name space FL.API
             // 	// alert("FLMenu2.js saveMenuToLocalAndServer called FL.server.saveMainMenu with style="+lastStyleStr+ " font="+lastFontFamilyStr);
             // });
             return def.promise();
-        }
-        ,
+        },
         XcreateHistoMails_ifNotExisting: function () {//checks if histoMails exist. If not creates it
             var eCN = FL.dd.getCEntity("_histoMail");
             // eCN = 23;
@@ -2251,8 +2245,7 @@ FL["API"] = (function () {//name space FL.API
                 def.resolve();//it exists already
             }
             return def.promise();
-        }
-        ,
+        },
         createTableHistoMails_ifNotExisting: function (entityName) {// createHistoMails_ifNotExisting: function(entityName) {//creates "_histoMail_<eCN>" where eCN is the Entity Compressed name of entityName
             //Note: entityName must exist
             var def = $.Deferred();
@@ -2283,8 +2276,7 @@ FL["API"] = (function () {//name space FL.API
                 }
             }
             return def.promise();
-        }
-        ,
+        },
         createTemplates_ifNotExisting: function () {//checks if templates exist. If not creates it
             var eCN = FL.dd.getCEntity("_templates");
             // eCN = 23;
@@ -2309,8 +2301,7 @@ FL["API"] = (function () {//name space FL.API
                 def.resolve();//it exists already
             }
             return def.promise();
-        }
-        ,
+        },
         mailRecipientsOfTemplate: function (entityName, templateName) {//for list entityName and templateName returns all emails received in Webhook
             //assumes a login to an application exists
             FL.common.printToConsole("....................................>beginning mailRecipientsOfTemplate....with appToken=" + JSON.stringify(FL.login.appToken));
@@ -2348,8 +2339,7 @@ FL["API"] = (function () {//name space FL.API
                 def.reject(err);
             });
             return def.promise();
-        }
-        ,
+        },
         upsertByKey: function (keyFieldValue, entityName, record) {
             //upsert record for <keyField>=<keyFieldValue> in table entityName
             //record is a JSON that may contain _id key ex: {"_id":12345,"id":1,"code":"abc"}
@@ -2380,8 +2370,7 @@ FL["API"] = (function () {//name space FL.API
                 }
             }
             return def.promise();
-        }
-        ,
+        },
         upsertByKeyOnECN: function (keyFieldValue, eCN, recordWithFCN) {//upsert for <keyField>=<keyFieldValue>for list entityName and templateName returns all emails received in Webhook
             //if _id exists =>direct update
             //upsert record with field compressed names  for <fCNkey>=<keyFieldValue> in table with compressed name eCN
@@ -2399,8 +2388,7 @@ FL["API"] = (function () {//name space FL.API
                     return def.reject("upsertByKeyOnECN with _id unable to insert err=" + err);
                 });
             return def.promise();
-        }
-        ,
+        },
         mandrillRejectListForSender: function (senderEmail) {//get reject list from mandrill only for sender=sender
             FL.common.printToConsole("....................................>beginning mandrillRejectListForSender....with appToken=" + JSON.stringify(FL.login.appToken));
             var def = $.Deferred();
@@ -2413,8 +2401,7 @@ FL["API"] = (function () {//name space FL.API
                     return def.reject("mandrillRejectListForSender FAILURE err=" + err);
                 });
             return def.promise();
-        }
-        ,
+        },
         mandrillDeleteFromReject: function (arrayOfEmails) {//get reject list from mandrill only for sender=sender
             FL.common.printToConsole("....................................>beginning mandrillDeleteFromReject....with appToken=" + JSON.stringify(FL.login.appToken));
             var def = $.Deferred();
@@ -2427,8 +2414,7 @@ FL["API"] = (function () {//name space FL.API
                     return def.reject("mandrillDeleteFromReject FAILURE err=" + err);
                 });
             return def.promise();
-        }
-        ,
+        },
         customTable: function (entityProps) {
             // Ex FL.API.customTable({singular:"shipment"});
             //uses --> FL.dd.createEntity("sales rep","employee responsable for sales");
@@ -2478,8 +2464,7 @@ FL["API"] = (function () {//name space FL.API
             // def.reject();//to test
             return def.promise();
             // alert("FL.server.test() -->"+x);
-        }
-        ,
+        },
         getFLContextFromBrowserLocationBar: function () {//to be used at the entry point of independent applications
             //reads the browser adress bar to get the connection string then connects to the default application
             var def = $.Deferred();
@@ -2516,16 +2501,13 @@ FL["API"] = (function () {//name space FL.API
                 }
             }
             return def.promise();
-        }
-        ,
+        },
         nicoTestDuplicateIds: function (arrToTest) {
             return nicoTestDuplicateIds(arrToTest);
-        }
-        ,
+        },
         nicoTestDuplicateIds: function (arrToTest) {
             return nicoTestDuplicateIds(arrToTest);
-        }
-        ,
+        },
         testFunc: function (x) {
             alert("FL.server.test() -->" + x);
         }

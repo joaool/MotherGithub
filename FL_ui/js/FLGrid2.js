@@ -90,15 +90,17 @@ FL["grid"] = (function () {//name space FL.grid
             if (!flagFormatDiscovered) {
                 _.each(arrOfKeys, function (colName, index) {
                     if (!flagFormatDiscovered) {
-                        var userType = FL.common.getArrUserType([currentRow[colName]]);
-                        if (userType == "numberbox") {
-                            discoverRadixAndSep(currentRow[colName]);
-                        } else if (userType == "currencybox") {
-                            var strNum = FL.common.extractContentBetweenFirstAndLastDigit(currentRow[colName]);// - is excluded !!!! IMPORTANT
-                            discoverRadixAndSep(strNum);
-                        } else if (userType == "percentbox") {
-                            var strNum = FL.common.extractContentBetweenFirstAndLastDigit(currentRow[colName]);// - is excluded !!!! IMPORTANT
-                            discoverRadixAndSep(strNum);
+                        var userType = FL.common.getArrUserType([currentRow[colName]]);//assumes an array of strings. If any element is not string it returns null
+                        if (userType) {
+                            if (userType == "numberbox") {
+                                discoverRadixAndSep(currentRow[colName]);
+                            } else if (userType == "currencybox") {
+                                var strNum = FL.common.extractContentBetweenFirstAndLastDigit(currentRow[colName]);// - is excluded !!!! IMPORTANT
+                                discoverRadixAndSep(strNum);
+                            } else if (userType == "percentbox") {
+                                var strNum = FL.common.extractContentBetweenFirstAndLastDigit(currentRow[colName]);// - is excluded !!!! IMPORTANT
+                                discoverRadixAndSep(strNum);
+                            }
                         }
                     }
                 });
@@ -135,13 +137,21 @@ FL["grid"] = (function () {//name space FL.grid
                     //analysis of the first 50 elements or all if length<50
                     var fieldType = "string";
                     userType = FL.common.getArrUserType(arrOfSampleRowValues);//one of textbox,numberbox,integerbox,currencybox,percentbox,urlbox,checkbox,datetimebox,emailbox
-                    if (userType == "textbox") {//it may be a combobox
-                        if (FL.common.is_enumerableArr(arrOfSampleRowValues, percent)) {//It is an enumerable we will prepare the enumerable content
-                            var arrOfAllRowValues = _.pluck(rows, element);
-                            var fullUniqueObj = FL.common.extractUniqueFromArray(arrOfAllRowValues);
-                            enumerable = fullUniqueObj.uniqueArr;
-                            userType = "combobox";
+                    if (userType) {
+                        if (userType == "textbox") {//it may be a combobox
+                            if (FL.common.is_enumerableArr(arrOfSampleRowValues, percent)) {//It is an enumerable we will prepare the enumerable content
+                                var arrOfAllRowValues = _.pluck(rows, element);
+                                var fullUniqueObj = FL.common.extractUniqueFromArray(arrOfAllRowValues);
+                                enumerable = fullUniqueObj.uniqueArr;
+                                userType = "combobox";
+                            }
                         }
+                    } else {//user type is null => although the first column element is a string there are one or more column elements that are not string
+                        var property = element;
+                        _.each(rows, function (row, index) {
+                            rows[index][property] = FL.common.forceToString(row[property]);
+                        });
+                        userType = "textbox";
                     }
                 } else {
                     var arrOfSamplesStr = [];//because arrOfSampleRowValues is an array of numbers we must convert it to string before discovering the type
@@ -599,44 +609,6 @@ FL["grid"] = (function () {//name space FL.grid
                 var elementAnchor = insideDiv.find('a');//Id already assigned we search the sub element anchor
                 if (item.link)
                     $(elementAnchor).attr('href', item.link);
-
-
-                /*
-                 //------TEST CODE
-                 //http://jsfiddle.net/joaool/MCSyr/230/
-                 var style ={};
-                 if(window.templateCounter==0){
-                 $(elementImg).attr('src','http://placehold.it/140x100');//<img src='http://placehold.it/200x200'/>
-                 $(elementImg).attr("align","right");
-                 }else if(window.templateCounter<4){
-                 $(elementImg).attr('src','http://dummyimage.com/200x100&text=200 by 100');//<img src='http://placehold.it/200x200'/>
-                 }else if(window.templateCounter<6){
-                 $(elementImg).attr('src','http://dummyimage.com/400x100&text=400 with max380');//<img src='http://placehold.it/200x200'/>
-                 $(elementImg).attr("width","380");
-                 $(elementImg).attr("height","auto");
-                 }else if(window.templateCounter<8){
-                 $(elementImg).attr('src','http://dummyimage.com/500x100&text=500 with max380');//<img src='http://placehold.it/200x200'/>
-                 $(elementImg).attr("width","380");
-                 $(elementImg).attr("height","auto");
-                 }else if(window.templateCounter<10){
-                 $(elementImg).attr('src','http://dummyimage.com/500x100&text=500 with max468');//<img src='http://placehold.it/200x200'/>
-                 $(elementImg).attr("width","468");
-                 $(elementImg).attr("height","auto");
-                 $(elementImg).attr("align","right");
-                 // $(elementImg).css(style);
-                 }else if(window.templateCounter<12){
-                 $(elementImg).attr('src','http://dummyimage.com/700x100&text=700 with max468');//<img src='http://placehold.it/200x200'/>
-                 $(elementImg).attr("width","468");
-                 $(elementImg).attr("height","auto");
-                 // $(elementImg).attr("border", "1px solid #ff0000;");
-                 $(elementImg).attr("align","right");
-                 $(elementImg).css(style);
-                 }else{
-                 $(elementImg).attr('src','http://placehold.it/350x150');//<img src='http://placehold.it/200x200'/>
-                 }
-                 $(parentElement).append(element);
-                 //------END OF TEST CODE
-                 */
                 //------- PRODUCTION CODE
                 addImageToMandrillImageArr("template" + window.templateCounter, item.source.substring(23));//name,imageFromJson - removes the beginning chars:"data:image/jpeg;base64,"
                 $(elementImg).attr('src', 'cid:template' + window.templateCounter);
@@ -947,6 +919,9 @@ FL["grid"] = (function () {//name space FL.grid
         var emailAttributeName = FL.dd.firstEmailAttribute(eCN);
         if (emailAttributeName) {
             $('#_newsletter').off('click');
+            //var iconMenuBarHTML = $("#_iconMenuBar").html();// alert($('#hello').html());
+            //$("#_iconMenuBarSlot").html(iconMenuBarHTML);
+
             $("#_newsletter").click(function () {
                 var templatePromise = FL.API.createTemplates_ifNotExisting();
                 templatePromise.done(function () {

@@ -150,52 +150,6 @@ FL["bg"] = (function () {//name space FL.common
                 eCN: field.parentECN,
                 fCN: fCN
             };
-            var boxOptions = {
-                type: "primary",
-                icon: "th-list",
-                button1: "Cancel",
-                button2: "Confirm field edition",
-                posField: {
-                    fieldLabel: function (Box) {
-                        //alert("You are leaving the column title field");
-                    },
-                    fieldName: function (Box) {
-                        //alert("You are leaving the fieldName field");
-                        //var singular = FL.dd.getEntityByCName(Box.data.eCN);
-                        //Box.data.fCN = FL.dd.getFieldCompressedName(singular,Box.get("fieldName"));
-                    }
-                },
-                preField: {
-                    fieldDescription: function (Box) {
-                        //alert("You are entering the column description field");
-                    }
-                },
-                option: {
-                    userType_options: function (Box, selected) {
-                        //alert("You clicked in option " + selected.text);
-                        FL.common.printToConsole("%%%%%%%%>user code typeUI_options --> content=" + JSON.stringify(selected), "modalIn");
-                    }
-                }
-            };
-            var dataItems = {
-                master: {
-                    fieldLabel: columnLabel,
-                    fieldName: options.column.attributes.name,
-                    fieldDescription: description,
-                    userType: FL.dd.userType({type: "string", typeUI: typeUI}),
-                    userType_options: arrOfObj
-                },
-                eCN: field.parentECN,
-                fCN: fCN
-            };
-            //var fieldEditorModal = new FL.modal.Box("Field Editor", "fieldEdition", dataItems, boxOptions, function (result, data, changed) {
-            //    if (result) {
-            //        if (changed) {
-            //            alert("fieldEditorModal Master  " + JSON.stringify(data.master));
-            //        }
-            //    }
-            //});
-            fieldEditorModal.show();
             var MyModal = new FL.modal.Box(" " + columnLabel, "columnEdition", dataItems, boxOptions, function (result, data, changed) {
                 if (result) {
                     if(changed) {
@@ -330,8 +284,13 @@ FL["bg"] = (function () {//name space FL.common
     var AreaCellEditor = Backgrid.Extension.TextareaEditor = Backgrid.CellEditor.extend({//from Jimmy Yuen Ho Wong and contributors - http://github.com/wyuenho/backgrid
         tagName: "div",
         className: "modal fade",
+        options:null,
         template: function (data) {
-            return '<div class="modal-dialog"><div class="modal-content"><form><div class="modal-header"><button type="button" class="close" data-dismiss="modal">&times;</button><h3>' + data.column.get("label") + '</h3></div><div class="modal-body"><textarea cols="' + data.cols + '" rows="' + data.rows + '">' + data.content + '</textarea></div><div class="modal-footer"><input class="btn btn-primary" type="submit" value="JO Save"/></div></form></div></div>';
+            return '<div class="modal-dialog"><div class="modal-content"><form><div class="modal-header">'+
+                '<button type="button" class="close" data-dismiss="modal">&times;</button><h3>' + data.column.get("label") +
+                '<input class="btn btn-primary" type="submit" value="edit textarea"/>'+
+                '</h3></div><div class="modal-body"><textarea cols="' + data.cols + '" rows="' + data.rows + '">' + data.content +
+                '</textarea></div><div class="modal-footer"><input class="btn btn-primary" type="submit" value="JO Save"/></div></form></div></div>';
         },
         cols: 80,
         rows: 10,
@@ -382,7 +341,7 @@ FL["bg"] = (function () {//name space FL.common
                 this.$el.modal("hide");
             }
             else if (e.type != "hide") this.$el.modal("hide");
-            exitColumn(options);
+            exitColumn(this.options);
         },
         clearError: _.debounce(function () {
             if (!_.isUndefined(this.formatter.toRaw(this.$el.find("textarea").val()))) {
@@ -399,7 +358,10 @@ FL["bg"] = (function () {//name space FL.common
         },
         initialize: function (options) {
             Backgrid.CellEditor.prototype.initialize.apply(this, arguments);
-            editColumn(options);
+            //editColumn(options);
+            var field = AreaCellEditor.prototype.field;
+            editColumn(options, field);//description,typeUI);
+            this.options = options;//this will be necessary in saveOrCancel() for exitColumns()
             var cellVal = $(this.el).val();
             //console.log('------------->areatext entering.... ==>' + $(this).val());
         }
@@ -1024,6 +986,7 @@ FL["bg"] = (function () {//name space FL.common
             } else if (typeUI == "areabox") {//http://backbone-paginator.github.io/backbone.paginator/examples/js/extensions/text-cell/backgrid-text-cell.js
                 AreaCellEditor.prototype.typeUI = typeUI;
                 AreaCellEditor.prototype.description = description;
+                AreaCellEditor.prototype.field = field;
                 var areaFormatter = {
                     fromRaw: function (rawValue) {
                         rawValue += ''; //to convert any value to string
@@ -1392,8 +1355,31 @@ FL["bg"] = (function () {//name space FL.common
                 arrElObj = _.omit(arrElObj, ["nesting", "orderable", "resizeable", "width"]);//temporary while these propoerties are inactive
                 columnsArr.push(arrElObj);
             }, this);
-            //inserts auxiliary columns upfront
+            //inserts auxiliary 3 columns upfront (checkboxes select-row, button to access form, # serial number)
+            var accessFormCell = Backgrid.Cell.extend({
+                template: _.template($("#gridFormAccessButton").html()),
+                className: "backgridDelColumn",
+                events: {
+                    "click": "accessForm"
+                },
+                accessForm: function (e) {
+                    e.preventDefault();
+                    alert("we will access the form of this record ->"+JSON.stringify(this.model));
+                    // csvSetCollection.sync("delete",this.model);
+                    //this.model.collection.sync("delete",this.model);
+                    //this.model.collection.remove(this.model);
+                },
+                render: function () {
+                    this.$el.html(this.template());
+                    this.delegateEvents();
+                    return this;
+                }
+            });
             columnsArr.unshift({name: "", cell: "select-row", headerCell: "select-all"}, {
+                editable: false,
+                label: " ",
+                cell: accessFormCell
+            },{
                 editable: false,
                 label: "#",
                 name: "id",
