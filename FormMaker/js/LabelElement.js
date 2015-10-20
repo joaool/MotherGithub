@@ -27,7 +27,9 @@ FormMaker.BaseElement = Backbone.View.extend({
 		"blur input" : "focusOut",
 		"change input" : "valueChange",
 		"keyup input" : "valueChange",
-        "click " : "onElementClick"
+        "click " : "onElementClick",
+        "mouseover " : "onMouseOver",
+        "mouseout " : "onMouseOut"
 	},
     onRightClick: function(e){
         console.log(e);
@@ -108,6 +110,12 @@ FormMaker.BaseElement = Backbone.View.extend({
         this.model.set("value",this.value.val());
         this.trigger(FormMaker.Events.ValueChange,this.model.toJSON());
 	},
+    onMouseOver : function(evt){
+        this.trigger(FormMaker.Events.MouseOver,this.model.toJSON());
+    },
+    onMouseOut : function(evt){
+        this.trigger(FormMaker.Events.MouseOut,this.model.toJSON());
+    },
     getValue : function(){
         return this.model.get("value") || "";
     },

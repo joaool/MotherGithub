@@ -348,7 +348,7 @@ button#editField {
 }
 
 td.option.field {
-padding: 10px;padding-bottom: 0px;}
+padding: 10px;padding-bottom: 0px;text-indent: 20px;      line-height: 35px;      width: 300px;      display: inline-block;}
 
 td.option.field > div {
     background-color: #ECECEC;
@@ -356,6 +356,7 @@ td.option.field > div {
     border-bottom: 3px solid #CACACA;
     color: #5A4E4E;
     text-decoration: none;
+    position: relative;
 }
 
 td.option.field > div:hover {
@@ -364,7 +365,11 @@ td.option.field > div:hover {
     border-bottom: 3px solid #488294;
     color: #0A4B5F;
 }
-
+td.option.field.field-hovered > div{
+    background-color: #7BACBB!important;
+    border-bottom: 3px solid #488294!important;
+    color: #0A4B5F!important;
+}
 .delete-icon {
     position: absolute;
     top: 0px;
@@ -385,4 +390,20 @@ td.option.field > div:hover {
 
 #designerCol1 .dropped:hover .delete-icon {
     display: inline-block;
+}
+
+.ui-draggable-dragging .edit-field{
+    display:none;
+}
+
+.edit-field {
+    display:inline-block;
+    color: gray;
+    width: 25px;
+    text-align: center;
+    height: 25px;
+    line-height: 25px;
+    border-radius: 50%;
+    text-indent: 0px;
+    top: 5px;
 }

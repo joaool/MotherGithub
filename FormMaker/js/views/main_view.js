@@ -8,6 +8,7 @@ FormDesigner.Views.MainView = Backbone.View.extend({
     initialize: function(){
         this.m_Editor = new FormDesigner.Views.ElementHolder({el : "body"});
         this.listenTo(this.m_Editor, FormMaker.Events.ElementClick,this.onElementClick.bind(this));
+        this.listenTo(this.m_Editor, FormMaker.Events.FormLoaded,this.onFormLoaded.bind(this));
 
         this.setEntityModel(new FormDesigner.Models.EntityModel());
         this.entityTempalate = Handlebars.compile($("#entityOption").html() );
@@ -39,6 +40,13 @@ FormDesigner.Views.MainView = Backbone.View.extend({
     onElementClick: function(data){
         this.elementClickModel = data;
         $("#editField").html(data.leftLabel); 
+        this.onEditBtnClick();
+    },
+    onFormLoaded: function(data){
+        var fields = FL.dd.t.entities[data].fieldsList();
+        this.fieldsList.html(this.fieldsTempalate({"fields" : fields}));
+        this.m_Editor.setEntity(FL.dd.t.entities[data]);
+        this.m_Editor.bindDraggableObject();
     },
     onEditBtnClick: function(){
         if (this.elementClickModel.element == "TextLabel"){
@@ -97,7 +105,9 @@ FormDesigner.Views.MainView = Backbone.View.extend({
             if (result) {
                 if (changed) {
                     console.log("fieldEditorModal Master  " ,data.master);
+                    data.master.fCN = self.elementClickModel.fieldName;
                     self.m_Editor.updateElement(data.master);
+                    
                 }
             }
         });
@@ -116,7 +126,7 @@ FormDesigner.Views.MainView = Backbone.View.extend({
                 titleText: this.elementClickModel.leftLabel,
                 fontSize: this.elementClickModel.fontSize || 12,
                 fontColor: this.elementClickModel.fontColor || "black",
-                titleAlignment : this.elementClickModel.textAlignment || "normal",
+                titleAlignment : this.elementClickModel.textAlignment || "left",
                 fontSize_options: [
                     {
                         "value": 1,
@@ -152,11 +162,15 @@ FormDesigner.Views.MainView = Backbone.View.extend({
                 titleAlignment_options: [
                     {
                         "value": 1,
-                        "text": "normal"
+                        "text": "left"
                     },
                     {
                         "value": 2,
-                        "text": "nowrap"
+                        "text": "center"
+                    },
+                    {
+                        "value": 3,
+                        "text": "right"
                     }
                 ]
             }
@@ -165,6 +179,7 @@ FormDesigner.Views.MainView = Backbone.View.extend({
             if (result) {
                 if (changed) {
                     console.log("titleModal Master  " ,data.master);
+                    data.master.fieldName = self.elementClickModel.fieldName;
                     self.m_Editor.updateLabel(data.master);
                 }
             }
