@@ -23,7 +23,19 @@ FormDesigner.Views.MainView = Backbone.View.extend({
         "click .option.entity" : "onEntityClick",
         "click #save" : "saveBtnClick",
         "click #load" : "loadJson",
+        "click #Add" : "onAddClick",
         "click #editField" : "onEditBtnClick"
+    },
+    onAddClick: function(){
+        var fCN = FL.dd.t.entities[this.entityLoaded.csingular]
+            .addField( "TextField-"+this.labelIdCnt++,
+                "Text Description",
+                "label", 
+                "text");
+        //var fCN = FL.dd.t.entities[this.entityLoaded.csingular].getCName("TextField");
+        var fieldData =  FL.dd.t.entities[this.entityLoaded.csingular].fields[fCN];
+        this.fieldsList.append(this.fieldsTempalate({"fields" : [fieldData]}));
+        //FL.dd.t.entities[this.entityLoaded.csingular].save();   
     },
     loadJson: function(){
         $.getJSON("Sample.json",(function(data){
@@ -43,7 +55,7 @@ FormDesigner.Views.MainView = Backbone.View.extend({
         this.onEditBtnClick();
     },
     onFormLoaded: function(data){
-        var fields = FL.dd.t.entities[data].fieldsList();
+        var fields = FL.dd.t.entities[data].fieldList();
         this.fieldsList.html(this.fieldsTempalate({"fields" : fields}));
         this.m_Editor.setEntity(FL.dd.t.entities[data]);
         this.m_Editor.bindDraggableObject();
@@ -193,15 +205,26 @@ FormDesigner.Views.MainView = Backbone.View.extend({
     onEntityClick: function(evt){
         var entityId = $(evt.target).attr("entity_id");
         this.$(".selectedOption").text($(evt.target).html());
-        var fields = FL.dd.t.entities[entityId].fieldsList();
+        var fields = FL.dd.t.entities[entityId].fieldList();
         this.fieldsList.html(this.fieldsTempalate({"fields" : fields}));
-        this.m_Editor.setEntity(FL.dd.t.entities[entityId]);
+        this.entityLoaded = FL.dd.t.entities[entityId];
+        this.m_Editor.setEntity(this.entityLoaded);
         this.m_Editor.bindDraggableObject();
     },
     saveBtnClick: function(){
-        var formData = this.m_Editor.save();  
-        window.formData = formData;
-        window.open("formMaker.html","_blank");
+        var promise = FL.dd.t.entities[this.entityLoaded.csingular].save();
+        promise.done(function (eCN) {
+            var entityName = FL.dd.getEntityByCName(eCN);
+            FL.dd.t.entities.dumpToConsole();
+            var formData = this.m_Editor.save();  
+            window.formData = formData;
+            window.open("formMaker.html","_blank");
+        });
+        promise.fail(function (err) {
+            alert(err);
+            alert("STOP");
+        });
+        
     },
     loadJSON: function(data){
         

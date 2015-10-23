@@ -25,7 +25,6 @@ FormDesigner.Views.ElementHolder = Backbone.View.extend({
         "click .delete-icon" :"onDeleteClick",
         "click #fields .ui-draggable" : "onEntityFieldItemClicked",
         "click #addLabel" : "onAddLabelClick",
-        "click #Add" : "onAddClick",
         "click .edit-field" : "onEditFieldIconClick"
     },
     bindDraggableObject : function(){
@@ -138,16 +137,6 @@ FormDesigner.Views.ElementHolder = Backbone.View.extend({
             element.entityName = this.entityLoaded.csingular;
         element.alignment = "left";
         this.addElement("designerCol1",element);
-    },
-    onAddClick: function(){
-        FL.dd.t.entities[this.entityLoaded.csingular]
-            .addField( "TextField"+this.labelIdCnt++,
-                "Text Description",
-                "label", 
-                "text", 
-                "text", 
-                null);
-        var fCN = FL.dd.t.entities[this.entityLoaded.csingular].getCName("TextField");    
     },
     onDrop : function(target,droppedObject){
         var cname = $(droppedObject).attr("cname");
