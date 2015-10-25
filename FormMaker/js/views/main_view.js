@@ -4,6 +4,7 @@ FormDesigner.Views.MainView = Backbone.View.extend({
     entitiesDropDown : null,
     fieldsTemplate : null,
     elementClickModel: null,
+    labelIdCnt : 0,
     
     initialize: function(){
         this.m_Editor = new FormDesigner.Views.ElementHolder({el : "body"});
@@ -35,6 +36,7 @@ FormDesigner.Views.MainView = Backbone.View.extend({
         //var fCN = FL.dd.t.entities[this.entityLoaded.csingular].getCName("TextField");
         var fieldData =  FL.dd.t.entities[this.entityLoaded.csingular].fields[fCN];
         this.fieldsList.append(this.fieldsTempalate({"fields" : [fieldData]}));
+        this.m_Editor.bindDraggableObject();
         //FL.dd.t.entities[this.entityLoaded.csingular].save();   
     },
     loadJson: function(){
@@ -213,10 +215,11 @@ FormDesigner.Views.MainView = Backbone.View.extend({
     },
     saveBtnClick: function(){
         var promise = FL.dd.t.entities[this.entityLoaded.csingular].save();
+        var self = this;
         promise.done(function (eCN) {
             var entityName = FL.dd.getEntityByCName(eCN);
             FL.dd.t.entities.dumpToConsole();
-            var formData = this.m_Editor.save();  
+            var formData = self.m_Editor.save();  
             window.formData = formData;
             window.open("formMaker.html","_blank");
         });
