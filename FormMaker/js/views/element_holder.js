@@ -153,7 +153,7 @@ FormDesigner.Views.ElementHolder = Backbone.View.extend({
         var alignment = target.id == "designerCol1" ? "left" : "right";
         var fieldId = $(droppedObject).attr("field_id");
         var element = {
-            "element" : elementType || FormMaker.Elements.Label,
+            "element" : elementType || FormMaker.Elements.Text,
             "leftLabel" : leftLabel,
             "name" : name,
             "type" : inputType,
