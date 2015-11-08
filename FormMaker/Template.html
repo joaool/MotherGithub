@@ -1,26 +1,22 @@
 <script id="__text" type="text/x-handlebars-template">
-	<div class="input-group dropped" style="padding:5px 5px 5px" id="{{id}}" cname="{{cname}}">
-		<div class="input-group" style="line-height:0px;">
-			<div contenteditable=true class="input-group-addon" id="leftLabel">{{leftLabel}}</div>
-	        <input id="value" type="{{type}} class="form-control" placeholder="{{placeholder}}" value="{{value}}" data-parsley-trigger="{{trigger}} data-toggle="tooltip" data-placement="top" title="{{tooltip}}">
-			<span class="input-group-addon"><span id="icon" class="glyphicon {{icon}}"></span></span>
-		</div>
+	<div class="form-group dropped" style="padding:5px 5px 5px" id="{{id}}" cname="{{cname}}">
+	    <label id="leftLabel">{{leftLabel}}</label>
+	    <input type="{{type}}"  class="form-control" id="value" placeholder="{{placeholder}}" value="{{value}}" title="{{tooltip}}">
 		<div class="delete-icon" data-id="{{id}}"><i class="glyphicon glyphicon-plus" data-id="{{id}}"></i></div>
 	</div>    
 </script>
 <script id="__textLabel" type="text/x-handlebars-template">
-	<div class="input-group dropped" style="{{style}};padding:5px 5px 5px" id="{{id}}" cname="{{cname}}">
-		<div class="input-group">
-            <label style="height:40px">{{leftLabel}}</label>
-		</div>
+	<div class="form-group dropped" style="{{style}};padding:5px 5px 5px" id="{{id}}" cname="{{cname}}">
+	    <label for="value" id="leftLabel" style="height:40px">{{leftLabel}}</label>
 		<div class="delete-icon" data-id="{{id}}"><i class="glyphicon glyphicon-plus" data-id="{{id}}"></i></div>
 	</div>
 </script>    
 <script id="inTextareaLabel" type="text/x-handlebars-template"> 
-	<div class="input-group dropped" style="line-height:0px;" id="{{id}}"  cname="{{cname}}">
-		<span class="input-group-addon" id="leftLabel" id="leftLabel">Description:</span>
-		<textarea class="form-control" name="entityDescription" onkeyup="FL.slidePanels.dictTemplateChangeDescription(this.form)" rows="2"></textarea>
-		<div class="delete-icon" data-id="{{id}}"><i class="glyphicon glyphicon-plus" data-id="{{id}}"></i></div>
+	<div class="form-group dropped" style="line-height:0px;" id="{{id}}"  cname="{{cname}}">
+	    <label for="value" id="leftLabel">{{leftLabel}}</label>
+	    <textarea type="{{type}}"  class="form-control" id="value" name="entityDescription" placeholder="{{placeholder}}" rows="2" value="{{value}}" title="{{tooltip}}">
+	    </textarea>
+	  	<div class="delete-icon" data-id="{{id}}"><i class="glyphicon glyphicon-plus" data-id="{{id}}"></i></div>
 	</div>
 </script>
 <script id="__button" type="text/x-handlebars-template"> 
@@ -30,20 +26,28 @@
 	</div>
 </script>
 <script id="__checkbox" type="text/x-handlebars-template"> 
-	<div id="{{id}}" class="input-group dropped" style="padding:5px 5px 5px" cname="{{cname}}">
-		<label class="checkbox-inline {{chkHide}}"><input type="checkbox" {{checked}} value="{{value}}">{{value}}</label>
+	<div id="{{id}}" class="form-group dropped" style="padding:5px 5px 5px" cname="{{cname}}">
+		<div class="form-group">
+		    <label class="checkbox-inline {{chkHide}}">
+		    	<input type="checkbox" {{checked}} class="form-control" value="{{value}}" title="{{tooltip}}">{{value}}
+		    </label>
+	  	</div>
 		<div class="delete-icon" data-id="{{id}}"><i class="glyphicon glyphicon-plus" data-id="{{id}}"></i></div>
 	</div>
 </script>
 <script id="__radiobox" type="text/x-handlebars-template"> 
-	<div id="{{id}}" class="input-group dropped" style="padding:5px 5px 5px" cname="{{cname}}">
-		<label class="radio-inline {{radioHide}}"><input type="radio" {{checked}} name="{{name}}" value="{{value}}">{{value}}</label>
+	<div id="{{id}}" class="form-group dropped" style="padding:5px 5px 5px" cname="{{cname}}">
+		<div class="form-group">
+		    <label class="radio-inline {{radioHide}}">
+		    	<input type="radio" {{checked}} class="form-control" value="{{value}}" title="{{tooltip}}">{{value}}
+		    </label>
+	  	</div>
 		<div class="delete-icon" data-id="{{id}}"><i class="glyphicon glyphicon-plus" data-id="{{id}}"></i></div>
 	</div>
 </script>    
 <script id="__combo" type="text/x-handlebars-template">    
-	<div class="input-group dropped" style="line-height:0px;padding:5px 5px 5px" id="{{id}}" cname="{{cname}}">
-		<span class="input-group-addon" id="leftLabel">{{leftLabel}}</span>
+	<div class="form-group dropped" style="line-height:0px;padding:5px 5px 5px" id="{{id}}" cname="{{cname}}">
+		<label for="select" id="leftLabel">{{leftLabel}}</label>
 		<select class="form-control" title="{{tooltip}}" value="{{value}}">
             {{#each comboArr}}
                 <option value="{{value}}">{{label}} </option>
@@ -53,59 +57,24 @@
 	</div>
 </script>
 <script id="__date" type="text/x-handlebars-template">
-	<div class="input-group dropped" style="padding:5px 5px 5px" id="{{id}}" cname="{{cname}}">
-		<div class="input-group" style="line-height:0px;">
-			<span class="input-group-addon" id="leftLabel">{{leftLabel}}</span>
-			 <input type="{{type}}" class="form-control datePicker {{class}}" placeholder="{{placeholder}}" value="{{value}}" data-parsley-trigger="{{trigger}}" data-toggle="tooltip" data-placement="top" title="{{tooltip}}">
-		</div>
+	<div class="form-group dropped" style="padding:5px 5px 5px" id="{{id}}" cname="{{cname}}">
+		<label for="select" id="leftLabel">{{leftLabel}}</label>
+		 <input type="{{type}}" class="form-control datePicker {{class}}" placeholder="{{placeholder}}" value="{{value}}" data-parsley-trigger="{{trigger}}" data-toggle="tooltip" data-placement="top" title="{{tooltip}}">
 		<div class="delete-icon" data-id="{{id}}"><i class="glyphicon glyphicon-plus" data-id="{{id}}"></i></div>
 	</div>
 </script>
 <script id="__textarea" type="text/x-handlebars-template">
-    <div class="input-group dropped" style="padding:5px 5px 5px" id="{{id}}" cname="{{cname}}">
-        <span class="input-group-addon" id="leftLabel">{{leftLabel}}</span>
+    <div class="form-group dropped" style="padding:5px 5px 5px" id="{{id}}" cname="{{cname}}">
+        <label for="select" id="leftLabel">{{leftLabel}}</label>
         <textarea placeholder="{{placeholder}}">{{value}}</textarea>
 	    <div class="delete-icon" data-id="{{id}}"><i class="glyphicon glyphicon-plus" data-id="{{id}}"></i></div>
     </div>
 </script>
 <script id="__image" type="text/x-handlebars-template">
-    <div class="input-group dropped" style="padding:5px 5px 5px" id="{{id}}" cname="{{cname}}">
-        <span class="input-group-addon" id="leftLabel">{{leftLabel}}</span>
+    <div class="form-group dropped" style="padding:5px 5px 5px" id="{{id}}" cname="{{cname}}">
+        <label for="select" id="leftLabel">{{leftLabel}}</label>
         <img id="imagePreview" class="imagePreview" src="">
         <input id="imageUploadBtn" type="file" class="custom-file-input file-loading" id="imageUploadBtn">
 	    <div class="delete-icon" data-id="{{id}}"><i class="glyphicon glyphicon-plus" data-id="{{id}}"></i></div>
     </div>
-</script>
-
-<script id="__text_merge" type="text/x-handlebars-template">
-	<input id="value" type="{{type}}" class="form-control" placeholder="{{placeholder}}" value="{{value}}" data-parsley-trigger="{{trigger}} data-toggle="tooltip" data-placement="top" title="{{tooltip}}">
-</script>
-<script id="inTextareaLabel_merge" type="text/x-handlebars-template">
-	<textarea class="form-control" name="entityDescription" onkeyup="FL.slidePanels.dictTemplateChangeDescription(this.form)" rows="2"></textarea>
-</script>
-<script id="__button_merge" type="text/x-handlebars-template">
-	<button type="button" class="btn btn-{{btnType}} {{buttonHide}}" onclick="{{onClick}}" data-toggle="tooltip" data-placement="top" title="{{tooltip}}" value="{{value}}">{{leftLabel}}</button>
-</script>
-<script id="__checkbox_merge" type="text/x-handlebars-template">
-	<label class="checkbox-inline {{chkHide}}"><input type="checkbox" {{checked}} value="{{value}}">{{value}}</label>
-</script>
-<script id="__radiobox_merge" type="text/x-handlebars-template">
-	<label class="radio-inline {{radioHide}}"><input type="radio" {{checked}} name="{{name}}" value="{{value}}">{{value}}</label>
-</script>
-<script id="__combo_merge" type="text/x-handlebars-template">
-	<select class="form-control" title="{{tooltip}}" value="{{value}}">
-		{{#each comboArr}}
-			<option value="{{value}}">{{label}} </option>
-		{{/each}}
-	</select>
-</script>
-<script id="__date_merge" type="text/x-handlebars-template">
-	<input type="{{type}}" class="form-control datePicker {{class}}" placeholder="{{placeholder}}" value="{{value}}" data-parsley-trigger="{{trigger}}" data-toggle="tooltip" data-placement="top" title="{{tooltip}}">
-</script>
-<script id="__textarea_merge" type="text/x-handlebars-template">
-	<textarea placeholder="{{placeholder}}">{{value}}</textarea>
-</script>
-<script id="__image_merge" type="text/x-handlebars-template">
-	<img id="imagePreview" class="imagePreview" src="">
-	<input id="imageUploadBtn" type="file" class="custom-file-input file-loading" id="imageUploadBtn">
 </script>

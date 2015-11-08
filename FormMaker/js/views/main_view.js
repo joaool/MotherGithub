@@ -35,12 +35,14 @@ FormDesigner.Views.MainView = Backbone.View.extend({
                 "text");
         //var fCN = FL.dd.t.entities[this.entityLoaded.csingular].getCName("TextField");
         var fieldData =  FL.dd.t.entities[this.entityLoaded.csingular].fields[fCN];
+        fieldData["fieldname"] = fCN;
         this.fieldsList.append(this.fieldsTempalate({"fields" : [fieldData]}));
         this.m_Editor.bindDraggableObject();
         //FL.dd.t.entities[this.entityLoaded.csingular].save();   
     },
-    loadJson: function(){
-        $.getJSON("Sample.json",(function(data){
+    loadJson: function(jsonFile){
+        jsonFile = jsonFile || this.jsonFile || "Sample.json";
+        $.getJSON(jsonFile,(function(data){
             this.addJsonData(data);
         }).bind(this));
     },
@@ -60,6 +62,7 @@ FormDesigner.Views.MainView = Backbone.View.extend({
         var fields = FL.dd.t.entities[data].fieldList();
         this.fieldsList.html(this.fieldsTempalate({"fields" : fields}));
         this.m_Editor.setEntity(FL.dd.t.entities[data]);
+        this.entityLoaded = FL.dd.t.entities[data];
         this.m_Editor.bindDraggableObject();
     },
     onEditBtnClick: function(){
@@ -202,7 +205,9 @@ FormDesigner.Views.MainView = Backbone.View.extend({
     },
     onEntitiesLoaded: function(){
         console.log(this.entityModel.get("entities"));
+        this.entityLoaded = this.entityModel.get("entities");
         this.entitiesDropDown.html(this.entityTempalate({"entities" : this.entityModel.get("entities")}));
+        this.trigger("ENTITIES_LOADED",null);
     },
     onEntityClick: function(evt){
         var entityId = $(evt.target).attr("entity_id");
@@ -227,9 +232,6 @@ FormDesigner.Views.MainView = Backbone.View.extend({
             alert(err);
             alert("STOP");
         });
-        
-    },
-    loadJSON: function(data){
         
     },
     loadEntities: function(){

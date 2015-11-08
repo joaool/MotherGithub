@@ -1,9 +1,12 @@
 ElementModel = Backbone.Model.extend({
     
+    initialize: function(){
+
+    },
     saveToDB: function(){
         FL.dd.t.entities[this.get("entityName")].
         fields[this.get("fieldName")].
-        setField({
+        set({
                 description: this.get("description"),
                 enumerable: null,
                 label: this.get("leftLabel"),

@@ -253,7 +253,7 @@
                       data-fieldname="{{fCN}}"
                       cname="{{cname}}">
 	                    <div>
-                         {{name}} 
+                            <div id="fieldNameLabel" data-fieldname="{{fCN}}">{{name}}</div> 
                             <div class="edit-field glyphicon glyphicon-pencil pull-right" title="edit field" data-fieldname="{{fCN}}"></div>
                         </div>
                   </td>
@@ -277,11 +277,6 @@
             </label>
             {{/each}}
         </script>
-    </div>
-    <div id="contextMenu" style="display:none">
-        <ul id="menuItems" class="custom-list">
-            <li id="delete" class="menuItem"><div>Delete</div></li>
-        </ul>
     </div>
 </body>
 

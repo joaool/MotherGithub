@@ -25,7 +25,27 @@ FormDesigner.Views.ElementHolder = Backbone.View.extend({
         "click .delete-icon" :"onDeleteClick",
         "click #fields .ui-draggable" : "onEntityFieldItemClicked",
         "click #addLabel" : "onAddLabelClick",
-        "click .edit-field" : "onEditFieldIconClick"
+        "click .edit-field" : "onEditFieldIconClick",
+        "click #fieldNameLabel" : "onFieldLabelClicked",
+        "blur .editableLabel" : "focusOutLabel",
+    },
+    onFieldLabelClicked : function(evt){
+        this.replaceWithInputField($(evt.currentTarget));
+        evt.stopPropagation();
+    },
+    replaceWithInputField: function(element){
+
+        var editableElement = $("<input type='text' data-fieldname='"+element.data("fieldname")+"' class='editableLabel' id='FieldNameEditableDiv' value='"+element.html()+"'/>");
+        $(element).replaceWith(editableElement);
+        editableElement.focus();
+    },
+    focusOutLabel: function(evt){
+        var element = $(evt.currentTarget);
+        var value = element.val();
+        FL.dd.t.entities[this.entityLoaded.csingular].fields[element.data("fieldname")].set({
+            "name":value
+        });
+        $(element).replaceWith("<div id='fieldNameLabel'>"+value+"</div>");
     },
     bindDraggableObject : function(){
         this.dragNDropHandler = new DragNDrop();
@@ -131,7 +151,8 @@ FormDesigner.Views.ElementHolder = Backbone.View.extend({
             "type" : "TextLabel",
             "value" : null,
             "id" : "Label"+this.labelIdCnt++,
-            "fieldName" : "lbl"
+            "fieldName" : "lbl",
+            "entityName" : this.entityLoaded.csingular
         };
         if(this.entityLoaded)
             element.entityName = this.entityLoaded.csingular;
@@ -295,7 +316,8 @@ FormDesigner.Views.ElementHolder = Backbone.View.extend({
                     fontSize : element.fontSize,
                     fontColor : element.fontColor,
                     textAlignment : element.textAlignment,
-                    style : styleString
+                    style : styleString,
+                    "entityName" : this.entityLoaded.csingular
                 };
             }
             else {
@@ -305,7 +327,9 @@ FormDesigner.Views.ElementHolder = Backbone.View.extend({
                     "leftLabel": field.label,
                     "name": field.name,
                     "type": field.type,
-                    "id": element.fCN
+                    "id": element.fCN,
+                    "fieldName" : element.fCN,
+                    "entityName" : this.entityLoaded.csingular
                 }
             }
             item = _.extend({},elementJson,element);
@@ -342,7 +366,7 @@ FormDesigner.Views.ElementHolder = Backbone.View.extend({
         };
         FL.dd.t.entities[this.entityLoaded.csingular].
         fields[elementData.fCN].
-        setField({
+        set({
             description: elementData.fieldDescription,
             label: elementData.fieldLabel,
             name: elementData.fieldName,

@@ -25,21 +25,14 @@ FormMaker.BaseElement = Backbone.View.extend({
 	events : {
 		"focus input" : "focusIn",
 		"blur input" : "focusOut",
+        "blur .editableLabel" : "focusOutLabel",
 		"change input" : "valueChange",
 		"keyup input" : "valueChange",
+        "click #leftLabel" : "onLabelClick",
         "click " : "onElementClick",
         "mouseover " : "onMouseOver",
         "mouseout " : "onMouseOut"
 	},
-    onRightClick: function(e){
-        console.log(e);
-        var offset = {left : e.pageX,top:e.pageY};
-        $("#contextMenu").css(offset);
-        $("#contextMenu").show();
-        FormMaker.CurrentElement = this;
-        e.stopPropagation();
-        e.preventDefault();
-    },
 	loadData : function(data){
         this.model.set(data);
 	},
@@ -59,7 +52,6 @@ FormMaker.BaseElement = Backbone.View.extend({
         this.setElement(element);
 		this.onRender();
         this.setElements();
-        this.$el.on("contextmenu", this.onRightClick.bind(this));
     },
 	render : function(){
 		var element = $.parseHTML(this.m_template(this.model.toJSON()).trim());
@@ -67,7 +59,7 @@ FormMaker.BaseElement = Backbone.View.extend({
         this.setElement(element);
 		this.onRender();
         this.setElements();
-        this.$el.on("contextmenu", this.onRightClick.bind(this));
+
 	},
     setElements : function(){
         this.name = this.$("#name");
@@ -92,12 +84,27 @@ FormMaker.BaseElement = Backbone.View.extend({
         this.setElement(newElement);
         this.onRender();
         this.setElements();
-        this.$el.on("contextmenu", this.onRightClick.bind(this));
     },
     onElementClick: function(evt){
         FormMaker.CurrentElement = this;
         console.log("Element click");
         this.trigger(FormMaker.Events.ElementClick,this.model.toJSON());
+    },
+    onLabelClick: function(evt){
+        console.log("label click");
+        this.replaceWithInputField($(evt.currentTarget));
+        evt.stopPropagation();
+    },
+    replaceWithInputField: function(element){
+        var editableElement = $("<input type='text'  class='editableLabel' id='editableLeftLabel' value='"+element.html()+"'/>");
+        $(element).replaceWith(editableElement);
+        editableElement.focus();
+    },
+    focusOutLabel: function(evt){
+        var element = $(evt.currentTarget);
+        var value = element.val();
+        this.model.set("leftLabel",value);
+        $(element).replaceWith("<label id='leftLabel'>"+value+"</label>");
     },
 	focusIn : function(evt){
 		console.log("Focus In");
