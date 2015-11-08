@@ -22,6 +22,7 @@ FL["dd"] = (function () {//name space FL.dd
     //					plural:"clients",
     //					description:"Individual or Company to whom we may send invoices",
     //					sync:false,
+    //                  new:true,
     //					lastId:0,
     //					L2C:{},
     //					C2L:{},
@@ -33,10 +34,12 @@ FL["dd"] = (function () {//name space FL.dd
     //	csingular - is the compressed entity name (does not change on renames)
     //  plural - plural expression corresponding to singular
     //  description - description of singular (answer to: "what is a <singular> ?")
-    //	sync - false if no synchronization was done with the server - true if synchronization was done
-    //				- if sync = false (default) csingular and all attributes fieldCN are temporary 
-    //				- when sync = true - csingular and all attributes fieldCN are correct
-    //  lastId - number of attributes of entity <singular>
+    //	sync - false if synchronization needs to be done with the server - true if synchronization was done (for entity and all fields)
+    //				- if sync = false (default) either the entity, either one or several fields need server synchronization
+    //                      to evaluate which sync needs to be done we need to check <entity>.new  and <entity>.<field>.sync and <entity>.<field>.new
+    //				- when sync = true - csingular and all attributes fieldCN are synchronized in the server
+    //  new - true if the entity has not been yet created on the server (the eCN(csingular) is temporary) - false as soon as the entity has a eCN provided by the server
+    // lastId - number of attributes of entity <singular>
     //
     //each attribute (i) is in dDictionary.entities[<sEentity>].attributes[i]
     //     with the format 
@@ -57,6 +60,11 @@ FL["dd"] = (function () {//name space FL.dd
     //			specialTypeDef - Special type definition - An array. Ex of specialtype is typeUI=="lookup" (Nico's field "P" - stored as an array of JSON -  element 0 is for lookup specialTypeDef)
     //				if typeUI == "lookup" =>specialTypeDef="{eCN:<entity compressed name>, fCN:<field compressed name>}"
     //			key - boolean. True means the attribute is the  key field of the entity . (only one allowed)
+    //          sync - boolean. false if  synchronization needs to be done with the server - true if synchronization was done
+    //                  - if sync = false (default) either the field is new or any of its properties have been updated locally without server synchronization
+    //                       to evaluate which sync needs to be done we need to check <entity>.<field>.new
+    //				    - when sync = true - all field properties are synchronized in the server
+    //          new - true if the field has not been yet created on the server (the fCN(in table L2C and C2L) is temporary) - false as soon as the entity has a fCN provided by the server
     //	NEW TBD fieldPrefix - to be used only in search - for the time being it is fCN
     //	NEW TBD Repeatable  - ex: [‘albert@monaco.mo’ ,’toto@totoi.mo’] true/false
     //			
@@ -602,7 +610,8 @@ FL["dd"] = (function () {//name space FL.dd
                     } else if (key == "__LastRelation") {
                         FL.common.printToConsole("(__LastRelation) -> Number of relations in dictionary=" + oEntities[key], "dump");
                     } else {
-                        FL.common.printToConsole("Entity=" + oEntities[key].singular + "/" + oEntities[key].csingular + " - Plural=" + oEntities[key].plural + "- description=" + oEntities[key].description + " sync=" + oEntities[key].sync, "dump");
+                        FL.common.printToConsole("Entity=" + oEntities[key].singular + "/" + oEntities[key].csingular + " - Plural=" + oEntities[key].plural +
+                            "- description=" + oEntities[key].description + " new=" + oEntities[key].new + " sync=" + oEntities[key].sync, "dump");
                         //now we display each attribute
                         var oL2C = oEntities[key].L2C;
                         var xArr = oEntities[key].attributes;
@@ -617,6 +626,8 @@ FL["dd"] = (function () {//name space FL.dd
                                 var xUserType = FL.dd.userType({type:xArr[i].type, typeUI:xArr[i].typeUI});
                                 var xMask = xArr[i].mask;
                                 var xSpecialTypeDef = xArr[i].specialTypeDef;
+                                var xNew = xArr[i].new;
+                                var xSync = xArr[i].sync;
                                 if (FL.common.typeOf(xSpecialTypeDef) == "array") {
                                     var specialEl = xSpecialTypeDef[0];
                                     if (FL.common.typeOf(specialEl) == "object") {
@@ -626,7 +637,8 @@ FL["dd"] = (function () {//name space FL.dd
                                 var xKey = xArr[i].key;
                                 var xEnumerable = xArr[i].enumerable;
                                 //FL.common.printToConsole("-----> attribute[" + i + "]=" + xName + "/" + xDescr + "/" + xCName + ",label=" + xLabel + ",key=" + xKey + ",type=" + xType + ",typeUI=" + xTypeUI + ",mask=" + xMask + ",specialTypeDef=" + xSpecialTypeDef, "dump");
-                                FL.common.printToConsole("-----> attribute[" + i + "]=" + xName + "/" + xDescr + "/" + xCName + ",label=" + xLabel + ",key=" + xKey + ",userType=" + xUserType + ",mask=" + xMask + ",specialTypeDef=" + xSpecialTypeDef, "dump");
+                                FL.common.printToConsole("-----> attribute[" + i + "]=" + xName + "/" + xDescr + "/" + xCName + ",label=" + xLabel + ",key=" + xKey + ",userType=" + xUserType + ",mask=" + xMask +
+                                    ",specialTypeDef=" + xSpecialTypeDef + ",new=" + xNew + ",sync=" + xSync, "dump");
                                 if (xEnumerable) {
                                     for (var j = 0; j < xEnumerable.length; j++) {
                                         FL.common.printToConsole("------------> enumerable[" + j + "]=" + xEnumerable[j], "dump");
@@ -715,6 +727,7 @@ FL["dd"] = (function () {//name space FL.dd
                     plural: xPlural,
                     description: xDescription,
                     sync: false,
+                    new: true,
                     lastId: 0,
                     L2C: {},
                     C2L: {},
@@ -886,7 +899,9 @@ FL["dd"] = (function () {//name space FL.dd
                         mask: xMask,
                         specialTypeDef: xSpecialTypeDef,
                         enumerable: arrEnumerable,
-                        key: false
+                        key: false,
+                        new: true,
+                        sync: false
                     });
                     oEntity.L2C[xAttribute] = sComp;//Logical to Compressed
                     oEntity.C2L[sComp] = xAttribute;//Compressed to Logical
@@ -904,8 +919,9 @@ FL["dd"] = (function () {//name space FL.dd
                     oEntity.attributes[xIndex].mask = xMask;
                     oEntity.attributes[xIndex].specialTypeDef = xSpecialTypeDef;
                     //oEntity.attributes[xIndex].key=xKey;
+                    oEntity.attributes[xIndex].sync = false;
                 }
-                oEntity.sync = false;
+                oEntity.sync = false;//the entity is not in sync either for new attribute or for update attribute
                 //dDictionary.save(xSingular,oEntity);
             } else {
                 alert("FL.dd.addAttribute Error: you tried to add attribute " + xAttribute + " to a non existing entity " + xSingular);
@@ -954,7 +970,9 @@ FL["dd"] = (function () {//name space FL.dd
                 mask: null,
                 specialTypeDef: null,
                 enumerable: null,
-                key: false
+                key: false,
+                new: true,
+                sync: false
             };
             _.extend(propsToUse, options);
             // enforcements -------
@@ -986,10 +1004,10 @@ FL["dd"] = (function () {//name space FL.dd
                     oEntity.attributes[xIndex].specialTypeDef = propsToUse.specialTypeDef;
                     oEntity.attributes[xIndex].enumerable = arrEnumerable;
                     //oEntity.attributes[xIndex].key=xKey;
+                    oEntity.attributes[xIndex].sync = false;
                 }
-                oEntity.sync = false;
-                //dDictionary.save(xSingular,oEntity);
-            } else {
+                oEntity.sync = false;//the entity is not in sync either for new attribute or for update attribute
+             } else {
                 alert("FL.dd.upsertAttribute Error: you tried to add attribute " + xAttribute + " to a non existing entity " + xSingular);
             }
         },
@@ -1032,7 +1050,9 @@ FL["dd"] = (function () {//name space FL.dd
                     //send to server
                     var promise = FL.API.updateDictionaryAttribute(fCN, oAttributes);
                     promise.done(function (result) {
-                        oEntity.sync = true;
+                        //oEntity.sync = true;//NOT VALID becayse othe fields may be not in sync
+                        FL.dd.setFieldSync(xSingular, xAttribute,true);
+                        FL.dd.setFieldNew(xSingular, xAttribute,false);
                         return def.resolve(result);
                     });
                     promise.fail(function (err) {
@@ -1070,7 +1090,8 @@ FL["dd"] = (function () {//name space FL.dd
                     }
                     oEntity.attributes[xIndex] = _.omit(oAttributes, "oldname", "singular");
                     var fCN = oEntity.L2C[oAttributes.name];
-                    oEntity.sync = false;
+                    oEntity.sync = false;//the entity is not in sync because on of the fields (this one) was locally updated
+                    FL.dd.setFieldSync(xSingular, xAttribute,false);
                     //var eCN = oEntity.csingular;
                 } else {
                     err = "FL.dd.updateAttribute Error: impossible to update attribute " + xAttribute + ". It does not exist in entity " + xSingular;
@@ -1078,6 +1099,28 @@ FL["dd"] = (function () {//name space FL.dd
                 }
             } else {
                 err = "FL.dd.updateAttribute Error: you tried to update attribute " + xAttribute + " to a non existing entity " + xSingular;
+                return def.reject(err);
+            }
+            return;
+        },
+        removeLocalAttribute: function (xSingular, xAttribute) {
+            //remove attribute with name=xAttribute form entity xSingular. if xAttribute does not exist nothing is done
+            var err = null;
+            var oEntity = this.entities[xSingular];
+            if (oEntity) {
+                var xIndex = attributeIndex(xSingular, xAttribute);
+                if (xIndex >= 0) {//if attribute exists it will be removed
+                    // to remove an attribute is to delete the corresponding element from array and reajust C2L and L2C deleting the objects
+                    FL.common.printToConsole("FL.dd.removeLocalAttribute() " + oEntity.attributes[xIndex].name + " will be removed !","test");
+                    oEntity.attributes.splice(xIndex,1);
+                    var compressedAttr = oEntity.L2C[xAttribute];
+                    FL.common.printToConsole("FL.dd.removeLocalAttribute() -> the L2C entry " + oEntity.L2C[xAttribute] + " corresponding to key " + xAttribute + " will be removed !","test");
+                    FL.common.printToConsole("FL.dd.removeLocalAttribute() -> the C2L entry " + oEntity.C2L[compressedAttr] + " corresponding to key " + compressedAttr + " will be removed !","test");
+                    delete oEntity.L2C[xAttribute];
+                    delete oEntity.C2L[compressedAttr];
+                 }
+            } else {
+                err = "FL.dd.removeLocalAttribute Error: you tried to remove attribute " + xAttribute + " from a non existing entity " + xSingular;
                 return def.reject(err);
             }
             return;
@@ -1256,9 +1299,17 @@ FL["dd"] = (function () {//name space FL.dd
             return false;
         },
         setSync: function (xSingular, bStatus) {//set sync = true for entity= xSingular - nothing is done if entity does not exist
+            //NOTE: to say that entity is in sync is to say that the entity properties and all its fields are in sync
+            //              if all the entity properties are in sinc
             var oEntity = this.entities[xSingular];
             if (oEntity) {
                 oEntity.sync = bStatus;
+            }
+        },
+        setEntityNew: function (xSingular, bStatus) {//set sync = true for entity= xSingular - nothing is done if entity does not exist
+            var oEntity = this.entities[xSingular];
+            if (oEntity) {
+                oEntity.new = bStatus;
             }
         },
         setFieldTypeUI: function (xSingular, fieldName, newTypeUI) {//sets typeUI = newTypeUI for field = fieldName in entity xSingular
@@ -1305,7 +1356,7 @@ FL["dd"] = (function () {//name space FL.dd
         setFieldCompressedName: function (xSingular, fieldName, fieldCN) {//for entity xSingular and attribute fieldName sets compressed name
             var oEntity = this.entities[xSingular];
             if (oEntity) {
-                oEntity.sync = false;
+                //oEntity.sync = false; this is ruled above this method !!!!!
                 var oldCFieldName = oEntity.L2C[fieldName];
                 if (oldCFieldName) {
                     delete oEntity.C2L[oldCFieldName];
@@ -1322,7 +1373,31 @@ FL["dd"] = (function () {//name space FL.dd
             }
             return fieldCN;
         },
-        getArrayOfFields: function (xSingular) {//for entity xSingular return an array of JSON including statment
+        setFieldNew: function (xSingular, fieldName, bStatus) {//for entity xSingular and attribute fieldName sets field property new to bStatus (true or false)
+            var oEntity = this.entities[xSingular];
+            if (oEntity) {
+                //alert("FL.dd.setFieldNew TBD");
+                var oAttribute = FL.dd.getEntityAttribute(xSingular, fieldName);
+                if (oAttribute) {
+                    oAttribute.new = bStatus;
+                } else {
+                    alert("FL.dd.setFieldNew Error: " + xSingular + "." + fieldName + "  does not exist! ");
+                }
+            }
+        },
+        setFieldSync: function (xSingular, fieldName, bStatus) {//for entity xSingular and attribute fieldName sets field property new to bStatus (true or false)
+            var oEntity = this.entities[xSingular];
+            if (oEntity) {
+                //alert("FL.dd.setFieldSync TBD");
+                var oAttribute = FL.dd.getEntityAttribute(xSingular, fieldName);
+                if (oAttribute) {
+                    oAttribute.sync = bStatus;
+                } else {
+                    alert("FL.dd.setFieldSync Error: " + xSingular + "." + fieldName + "  does not exist! ");
+                }
+            }
+        },
+        getArrayOfFields: function (xSingular) {//for entity xSingular return an array of JSON including statement
             // The array has an object for each field with {attribute:xName, description:xDescription,statement:xStatement}
             // Ex: returning items (excepting id)
             //  items = [
@@ -1347,6 +1422,8 @@ FL["dd"] = (function () {//name space FL.dd
                         el["typeUI"] = element.typeUI;
                         el["mask"] = element.mask;
                         el["specialTypeDef"] = element.specialTypeDef;
+                        el["sync"] = element.sync;
+                        el["new"] = element.new;
                         // ----
                         xRetArr.push(el);
                     }
@@ -1536,7 +1613,7 @@ FL["dd"] = (function () {//name space FL.dd
                 });
             }
         },
-        removeEntity: function (xSingular) {//removes  entity xSingular in local dictionary
+        removeEntity: function (xSingular) {//removes  entity xSingular from local dictionary
             //In order to remove an entity we begin by removing the relations of every direct relation of xSingular	and also the inverse relations
             //		that other entities ,may have with xSingular
             //	format of each array element:
@@ -1670,9 +1747,12 @@ FL["dd"] = (function () {//name space FL.dd
                                     var xUserType = FL.dd.userType({type:element.type, typeUI:element.typeUI});
                                     el["userType"] =xUserType
                                     el["enumerable"] = element.enumerable;
-                                    //el["typeUI"] = element.typeUI;
+                                    el["type"] = element.type;
+                                    el["typeUI"] = element.typeUI;
                                     el["mask"] = element.mask;
                                     el["specialTypeDef"] = element.specialTypeDef;
+                                    el["sync"] = element.sync;
+                                    el["new"] = element.new;
                                     // ----
                                     fieldListArr.push(el);
                                 }
@@ -1696,6 +1776,11 @@ FL["dd"] = (function () {//name space FL.dd
                         //   options = {description:description,label:label,type:type, typeUI:typeUI,mask:mask,specialTypeDef:specialTypeDef,enumerable:arrEnumerable}
                         return FL.dd.getFieldCompressedName(this.singular, name);//return null name does not exist
                     };
+                    properties["removeField"] = function (fieldName) {//if the field name exists remove it form the local dictionary
+                        //example	FL.dd.t.entities[eCN].removeField("petName");
+                        FL.dd.removeLocalAttribute(this.singular, fieldName);
+                        FL.dd.init_t();//update changes to FL.dd.t.entities
+                    };
                     properties["save"] = function () {//it will commit entity eCN (local name) to server, returning the new eCN
                         //	var promiseSave = FL.dd.t.entities[eCN].save();//fieldsList()
                         var def = $.Deferred();
@@ -1704,7 +1789,8 @@ FL["dd"] = (function () {//name space FL.dd
                         if (FL.dd.isEntityByCNInSync(eCN)) {
                             return def.resolve(eCN);
                         } else {
-                            FL.API.syncLocalDictionaryToServer(entityName)
+                              //FL.API.syncLocalDictionaryToServer(entityName)
+                              FL.API.saveDictionaryOrchestration(eCN)
                                 .then(function () {
                                     eCN = FL.dd.getCEntity(entityName);
                                     FL.dd.init_t();//update changes to FL.dd.t.entities

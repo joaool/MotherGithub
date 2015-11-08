@@ -109,16 +109,16 @@ testMockUp = function(){
 	// Now we want to commit this values to the database
 	//FL.dd.t.save()://will commit all value
 
-	//var promiseSave = FL.dd.t.entities[eCN].save();
-	//promiseSave.done(function (eCN) {
-	//	var entityName = FL.dd.getEntityByCName(eCN);
-	//	FL.dd.t.entities.dumpToConsole();
-	//	alert("CHECKED TILL THIS POINT");
-	//});
-	//promiseSave.fail(function (err) {
-	//	alert(err);
-	//	alert("STOP");
-	//});
+	var promiseSave = FL.dd.t.entities[eCN].save();
+	promiseSave.done(function (eCN) {
+		var entityName = FL.dd.getEntityByCName(eCN);
+		FL.dd.t.entities.dumpToConsole();
+		alert("CHECKED TILL THIS POINT");
+	});
+	promiseSave.fail(function (err) {
+		alert(err);
+		alert("STOP");
+	});
 
 /*
 

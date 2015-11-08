@@ -490,13 +490,54 @@ FL["API"] = (function () {//name space FL.API
                 oEntity.csingular = eCN;
                 for (var i = 0; i < data[0].fields.length; i++) {//
                     FL.dd.setFieldCompressedName(entityName, data[0].fields[i].d["3"], data[0].fields[i]["_id"]);//xSingular,fieldName,fieldCN
+                    FL.dd.setFieldNew(entityName, data[0].fields[i].d["3"], false);//xSingular,fieldName,false - field is not new anymore
+                    FL.dd.setFieldSync(entityName, data[0].fields[i].d["3"], true);//xSingular,fieldName,true - field is in sync
                 }
-                FL.dd.setSync(entityName, true);
-
+                FL.dd.setEntityNew(entityName, false);// entity is not new anymore
+                FL.dd.setSync(entityName, true);// the whole entity and fields are in sync
                 FL.common.printToConsole("=====================================>_addWithFields: OK " + entityName + " stored on server and local Dict in synch");
                 def.resolve();
             }
         });
+        return def.promise();
+    };
+    var _fieldAdd = function (eCN,obj) {//creates a new field in entity eCN. with _id=field_id defined inside object obj with all field definitions
+        //obj - {name_3:x1,description_4:x2,label_K:x3,type_M:x4,typeUI_9:x5,enumerable_N:x6} - all keys must be supplied
+        var def = $.Deferred();
+        var fl = FL.fl; //new flMain();
+        // var fl = new flMain();
+        // var fa = FL.login.token.fa;//new fl.app();
+        var fField = new fl.field();
+        var field_id = obj._id;
+        fField.add({
+                "1": eCN,
+                "3": obj.name_3,
+                "4": obj.description_4,
+                "K": obj.label_K,
+                "M": obj.type_M,
+                "9": obj.typeUI_9,
+                "N": obj.enumerable_N,
+                "O": obj.Nico_O,
+                "P": obj.Nico_P
+            },
+            function (err, data) {
+                FL.common.printToConsole("............................._fieldAdd....", "test");
+                // err = "abc";
+                if (err) {
+                    FL.common.printToConsole("======================>ERROR ON _fieldUpdate err=" + err, "test");
+                    def.reject("ERROR: _fieldUpdate err=" + err);
+                } else {
+                    FL.common.printToConsole("=====================================>_fieldUpdate: OK ", "test");
+                    //Now we replace old fCN by the new on returned from server
+                    var entityName = FL.dd.getEntityByCName(eCN);
+                    var fieldName = obj.name_3;
+                    FL.dd.setFieldCompressedName(entityName, fieldName, data[0]._id);//xSingular,fieldName,fieldCN
+                    FL.dd.setFieldNew(entityName, fieldName, false);//xSingular,fieldName,false - field is not new anymore
+                    FL.dd.setFieldSync(entityName, fieldName, true);//xSingular,fieldName,true - field is in sync
+                    def.resolve(data[0]._id);
+                }
+            }
+        );
         return def.promise();
     };
     var _fieldUpdate = function (obj) {//updates a field with _id=field_id defined inside object obj with all field definitions
@@ -799,6 +840,8 @@ FL["API"] = (function () {//name space FL.API
             oEntity = FL.dd.entities[entities[i].d["3"]];
             oEntity.plural = entities[i].d["E"];
             oEntity.csingular = entities[i]._id;
+            oEntity.sync = true;
+            oEntity.new = false;
             // FL.common.printToConsole("--- *** fields *** ---");
             for (var fieldIndex = 0; fieldIndex < entities[i].fields.length; fieldIndex++) {//boucle fields
                 // FL.common.printToConsole("--->field fCN=" + entities[i].fields[fieldIndex]._id + " fieldName=" + entities[i].fields[fieldIndex].d["3"] );
@@ -806,6 +849,8 @@ FL["API"] = (function () {//name space FL.API
                 FL.dd.addAttribute(entities[i].d["3"], entities[i].fields[fieldIndex].d["3"], entities[i].fields[fieldIndex].d["4"], entities[i].fields[fieldIndex].d["K"], entities[i].fields[fieldIndex].d["M"], entities[i].fields[fieldIndex].d["9"], entities[i].fields[fieldIndex].d["N"], null, entities[i].fields[fieldIndex].d["P"]);
                 //addAttribute uses a local compressed name. Now we have to force the field compressed name comming from server								
                 FL.dd.setFieldCompressedName(entities[i].d["3"], entities[i].fields[fieldIndex].d["3"], entities[i].fields[fieldIndex]._id);
+                FL.dd.setFieldNew(entities[i].d["3"], entities[i].fields[fieldIndex].d["3"], false);//xSingular,fieldName,false - field is not new
+                FL.dd.setFieldSync(entities[i].d["3"], entities[i].fields[fieldIndex].d["3"], true);//xSingular,fieldName,true - field is in sync
             }
             // FL.common.printToConsole("--- *** relations *** ---");
             var rCN = null;
@@ -1466,14 +1511,14 @@ FL["API"] = (function () {//name space FL.API
             FL.common.printToConsole("xxxxxxxxx #$%#%#%5 xxxxxxx");
         },
         syncLocalDictionary: function () {//clears local dictionary and updates it from server dictionary
-            FL.common.printToConsole("....................................>beginning syncLocalDictionary....with token=" + JSON.stringify(FL.login.token),"API");
+            FL.common.printToConsole("....................................>beginning syncLocalDictionary....with token=" + JSON.stringify(FL.login.token), "API");
             var def = $.Deferred();
             //_getFullDictionary->FL.dd.clear()->rebuildsLocalDictionary()
             // temporaryRebuildsLocalDictionaryFromServer("ABC");
             // _test();
             var syncLocalDictionary = _getFullDictionary();
             syncLocalDictionary.done(function (entities) {
-                FL.common.printToConsole(">>>>> syncLocalDictionary SUCCESS <<<<< entities=" + entities,"API");
+                FL.common.printToConsole(">>>>> syncLocalDictionary SUCCESS <<<<< entities=" + entities, "API");
                 FL.dd.clear();
                 if (entities) {
                     FL.common.printToConsole(">>>>> syncLocalDictionary -> does temporaryRebuildsLocalDictionaryFromServer(entities)");
@@ -1515,19 +1560,19 @@ FL["API"] = (function () {//name space FL.API
             }
             return entityJSON;
         },
-        syncLocalDictionaryToServer: function (entityName) {//synch table entityName existing in local dictionary with server dict
+        syncLocalDictionaryToServer: function (entityName) {//BAD NAME !!!!! (check duplicate syncLocalDictionaryNewEntityToServer()) synch table entityName existing in local dictionary with server dict
             // entityName - singular name as it is in local dd
-            FL.common.printToConsole("....................................>beginning syncLocalDictionaryToServer....with token=" + JSON.stringify(FL.login.token),"API");
+            FL.common.printToConsole("....................................>beginning syncLocalDictionaryToServer....with token=" + JSON.stringify(FL.login.token), "API");
             var def = $.Deferred();
             var entityJSON = this.prepareJSONFromLocalEntity(entityName);
             // alert("entityJSON = "+JSON.stringify(entityJSON));
             var addWithFields = _addWithFields(entityJSON);
             addWithFields.done(function () {
-                FL.common.printToConsole(">>>>> syncLocalDictionaryToServer SUCCESS <<<<<","API");
+                FL.common.printToConsole(">>>>> syncLocalDictionaryToServer SUCCESS <<<<<", "API");
                 return def.resolve();
             });
             addWithFields.fail(function (err) {
-                FL.common.printToConsole(">>>>> syncLocalDictionaryToServer FAILURE <<<<< " + err,"API");
+                FL.common.printToConsole(">>>>> syncLocalDictionaryToServer FAILURE <<<<< " + err, "API");
                 return def.reject();
             });
             return def.promise();
@@ -1550,7 +1595,7 @@ FL["API"] = (function () {//name space FL.API
             });
             return def.promise();
         },
-        updateDictionaryAttribute: function (fCN, oAttribute) {//works with FL.dd.updateAttribute to update attribute to server
+        updateDictionaryAttribute: function (fCN, oAttribute) {//updates field properties in server for an attribute existing in local dictionary
             var def = $.Deferred();
             var attrJSON = {
                 "_id": fCN,
@@ -1571,6 +1616,30 @@ FL["API"] = (function () {//name space FL.API
             });
             fieldUpdatePromise.fail(function (err) {
                 FL.common.printToConsole(">>>>> updateDictionaryAttribute FAILURE <<<<< " + err);
+                return def.reject(err);
+            });
+            return def.promise();
+        },
+        insertDictionaryAttribute: function (eCN, oAttribute) {//inserts field properties in server for an attribute existing in local dictionary but not in server
+            var def = $.Deferred();
+            var attrJSON = {
+                "name_3": oAttribute.name,
+                "description_4": oAttribute.description,
+                'label_K': oAttribute.label,
+                'typeUI_9': oAttribute.typeUI,
+                'type_M': oAttribute.type,
+                'enumerable_N': oAttribute.enumerable,
+                'Nico_O': false,
+                'Nico_P': oAttribute.specialTypeDef
+            };
+            //var attrJSON = {"name_3":oAttribute.name, "description_4":oAttribute.description, 'label_K': oAttribute.label,'typeUI_9':oAttribute.typeUI, 'type_M': oAttribute.type, 'enumerable_N':oAttribute.enumerable,'Nico_O':false };
+            var fieldInsertPromise = _fieldAdd(eCN,attrJSON);
+            fieldInsertPromise.done(function (result) {
+                FL.common.printToConsole(">>>>> insertDictionaryAttribute SUCCESS <<<<<");
+                return def.resolve(result);
+            });
+            fieldInsertPromise.fail(function (err) {
+                FL.common.printToConsole(">>>>> insertDictionaryAttribute FAILURE <<<<< " + err);
                 return def.reject(err);
             });
             return def.promise();
@@ -1624,6 +1693,174 @@ FL["API"] = (function () {//name space FL.API
             });
             return def.promise();
         },
+        syncLocalDictionaryNewEntityToServer: function (entityName) {//synch table entityName (including all fields) existing in local dictionary with server dict
+            // entityName - singular name as it is in local dd
+            FL.common.printToConsole("....................................>beginning syncLocalDictionaryToServer....with token=" + JSON.stringify(FL.login.token), "API");
+            var def = $.Deferred();
+            if (FL.dd.entities[entityName]) {//entityName exists in local dictionary
+                var entityJSON = this.prepareJSONFromLocalEntity(entityName);
+                // alert("entityJSON = "+JSON.stringify(entityJSON));
+                var addWithFields = _addWithFields(entityJSON);
+                addWithFields.done(function () {
+                    FL.common.printToConsole(">>>>> syncLocalDictionaryNewEntityToServer SUCCESS <<<<<", "API");
+                    //inside _addWithFields() we have already updated <entity>.new=false, <entity>.sync=true and for all fields <entity>.<field>.new=false and <entity>.<field>.sync = true
+                    return def.resolve();
+                });
+                addWithFields.fail(function (err) {
+                    FL.common.printToConsole(">>>>> syncLocalDictionaryNewEntityToServer FAILURE <<<<< " + err, "API");
+                    return def.reject();
+                });
+            } else {//entityName does not exists in dictionary
+                var err = "FL.API.syncLocalDictionaryNewEntityToServer Error: you tried to creaste " + entityName + " in server but it does not exists in Local Dictionary";
+                return def.reject(err);
+            }
+            return def.promise();
+        },
+        saveDictionaryOrchestration : function (eCN) {//for eCN forces synch between local version and server version
+            // The local dictionary follows the convention:
+            //     at entity level - if <entity>.sync = true ->no need to save
+            //                       if <entity>.sync = false ->a change was done locally that needs to be synchronized to the server
+            //                          saveDictionary checks if <entity>.new is true =>syncLocalDictionaryNewEntityToServer and exits
+            //                          saveDictionary checks if <entity>.new is false =>update all entity properties to server and for each field:
+            //                              if <entity>.<field>.sync is true nothing is done with the field
+            //                              if <entity>.<field>.sync is false:
+            //                                      if <entity>.<field>.new is true =>create a new field ELSE updates all field properties
+            var def = $.Deferred();
+            var entityName = FL.dd.getEntityByCName(eCN);
+            if (entityName) {
+                var oEntity = FL.dd.entities[entityName];
+                if (oEntity.sync) {//->no need to save
+                    FL.common.printToConsole(">>>>>saveDictionaryOrchestration SUCCESS no need to save<<<<<","API");
+                    return def.resolve();
+                } else {//a change was done locally that needs to be synchronized to the server
+                    if (oEntity.new) {//-=>syncLocalDictionaryNewEntityToServer and exits
+                        var synch = FL.API.syncLocalDictionaryNewEntityToServer(entityName);
+                        synch.done(function () {
+                            FL.common.printToConsole(">>>>>saveDictionaryOrchestration SUCCESS new entity<<<<<","API");
+                            return def.resolve();
+                        });
+                        synch.fail(function (err) {
+                            FL.common.printToConsole(">>>>>saveDictionaryOrchestration FAILURE new entity <<<<< " + err,"API");
+                            return def.reject("saveDictionaryOrchestration FAILURE err=" + err);
+                        });
+                        def.resolve();
+                    } else {// entity already existing in server =>update all entity properties to server and for each field:
+                        var oProperties = { singular:oEntity.singular, plural:oEntity.plural, description:oEntity.description };
+                        //ex:updateDictionaryEntityProperties("50",{singular:singular,plural:xPlural,description:description});entityName,{singular:singular,plural:xPlural,description:description});
+                        var updateEntityProps = FL.API.updateDictionaryEntityProperties(eCN,oProperties);
+                        updateEntityProps.done(function () {
+                            FL.common.printToConsole(">>>>>saveDictionaryOrchestration SUCCESS updating props of existing entity <<<<<","test");
+                            // Now updates all fields
+                            var saveFieldsPromise = FL.API.saveDictionaryFieldsOf(eCN);
+                            saveFieldsPromise.done(function () {
+                                FL.common.printToConsole(">>>>>saveDictionaryOrchestration SUCCESS new entity and fields<<<<<","test");
+                                return def.resolve();
+                            });
+                            saveFieldsPromise.fail(function (err) {
+                                FL.common.printToConsole(">>>>>saveDictionaryOrchestration FAILURE new entity and fields  <<<<< " + err,"test");
+                                return def.reject("saveDictionaryOrchestration FAILURE new entity and fields err=" + err);
+                            });
+                            return def.resolve();
+                        });
+                        updateEntityProps.fail(function (err) {
+                            FL.common.printToConsole(">>>>>saveDictionaryOrchestration FAILURE <<<<< " + err,"test");
+                            return def.reject("saveDictionaryOrchestration FAILURE updating props of existing entity err=" + err);
+                        });
+                    }
+                }
+            } else {
+                var err = "FL.API.saveDictionaryOrchestration Error: Entity with compressedName=" + eCN + " does not exists in local Dictionary";
+                def.reject(err);
+            }
+            return def.promise();
+        },
+
+        saveDictionaryFieldsOf: function (eCN) {//for eCN forces synch between local version and server version
+            // The local dictionary follows the convention:
+            //     at entity level - if <entity>.sync = true ->no need to save
+            //                       if <entity>.sync = false ->a change was done locally that needs to be synchronized to the server
+            //                          saveDictionary checks if <entity>.new is true =>syncLocalDictionaryNewEntityToServer and exits
+            //                          saveDictionary checks if <entity>.new is false =>update all entity properties to server and for each field:
+            //                              if <entity>.<field>.sync is true nothing is done with the field
+            //                              if <entity>.<field>.sync is false:
+            //                                      if <entity>.<field>.new is true =>create a new field ELSE updates all field properties
+            //if eCN is a new entity uses syncLocalDictionaryToServer() [bad name] -->_addWithFields(entityJSON); and exit
+            //if eCN exists updates properties singular,plural and description)  updateDictionaryEntityProperties(eCN,oProperties):
+            //   for each field
+            //      if field is synchronized ->FL.dd.updateAttribute(entityName, fieldName, options); ->FL.API.updateDictionaryAttribute(fCN, oAttributes);
+            //      if it is a new field
+            var def = $.Deferred();
+            var entityName = FL.dd.getEntityByCName(eCN);
+            var oEntity = FL.dd.entities[entityName];
+
+            // -------- given an eCN ------------
+            var fieldList = FL.dd.t.entities[eCN].fieldList();
+            //console.log("----------- fields:"+JSON.stringify(fieldList));
+            var fieldCount = fieldList.length;
+            var count = 0;
+            async.whilst(
+                function () {
+                    return count < fieldCount;
+                },
+                function (callback) {
+                    FL.common.printToConsole("inside cycle *** --->" + count + " - name=" + fieldList[count].name + " label=" + fieldList[count].label, "test");
+                    var fCN = fieldList[count].fCN;
+                    // test if fCN is new or old ->new => ffield.add(),   old =>updateDictionaryAttribute() ffield.update
+
+                    if (!fieldList[count].sync) {
+                        FL.common.printToConsole("-----> field=" + FL.dd.t.entities[eCN].singular + "." + fieldList[count].name + " not in sync. =>save to server", "test");
+                        if (!fieldList[count].new) {
+                            var updatePromise = FL.API.updateDictionaryAttribute(fCN, fieldList[count]);
+                            updatePromise.done(function (result) {
+                                FL.common.printToConsole("---------------->" + FL.dd.t.entities[eCN].singular + "." + fieldList[count].name + " successfully updated...", "test");
+
+                                //in order to keep compatibility with old code, we didn't change updateDictionaryAttribute (calling _fieldUpdate) to update the fields's new and sync flags. We do it here
+                                var entityName = FL.dd.getEntityByCName(eCN);
+                                var fieldName = fieldList[count].name;
+                                FL.dd.setFieldNew(entityName, fieldName, false);//xSingular,fieldName,false - field is surely not new
+                                FL.dd.setFieldSync(entityName, fieldName, true);//xSingular,fieldName,true - field is in sync
+
+                                count++;
+                                return callback();
+                            });
+                            updatePromise.fail(function (err) {
+                                //FL.common.printToConsole(">>>>> updateDictionaryAttribute FAILURE <<<<< " + err);
+                                return callback("Error in FL.API.saveDictionary() trying to update " + FL.dd.t.entities[eCN].singular + "." + fieldList[count].name + " err=" + err);
+                            });
+                        } else {
+                            var insertPromise = FL.API.insertDictionaryAttribute(eCN, fieldList[count]);
+                            insertPromise.done(function (result) {
+                                FL.common.printToConsole("---------------->" + FL.dd.t.entities[eCN].singular + "." + fieldList[count].name + " new field inserted on server", "test");
+                                count++;
+                                return callback();
+                            });
+                            insertPromise.fail(function (err) {
+                                //FL.common.printToConsole(">>>>> updateDictionaryAttribute FAILURE <<<<< " + err);
+                                return callback("Error in FL.API.saveDictionary() trying to insert " + FL.dd.t.entities[eCN].singular + "." + fieldList[count].name + " err=" + err);
+                            });
+                        }
+                    } else {
+                        FL.common.printToConsole("-----> field=" + FL.dd.t.entities[eCN].singular + "." + fieldList[count].name + " is in sync. =>no need to save to server", "test");
+                        count++;
+                        return callback();
+                    }
+                },
+                function (err) {//this is allways called by the end of the loop.
+                    if (err) {//not null =>fail
+                        FL.common.printToConsole(">>>>> saveDictionary  FAILURE <<<<< " + err, "test");
+                        return def.reject(err);
+                    } else { //null=>success
+                        FL.common.printToConsole(">>>>> saveDictionary all fields updated in server SUCCESS <<<<<", "test");
+                        // now we need to save the current dictionary version copy to server
+
+                        return def.resolve();
+                    }
+                }
+            );
+            return def.promise();
+        },
+
+
         loadAppDataForSignInUser2: function () {//loads (local dict + menu + style + fontFamily) from server
             FL.common.printToConsole("....................................>beginning loadAppDataForSignInUser2....with token=" + JSON.stringify(FL.login.token));
             var def = $.Deferred();
@@ -2113,22 +2350,22 @@ FL["API"] = (function () {//name space FL.API
                         return recordEl.d;//returns a JSON with {fCN1:<content1>,fCN2:<content2>,...fCNn:<contentn>]
                     },
                     getColumn: function (fCN) {//returns an array with the content of fCN of each record
-                         //var colArr = _.pluck(this.data, fCN);//cannot be used because of d.fCN
-                        if(!fCN)
+                        //var colArr = _.pluck(this.data, fCN);//cannot be used because of d.fCN
+                        if (!fCN)
                             fCN = this.defaultFCN;//if argument is missing default is used
                         var colArr = [];
-                        _.each(this.data, function(element){
+                        _.each(this.data, function (element) {
                             colArr.push(element.d[fCN]);
-                          });
+                        });
                         return colArr;
                     },
-                    setDefaultFCN: function(fCN){
+                    setDefaultFCN: function (fCN) {
                         this.defaultFCN = fCN;
                     },
                     data: dataArray,
-                    defaultFCN:null
+                    defaultFCN: null
                 };
-                 def.resolve(tableObj);
+                def.resolve(tableObj);
             });
             loadPromise.fail(function (err) {
                 FL.common.printToConsole(">>>>> openTable FAILURE <<<<<" + err);
@@ -2142,7 +2379,7 @@ FL["API"] = (function () {//name space FL.API
             var def = $.Deferred();
             var syncLocalDictionary = _getFullDictionary();
             syncLocalDictionary.done(function (entities) {
-                FL.common.printToConsole(">>>>> syncLocalDictionary SUCCESS <<<<< entities=" + entities,"API");
+                FL.common.printToConsole(">>>>> syncLocalDictionary SUCCESS <<<<< entities=" + entities, "API");
                 FL.dd.clear();
                 FL.common.printToConsole(">>>>> syncLocalDictionary -> does temporaryRebuildsLocalDictionaryFromServer(entities)");
                 rebuildsLocalDictionaryFromServer(entities);//interprets entity JSON received from server to local dd
