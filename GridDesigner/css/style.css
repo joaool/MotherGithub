@@ -1,0 +1,87 @@
+.navbar-static-top {
+    border-bottom: 1px solid #222D32!important;
+}
+
+.new-table-container {
+    padding: 10px;
+    position: relative;
+    text-align: center;
+}
+
+.table-controls {
+    position: absolute;
+    height: 50px;
+    width: 150px;
+    text-align: center;
+    top: -51px;
+    left: 30%;
+    z-index: 1031;
+}
+
+.new-field-type {
+    border: 1px solid #CACACA;
+    height: 150px;
+    padding: 20px;
+    padding-top: 30px;
+    text-align: center;
+}
+
+.new-table {
+text-align: left;}
+
+input#newField {
+    width: 200px;
+}
+
+input#importTable {
+    width: 200px;
+}
+
+.fields-container {
+    border: 1px solid #CACACA;
+    height: 150px;
+    padding: 20px;
+    padding-top: 30px;
+    text-align: left;
+    overflow-x: scroll;
+    overflow-y: hidden;
+    width: 500px;
+}
+
+.new-field {
+    min-width: 169px;
+    min-height: 90px;
+    background: gray;
+    padding: 2px;
+    padding-right: 30px;
+    width: 169px;
+    position: relative;
+    display: inline-block;
+    margin-right: 20px;
+    float: left;
+}
+
+.field-conrols {
+    position: absolute;
+    right: 0px;
+    width: 30px;
+    height: 100%;
+    top: 0px;
+}
+
+.field-conrol {
+    width: 30px;
+    height: 30px;
+}
+
+.table-control {
+    width: 50px;
+    display: inline-block;
+    height: 50px;
+    /* margin-top: 12px; */
+    background: #CACACA;
+    border-radius: 50%;
+}
+
+div#saveTable i {
+}
