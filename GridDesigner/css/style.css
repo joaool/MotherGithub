@@ -37,7 +37,7 @@ input#importTable {
     width: 200px;
 }
 
-.fields-container {
+.fields-container-scroller {
     border: 1px solid #CACACA;
     height: 150px;
     padding: 20px;
@@ -45,43 +45,91 @@ input#importTable {
     text-align: left;
     overflow-x: scroll;
     overflow-y: hidden;
-    width: 500px;
 }
 
 .new-field {
     min-width: 169px;
     min-height: 90px;
-    background: gray;
+    background: gainsboro;
     padding: 2px;
     padding-right: 30px;
-    width: 169px;
+    width: 100%;
     position: relative;
     display: inline-block;
     margin-right: 20px;
-    float: left;
 }
 
 .field-conrols {
     position: absolute;
-    right: 0px;
+    right: -1px;
     width: 30px;
     height: 100%;
-    top: 0px;
+    top: 3px;
+    padding-top: 28px;
 }
 
 .field-conrol {
-    width: 30px;
-    height: 30px;
+    width: 26px;
+    height: 26px;
+    text-align: center;
+    background: white;
+    border: 1px solid #CACACA;
+    padding-top: 0px;
+    cursor: pointer;
+    margin-bottom: 3px;
+    font-size: 18px;
 }
 
 .table-control {
     width: 50px;
     display: inline-block;
     height: 50px;
-    /* margin-top: 12px; */
-    background: #CACACA;
+    vertical-align: top;
     border-radius: 50%;
 }
 
-div#saveTable i {
+.table-control i {
+padding-top: 12px;font-size: 25px;color: white;}
+
+.fields-container {
+    width: auto;
+    white-space: nowrap;
+}
+
+.save {
+    background: green;
+}
+
+.cancel {
+    background: #BF0404;
+}
+
+
+.delete-field {
+    color: #BF0404;
+}
+.ui-resizable-handle {
+    height: 26px;
+    width: 26px;
+    background-color: #FFFFFF;
+    cursor: move;
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    border: 1px solid #CACACA;
+    text-align: center;
+}
+.placeholder {
+    display:inline-block;
+    height: 1px !important;
+}
+input#fieldName {
+    width: 100%;
+}
+
+.resizable {
+    position: relative;
+    width: 169px;
+    min-width: 169px;
+    display: inline-block;
 }

@@ -18,6 +18,7 @@ define(function(require){
 			this.$el.find("#fieldsContainer").append(fieldTemplate);
 			var field = new NewField({"el" : "#field-"+id});
 			this.fields.push(field);
+			NewField.attachResizeEvent();
 		}
 	});
 	return View;
