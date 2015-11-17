@@ -1,12 +1,20 @@
 define(function(require){
 	'use strict';
 
+	var FieldModel = require("models/field");
+
 	var View = Backbone.View.extend({
 		initialize: function(){
-			
+			this.model = new FieldModel();
 		},
 		events: {
-			
+			"keyup #fieldName" : "onFieldNameUpdate"	
+		},
+		onFieldNameUpdate: function(){
+			this.model.set("fieldName",this.$el.find("#fieldName").val());
+		},
+		getModel : function(){
+			return this.model;
 		}
 	});
 	View.attachResizeEvent = function(){
