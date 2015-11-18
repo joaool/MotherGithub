@@ -4,14 +4,22 @@ define(function(require){
 	var FieldModel = require("models/field");
 
 	var View = Backbone.View.extend({
-		initialize: function(){
-			this.model = new FieldModel();
+		initialize: function(options){
+			this.model = new FieldModel(options);
 		},
 		events: {
-			"keyup #fieldName" : "onFieldNameUpdate"	
+			"keyup #fieldName" : "onFieldNameUpdate",
+			"resizestop" : "onFieldResized",
+			"click .delete-field" : "onDeleteClick"  
 		},
 		onFieldNameUpdate: function(){
 			this.model.set("fieldName",this.$el.find("#fieldName").val());
+		},
+		onFieldResized: function(evt){
+			this.model.set("width",$(evt.currentTarget).width());
+		},
+		onDeleteClick: function(evt){
+			this.trigger("DELETE_FIELD",$(evt.currentTarget).data("id"));	
 		},
 		getModel : function(){
 			return this.model;

@@ -21,21 +21,29 @@ define(function(require){
 			this.listenTo(this.newTable,"NEW_TABLE_CREATED",this.onTableCreated);
 			this.listenTo(this.newTable,"CLOSE_NEW_TABLE",this.onTableCloseClick);
 		},
-		setEditTableView: function(id){
+		editTable: function(id){
 			var table = this.tables.get(id);
-			this.$el.html("Table "+table.get("tableName")+" Clicked.");
+			this.setNewTableView();
+			this.newTable.setTableData(table.toJSON());
 		},
 		onTableCloseClick: function(){
 			this.$el.html("");
 		},
-		onTableCreated: function(table){
-			table.set({
-				"id": ++this.tableId
-			});
-			this.tables.add(table);
-			this.trigger("NEW_TABLE_CREATED",table.toJSON());
+		onTableCreated: function(newTable){
+			if (!newTable.get("id")){
+				newTable.set({
+					"id": ++this.tableId
+				});
+				this.tables.add(newTable);
+				this.trigger("NEW_TABLE_CREATED",newTable.toJSON());
+			}
+			else{
+				var table = this.tables.get(newTable.get("id"));
+				table.set(newTable.toJSON());
+				this.trigger("TABLE_UPDATED",table.toJSON());
+			}
 			this.$el.html("");
-		}
+		},
 	});
 	return View;
 });

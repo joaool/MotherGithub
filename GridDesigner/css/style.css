@@ -112,7 +112,6 @@ padding-top: 12px;font-size: 25px;color: white;}
     height: 26px;
     width: 26px;
     background-color: #FFFFFF;
-    cursor: move;
     position: absolute;
     top: 2px;
     right: 2px;
@@ -132,4 +131,10 @@ input#fieldName {
     width: 169px;
     min-width: 169px;
     display: inline-block;
+    margin-right: 20px;
+}
+
+.ui-resizable-handle i {
+    font-size: 18px;
+    padding-top: 3px;
 }

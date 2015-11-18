@@ -26,7 +26,7 @@ define(function(require){
 			});
 			this.model.set({
 				"tableName" : tableName,
-				"fields" : fields
+				"fields" : new Fields(fields)
 			});
 			this.trigger("NEW_TABLE_CREATED",this.model);
 		},
@@ -35,11 +35,36 @@ define(function(require){
 		},
 		onNewFieldBtnClick: function(){
 			var id = ++this.fieldsId;
-			var fieldTemplate = Handlebars.compile(FieldTemplate)({"id":id});
+			var fieldData = {
+				"id" : id
+			};
+			this.addField(fieldData);
+		},
+		addField: function(fieldData){
+			var fieldTemplate = Handlebars.compile(FieldTemplate)(fieldData);
 			this.$el.find("#fieldsContainer").append(fieldTemplate);
-			var field = new Field({"el" : "#field-"+id});
+			var field = new Field(_.extend({},fieldData,{"el" : "#field-"+fieldData.id}));
+			this.listenTo(field,"DELETE_FIELD",this.deleteField);
 			this.fields.add(field.getModel());
 			Field.attachResizeEvent();
+		},
+		deleteField: function(fieldId){
+			this.fields.remove(fieldId);
+			$("#field-"+fieldId).remove();
+		},
+		setTableData: function(tableData){
+			this.model.clear();
+			this.model.set(tableData);
+			this.updateUI();
+			this.fieldsId = _.max(_.pluck(this.model.get("fields").models,"id"));
+		},
+		updateUI: function(){
+			this.$el.find("#tableName").val(this.model.get("tableName"));
+			if (this.model.get("fields")){
+				_.each(this.model.get("fields").models,(function(field){
+					this.addField(field.attributes);
+				}).bind(this));
+			}
 		}
 	});
 	return View;

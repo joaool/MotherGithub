@@ -3,7 +3,7 @@ require.config({
     paths: {
         "jquery": '../../mailer/js/lib/jquery-1.11.0',
         "jquery.ui" : "../../mailer/js/lib/jquery-ui-1.10.4",
-        "bootstrap" : "../../FL_ui/js/bootstrap.min",
+        "bootstrap" : "lib/bootstrap",
         "handlebars": '../../mailer/js/lib/handlebars-v1.3.0',
         "underscore": '../../mailer/js/lib/underscore',
         "backbone": '../../mailer/js/lib/backbone',
