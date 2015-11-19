@@ -3,6 +3,7 @@ define(function(require){
 
 	var Field = require("views/new-field");
 	var Fields = require("collections/fields");
+	var NewTableTemplate = require("text!templates/new-table.html");
 	var FieldTemplate = require("text!templates/new-field.html");
 	var TableModel = require("models/table");
 
@@ -16,6 +17,22 @@ define(function(require){
 			"click #newField" : "onNewFieldBtnClick",
 			"click #saveTable" : "onSaveTableClick",
 			"click #cancelTable" : "onCancelTableClick"
+		},
+		render: function(){
+			this.$el.html(Handlebars.compile(NewTableTemplate)(this.model.toJSON()));
+			
+			if (this.model.get("fields")){
+				_.each(this.model.get("fields").models,(function(field){
+					this.addField(field.toJSON());
+				}).bind(this));
+				this.fieldsId = _.max(_.pluck(this.model.get("fields").models,"id"));
+			}
+		},
+		show: function(){
+			this.$el.show();
+		},
+		hide: function(){
+			this.$el.hide();
 		},
 		onSaveTableClick: function(){
 			var self = this;
@@ -41,9 +58,9 @@ define(function(require){
 			this.addField(fieldData);
 		},
 		addField: function(fieldData){
-			var fieldTemplate = Handlebars.compile(FieldTemplate)(fieldData);
-			this.$el.find("#fieldsContainer").append(fieldTemplate);
-			var field = new Field(_.extend({},fieldData,{"el" : "#field-"+fieldData.id}));
+			var field = new Field({"el" : "#fieldsContainer"});
+			field.setFieldData(fieldData);
+			field.render();
 			this.listenTo(field,"DELETE_FIELD",this.deleteField);
 			this.fields.add(field.getModel());
 			Field.attachResizeEvent();
@@ -55,11 +72,10 @@ define(function(require){
 		setTableData: function(tableData){
 			this.model.clear();
 			this.model.set(tableData);
-			this.updateUI();
-			this.fieldsId = _.max(_.pluck(this.model.get("fields").models,"id"));
 		},
 		updateUI: function(){
 			this.$el.find("#tableName").val(this.model.get("tableName"));
+			this.$el.find("#fieldsContainer").html("");
 			if (this.model.get("fields")){
 				_.each(this.model.get("fields").models,(function(field){
 					this.addField(field.attributes);

@@ -1,30 +1,28 @@
-<div class="new-table-container" id="newTableTemplate">
-	<div class="table-controls">
-		<div class="table-control save" id="saveTable">
-			<i class="fa fa-fw fa-check"></i>
-		</div>
-		<div class="table-control cancel" id="cancelTable">
-			<i class="fa fa-fw fa-close"></i>
-		</div>
+<div class="table-controls">
+	<div class="table-control save" id="saveTable" title="save">
+		<i class="fa fa-fw fa-check"></i>
 	</div>
-	<div class="form-group new-table table-name col-xs-4">
-	    <label for="tableName">Table name</label>
-	    <input type="text"  class="form-control" id="tableName" placeholder="enter table name" value="">
+	<div class="table-control cancel" id="cancelTable" title="cancel">
+		<i class="fa fa-fw fa-close"></i>
 	</div>
-	<div class="form-group new-field-type col-xs-12">
-		<div class="new-table-field-btn col-xs-5">
-		    <label for="newField">Create table fields clicking the plus sign.</label><br/>
-		    <input type="button"  class="form-control btn btn-default " id="newField" value="Table Fields">
-	    </div>
-	    <label class="col-xs-2"> OR </label>
-	    <div class="import-table-field-btn col-xs-5">
-	    	<label for="importTable">Import table from an existing spreadsheet.</label><br/>	
-		    <input type="button"  class="form-control btn btn-primary" id="importTable" value="Import table">
-	    </div>
-	</div>
-	<div class="form-group fields-container-scroller col-xs-12">
-		<div class="fields-container" id="fieldsContainer">
+</div>
+<div class="form-group new-table table-name col-xs-4">
+    <label for="tableName">Table name</label>
+    <input type="text"  class="form-control" id="tableName" placeholder="enter table name" value="{{tableName}}">
+</div>
+<div class="form-group new-field-type col-xs-12">
+	<div class="new-table-field-btn col-xs-5">
+	    <label for="newField">Create table fields clicking the plus sign.</label><br/>
+	    <input type="button"  class="form-control btn btn-default " id="newField" value="Table Fields">
+    </div>
+    <label class="col-xs-2"> OR </label>
+    <div class="import-table-field-btn col-xs-5">
+    	<label for="importTable">Import table from an existing spreadsheet.</label><br/>	
+	    <input type="button"  class="form-control btn btn-primary" id="importTable" value="Import table">
+    </div>
+</div>
+<div class="form-group fields-container-scroller col-xs-12">
+	<div class="fields-container" id="fieldsContainer">
 
-		</div>
 	</div>
 </div>
