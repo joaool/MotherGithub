@@ -42,9 +42,9 @@ FormDesigner.Views.ElementHolder = Backbone.View.extend({
     focusOutLabel: function(evt){
         var element = $(evt.currentTarget);
         var value = element.val();
-        FL.dd.t.entities[this.entityLoaded.csingular].fields[element.data("fieldname")].set({
-            "name":value
-        });
+        var fieldData = FL.dd.t.entities[this.entityLoaded.csingular].fields[element.data("fieldname")];
+        fieldData.name = value;
+        fieldData.set(fieldData);
         $(element).replaceWith("<div id='fieldNameLabel'>"+value+"</div>");
     },
     bindDraggableObject : function(){

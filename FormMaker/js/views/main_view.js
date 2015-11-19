@@ -35,7 +35,7 @@ FormDesigner.Views.MainView = Backbone.View.extend({
                 "text");
         //var fCN = FL.dd.t.entities[this.entityLoaded.csingular].getCName("TextField");
         var fieldData =  FL.dd.t.entities[this.entityLoaded.csingular].fields[fCN];
-        fieldData["fieldname"] = fCN;
+        fieldData["fCN"] = fCN;
         this.fieldsList.append(this.fieldsTempalate({"fields" : [fieldData]}));
         this.m_Editor.bindDraggableObject();
         //FL.dd.t.entities[this.entityLoaded.csingular].save();   

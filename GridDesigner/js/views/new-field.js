@@ -31,7 +31,7 @@ define(function(require){
 		},
 		render: function(){
 			var fieldTemplate = Handlebars.compile(FieldTemplate)(this.model.toJSON());
-			this.$el.html(fieldTemplate);
+			this.$el.append(fieldTemplate);
 		},
 		show: function(){
 			this.$el.show();
