@@ -28,6 +28,10 @@ FormDesigner.Views.MainView = Backbone.View.extend({
         "click #editField" : "onEditBtnClick"
     },
     onAddClick: function(){
+        if (!this.entityLoaded) {
+            alert("Select a entity first");
+            return;
+        }
         var fCN = FL.dd.t.entities[this.entityLoaded.csingular]
             .addField( "TextField-"+this.labelIdCnt++,
                 "Text Description",
@@ -41,6 +45,10 @@ FormDesigner.Views.MainView = Backbone.View.extend({
         //FL.dd.t.entities[this.entityLoaded.csingular].save();   
     },
     loadJson: function(jsonFile){
+        if (!this.entityLoaded) {
+            alert("Select a entity first");
+            return;
+        }
         jsonFile = jsonFile || this.jsonFile || "Sample.json";
         $.getJSON(jsonFile,(function(data){
             this.addJsonData(data);
@@ -219,6 +227,10 @@ FormDesigner.Views.MainView = Backbone.View.extend({
         this.m_Editor.bindDraggableObject();
     },
     saveBtnClick: function(){
+        if (!this.entityLoaded) {
+            alert("Select a entity first");
+            return;
+        }
         var promise = FL.dd.t.entities[this.entityLoaded.csingular].save();
         var self = this;
         promise.done(function (eCN) {

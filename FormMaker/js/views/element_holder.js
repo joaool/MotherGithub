@@ -108,27 +108,27 @@ FormDesigner.Views.ElementHolder = Backbone.View.extend({
 		var temp = this;
     $( ".sortable" ).sortable();
     $( ".sortable" ).sortable("destroy");
-		$( ".sortable" ).sortable({
-			connectWith : ".sortable",
-		 	placeholder: "ui-state-highlight",
-			tolerance: "pointer",
-			stop : function(event, ui){
-                temp.onDrop(event.target,ui.item[0]);
-			},
-			beforeStop : function(event, ui){
-				temp.DroppedObjectOnMove = ui.helper;
-			},
-            update: (function(event, ui){
-                var droppedObject = ui.item[0];
-                var alignment = event.target.id == "designerCol1" ? "left" : "right";
-                var cname = $(droppedObject).attr("id");
-                if (cname){
-                    var element = this.modelsCollection.where({"id" : cname})[0];
-                    element.set("alignment", alignment);
-                }
-            }).bind(this)
-		});
-		//$( ".sortable" ).disableSelection();
+	$( ".sortable" ).sortable({
+		connectWith : ".sortable",
+	 	placeholder: "ui-state-highlight",
+		tolerance: "pointer",
+		stop : function(event, ui){
+            temp.onDrop(event.target,ui.item[0]);
+		},
+		beforeStop : function(event, ui){
+			temp.DroppedObjectOnMove = ui.helper;
+		},
+        update: (function(event, ui){
+            var droppedObject = ui.item[0];
+            var alignment = event.target.id == "designerCol1" ? "left" : "right";
+            var cname = $(droppedObject).attr("id");
+            if (cname){
+                var element = this.modelsCollection.where({"id" : cname})[0];
+                element.set("alignment", alignment);
+            }
+        }).bind(this)
+	});
+	//$( ".sortable" ).disableSelection();
 	},
     ApplyHoverEvent : function(){
 		var temp = this;
@@ -143,6 +143,10 @@ FormDesigner.Views.ElementHolder = Backbone.View.extend({
 		//this.m_PropertyToolbar.setElement(obj);
 	},
     onAddLabelClick: function(){
+        if (!this.entityLoaded) {
+            alert("Select a entity first");
+            return;
+        }
         var label = $("#addLabel");
         var element = {
             "element" : FormMaker.Elements.Label,
@@ -204,6 +208,10 @@ FormDesigner.Views.ElementHolder = Backbone.View.extend({
         $(droppedObject).remove();
     },
     addElement: function(id,element){
+        if (!this.entityLoaded) {
+            alert("Select a entity first");
+            return;
+        }
         var obj = new FormMaker[element.element]({el : "#"+id,model : element});
         this.listenTo(obj, FormMaker.Events.ElementClick,this.onElementClick.bind(this));
         this.listenTo(obj, FormMaker.Events.MouseOver,this.onElementHoverIn.bind(this));
