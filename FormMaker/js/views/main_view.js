@@ -233,6 +233,7 @@ FormDesigner.Views.MainView = Backbone.View.extend({
         }
         var promise = FL.dd.t.entities[this.entityLoaded.csingular].save();
         var self = this;
+        debugger;
         promise.done(function (eCN) {
             var entityName = FL.dd.getEntityByCName(eCN);
             FL.dd.t.entities.dumpToConsole();

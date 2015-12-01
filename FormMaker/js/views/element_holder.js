@@ -77,6 +77,7 @@ FormDesigner.Views.ElementHolder = Backbone.View.extend({
         if (element){
             this.removeElement(element);
             $("[field_id='"+element.model.get('fieldId')+"']").draggable("enable");
+            $("[field_id='"+element.model.get('fieldId')+"']").removeClass("field-hovered");
         }
     },
     onEditFieldIconClick: function(evt){
@@ -156,54 +157,32 @@ FormDesigner.Views.ElementHolder = Backbone.View.extend({
             "value" : null,
             "id" : "Label"+this.labelIdCnt++,
             "fieldName" : "lbl",
-            "entityName" : this.entityLoaded.csingular
+            "entityName" : this.entityLoaded.csingular,
+            "alignment": "left"
         };
-        if(this.entityLoaded)
-            element.entityName = this.entityLoaded.csingular;
-        element.alignment = "left";
         this.addElement("designerCol1",element);
     },
     onDrop : function(target,droppedObject){
         var cname = $(droppedObject).attr("cname");
         if ($(droppedObject).hasClass("dropped") && cname != "new") return;
-
-        var elementType =  FormMaker.DBElements[$(droppedObject).data("type")];
-        var inputType = FormMaker.DBType[$(droppedObject).data("input-type")];
-        var leftLabel = $(droppedObject).data("label");
-        var name = $(droppedObject).data("name");
-        var dropDownEnum = $(droppedObject).data("enum");
-        var description = $(droppedObject).data("description");
-        var fieldName = $(droppedObject).data("fieldname");
-        var id = this.getNextId();
-        var alignment = target.id == "designerCol1" ? "left" : "right";
-        var fieldId = $(droppedObject).attr("field_id");
+        var fCN = $(droppedObject).data("fieldname");
+        var entity = FL.dd.t.entities[this.entityLoaded.csingular].fields[fCN];
         var element = {
-            "element" : elementType || FormMaker.Elements.Text,
-            "leftLabel" : leftLabel,
-            "name" : name,
-            "type" : inputType,
-            "value" : dropDownEnum,
-            "id" : id,
-            "fieldName" : fieldName,
-            "fCN" : fieldName,
-            "fieldId" : fieldId
+            "element" : FormMaker.DBElements[entity["typeUI"]] || FormMaker.Elements.Text,
+            "leftLabel" : entity["label"],
+            "name" : entity["name"],
+            "type" : FormMaker.DBType[entity["type"]],
+            "value" : entity["enum"],
+            "id" : this.getNextId(),
+            "fieldName" : fCN,
+            "fCN" : fCN,
+            "fieldId" : $(droppedObject).attr("field_id"),
+            "entityName" : this.entityLoaded.csingular,
+            "alignment": "left"
         };
-        if (cname){
-            var fieldName = FL.dd.t.entities[this.entityLoaded.csingular].getFieldCName(name);
-            element = this.model.getElement(cname);
-            element = jQuery.extend(true,{},element);
-            var id = this.getNextId();
-            element.id = id;
-            element.cname = cname;
-            element.fieldName = fieldName;
-        }
         if (element.element == "TextLabel") {
             element.id = "Label"+this.labelIdCnt++;
         }
-        if(this.entityLoaded)
-            element.entityName = this.entityLoaded.csingular;
-        element.alignment = alignment;
-        
         this.addElement(target.id,element);
         $(droppedObject).remove();
     },
