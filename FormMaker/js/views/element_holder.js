@@ -22,7 +22,6 @@ FormDesigner.Views.ElementHolder = Backbone.View.extend({
         this.bindDraggableObject();
     },
     events : {
-        "click .delete-icon" :"onDeleteClick",
         "click #fields .ui-draggable" : "onEntityFieldItemClicked",
         "click #addLabel" : "onAddLabelClick",
         "click .edit-field" : "onEditFieldIconClick",
@@ -79,6 +78,7 @@ FormDesigner.Views.ElementHolder = Backbone.View.extend({
             $("[field_id='"+element.model.get('fieldId')+"']").draggable("enable");
             $("[field_id='"+element.model.get('fieldId')+"']").removeClass("field-hovered");
         }
+        e.stopPropagation();
     },
     onEditFieldIconClick: function(evt){
         var fCN = $(evt.currentTarget).data("fieldname");
@@ -196,6 +196,7 @@ FormDesigner.Views.ElementHolder = Backbone.View.extend({
         this.listenTo(obj, FormMaker.Events.MouseOver,this.onElementHoverIn.bind(this));
         this.listenTo(obj, FormMaker.Events.MouseOut,this.onElementHoverOut.bind(this));
         this.listenTo(obj, FormMaker.Events.ValueChange,this.onValueChange.bind(this));
+        this.listenTo(obj, FormMaker.Events.DELETE_CLICK,this.onDeleteClick.bind(this));
         obj.loadData(element);
         obj.setParent("#"+id);
         obj.render();

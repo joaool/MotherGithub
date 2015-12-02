@@ -31,8 +31,12 @@ FormMaker.BaseElement = Backbone.View.extend({
         "click #leftLabel" : "onLabelClick",
         "click " : "onElementClick",
         "mouseover " : "onMouseOver",
-        "mouseout " : "onMouseOut"
+        "mouseout " : "onMouseOut",
+        "click .delete-icon" :"onDeleteClick"
 	},
+    onDeleteClick: function(evt){
+        this.trigger(FormMaker.Events.DELETE_CLICK,evt);
+    },
 	loadData : function(data){
         this.model.set(data);
 	},

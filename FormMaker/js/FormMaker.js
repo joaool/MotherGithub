@@ -110,7 +110,8 @@ FormMaker.Events = {
     "ValueChange" : "valueChange",
     "TypeChange" : "typeChange",
     "LabelTypeChange" : "labelTypeChange",
-    "FormLoaded" : "formLoaded"
+    "FormLoaded" : "formLoaded",
+    "DELETE_CLICK" : "DELETE_CLICK"
 }
 
 FormMaker.Elements = {
