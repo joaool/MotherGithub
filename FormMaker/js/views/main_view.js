@@ -25,7 +25,8 @@ FormDesigner.Views.MainView = Backbone.View.extend({
         "click #save" : "saveBtnClick",
         "click #load" : "loadJson",
         "click #Add" : "onAddClick",
-        "click #editField" : "onEditBtnClick"
+        "click #editField" : "onEditBtnClick",
+        "click #addEntity" : "onAddEntityBtnClick"
     },
     onAddClick: function(){
         if (!this.entityLoaded) {
@@ -233,7 +234,6 @@ FormDesigner.Views.MainView = Backbone.View.extend({
         }
         var promise = FL.dd.t.entities[this.entityLoaded.csingular].save();
         var self = this;
-        debugger;
         promise.done(function (eCN) {
             var entityName = FL.dd.getEntityByCName(eCN);
             FL.dd.t.entities.dumpToConsole();
@@ -249,5 +249,13 @@ FormDesigner.Views.MainView = Backbone.View.extend({
     },
     loadEntities: function(){
         this.entityModel.loadEntities();
+    },
+    onAddEntityBtnClick: function(){
+        var entityName = $("#entityName").val();
+        var eCN = FL.dd.t.entities.add(entityName,"Entity Description");
+        var promise = FL.dd.t.entities[eCN].save();
+        promise.done(function (eCN) {
+            var entityName = FL.dd.getEntityByCName(eCN);
+        });
     }
 });
