@@ -38,12 +38,10 @@ FormDesigner.Views.MainView = Backbone.View.extend({
                 "Text Description",
                 "label", 
                 "text");
-        //var fCN = FL.dd.t.entities[this.entityLoaded.csingular].getCName("TextField");
         var fieldData =  FL.dd.t.entities[this.entityLoaded.csingular].fields[fCN];
         fieldData["fCN"] = fCN;
         this.fieldsList.append(this.fieldsTempalate({"fields" : [fieldData]}));
-        this.m_Editor.bindDraggableObject();
-        //FL.dd.t.entities[this.entityLoaded.csingular].save();   
+        this.m_Editor.bindDraggableObject();  
     },
     loadJson: function(jsonFile){
         if (!this.entityLoaded) {
@@ -87,33 +85,21 @@ FormDesigner.Views.MainView = Backbone.View.extend({
             button2: "Confirm field edition",
             posField: {
                 fieldLabel: function (Box) {
-                    //alert("You are leaving the column title field");
                 },
                 fieldName: function (Box) {
-                    //alert("You are leaving the fieldName field");
-                    //var singular = FL.dd.getEntityByCName(Box.data.eCN);
-                    //Box.data.fCN = FL.dd.getFieldCompressedName(singular,Box.get("fieldName"));
                 }
             },
             preField: {
                 fieldDescription: function (Box) {
-                    //alert("You are entering the fields description.");
                 }
             },
             option: {
                 userType_options: function (Box, selected) {
-                    //alert("You clicked in option " + selected.text);
                     FL.common.printToConsole("%%%%%%%%>user code typeUI_options --> content=" + JSON.stringify(selected), "modalIn");
                 }
             }
         };
         var arrOfObj = FL.dd.arrOfUserTypesForDropdown();
-//        var mergeElement = [{"value": 1,"text": "no merge"}];
-//        var self = this;
-//        _.each(Object.keys(self.m_Editor.droppedElements), function (element) {
-//            var value = self.m_Editor.droppedElements[element].model.get("leftLabel");
-//            mergeElement.push({"value":element,"text":value});
-//        });
         var dataItems = {
             master: {
                 fieldLabel: FL.dd.t.entities[this.elementClickModel.entityName].fields[this.elementClickModel.fieldName].label,
@@ -121,8 +107,6 @@ FormDesigner.Views.MainView = Backbone.View.extend({
                 fieldDescription: FL.dd.t.entities[this.elementClickModel.entityName].fields[this.elementClickModel.fieldName].description,
                 placeholder : "test",
                 icon:"text",
-//                mergeWith : "no merge",
-//                mergeWith_options : mergeElement,
                 userType: FL.dd.userType({type: "string", typeUI: FL.dd.t.entities[this.elementClickModel.entityName].fields[this.elementClickModel.fieldName].typeUI}),
                 userType_options: arrOfObj
             }
