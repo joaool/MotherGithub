@@ -101,6 +101,7 @@ FormMaker = Backbone.View.extend({
         // insert Data to Table
     }
 });
+
 FormMaker.Events = {
     "PropertyChange" : "propChange",
     "ElementClick" : "elementClick",
