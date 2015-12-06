@@ -29,7 +29,7 @@ FormDesigner.Views.MainView = Backbone.View.extend({
         "click #addEntity" : "onAddEntityBtnClick"
     },
     onAddClick: function(){
-        if (!this.entityLoaded) {
+        if (!this.m_Editor.entityLoaded) {
             alert("Select a entity first");
             return;
         }
@@ -38,13 +38,15 @@ FormDesigner.Views.MainView = Backbone.View.extend({
                 "Text Description",
                 "label", 
                 "text");
+        debugger;
         var fieldData =  FL.dd.t.entities[this.entityLoaded.csingular].fields[fCN];
         fieldData["fCN"] = fCN;
+
         this.fieldsList.append(this.fieldsTempalate({"fields" : [fieldData]}));
         this.m_Editor.bindDraggableObject();  
     },
     loadJson: function(jsonFile){
-        if (!this.entityLoaded) {
+        if (!this.m_Editor.entityLoaded) {
             alert("Select a entity first");
             return;
         }
@@ -212,7 +214,7 @@ FormDesigner.Views.MainView = Backbone.View.extend({
         this.m_Editor.bindDraggableObject();
     },
     saveBtnClick: function(){
-        if (!this.entityLoaded) {
+        if (!this.m_Editor.entityLoaded) {
             alert("Select a entity first");
             return;
         }

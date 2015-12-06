@@ -141,7 +141,6 @@ FormDesigner.Views.ElementHolder = Backbone.View.extend({
 	OnHoverIn : function(obj){
 		var element = this.model.getElement($(obj).attr("cname"));
         this.currentHoverElement = obj;
-		//this.m_PropertyToolbar.setElement(obj);
 	},
     onAddLabelClick: function(){
         if (!this.entityLoaded) {
