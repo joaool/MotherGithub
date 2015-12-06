@@ -238,10 +238,14 @@ FormDesigner.Views.MainView = Backbone.View.extend({
     },
     onAddEntityBtnClick: function(){
         var entityName = $("#entityName").val();
+        if (entityName == "") {
+            alert("Please enter entity name.");
+        }
         var eCN = FL.dd.t.entities.add(entityName,"Description of " + entityName);
         var promise = FL.dd.t.entities[eCN].save();
         promise.done(function (eCN) {
             var entityName = FL.dd.getEntityByCName(eCN);
+            alert(entityName + " saved.");
         });
     }
 });
