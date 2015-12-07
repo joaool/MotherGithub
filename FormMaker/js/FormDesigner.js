@@ -8,7 +8,7 @@
             "TypeChange" : "typeChange",
             "LabelTypeChange" : "labelTypeChange"
         }
-    }; 
+    };
     $(document).ready(function(){
         $("#templates").load("Template.html");
          $("#menu-toggle").click(function(e) {
