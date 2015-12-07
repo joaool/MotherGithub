@@ -27,12 +27,14 @@ define(function(require){
 			this.rightContainer = new RightContainer({"el" : "#rightContainer"});
 			this.listenTo(this.rightContainer,"NEW_TABLE_CREATED",this.onTableCreated);
 			this.listenTo(this.rightContainer,"TABLE_UPDATED",this.onTableUpdated);
+			this.rightContainer.setEntities(this.entityModel.get("entities"));
+
 	        var entityLoaded = this.entityModel.get("entities");
 	        var self = this;
 	        $.each(entityLoaded,function(index,entity){
 	        	$(Handlebars.compile(TableListItem)({
 	        		"id" : entity.csingular,
-	        		"tableName" : entity.description
+	        		"tableName" : entity.singular
 	        	})).insertBefore(self.$el.find("#newTableListItem"));
 	        });
 		},
