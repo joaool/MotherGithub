@@ -9,6 +9,7 @@ define(function(require){
 		initialize: function(){
 			
 		},
+
 		generateTablesFromEntities : function(entities){
 			var self = this;
 			$.each(entities,function(index,entity){
@@ -17,7 +18,7 @@ define(function(require){
 					var field = new Field({
 						"id" : field.fCN,
 						"fieldName" : field.name,
-						"width" : field.width || 100
+						"width" : field.width || 150
 					});
 					fields.add(field);
 				});
