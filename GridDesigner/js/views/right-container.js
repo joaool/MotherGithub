@@ -13,9 +13,8 @@ define(function(require){
 			this.listenTo(this.newTable,"NEW_TABLE_CREATED",this.onTableCreated);
 			this.listenTo(this.newTable,"CLOSE_NEW_TABLE",this.onTableCloseClick);
 		},
-		setEntities: function(entityModel){
-			this.entityModel = entityModel;
-			this.tables.generateTablesFromEntities(this.entityModel);
+		setTables: function(tables){
+			this.tables = tables;
 		},
 		setNewTableView: function(){
 			this.newTable.render();

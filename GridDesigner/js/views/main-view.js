@@ -5,9 +5,12 @@ define(function(require){
 	var RightContainer = require("views/right-container");
 	var TableListItem = require("text!templates/table-list-item.html");
 	var EntityModel = require("formMakerLib/js/models/entity_model");
+	var Tables = require("collections/tables");
+	var DBUtil = require("db-util");
 
 	var View = Backbone.View.extend({
 		initialize: function(){
+			this.DBUtility = new DBUtil();
 			this.entityModel = new FormDesigner.Models.EntityModel();
 	        this.listenTo(this.entityModel,"change:entities",this.onEntitiesLoaded.bind(this));
 		},
@@ -22,20 +25,21 @@ define(function(require){
 			this.rightContainer.editTable($(evt.currentTarget).data("id"));
 		},
 		render: function(){
-			this.$el.append(Template);
+			this.$el.html(Template);
 			this.templateFixes();
+			this.initRightController();
+			this.listTables();
+		},
+		initRightController : function(){
 			this.rightContainer = new RightContainer({"el" : "#rightContainer"});
 			this.listenTo(this.rightContainer,"NEW_TABLE_CREATED",this.onTableCreated);
 			this.listenTo(this.rightContainer,"TABLE_UPDATED",this.onTableUpdated);
-			this.rightContainer.setEntities(this.entityModel.get("entities"));
-
-	        var entityLoaded = this.entityModel.get("entities");
+			this.rightContainer.setTables(this.tables);
+		},
+	    listTables : function(){   
 	        var self = this;
-	        $.each(entityLoaded,function(index,entity){
-	        	$(Handlebars.compile(TableListItem)({
-	        		"id" : entity.csingular,
-	        		"tableName" : entity.singular
-	        	})).insertBefore(self.$el.find("#newTableListItem"));
+	        $.each(this.tables.models,function(index,table){
+	        	$(Handlebars.compile(TableListItem)(table.toJSON())).insertBefore(self.$el.find("#newTableListItem"));
 	        });
 		},
 		onTableCreated: function(table){
@@ -54,6 +58,7 @@ define(function(require){
 			this.entityModel.loadEntities();
 		},
 		onEntitiesLoaded: function(){
+			this.tables = this.DBUtility.generateTablesFromEntities(this.entityModel.get("entities"));
 			this.render();	        
 	    },
         templateFixes: function() {

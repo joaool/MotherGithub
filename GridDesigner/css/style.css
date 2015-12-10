@@ -139,3 +139,15 @@ input#fieldName {
     font-size: 18px;
     padding-top: 3px;
 }
+
+.main-sidebar {
+    position: fixed;
+    overflow: hidden;
+    height: 100%;
+    overflow-y: scroll;
+}
+
+div#rightContainer {
+    height: 100%;
+    overflow-y: scroll;
+}

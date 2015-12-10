@@ -24,6 +24,29 @@ require.config({
         "ajaxBrowser" : "../../FL_ui/flClient/ajaxBrowser",
         "FLAPI" : "../../FL_ui/js/FLAPI",
         "FLmodal2" : "../../FL_ui/js/FLmodal2"
+    },
+    shim : {
+        "FLCommon2" : {
+            deps : ["flClient"]
+        },
+        "FLAPI" : {
+            deps : ["flClient"]
+        },
+        "FLdd2" : {
+            deps : ["flClient"]
+        },
+        "FLSlidePanels" : {
+            deps : ["flClient"]
+        },
+        "FLmodal2" : {
+            deps : ["flClient"]
+        },
+        "FLMenu2" : {
+            deps : ["flClient"]
+        },
+        "FLlogin2" : {
+            deps : ["flClient"]
+        }
     }
 });
 require(['jquery'],function() {
@@ -33,7 +56,6 @@ require(['jquery'],function() {
         'handlebars',
         'underscore',
         'backbone',
-        "ajaxBrowser",
         "spin.min",
         "flClient",
         "template"
@@ -52,6 +74,7 @@ require(['jquery'],function() {
         require([
             "views/main-view",
             "common-utils",
+            "ajaxBrowser",
             "FLCommon2",
             "FLAPI",
             "FLlogin2",
