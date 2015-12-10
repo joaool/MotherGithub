@@ -13,11 +13,11 @@ define(function(require){
 		var tables = new Tables();
 		$.each(entities,function(index,entity){
 			var fields = new Fields();
-			$.each(FL.dd.t.entities[50].fieldList(),function(index,field){
+			$.each(FL.dd.t.entities[entity.csingular].fieldList(),function(index,f){
 				var field = new Field({
-					"id" : field.fCN,
-					"fieldName" : field.name,
-					"width" : field.width || 150
+					"id" : f.fCN,
+					"fieldName" : f.name,
+					"width" : f.width || 150
 				});
 				fields.add(field);
 			});
@@ -29,6 +29,26 @@ define(function(require){
 			tables.add(table);
 		});
 		return tables;
+	}
+
+	DBUtil.prototype.saveToDb = function(tables) {
+
+	}
+
+	DBUtil.removeField = function(table,field){
+
+	}
+
+	DBUtil.addField = function(table,field) {
+		
+	};
+
+	DBUtil.updateField = function(table,field){
+
+	}
+
+	DBUtil.updateTable = function(table){
+		
 	}
 	return DBUtil;
 });
