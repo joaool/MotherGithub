@@ -10,7 +10,6 @@ define(function(require){
 
 	var View = Backbone.View.extend({
 		initialize: function(){
-			this.DBUtility = new DBUtil();
 			this.entityModel = new FormDesigner.Models.EntityModel();
 	        this.listenTo(this.entityModel,"change:entities",this.onEntitiesLoaded.bind(this));
 		},
@@ -19,6 +18,10 @@ define(function(require){
 			"click .table-list-item" : "onTableListItemClick"
 		},
 		onNewTableClick: function(){
+			var table = DBUtil.addEntity({
+				name : "entityName",
+				description : "Description of Entity"
+			});
 			this.rightContainer.setNewTableView();
 		},
 		onTableListItemClick: function(evt){
@@ -58,7 +61,7 @@ define(function(require){
 			this.entityModel.loadEntities();
 		},
 		onEntitiesLoaded: function(){
-			this.tables = this.DBUtility.generateTablesFromEntities(this.entityModel.get("entities"));
+			this.tables = DBUtil.generateTablesFromEntities(this.entityModel.get("entities"));
 			this.render();	        
 	    },
         templateFixes: function() {

@@ -38,7 +38,6 @@ FormDesigner.Views.MainView = Backbone.View.extend({
                 "Text Description",
                 "label", 
                 "text");
-        debugger;
         var fieldData =  FL.dd.t.entities[this.entityLoaded.csingular].fields[fCN];
         fieldData["fCN"] = fCN;
 

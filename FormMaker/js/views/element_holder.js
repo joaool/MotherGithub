@@ -325,7 +325,6 @@ FormDesigner.Views.ElementHolder = Backbone.View.extend({
         $.each(rightElements,(function(i,element){
             this.addElement("designerCol2",element);
         }).bind(this));
-        
     },
     updateLabel : function(elementData){
         var styleString = ";font-size:"+elementData.fontSize+";color:"+elementData.fontColor+";text-align:"+elementData.titleAlignment+";";

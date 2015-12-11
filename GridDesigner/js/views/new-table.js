@@ -6,6 +6,7 @@ define(function(require){
 	var NewTableTemplate = require("text!templates/new-table.html");
 	var FieldTemplate = require("text!templates/new-field.html");
 	var TableModel = require("models/table");
+	var DBUtil = require("db-util");
 
 	var View = Backbone.View.extend({
 		initialize: function(options){
@@ -23,7 +24,7 @@ define(function(require){
 			
 			if (this.model.get("fields")){
 				_.each(this.model.get("fields").models,(function(field){
-					this.addField(field.toJSON());
+					this.addField(field);
 				}).bind(this));
 				this.fieldsId = _.max(_.pluck(this.model.get("fields").models,"id"));
 			}
@@ -45,21 +46,26 @@ define(function(require){
 				"tableName" : tableName,
 				"fields" : new Fields(fields)
 			});
-			this.trigger("NEW_TABLE_CREATED",this.model);
+			DBUtil.saveToDb(this.model.toJSON(),function(){
+				this.trigger("NEW_TABLE_CREATED",this.model);
+			});
 		},
 		onCancelTableClick: function(){
 			this.trigger("CLOSE_NEW_TABLE");
 		},
 		onNewFieldBtnClick: function(){
-			var id = ++this.fieldsId;
 			var fieldData = {
-				"id" : id
+				fieldName : "field name",
+				description : "description for field",
+				label : "label for field",
+				inputType : "text"
 			};
-			this.addField(fieldData);
+			var field = DBUtil.addField(this.model.toJSON(),fieldData);
+			this.addField(field);
 		},
-		addField: function(fieldData){
+		addField: function(fieldModel){
 			var field = new Field({"el" : "#fieldsContainer"});
-			field.setFieldData(fieldData);
+			field.setModel(fieldModel);
 			field.render();
 			this.listenTo(field,"DELETE_FIELD",this.deleteField);
 			this.fields.add(field.getModel());
@@ -78,7 +84,7 @@ define(function(require){
 			this.$el.find("#fieldsContainer").html("");
 			if (this.model.get("fields")){
 				_.each(this.model.get("fields").models,(function(field){
-					this.addField(field.attributes);
+					this.addField(field);
 				}).bind(this));
 			}
 		}

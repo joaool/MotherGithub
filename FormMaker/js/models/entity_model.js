@@ -19,7 +19,7 @@ FormDesigner.Models.EntityModel = Backbone.Model.extend({
             return;
         },function(err){alert("ERROR ->"+err.code+" - "+err.message);return;});
     },
-    entitiesLoaded: function(){
+    entitiesLoaded: function() {
         var entities = FL.dd.t.entities.list();
         this.set("entities",entities);
         var initData = {};

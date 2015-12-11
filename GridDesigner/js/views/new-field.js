@@ -25,6 +25,9 @@ define(function(require){
 		getModel : function(){
 			return this.model;
 		},
+		setModel : function(model){
+			this.model = model;
+		},
 		setFieldData: function(data){
 			this.model.clear();
 			this.model.set(data);

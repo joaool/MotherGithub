@@ -14,51 +14,27 @@ require.config({
         "models" : "models",
         "collections" : "collections",
         "formMakerLib" : "../../FormMaker",
-        "FLSlidePanels" : "../../FL_ui/js/FLSlidePanels",
         "spin.min" : "../../FL_ui/js/spin.min",
-        "FLMenu2" : "../../FL_ui/js/FLMenu2",
-        "FLlogin2" : "../../FL_ui/js/FLlogin2",
-        "FLCommon2" : "../../FL_ui/js/FLCommon2",
-        "FLdd2" : "../../FL_ui/js/FLdd2",
-        "flClient" : "../../FL_ui/flClient/flClient",
-        "ajaxBrowser" : "../../FL_ui/flClient/ajaxBrowser",
-        "FLAPI" : "../../FL_ui/js/FLAPI",
-        "FLmodal2" : "../../FL_ui/js/FLmodal2"
     },
-    shim : {
-        "FLCommon2" : {
-            deps : ["flClient"]
-        },
-        "FLAPI" : {
-            deps : ["flClient"]
-        },
-        "FLdd2" : {
-            deps : ["flClient"]
-        },
-        "FLSlidePanels" : {
-            deps : ["flClient"]
-        },
-        "FLmodal2" : {
-            deps : ["flClient"]
-        },
-        "FLMenu2" : {
-            deps : ["flClient"]
-        },
-        "FLlogin2" : {
-            deps : ["flClient"]
-        }
-    }
 });
 require(['jquery'],function() {
+    $("head").append('<script src="../FL_ui/js/FLSlidePanels.js"></script>');
+    $("head").append('<script src="../FL_ui/js/FLMenu2.js"></script>');
+    $("head").append('<script src="../FL_ui/js/FLlogin2.js"></script>');
+    $("head").append('<script src="../FL_ui/js/FLCommon2.js"></script>');
+    $("head").append('<script src="../FL_ui/js/FLdd2.js"></script>');
+    $("head").append('<script src="../FL_ui/flClient/flClient.js"></script>');
+    $("head").append('<script src="../FL_ui/flClient/ajaxBrowser.js"></script>');
+    $("head").append('<script src="../FL_ui/js/FLAPI.js"></script>');
+    $("head").append('<script src="../FL_ui/js/FLmodal2.js"></script>');
     require([
         'jquery.ui',
         'bootstrap',
         'handlebars',
         'underscore',
         'backbone',
+        "template",
         "spin.min",
-        "flClient",
-        "template"
     ], function () {
         window.FormDesigner = {
             Views : {},
@@ -73,15 +49,7 @@ require(['jquery'],function() {
         };
         require([
             "views/main-view",
-            "common-utils",
-            "ajaxBrowser",
-            "FLCommon2",
-            "FLAPI",
-            "FLlogin2",
-            "FLdd2",
-            "FLSlidePanels",
-            "FLmodal2",
-            "FLMenu2"
+            "common-utils"
         ],function(MainView){
             $.widget.bridge('uibutton', $.ui.button);
             var mainView = new MainView({el : 'body'});

@@ -9,30 +9,54 @@ define(function(require){
 
 	};
 
-	DBUtil.prototype.generateTablesFromEntities = function(entities){
+	DBUtil.generateTablesFromEntities = function(entities){
 		var tables = new Tables();
 		$.each(entities,function(index,entity){
 			var fields = new Fields();
-			$.each(FL.dd.t.entities[entity.csingular].fieldList(),function(index,f){
-				var field = new Field({
-					"id" : f.fCN,
-					"fieldName" : f.name,
-					"width" : f.width || 150
-				});
+			$.each(FL.dd.t.entities[entity.csingular].fieldList(),function(index,fieldData){
+				var field = DBUtil.convertFieldToGridField(fieldData);
 				fields.add(field);
 			});
-			var table = new Table({
-				"id" : entity.csingular,
-				"tableName" : entity.singular,
-				"fields" : fields
-			});
+			var table = DBUtil.convertEntityToTable(entity,fields);
 			tables.add(table);
 		});
 		return tables;
 	}
 
-	DBUtil.prototype.saveToDb = function(tables) {
+	DBUtil.convertEntityToTable = function(entity,fields){
+		return new Table({
+			"id" : entity.csingular,
+			"tableName" : entity.singular,
+			"description" : entity.description,
+			"fields" :fields
+		});
+	}
+	
+	DBUtil.convertFieldToGridField = function(fieldData){
+		return new Field({
+			"id" : fieldData.fCN,
+			"fieldName" : fieldData.name,
+			"width" : fieldData.width || 150,
+			"label": fieldData.label || "label" ,
+			"inputType" : fieldData.inputType || "text",
+			"typeUI" : fieldData.typeUI || "text",
+			"description" : fieldData.description
+		});
+	}
 
+	DBUtil.saveToDb = function(table,callback) {
+		var promise = FL.dd.t.entities[table.id].save();
+        promise.done(function (eCN) {
+            var entityName = FL.dd.getEntityByCName(eCN);
+            FL.dd.t.entities.dumpToConsole();
+            alert("entity saved");
+            if (callback)
+            	callback();
+        });
+        promise.fail(function (err) {
+            alert(err);
+            alert("save error");
+        });
 	}
 
 	DBUtil.removeField = function(table,field){
@@ -40,15 +64,35 @@ define(function(require){
 	}
 
 	DBUtil.addField = function(table,field) {
-		
+		var fCN = FL.dd.t.entities[table.id]
+            .addField(field.fieldName,
+                field.description,
+                field.label, 
+                field.inputType);
+        var fieldData =  FL.dd.t.entities[table.id].fields[fCN];
+        fieldData.fCN = fCN;
+        return DBUtil.convertFieldToGridField(fieldData);
 	};
 
-	DBUtil.updateField = function(table,field){
-
+	DBUtil.updateField = function(table,fieldData){
+		FL.dd.t.entities[table.id].fields[field.id].set({
+            description: fieldData.description,
+            label: fieldData.label,
+            name: fieldData.fieldName,
+            typeUI: fieldData.typeUI
+        });
 	}
 
-	DBUtil.updateTable = function(table){
-		
+	DBUtil.addEntity = function(table) {
+		var eCN = FL.dd.t.entities.add(table.name,table.description);
+		var entity = FL.dd.t.entities[eCN];
+		return DBUtil.convertEntityToTable(entity,[]);
+	}
+
+	DBUtil.updateEntity = function(table){
+		FL.dd.t.entities[table.id].set({
+            name: table.tableName,
+        });
 	}
 	return DBUtil;
 });
