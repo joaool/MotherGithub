@@ -44,8 +44,8 @@ define(function(require){
 		});
 	}
 
-	DBUtil.saveToDb = function(table,callback) {
-		var promise = FL.dd.t.entities[table.id].save();
+	DBUtil.saveToDb = function(tableId,callback) {
+		var promise = FL.dd.t.entities[tableId].save();
         promise.done(function (eCN) {
             var entityName = FL.dd.getEntityByCName(eCN);
             FL.dd.t.entities.dumpToConsole();
@@ -60,7 +60,7 @@ define(function(require){
 	}
 
 	DBUtil.removeField = function(table,field){
-
+		FL.dd.t.entities[table.id].remove(field.fieldName);
 	}
 
 	DBUtil.addField = function(table,field) {
@@ -84,15 +84,18 @@ define(function(require){
 	}
 
 	DBUtil.addEntity = function(table) {
-		var eCN = FL.dd.t.entities.add(table.name,table.description);
+		var eCN = FL.dd.t.entities.add(table.tableName,table.description);
 		var entity = FL.dd.t.entities[eCN];
-		return DBUtil.convertEntityToTable(entity,[]);
+		return DBUtil.convertEntityToTable(entity,table.fields);
 	}
 
 	DBUtil.updateEntity = function(table){
 		FL.dd.t.entities[table.id].set({
-            name: table.tableName,
+            name: table.tableName
         });
+        $.each(table.fields.models,function(i,field){
+        	DBUtil.updateField(table.toJSON(),field.toJSON());
+        })
 	}
 	return DBUtil;
 });

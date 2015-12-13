@@ -42,11 +42,21 @@ define(function(require){
 				var fieldId = $(field).data("id");
 				return self.fields.get(fieldId); 
 			});
-			this.model.set({
-				"tableName" : tableName,
-				"fields" : new Fields(fields)
-			});
-			DBUtil.saveToDb(this.model.toJSON(),function(){
+			if (!this.model.get("id")) {
+				this.model = DBUtil.addEntity({
+					"tableName" : tableName,
+					"description" : "Description for "+tableName,
+					"fields" : new Fields(fields)
+				});
+			}
+			else {
+				this.model = DBUtil.updateEntity({
+					"tableName" : tableName,
+					"description" : "Description for "+tableName,
+					"fields" : new Fields(fields)
+				});	
+			}
+			DBUtil.saveToDb(this.model.get("id"),function(){
 				this.trigger("NEW_TABLE_CREATED",this.model);
 			});
 		},
@@ -72,6 +82,7 @@ define(function(require){
 			Field.attachResizeEvent();
 		},
 		deleteField: function(fieldId){
+			DBUtil.removeField(this.model.toJSON(),this.fields.get(fieldId));
 			this.fields.remove(fieldId);
 			$("#field-"+fieldId).remove();
 		},

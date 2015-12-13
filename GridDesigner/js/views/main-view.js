@@ -18,10 +18,6 @@ define(function(require){
 			"click .table-list-item" : "onTableListItemClick"
 		},
 		onNewTableClick: function(){
-			var table = DBUtil.addEntity({
-				name : "entityName",
-				description : "Description of Entity"
-			});
 			this.rightContainer.setNewTableView();
 		},
 		onTableListItemClick: function(evt){
