@@ -15,6 +15,7 @@ require.config({
         "collections" : "collections",
         "formMakerLib" : "../../FormMaker",
         "spin.min" : "../../FL_ui/js/spin.min",
+        "async" : "../../FL_ui/js/async"
     },
 });
 require(['jquery'],function() {
@@ -27,15 +28,18 @@ require(['jquery'],function() {
     $("head").append('<script src="../FL_ui/flClient/ajaxBrowser.js"></script>');
     $("head").append('<script src="../FL_ui/js/FLAPI.js"></script>');
     $("head").append('<script src="../FL_ui/js/FLmodal2.js"></script>');
+    
     require([
+        "async",
         'jquery.ui',
         'bootstrap',
         'handlebars',
         'underscore',
         'backbone',
         "template",
-        "spin.min",
-    ], function () {
+        "spin.min"
+    ], function (async) {
+        window.async = async;
         window.FormDesigner = {
             Views : {},
             Models : {},

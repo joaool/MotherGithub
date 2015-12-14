@@ -18,7 +18,12 @@ define(function(require){
 			"click .table-list-item" : "onTableListItemClick"
 		},
 		onNewTableClick: function(){
-			this.rightContainer.setNewTableView();
+			var table = DBUtil.addEntity({
+				"tableName" : "",
+				"description" : "Description for new table"
+			});
+			this.rightContainer.addTable(table);
+			this.rightContainer.editTable(table.get("id"));
 		},
 		onTableListItemClick: function(evt){
 			this.rightContainer.editTable($(evt.currentTarget).data("id"));
@@ -31,8 +36,7 @@ define(function(require){
 		},
 		initRightController : function(){
 			this.rightContainer = new RightContainer({"el" : "#rightContainer"});
-			this.listenTo(this.rightContainer,"NEW_TABLE_CREATED",this.onTableCreated);
-			this.listenTo(this.rightContainer,"TABLE_UPDATED",this.onTableUpdated);
+			this.listenTo(this.rightContainer,"TABLE_UPDATED",this.renderTableToList);
 			this.rightContainer.setTables(this.tables);
 		},
 	    listTables : function(){   
@@ -45,10 +49,15 @@ define(function(require){
 			this.renderTableToList(table);
 		},
 		renderTableToList : function(table){
-			$(Handlebars.compile(TableListItem)(table)).insertBefore(this.$el.find("#newTableListItem"));
+			if (this.$el.find("#table-list-item-"+table.id).length > 0) {
+				this.$el.find("#table-list-item-"+table.id).replaceWith($(Handlebars.compile(TableListItem)(table)));
+			}
+			else {
+				$(Handlebars.compile(TableListItem)(table)).insertBefore(this.$el.find("#newTableListItem"));
+			}
 		},
 		onTableUpdated: function(table){
-			this.$el.find("#table-list-item-"+table.id).replaceWith($(Handlebars.compile(TableListItem)(table)));
+			this.renderTableToList(table);
 		},
 		init : function(){
 			this.loadEntities();

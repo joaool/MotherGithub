@@ -28,7 +28,7 @@ define(function(require){
 			"id" : entity.csingular,
 			"tableName" : entity.singular,
 			"description" : entity.description,
-			"fields" :fields
+			"fields" :fields || new Fields()
 		});
 	}
 	
@@ -51,7 +51,7 @@ define(function(require){
             FL.dd.t.entities.dumpToConsole();
             alert("entity saved");
             if (callback)
-            	callback();
+            	callback(eCN);
         });
         promise.fail(function (err) {
             alert(err);
@@ -60,7 +60,7 @@ define(function(require){
 	}
 
 	DBUtil.removeField = function(table,field){
-		FL.dd.t.entities[table.id].remove(field.fieldName);
+		FL.dd.t.entities[table.id].removeField(field.fieldName);
 	}
 
 	DBUtil.addField = function(table,field) {
@@ -75,7 +75,7 @@ define(function(require){
 	};
 
 	DBUtil.updateField = function(table,fieldData){
-		FL.dd.t.entities[table.id].fields[field.id].set({
+		FL.dd.t.entities[table.id].fields[fieldData.id].set({
             description: fieldData.description,
             label: fieldData.label,
             name: fieldData.fieldName,
@@ -94,8 +94,8 @@ define(function(require){
             name: table.tableName
         });
         $.each(table.fields.models,function(i,field){
-        	DBUtil.updateField(table.toJSON(),field.toJSON());
-        })
+        	DBUtil.updateField(table,field.toJSON());
+        });
 	}
 	return DBUtil;
 });

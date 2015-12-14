@@ -11,7 +11,6 @@ define(function(require){
 	var View = Backbone.View.extend({
 		initialize: function(options){
 			this.fields = new Fields();
-			this.fieldsId = 0;
 			this.model = new TableModel({"id":options.id});
 		},
 		events: {
@@ -26,7 +25,6 @@ define(function(require){
 				_.each(this.model.get("fields").models,(function(field){
 					this.addField(field);
 				}).bind(this));
-				this.fieldsId = _.max(_.pluck(this.model.get("fields").models,"id"));
 			}
 		},
 		show: function(){
@@ -42,22 +40,21 @@ define(function(require){
 				var fieldId = $(field).data("id");
 				return self.fields.get(fieldId); 
 			});
-			if (!this.model.get("id")) {
-				this.model = DBUtil.addEntity({
-					"tableName" : tableName,
-					"description" : "Description for "+tableName,
-					"fields" : new Fields(fields)
+			
+			this.model.set({
+				"tableName" : tableName,
+				"description" : "Description for "+tableName,
+				"fields" : new Fields(fields)
+			});
+			DBUtil.updateEntity(this.model.toJSON());
+			
+			DBUtil.saveToDb(this.model.get("id"),function(newECN){
+				var oldModel = self.model.toJSON();
+				self.model.set("id",newECN);
+				self.trigger("NEW_TABLE_CREATED",{
+					oldModel: oldModel,
+					newModel : self.model.toJSON()
 				});
-			}
-			else {
-				this.model = DBUtil.updateEntity({
-					"tableName" : tableName,
-					"description" : "Description for "+tableName,
-					"fields" : new Fields(fields)
-				});	
-			}
-			DBUtil.saveToDb(this.model.get("id"),function(){
-				this.trigger("NEW_TABLE_CREATED",this.model);
 			});
 		},
 		onCancelTableClick: function(){

@@ -7,8 +7,7 @@ define(function(require){
 	var View = Backbone.View.extend({
 		initialize: function(){
 			this.tables = new Tables();
-			this.tableId = 0;
-
+			
 			this.newTable = new NewTable({"el" : "#newTableContainer"});
 			this.listenTo(this.newTable,"NEW_TABLE_CREATED",this.onTableCreated);
 			this.listenTo(this.newTable,"CLOSE_NEW_TABLE",this.onTableCloseClick);
@@ -20,6 +19,9 @@ define(function(require){
 			this.newTable.render();
 			this.newTable.show();
 		},
+		addTable: function(table){
+			this.tables.add(table);
+		},
 		editTable: function(id){
 			var table = this.tables.get(id);
 			this.newTable.setTableData(table.toJSON());
@@ -28,19 +30,10 @@ define(function(require){
 		onTableCloseClick: function(){
 			this.newTable.hide();
 		},
-		onTableCreated: function(newTable){
-			if (!newTable.get("id")){
-				newTable.set({
-					"id": ++this.tableId
-				});
-				this.tables.add(newTable);
-				this.trigger("NEW_TABLE_CREATED",newTable.toJSON());
-			}
-			else{
-				var table = this.tables.get(newTable.get("id"));
-				table.set(newTable.toJSON());
-				this.trigger("TABLE_UPDATED",table.toJSON());
-			}
+		onTableCreated: function(data){
+			var table = this.tables.get(data.oldModel.id);
+			table.set(data.newModel);
+			this.trigger("TABLE_UPDATED",table.toJSON());
 			this.newTable.hide();
 		},
 	});
