@@ -19,7 +19,7 @@ define(function(require){
 		},
 		onNewTableClick: function(){
 			var table = DBUtil.addEntity({
-				"tableName" : "",
+				"tableName" : "new table",
 				"description" : "Description for new table"
 			});
 			this.rightContainer.addTable(table);
