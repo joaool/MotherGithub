@@ -10,17 +10,17 @@ define(function(require){
 		},
 		events: {
 			"keyup #fieldName" : "onFieldNameUpdate",
-			"resizestop .resizable" : "onFieldResized",
+			"resizestop" : "onFieldResized",
 			"click .delete-field" : "onDeleteClick"  
 		},
 		onFieldNameUpdate: function(){
-			this.model.set("fieldName",this.$el.find("#fieldName").val());
+			this.model.set("fieldName",this.$el.find("#fieldName[data-id='"+this.model.get("id")+"']").val());
 		},
 		onFieldResized: function(evt){
 			this.model.set("width",$(evt.currentTarget).width());
 		},
 		onDeleteClick: function(evt){
-			this.trigger("DELETE_FIELD",$(evt.currentTarget).data("id"));	
+			this.trigger("DELETE_FIELD",this.model.toJSON());	
 		},
 		getModel : function(){
 			return this.model;
@@ -35,6 +35,7 @@ define(function(require){
 		render: function(){
 			var fieldTemplate = Handlebars.compile(FieldTemplate)(this.model.toJSON());
 			this.$el.append(fieldTemplate);
+			this.setElement($("#field-"+this.model.get("id")));
 		},
 		show: function(){
 			this.$el.show();

@@ -9,11 +9,14 @@ define(function(require){
 			this.tables = new Tables();
 			
 			this.newTable = new NewTable({"el" : "#newTableContainer"});
-			this.listenTo(this.newTable,"NEW_TABLE_CREATED",this.onTableCreated);
+			this.listenTo(this.newTable,"TABLE_SAVED",this.onTableCreated);
 			this.listenTo(this.newTable,"CLOSE_NEW_TABLE",this.onTableCloseClick);
 		},
 		setTables: function(tables){
 			this.tables = tables;
+		},
+		clearTableModel: function(){
+			this.newTable.clearModel();
 		},
 		setNewTableView: function(){
 			this.newTable.render();
@@ -31,9 +34,14 @@ define(function(require){
 			this.newTable.hide();
 		},
 		onTableCreated: function(data){
-			var table = this.tables.get(data.oldModel.id);
-			table.set(data.newModel);
-			this.trigger("TABLE_UPDATED",table.toJSON());
+			var table = this.tables.get(data.id);
+			if (table) {
+				table.set(data);
+			}
+			else {
+				this.tables.add(data);
+			}
+			this.trigger("TABLE_SAVED",this.tables.get(data.id).toJSON());
 			this.newTable.hide();
 		},
 	});

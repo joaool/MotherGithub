@@ -40,6 +40,7 @@ define(function(require){
 			"label": fieldData.label || "label" ,
 			"inputType" : fieldData.inputType || "text",
 			"typeUI" : fieldData.typeUI || "text",
+			"userType" : fieldData.typeUI || "text",
 			"description" : fieldData.description
 		});
 	}
@@ -86,6 +87,10 @@ define(function(require){
 	DBUtil.addEntity = function(table) {
 		var eCN = FL.dd.t.entities.add(table.tableName,table.description);
 		var entity = FL.dd.t.entities[eCN];
+		table.id = eCN;
+		$.each(table.fields.models,function(i,field){
+        	DBUtil.addField(table,field.toJSON());
+        });
 		return DBUtil.convertEntityToTable(entity,table.fields);
 	}
 
@@ -94,7 +99,12 @@ define(function(require){
             name: table.tableName
         });
         $.each(table.fields.models,function(i,field){
-        	DBUtil.updateField(table,field.toJSON());
+        	if (FL.dd.t.entities[table.id].fields[field.get("id")]) {
+        		DBUtil.updateField(table,field.toJSON());
+        	}
+        	else {
+	        	DBUtil.addField(table,field.toJSON());
+        	}
         });
 	}
 	return DBUtil;

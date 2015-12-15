@@ -18,12 +18,8 @@ define(function(require){
 			"click .table-list-item" : "onTableListItemClick"
 		},
 		onNewTableClick: function(){
-			var table = DBUtil.addEntity({
-				"tableName" : "new table",
-				"description" : "Description for new table"
-			});
-			this.rightContainer.addTable(table);
-			this.rightContainer.editTable(table.get("id"));
+			this.rightContainer.clearTableModel();
+			this.rightContainer.setNewTableView();
 		},
 		onTableListItemClick: function(evt){
 			this.rightContainer.editTable($(evt.currentTarget).data("id"));
@@ -36,7 +32,7 @@ define(function(require){
 		},
 		initRightController : function(){
 			this.rightContainer = new RightContainer({"el" : "#rightContainer"});
-			this.listenTo(this.rightContainer,"TABLE_UPDATED",this.renderTableToList);
+			this.listenTo(this.rightContainer,"TABLE_SAVED",this.renderTableToList);
 			this.rightContainer.setTables(this.tables);
 		},
 	    listTables : function(){   
@@ -58,6 +54,8 @@ define(function(require){
 		},
 		onTableUpdated: function(table){
 			this.renderTableToList(table);
+			this.tables = DBUtil.generateTablesFromEntities(this.entityModel.get("entities"));
+			this.rightContainer.setTables(this.tables);
 		},
 		init : function(){
 			this.loadEntities();
