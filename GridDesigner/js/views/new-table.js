@@ -52,7 +52,7 @@ define(function(require){
 				this.model = DBUtil.addEntity(this.model.toJSON());
 			}
 			else {
-				DBUtil.updateEntity(this.model.toJSON());
+				this.model = DBUtil.updateEntity(this.model.toJSON());
 			}
 			DBUtil.saveToDb(this.model.get("id"),function(newECN){
 				var oldModel = self.model.toJSON();

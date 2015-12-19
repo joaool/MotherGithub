@@ -26,8 +26,7 @@
     text-align: center;
 }
 
-.new-table {
-text-align: left;}
+.new-table {/* text-align: left; */}
 
 input#newField {
     width: 200px;
@@ -141,15 +140,45 @@ input#fieldName {
 }
 
 .main-sidebar {
-    position: fixed;
+    position: absolute;
     overflow: hidden;
     height: 100%;
     overflow-y: scroll;
-    /* margin-top: 50px; */
-    /* padding-top: 0px; */
+    /* margin-top: 51px; */
+    padding-top: 0px;
+    display: inline-block;
+    top: initial;
 }
 
 div#rightContainer {
-    /* height: 100%; */
-    /* overflow-y: scroll; */
+    overflow-y: auto;
+    vertical-align: top;
+    margin: 0px;
+    height: 100%;
+}
+
+.wrapper {
+    position: relative;
+    height: 100%;
+    padding-top: 50px;
+}
+
+.main-header {
+    position: absolute;
+    top: 0px;
+    width: 100%;
+}
+
+body {
+    height: 100vh;
+}
+
+.main-body {
+    height: 100%;
+    position: relative;
+    padding-left: 230px;
+}
+
+.form-group {
+    float: none!important;
 }

@@ -36,7 +36,7 @@ require(['jquery'],function() {
         'handlebars',
         'underscore',
         'backbone',
-        "template",
+        
         "spin.min"
     ], function (async) {
         window.async = async;

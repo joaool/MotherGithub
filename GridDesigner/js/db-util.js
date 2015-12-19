@@ -12,15 +12,18 @@ define(function(require){
 	DBUtil.generateTablesFromEntities = function(entities){
 		var tables = new Tables();
 		$.each(entities,function(index,entity){
-			var fields = new Fields();
-			$.each(FL.dd.t.entities[entity.csingular].fieldList(),function(index,fieldData){
-				var field = DBUtil.convertFieldToGridField(fieldData);
-				fields.add(field);
-			});
-			var table = DBUtil.convertEntityToTable(entity,fields);
-			tables.add(table);
+			tables.add(DBUtil.generateTableFromEntity(entity));
 		});
 		return tables;
+	}
+
+	DBUtil.generateTableFromEntity = function(entity){
+		var fields = new Fields();
+		$.each(FL.dd.t.entities[entity.csingular].fieldList(),function(index,fieldData){
+			var field = DBUtil.convertFieldToGridField(fieldData);
+			fields.add(field);
+		});
+		return DBUtil.convertEntityToTable(entity,fields);
 	}
 
 	DBUtil.convertEntityToTable = function(entity,fields){
@@ -95,9 +98,10 @@ define(function(require){
 	}
 
 	DBUtil.updateEntity = function(table){
-		FL.dd.t.entities[table.id].set({
+		var ret = FL.dd.t.entities[table.id].set({
             name: table.tableName
         });
+        table.id = FL.dd.t.entities.getCName(table.tableName);
         $.each(table.fields.models,function(i,field){
         	if (FL.dd.t.entities[table.id].fields[field.get("id")]) {
         		DBUtil.updateField(table,field.toJSON());
@@ -106,6 +110,9 @@ define(function(require){
 	        	DBUtil.addField(table,field.toJSON());
         	}
         });
+        var entity = FL.dd.t.entities[table.id];
+        return DBUtil.generateTableFromEntity(entity);
+        return
 	}
 	return DBUtil;
 });

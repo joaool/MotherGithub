@@ -26,7 +26,7 @@ define(function(require){
 		},
 		render: function(){
 			this.$el.html(Template);
-			this.templateFixes();
+			//this.templateFixes();
 			this.initRightController();
 			this.listTables();
 		},
