@@ -112,7 +112,6 @@ define(function(require){
         });
         var entity = FL.dd.t.entities[table.id];
         return DBUtil.generateTableFromEntity(entity);
-        return
 	}
 	return DBUtil;
 });

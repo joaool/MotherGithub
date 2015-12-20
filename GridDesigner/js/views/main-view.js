@@ -58,7 +58,7 @@ define(function(require){
 			this.rightContainer.setTables(this.tables);
 		},
 		init : function(){
-			this.loadEntities();
+			// this.loadEntities();
 		},
 		loadEntities: function(){
 			this.entityModel.loadEntities();
