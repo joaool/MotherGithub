@@ -2,6 +2,7 @@ define(function(require){
 	'use strict';
 
 	var NewTable = require("views/new-table");
+	var NewForm = require("views/new-form");
 	var Tables = require("collections/tables");
 	var Modes = {
 		GRID : "Grid",
@@ -14,6 +15,8 @@ define(function(require){
 			this.newTable = new NewTable({"el" : "#newTableContainer"});
 			this.listenTo(this.newTable,"TABLE_SAVED",this.onTableCreated);
 			this.listenTo(this.newTable,"CLOSE_NEW_TABLE",this.onTableCloseClick);
+			
+			this.newForm = new NewForm({"el" : "#newFormContainer"})
 			this.currentMode = "none";
 		},
 		okBtnClick : function(){
@@ -27,6 +30,9 @@ define(function(require){
 				this.newTable.onCancelTableClick();
 			}
 			this.currentMode = "none";
+		},
+		showFormView: function(){
+			this.newForm.render();
 		},
 		setTables: function(tables){
 			this.tables = tables;

@@ -15,6 +15,7 @@ define(function(require){
 		},
 		events: {
 			"click #newTable" : "onNewTableClick",
+			"click #newForm" : "onNewFormClick",
 			"click .table-list-item" : "onTableListItemClick",
 			"click #okButton" : "onOkButtonClick",
 			"click #cancelButton" : "onCancelButtonClick"
@@ -24,6 +25,9 @@ define(function(require){
 		},
 		onCancelButtonClick: function(){
 			this.rightContainer.cancelBtnClick();
+		},
+		onNewFormClick : function(){
+			this.rightContainer.showFormView();
 		},
 		onNewTableClick: function(){
 			this.rightContainer.clearTableModel();
