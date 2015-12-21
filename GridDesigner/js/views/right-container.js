@@ -3,7 +3,10 @@ define(function(require){
 
 	var NewTable = require("views/new-table");
 	var Tables = require("collections/tables");
-
+	var Modes = {
+		GRID : "Grid",
+		TABLE : "Table"
+	}
 	var View = Backbone.View.extend({
 		initialize: function(){
 			this.tables = new Tables();
@@ -11,6 +14,19 @@ define(function(require){
 			this.newTable = new NewTable({"el" : "#newTableContainer"});
 			this.listenTo(this.newTable,"TABLE_SAVED",this.onTableCreated);
 			this.listenTo(this.newTable,"CLOSE_NEW_TABLE",this.onTableCloseClick);
+			this.currentMode = "none";
+		},
+		okBtnClick : function(){
+			if (this.currentMode == Modes.GRID) {
+				this.newTable.onSaveTableClick();
+			}
+			this.currentMode = "none";
+		},
+		cancelBtnClick : function(){
+			if (this.currentMode == Modes.GRID) {
+				this.newTable.onCancelTableClick();
+			}
+			this.currentMode = "none";
 		},
 		setTables: function(tables){
 			this.tables = tables;
@@ -21,6 +37,7 @@ define(function(require){
 		setNewTableView: function(){
 			this.newTable.render();
 			this.newTable.show();
+			this.currentMode = Modes.GRID;
 		},
 		addTable: function(table){
 			this.tables.add(table);

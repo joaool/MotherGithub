@@ -15,7 +15,15 @@ define(function(require){
 		},
 		events: {
 			"click #newTable" : "onNewTableClick",
-			"click .table-list-item" : "onTableListItemClick"
+			"click .table-list-item" : "onTableListItemClick",
+			"click #okButton" : "onOkButtonClick",
+			"click #cancelButton" : "onCancelButtonClick"
+		},
+		onOkButtonClick: function(){
+			this.rightContainer.okBtnClick();
+		},
+		onCancelButtonClick: function(){
+			this.rightContainer.cancelBtnClick();
 		},
 		onNewTableClick: function(){
 			this.rightContainer.clearTableModel();
@@ -38,7 +46,7 @@ define(function(require){
 	    listTables : function(){   
 	        var self = this;
 	        $.each(this.tables.models,function(index,table){
-	        	$(Handlebars.compile(TableListItem)(table.toJSON())).insertBefore(self.$el.find("#newTableListItem"));
+	        	$(Handlebars.compile(TableListItem)(table.toJSON())).insertBefore(self.$el.find("#newFormListItem"));
 	        });
 		},
 		onTableCreated: function(table){
@@ -49,7 +57,7 @@ define(function(require){
 				this.$el.find("#table-list-item-"+table.id).replaceWith($(Handlebars.compile(TableListItem)(table)));
 			}
 			else {
-				$(Handlebars.compile(TableListItem)(table)).insertBefore(this.$el.find("#newTableListItem"));
+				$(Handlebars.compile(TableListItem)(table)).insertBefore(this.$el.find("#newFormListItem"));
 			}
 		},
 		onTableUpdated: function(table){
@@ -58,7 +66,7 @@ define(function(require){
 			this.rightContainer.setTables(this.tables);
 		},
 		init : function(){
-			// this.loadEntities();
+			this.loadEntities();
 		},
 		loadEntities: function(){
 			this.entityModel.loadEntities();

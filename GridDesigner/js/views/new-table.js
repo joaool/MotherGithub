@@ -14,9 +14,7 @@ define(function(require){
 			this.fieldViews = [];
 		},
 		events: {
-			"click #newField" : "onNewFieldBtnClick",
-			"click #saveTable" : "onSaveTableClick",
-			"click #cancelTable" : "onCancelTableClick"
+			"click #newField" : "onNewFieldBtnClick"
 		},
 		clearModel: function(){
 			this.model.clear();
