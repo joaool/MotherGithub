@@ -12,9 +12,9 @@ FormDesigner.Views.MainView = Backbone.View.extend({
         this.listenTo(this.m_Editor, FormMaker.Events.FormLoaded,this.onFormLoaded.bind(this));
 
         this.setEntityModel(new FormDesigner.Models.EntityModel());
-        this.entityTempalate = Handlebars.compile($("#entityOption").html() );
-        this.fieldsTempalate = Handlebars.compile($("#fieldsOption").html() );
-        $("#type").html(Handlebars.compile($("#typeTemplate").html())(FormMaker.TypeTemplate));
+        this.entityTempalate = Handlebars.compile($("#entityOption").html() || "");
+        this.fieldsTempalate = Handlebars.compile($("#fieldsOption").html() || "");
+        $("#type").html(Handlebars.compile($("#typeTemplate").html() || "")(FormMaker.TypeTemplate));
         
         this.entitiesDropDown = this.$("#entities .options");
         this.fieldsList = this.$("#fields");
@@ -23,7 +23,7 @@ FormDesigner.Views.MainView = Backbone.View.extend({
     events: {
         "click .option.entity" : "onEntityClick",
         "click #save" : "saveBtnClick",
-        "click #load" : "loadJson",
+        "click #load" : "loadJsonBtnClick",
         "click #Add" : "onAddClick",
         "click #editField" : "onEditBtnClick",
         "click #addEntity" : "onAddEntityBtnClick"
@@ -43,6 +43,9 @@ FormDesigner.Views.MainView = Backbone.View.extend({
 
         this.fieldsList.append(this.fieldsTempalate({"fields" : [fieldData]}));
         this.m_Editor.bindDraggableObject();  
+    },
+    loadJsonBtnClick: function(){
+        this.loadJson();
     },
     loadJson: function(jsonFile){
         if (!this.m_Editor.entityLoaded) {

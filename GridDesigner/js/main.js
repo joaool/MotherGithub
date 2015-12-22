@@ -29,15 +29,7 @@ require(['jquery'],function() {
     $("head").append('<script src="../FL_ui/flClient/ajaxBrowser.js"></script>');
     $("head").append('<script src="../FL_ui/js/FLAPI.js"></script>');
     $("head").append('<script src="../FL_ui/js/FLmodal2.js"></script>');
-    $("head").append('<script src="../FormMaker/js/LabelElement.js');
-    $("head").append('<script src="../FormMaker/js/models/designer_model');
-    $("head").append('<script src="../FormMaker/js/models/element_model');
-    $("head").append('<script src="../FormMaker/js/models/entity_model');
-    $("head").append('<script src="../FormMaker/js/models/form_maker_model');
-    $("head").append('<script src="../FormMaker/js/collections/elements');
-    $("head").append('<script src="../FormMaker/js/views/main_view');
-    $("head").append('<script src="../FormMaker/js/views/element_holder');
-    $("head").append('<script src="../FormMaker/js/views/property_panel');
+
     require([
         "async",
         'jquery.ui',

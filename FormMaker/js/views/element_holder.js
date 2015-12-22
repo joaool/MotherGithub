@@ -15,7 +15,7 @@ FormDesigner.Views.ElementHolder = Backbone.View.extend({
         this.listenTo(this.propertiesPanel,FormMaker.Events.TypeChange,this.onTypeChange);
         this.listenTo(this.propertiesPanel,FormMaker.Events.LabelTypeChange,this.onLabelTypeChange);
 
-        this.model = new FormDesigner.Models.DesignerModel();
+        //this.model = new FormDesigner.Models.DesignerModel();
 
         this.modelsCollection = new Elements();
         // this.$("#fieldstemp").html((Handlebars.compile($("#tempTemplate").html()))());
@@ -139,8 +139,8 @@ FormDesigner.Views.ElementHolder = Backbone.View.extend({
 	},
 
 	OnHoverIn : function(obj){
-		var element = this.model.getElement($(obj).attr("cname"));
-        this.currentHoverElement = obj;
+		/*var element = this.model.getElement($(obj).attr("cname"));
+        this.currentHoverElement = obj;*/
 	},
     onAddLabelClick: function(){
         if (!this.entityLoaded) {
