@@ -4,7 +4,7 @@ define(function(require){
 	var Template = require("text!templates/main.html");
 	var RightContainer = require("views/right-container");
 	var TableListItem = require("text!templates/table-list-item.html");
-	var EntityModel = require("formMakerLib/js/models/entity_model");
+	var EntityModel = require("formMaker/js/models/entity_model");
 	var Tables = require("collections/tables");
 	var DBUtil = require("db-util");
 

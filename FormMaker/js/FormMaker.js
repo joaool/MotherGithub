@@ -1,5 +1,5 @@
-FormMaker = {};
-FormMaker = Backbone.View.extend({
+window.FormMaker = {};
+window.FormMaker = Backbone.View.extend({
 	m_lstTemplates : [],
     model : null,
     arrObjs : null,
@@ -102,7 +102,7 @@ FormMaker = Backbone.View.extend({
     }
 });
 
-FormMaker.Events = {
+window.FormMaker.Events = {
     "PropertyChange" : "propChange",
     "ElementClick" : "elementClick",
     "MouseOver" : "elementHoverIn",
@@ -115,7 +115,7 @@ FormMaker.Events = {
     "DELETE_CLICK" : "DELETE_CLICK"
 }
 
-FormMaker.Elements = {
+window.FormMaker.Elements = {
 	Label : "TextLabel",
 	Text : "Text",
 	Button : "Button",
@@ -127,7 +127,7 @@ FormMaker.Elements = {
     Image : "Image"
 };
 
-FormMaker.DBElements = {
+window.FormMaker.DBElements = {
     numberbox : "Text",
     textbox : "Text",
     combobox : "Combo",
@@ -148,13 +148,13 @@ FormMaker.DBElements = {
     "lookupbox": "Text"
 }
 
-FormMaker.DBType = {
+window.FormMaker.DBType = {
     number : "number",
     string : "text",
     text : "text"
 }
 
-FormMaker.TypeTemplate = [
+window.FormMaker.TypeTemplate = [
     {
         typeId : "TypeTextLabel",
         typeValue : "TextLabel",
