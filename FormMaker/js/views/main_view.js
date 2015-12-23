@@ -48,10 +48,10 @@ FormDesigner.Views.MainView = Backbone.View.extend({
         this.loadJson();
     },
     loadJson: function(jsonFile){
-        if (!this.m_Editor.entityLoaded) {
+        /*if (!this.m_Editor.entityLoaded) {
             alert("Select a entity first");
             return;
-        }
+        }*/
         jsonFile = jsonFile || this.jsonFile || "Sample.json";
         $.getJSON(jsonFile,(function(data){
             this.addJsonData(data);
