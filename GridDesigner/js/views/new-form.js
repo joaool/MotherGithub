@@ -16,6 +16,9 @@ define(function(require){
 		},
 		loadJson: function(){
 			//this.mainView.loadJson("../FormMaker/Sample.json");
+		},
+		setEntity: function(){
+			
 		}
 	});
 	return View;
