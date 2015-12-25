@@ -179,6 +179,7 @@ div#sidebar-wrapper {
 table#fields {
     overflow-y: auto;
     /* height: 300px; */
+    width: 100%;
 }
 
 #Add {

@@ -16,7 +16,7 @@ define(function(require){
 			this.forms = new Forms();
 		},
 		events: {
-			".form-list-item" : "onFormListItemClick"
+			"click .form-list-item" : "onFormListItemClick"
 		},
 		render : function() {
 			this.$el.html(Handlebars.compile(NewFormTemplate)());
@@ -42,11 +42,11 @@ define(function(require){
 			})
 		},
 		onFormListItemClick: function(event){
-			var formId = $(event.currentTarget).data("formId");
+			var formId = $(event.currentTarget).data("formid");
 			var form = this.forms.where({
 				"formId" : formId
 			});
-			this.mainView.addJsonData(form.fieldElements);
+			this.mainView.addJsonData(form[0].get("fieldElements"));
 		},
 		setEntity: function(entity){
 			this.loadForms("../FormMaker/forms.json");
