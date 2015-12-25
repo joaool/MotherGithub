@@ -370,23 +370,6 @@ FormDesigner.Views.ElementHolder = Backbone.View.extend({
                 $("#fields td[data-fieldname="+elementData.fCN+"]").draggable('disable');
             }
         }
-
-        /*
-        var elementType = FormMaker.CurrentElement.model.get("type");
-        FormMaker.CurrentElement.model.set(data);
-        FormMaker.CurrentElement.model.saveToDB();
-        if(elementType != elementData.userType){
-            this.changeType(FormMaker.CurrentElement.model.id,elementData.userType);
-        }
-        else if(data.mergeWith != 'no merge') {
-            var mergedWithElement = this.droppedElements[data.mergeWith];
-            mergedWithElement.setMergingElement(FormMaker.CurrentElement.model.toJSON());
-            mergedWithElement.reRender();
-            FormMaker.CurrentElement.remove();
-        }
-        else{
-            FormMaker.CurrentElement.reRender();
-        }*/
     },
     changeType: function (id, type) {
         var elementView = this.droppedElements[id];

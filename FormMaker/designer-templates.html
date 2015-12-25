@@ -1,0 +1,131 @@
+<script id="entityOption" type="text/template">
+    {{#each entities}}
+        <li entity_id="{{csingular}}" class="option entity">{{description}}</li>
+    {{/each}}
+</script>
+<script id="fieldsOption" type="text/template">
+    {{#each fields}}
+        <tr>
+          <td field_id="field-{{@index}}"
+              class="option field ui-draggable"
+              data-input-type="{{type}}"
+              data-type="{{typeUI}}"
+              data-label="{{label}}"
+              data-name="{{name}}"
+              data-enum="{{#arrayToString enumerable}}{{/arrayToString}}"
+              data-description="{{description}}"
+              data-fieldname="{{fCN}}"
+              cname="{{cname}}">
+                <div>
+                    <div id="fieldNameLabel" data-fieldname="{{fCN}}">{{name}}</div> 
+                    <div class="edit-field glyphicon glyphicon-pencil pull-right" title="edit field" data-fieldname="{{fCN}}"></div>
+                </div>
+          </td>
+        </tr>
+    {{/each}}
+</script>
+<script id="typeTemplate" type="text/template">
+    {{#each this}}
+    <label class="btn">
+        <input name="fieldType" type="radio" id="{{typeId}}" value="{{typeValue}}" /> {{displayLabel}}
+    </label>
+    {{/each}}
+</script>
+<script id="fieldEdition" type="text/template">
+    <div class="fieldEdition" style="margin-top:0px;">
+        <form id="form_fieldEdition">
+            <legend>Please define this field:</legend>
+            <div class="row">
+                <div class="col-xs-12">
+                    <div class="input-group" style="line-height:0px;">
+                        <span class="input-group-addon">Field label:</span>
+                        <input type="text" class="form-control" id="fieldEdition_fieldLabel"
+                               name="fieldLabel" placeholder="Ex. Your full name, Your address, Your email, Your phone..."
+                               value="<%= master.fieldLabel %>">
+                    </div>
+                    <div class="input-group" style="line-height:0px;">
+                        <span class="input-group-addon">Attribute:</span>
+                        <input type="text" class="form-control" id="fieldEdition_fieldName"
+                               name="fieldName" placeholder="Ex. name, address, email, phone..."
+                               value="<%= master.fieldName %>">
+                    </div>
+                    <label class="control-label" for="fieldEdition_fieldDescription"id="fieldEdition_whatIsLabel"></label>
+                    <div class="input-group" style="line-height:0px;">
+                        <span class="input-group-addon">Description:</span>
+                        <input type="text" class="form-control" id="fieldEdition_fieldDescription"
+                               name="fieldDescription" placeholder="Ex. descripton..."
+                               value="<%= master.fieldDescription %>">
+                    </div>
+	                <div class="input-group" style="line-height:0px;">
+		                <span class="input-group-addon">Placeholder:</span>
+		                <input type="text" class="form-control" id="fieldEdition_placeholder"
+		                       name="fieldName" placeholder="Enter a placeholder..."
+		                       value="<%= master.placeholder %>">
+	                </div>
+	                <div class="input-group" style="line-height:0px;">
+		                <span class="input-group-addon">Icon:</span>
+		                <input type="text" class="form-control" id="fieldEdition_icon"
+		                       name="fieldName" placeholder="Enter icon name"
+		                       value="<%= master.icon %>">
+	                </div>
+                    <div>
+                        <h4 id="fieldEdition_plural"></h4>
+                    </div>
+                    <div class="input-group" style="line-height:0px;">
+                        <span class="input-group-addon">User Type:</span>
+                        <div class="btn-group" style="width:100%">
+                            <a class="btn btn-default btn-block dropdown-toggle" data-toggle="dropdown"
+                               id="fieldEdition_userType" href="#"><%= master.userType %> <span class="caret"></span></a>
+                            <ul id="fieldEdition_userType_options" class="dropdown-menu"></ul>
+                        </div>
+                        <span class="input-group-addon"><span class="glyphicon glyphicon-th-list"></span></span>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</script>
+<script id="titleEdition" type="text/template">
+    <div class="fieldEdition" style="margin-top:0px;">
+        <form id="form_titleEdition">
+            <legend>Please define this title:</legend>
+            <div class="row">
+                <div class="col-xs-12">
+                    <div class="input-group" style="line-height:0px;">
+                        <span class="input-group-addon">Title Text:</span>
+                        <input type="text" class="form-control" id="titleEdition_titleText"
+                               name="titleText" placeholder="Choose a title for your form."
+                               value="<%= master.titleText %>">
+                    </div>
+                    <div class="input-group" style="line-height:0px;">
+                        <span class="input-group-addon">Font Size:</span>
+                        <div class="btn-group" style="width:100%">
+                            <a class="btn btn-default btn-block dropdown-toggle" data-toggle="dropdown"
+                               id="titleEdition_fontSize" href="#"><%= master.fontSize %> <span class="caret"></span></a>
+                            <ul id="titleEdition_fontSize_options" class="dropdown-menu"></ul>
+                        </div>
+                        <span class="input-group-addon"><span class="glyphicon glyphicon-th-list"></span></span>
+                    </div>
+                    <div class="input-group" style="line-height:0px;">
+	                    <span class="input-group-addon">Font Color:</span>
+	                    <div class="btn-group" style="width:100%">
+                            <a class="btn btn-default btn-block dropdown-toggle" data-toggle="dropdown"
+                               id="titleEdition_fontColor" href="#"><%= master.fontColor %> <span class="caret"></span></a>
+                            <ul id="titleEdition_fontColor_options" class="dropdown-menu"></ul>
+                        </div>
+                        <span class="input-group-addon"><span class="glyphicon glyphicon-th-list"></span></span>
+                    </div>
+                    <div class="input-group" style="line-height:0px;">
+	                    <span class="input-group-addon">Title Alignment:</span>
+	                    <div class="btn-group" style="width:100%">
+                            <a class="btn btn-default btn-block dropdown-toggle" data-toggle="dropdown"
+                               id="titleEdition_titleAlignment" href="#"><%= master.titleAlignment %> <span class="caret"></span></a>
+                            <ul id="titleEdition_titleAlignment_options" class="dropdown-menu"></ul>
+                        </div>
+                        <span class="input-group-addon"><span class="glyphicon glyphicon-th-list"></span></span>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</script>

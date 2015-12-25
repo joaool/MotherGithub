@@ -359,3 +359,11 @@ div#wrapper {
     line-height: 26px;
     margin-top: -5px!important;
 }
+
+.scroller {
+    width: 100%;
+}
+
+td.option.field {
+    width: 100%;
+}

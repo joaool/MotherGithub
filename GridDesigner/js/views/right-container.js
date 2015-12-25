@@ -32,8 +32,8 @@ define(function(require){
 			this.currentMode = "none";
 		},
 		showFormView: function(){
-			this.$("#newTableContainer").hide();
-			this.$("#newFormContainer").show();
+			this.$("#newTableContainer").addClass("hide");
+			this.$("#newFormContainer").removeClass("hide");
 			this.newForm.render();
 		},
 		setFormEntity: function(entity){
@@ -47,8 +47,8 @@ define(function(require){
 			this.newTable.clearModel();
 		},
 		setNewTableView: function(){
-			this.$("#newTableContainer").show();
-			this.$("#newFormContainer").hide();
+			this.$("#newTableContainer").removeClass("hide");
+			this.$("#newFormContainer").addClass("hide");
 			this.newTable.render();
 			this.newTable.show();
 			this.currentMode = Modes.GRID;

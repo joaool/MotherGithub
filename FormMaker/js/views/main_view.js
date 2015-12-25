@@ -15,10 +15,16 @@ FormDesigner.Views.MainView = Backbone.View.extend({
         this.entityTempalate = Handlebars.compile($("#entityOption").html() || "");
         this.fieldsTempalate = Handlebars.compile($("#fieldsOption").html() || "");
         $("#type").html(Handlebars.compile($("#typeTemplate").html() || "")(FormMaker.TypeTemplate));
-        
         this.entitiesDropDown = this.$("#entities .options");
         this.fieldsList = this.$("#fields");
-        
+    },
+    render: function(){
+        this.entityTempalate = Handlebars.compile($("#entityOption").html() || "");
+        this.fieldsTempalate = Handlebars.compile($("#fieldsOption").html() || "");
+        $("#type").html(Handlebars.compile($("#typeTemplate").html() || "")(FormMaker.TypeTemplate));
+        this.entitiesDropDown = this.$("#entities .options");
+        this.fieldsList = this.$("#fields");  
+        this.m_Editor.render();
     },
     events: {
         "click .option.entity" : "onEntityClick",

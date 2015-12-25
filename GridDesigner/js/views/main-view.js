@@ -29,16 +29,19 @@ define(function(require){
 			this.rightContainer.cancelBtnClick();
 		},
 		onNewFormClick : function(){
-			this.rightContainer.showFormView(true);
+			this.rightContainer.showFormView();
 		},
 		onFormIconClick: function(event){
 			var entityId = $(event.currentTarget).data("id");
 			var entity = DBUtil.getEntity(entityId);
-			this.rightContainer.showFormView(false);
+			this.rightContainer.showFormView();
+			this.rightContainer.setFormEntity(entity);
+			event.stopPropagation();
 		},
 		onGridIconClick: function(event){
 			var entityId = $(event.currentTarget).data("id");
 			var entity = DBUtil.getEntity(entityId);
+			event.stopPropagation();
 		},
 		onNewTableClick: function(){
 			this.rightContainer.clearTableModel();
