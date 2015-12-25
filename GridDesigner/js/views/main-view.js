@@ -17,6 +17,8 @@ define(function(require){
 			"click #newTable" : "onNewTableClick",
 			"click #newForm" : "onNewFormClick",
 			"click .table-list-item" : "onTableListItemClick",
+			"click .table-icons.form": "onFormIconClick" ,
+			"click .table-icons.grid": "onGridIconClick",
 			"click #okButton" : "onOkButtonClick",
 			"click #cancelButton" : "onCancelButtonClick"
 		},
@@ -27,7 +29,16 @@ define(function(require){
 			this.rightContainer.cancelBtnClick();
 		},
 		onNewFormClick : function(){
-			this.rightContainer.showFormView();
+			this.rightContainer.showFormView(true);
+		},
+		onFormIconClick: function(event){
+			var entityId = $(event.currentTarget).data("id");
+			var entity = DBUtil.getEntity(entityId);
+			this.rightContainer.showFormView(false);
+		},
+		onGridIconClick: function(event){
+			var entityId = $(event.currentTarget).data("id");
+			var entity = DBUtil.getEntity(entityId);
 		},
 		onNewTableClick: function(){
 			this.rightContainer.clearTableModel();

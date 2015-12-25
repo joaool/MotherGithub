@@ -3,6 +3,7 @@ require.config({
     paths: {
         "jquery": '../../mailer/js/lib/jquery-1.11.0',
         "jquery.ui" : "../../mailer/js/lib/jquery-ui-1.10.4",
+        "jquery-datetime": "../../mailer/js/lib/jquery-ui-timepicker",
         "bootstrap" : "lib/bootstrap",
         "handlebars": '../../mailer/js/lib/handlebars-v1.3.0',
         "underscore": '../../mailer/js/lib/underscore',
@@ -33,6 +34,7 @@ require(['jquery'],function() {
     require([
         "async",
         'jquery.ui',
+        'jquery-datetime',
         'bootstrap',
         'handlebars',
         'underscore',

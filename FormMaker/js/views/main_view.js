@@ -64,6 +64,16 @@ FormDesigner.Views.MainView = Backbone.View.extend({
         this.entityModel = entityModel
         this.listenTo(this.entityModel,"change:entities",this.onEntitiesLoaded.bind(this));
     },
+    setEntity: function(entity){
+        var fields =entity.fieldList();
+        this.fieldsList.html(this.fieldsTempalate({"fields" : fields}));
+        this.entityLoaded = entity;
+        this.m_Editor.setEntity(this.entityLoaded);
+        this.m_Editor.bindDraggableObject();
+    },
+    hideEntityList: function(){
+
+    },
     onElementClick: function(data){
         this.elementClickModel = data;
         $("#editField").html(data.leftLabel); 

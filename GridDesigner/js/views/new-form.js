@@ -4,21 +4,30 @@ define(function(require){
 	var NewFormTemplate = require("text!templates/form-container.html");
 	require("formMaker/js/loadJsFiles");
 	var templates = require("text!formMaker/Template.html");
+	var DBUtil = require("db-util");
+
 	var View = Backbone.View.extend({
 		initialize: function(options){
 			// this.model = new FormModel({"id":options.id});
 			this.mainView = new FormDesigner.Views.MainView({el : "#formDesignerContainer"});
-			$("#templates").html(templates);
+		},
+		events: {
+			
 		},
 		render : function() {
 			this.$el.html(Handlebars.compile(NewFormTemplate)());
-			this.loadJson();
+			$("#templates").html(templates);
+			
 		},
 		loadJson: function(){
-			//this.mainView.loadJson("../FormMaker/Sample.json");
+			this.mainView.loadJson("../FormMaker/Sample.json");
 		},
-		setEntity: function(){
-			
+		setEntity: function(entity){
+			this.mainView.setEntity(entity);
+			this.loadJson();
+		},
+		hideEntityList: function(){
+			this.mainView.hideEntityList();
 		}
 	});
 	return View;

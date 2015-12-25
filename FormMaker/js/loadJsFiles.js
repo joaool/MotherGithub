@@ -8,5 +8,5 @@ define(function(){
     $("head").append('<script src="../FormMaker/js/views/main_view.js"></script>');
     $("head").append('<script src="../FormMaker/js/views/element_holder.js"></script>');
     $("head").append('<script src="../FormMaker/js/views/property_panel.js"></script>');
-    $("#templates").load("../FormMaker/Template.html");
+    
 });

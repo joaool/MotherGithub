@@ -36,6 +36,10 @@ define(function(require){
 			this.$("#newFormContainer").show();
 			this.newForm.render();
 		},
+		setFormEntity: function(entity){
+			this.newForm.hideEntityList();
+			this.newForm.setEntity(entity);
+		},
 		setTables: function(tables){
 			this.tables = tables;
 		},

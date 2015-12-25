@@ -341,3 +341,21 @@ iframe#formDesigner {
 #formDesigner body {
     margin: 0px;
 }
+
+.table-icons {
+    position: static!important;
+    line-height: 35px;
+    text-align: center;
+}
+
+div#wrapper {
+    padding-left: 230px;
+}
+
+.table-icons.form {
+    border: 1px solid;
+    border-radius: 4px;
+    height: 28px;
+    line-height: 26px;
+    margin-top: -5px!important;
+}

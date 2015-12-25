@@ -8,6 +8,9 @@ define(function(require){
 	var DBUtil = function(){
 
 	};
+	DBUtil.getEntity = function(id){
+		return FL.dd.t.entities[id];
+	}
 
 	DBUtil.generateTablesFromEntities = function(entities){
 		var tables = new Tables();
