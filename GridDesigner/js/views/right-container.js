@@ -6,7 +6,7 @@ define(function(require){
 	var Tables = require("collections/tables");
 	var Modes = {
 		GRID : "Grid",
-		TABLE : "Table"
+		FORM : "Form"
 	}
 	var View = Backbone.View.extend({
 		initialize: function(){
@@ -15,26 +15,28 @@ define(function(require){
 			this.newTable = new NewTable({"el" : "#newTableContainer"});
 			this.listenTo(this.newTable,"TABLE_SAVED",this.onTableCreated);
 			this.listenTo(this.newTable,"CLOSE_NEW_TABLE",this.onTableCloseClick);
-			
+			Modes.GRID = this.newTable;
+
 			this.newForm = new NewForm({"el" : "#newFormContainer"})
-			this.currentMode = "none";
+			Modes.FORM = this.newForm;
+
+			this.currentMode = null;
 		},
 		okBtnClick : function(){
-			if (this.currentMode == Modes.GRID) {
-				this.newTable.onSaveTableClick();
-			}
-			this.currentMode = "none";
+			if (this.currentMode)
+				this.currentMode.onOkBtnClick();
+			this.currentMode = null;
 		},
 		cancelBtnClick : function(){
-			if (this.currentMode == Modes.GRID) {
-				this.newTable.onCancelTableClick();
-			}
-			this.currentMode = "none";
+			if (this.currentMode)
+				this.currentMode.onCancelBtnClick();
+			this.currentMode = null;
 		},
 		showFormView: function(){
 			this.$("#newTableContainer").addClass("hide");
 			this.$("#newFormContainer").removeClass("hide");
 			this.newForm.render();
+			this.currentMode = Modes.FORM;
 		},
 		setFormEntity: function(entity){
 			this.newForm.hideEntityList();

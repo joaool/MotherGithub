@@ -54,6 +54,16 @@ define(function(require){
 		},
 		hideEntityList: function(){
 			this.mainView.hideEntityList();
+		},
+		onOkBtnClick: function(){
+			this.mainView.saveBtnClick();
+		},
+		onCancelBtnClick: function(){
+			debugger;
+			this.hide();
+		},
+		hide: function(){
+			$("#newFormContainer").addClass("hide");
 		}
 	});
 	return View;

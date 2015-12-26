@@ -33,7 +33,7 @@ define(function(require){
 		hide: function(){
 			this.$el.hide();
 		},
-		onSaveTableClick: function(){
+		onOkBtnClick: function(){
 			var self = this;
 			var tableName = this.$el.find("#tableName").val();
 			var fields = this.$el.find(".resizable").toArray().map(function(field){
@@ -59,7 +59,7 @@ define(function(require){
 				self.model.clear();
 			});
 		},
-		onCancelTableClick: function(){
+		onCancelBtnClick: function(){
 			this.trigger("CLOSE_NEW_TABLE");
 			this.model.clear();
 		},
