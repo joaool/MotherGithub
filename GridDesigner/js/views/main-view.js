@@ -40,7 +40,7 @@ define(function(require){
 		},
 		onGridIconClick: function(event){
 			var entityId = $(event.currentTarget).data("id");
-			var entity = DBUtil.getEntity(entityId);
+			this.rightContainer.editTable(entityId);
 			event.stopPropagation();
 		},
 		onNewTableClick: function(){
@@ -48,7 +48,7 @@ define(function(require){
 			this.rightContainer.setNewTableView();
 		},
 		onTableListItemClick: function(evt){
-			this.rightContainer.editTable($(evt.currentTarget).data("id"));
+			
 		},
 		render: function(){
 			this.$el.html(Template);

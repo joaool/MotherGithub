@@ -304,7 +304,8 @@ FormDesigner.Views.ElementHolder = Backbone.View.extend({
                     fontColor : element.fontColor,
                     textAlignment : element.textAlignment,
                     style : styleString,
-                    "entityName" : this.entityLoaded.csingular
+                    "entityName" : this.entityLoaded.csingular,
+                    fieldId : element.fCN
                 };
             }
             else {
@@ -316,7 +317,8 @@ FormDesigner.Views.ElementHolder = Backbone.View.extend({
                     "type": field.type,
                     "id": element.fCN,
                     "fieldName" : element.fCN,
-                    "entityName" : this.entityLoaded.csingular
+                    "entityName" : this.entityLoaded.csingular,
+                    fieldId : element.fCN
                 }
             }
             item = _.extend({},elementJson,element);
