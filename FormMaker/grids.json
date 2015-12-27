@@ -1,0 +1,68 @@
+{
+    "eCN": "72",
+    "grids": [{
+        "gridId": "g1",
+        "gridName" : "Grid 1",
+        "fields": [{
+            "fCN": "5G",
+            "width": "100"
+        }, {
+            "fCN": "5H",
+            "width": "100"
+        }, {
+            "fCN": "5I",
+            "width": "100"
+        }, {
+            "fCN": "5J",
+            "width": "100"
+        }]
+    },{
+        "gridId": "g2",
+        "gridName" : "Grid 4",
+        "fields": [{
+            "fCN": "5G",
+            "width": "100"
+        }, {
+            "fCN": "5H",
+            "width": "100"
+        }, {
+            "fCN": "5I",
+            "width": "100"
+        }, {
+            "fCN": "5J",
+            "width": "100"
+        }]
+    },{
+        "gridId": "g3",
+        "gridName" : "Grid 2",
+        "fields": [{
+            "fCN": "5G",
+            "width": "100"
+        }, {
+            "fCN": "5H",
+            "width": "100"
+        }, {
+            "fCN": "5I",
+            "width": "100"
+        }, {
+            "fCN": "5J",
+            "width": "100"
+        }]
+    },{
+        "gridId": "g4",
+        "gridName" : "Grid 3",
+        "fields": [{
+            "fCN": "5G",
+            "width": "100"
+        }, {
+            "fCN": "5H",
+            "width": "100"
+        }, {
+            "fCN": "5I",
+            "width": "100"
+        }, {
+            "fCN": "5J",
+            "width": "100"
+        }]
+    }]
+}

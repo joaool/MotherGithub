@@ -1,9 +1,19 @@
 <div class="form-group new-table table-name col-xs-4">
-    <label for="tableName">Table name :</label>
-    <input type="text"  class="form-control" id="tableName" placeholder="enter table name" value="{{tableName}}">
-    <br/>
-    <label for="rowName">Each Row is a :</label>
-    <input type="text"  class="form-control" id="rowName" placeholder="enter Row name" value="{{rowName}}">
+    <div class="grid-selector">
+        <label>Grids to select</label>
+        <div class="grids-list">
+            <ul id="gridsList">
+                
+            </ul>
+        </div>
+    </div>
+    <div class="table-details">
+        <label for="tableName">Table name :</label>
+        <input type="text"  class="form-control" id="tableName" placeholder="enter table name" value="{{tableName}}">
+        <br/>
+        <label for="rowName">Each Row is a :</label>
+        <input type="text"  class="form-control" id="rowName" placeholder="enter Row name" value="{{rowName}}">
+    </div>
 </div>
 <div class="form-group new-field-type col-xs-12">
 	<div class="new-table-field-btn col-xs-5">

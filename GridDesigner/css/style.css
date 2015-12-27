@@ -222,7 +222,7 @@ body {
 
 .form-container {padding: 10px;height: 100%;}
 
-.form-selector {
+.form-selector,.grid-selector {
     display: inline-block;
     width: 250px;
     text-align: center;
@@ -231,7 +231,7 @@ body {
     top: 0px;
 }
 
-.forms-list {
+.forms-list, .grids-list {
     overflow: hidden;
     overflow-y: auto;
     height: 77px;
@@ -241,7 +241,7 @@ body {
     line-height: 25px;
 }
 
-.forms-list ul {
+.forms-list ul,.grids-list ul {
     margin: 0px;
     padding: 0px;
 }
@@ -366,4 +366,13 @@ div#wrapper {
 
 td.option.field {
     width: 230px;
+}
+
+.grid-selector {
+    position: relative;
+}
+
+.table-details {
+    display: inline-block;
+    margin-left: 50px;
 }

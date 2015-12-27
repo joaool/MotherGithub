@@ -6,15 +6,19 @@ define(function(require){
 	var FieldTemplate = require("text!templates/new-field.html");
 	var TableModel = require("models/table");
 	var DBUtil = require("db-util");
+	var gridListItemTemplate = require("text!templates/grid-list-item.html");
+	var Grids = require("collections/grids");
 
 	var View = Backbone.View.extend({
 		initialize: function(options){
 			this.model = new TableModel({"id":options.id});
 			this.fieldId = 0;
 			this.fieldViews = [];
+			this.grids = new Grids();
 		},
 		events: {
-			"click #newField" : "onNewFieldBtnClick"
+			"click #newField" : "onNewFieldBtnClick",
+			"click .grid-list-item": "onGridListItemClick"
 		},
 		clearModel: function(){
 			this.model.clear();
@@ -33,6 +37,30 @@ define(function(require){
 		hide: function(){
 			this.$el.hide();
 		},
+		loadGrids: function(jsonFile){
+			$.getJSON(jsonFile, (function(data) {
+                this.addGrids(data.grids);
+            }).bind(this));
+		},
+        addGrids: function(grids) {
+            this.grids.reset(grids);
+            var self = this;
+            self.$("#gridsList").html();
+            $.each(grids, function(i, gridData) {
+                self.$("#gridsList").append(Handlebars.compile(gridListItemTemplate)(gridData));
+            })
+        },
+		setEntity: function(entity) {
+			this.entity = entity;
+            this.loadGrids("../FormMaker/grids.json");
+        },
+        onGridListItemClick: function(event) {
+            var gridId = $(event.currentTarget).data("gridid");
+            var grid = this.grids.where({
+                "gridId": gridId
+            });
+            DBUtil.generateTableDataFromGridData(this.entity,grid[0]);
+        },
 		onOkBtnClick: function(){
 			var self = this;
 			var tableName = this.$el.find("#tableName").val();

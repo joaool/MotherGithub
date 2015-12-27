@@ -35,12 +35,16 @@ define(function(require){
 			var entityId = $(event.currentTarget).data("id");
 			var entity = DBUtil.getEntity(entityId);
 			this.rightContainer.showFormView();
-			this.rightContainer.setFormEntity(entity);
+			this.rightContainer.setEntity(entity);
 			event.stopPropagation();
 		},
 		onGridIconClick: function(event){
 			var entityId = $(event.currentTarget).data("id");
-			this.rightContainer.editTable(entityId);
+			var entity = DBUtil.getEntity(entityId);
+			// this.rightContainer.editTable(entityId);
+			this.rightContainer.clearTableModel();
+			this.rightContainer.setNewTableView();
+			this.rightContainer.setEntity(entity);
 			event.stopPropagation();
 		},
 		onNewTableClick: function(){

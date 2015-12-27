@@ -38,9 +38,9 @@ define(function(require){
 			this.newForm.render();
 			this.currentMode = Modes.FORM;
 		},
-		setFormEntity: function(entity){
-			this.newForm.hideEntityList();
-			this.newForm.setEntity(entity);
+		setEntity: function(entity){
+			if (this.currentMode)
+				this.currentMode.setEntity(entity);
 		},
 		setTables: function(tables){
 			this.tables = tables;

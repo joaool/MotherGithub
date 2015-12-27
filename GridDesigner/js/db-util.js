@@ -11,7 +11,16 @@ define(function(require){
 	DBUtil.getEntity = function(id){
 		return FL.dd.t.entities[id];
 	}
-
+	DBUtil.generateTableDataFromGridData = function(entity,grid){
+		var table = new Table();
+		table.id = entity.fCN;
+		var fields = new Fields();
+		var entity = entity;
+		$.each(grid.fields,function(i,fieldData){
+			var field = new Field;
+			field.set(entity.)
+		});
+	}
 	DBUtil.generateTablesFromEntities = function(entities){
 		var tables = new Tables();
 		$.each(entities,function(index,entity){
