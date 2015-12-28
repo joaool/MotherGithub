@@ -246,11 +246,13 @@ body {
     padding: 0px;
 }
 
-.forms-list ul a {
+.forms-list ul a,
+.grids-list ul a {
     display: block;
 }
 
-.forms-list li:hover {
+.forms-list li:hover,
+.grids-list li:hover {
     background-color: #CACACA;
 }
 
