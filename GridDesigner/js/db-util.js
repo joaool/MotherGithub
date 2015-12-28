@@ -16,10 +16,12 @@ define(function(require){
 		table.id = entity.fCN;
 		var fields = new Fields();
 		var entity = entity;
-		$.each(grid.fields,function(i,fieldData){
-			var field = new Field;
-			field.set(entity.)
+		$.each(grid.fields,function(i,field){
+			var fieldData = FL.dd.t.entities[entity.csingular].fields[field.fCN];
+			var field = DBUtil.convertFieldToGridField(fieldData);
+			fields.add(field);
 		});
+		return DBUtil.convertEntityToTable(entity,fields);
 	}
 	DBUtil.generateTablesFromEntities = function(entities){
 		var tables = new Tables();

@@ -25,6 +25,10 @@ define(function(require){
 		},
 		render: function(){
 			this.$el.html(Handlebars.compile(NewTableTemplate)(this.model.toJSON()));
+			this.renderTableData();
+		},
+		renderTableData: function(){
+			this.$("#tableName").val(this.model.get("tableName"));
 			if (this.model.get("fields")){
 				_.each(this.model.get("fields").models,(function(field){
 					this.addField(field.toJSON());
@@ -59,7 +63,9 @@ define(function(require){
             var grid = this.grids.where({
                 "gridId": gridId
             });
-            DBUtil.generateTableDataFromGridData(this.entity,grid[0]);
+            var tableData = DBUtil.generateTableDataFromGridData(this.entity,grid[0].toJSON());
+            this.setTableData(tableData.toJSON());
+            this.renderTableData();
         },
 		onOkBtnClick: function(){
 			var self = this;
