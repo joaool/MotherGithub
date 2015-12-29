@@ -57,9 +57,9 @@ define(function(require) {
         },
         onOkBtnClick: function() {
             this.mainView.saveBtnClick();
+            this.hide();
         },
         onCancelBtnClick: function() {
-            debugger;
             this.hide();
         },
         hide: function() {
