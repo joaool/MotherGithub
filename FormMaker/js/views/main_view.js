@@ -231,7 +231,7 @@ FormDesigner.Views.MainView = Backbone.View.extend({
         this.m_Editor.setEntity(this.entityLoaded);
         this.m_Editor.bindDraggableObject();
     },
-    saveBtnClick: function(){
+    saveBtnClick: function(callback){
         if (!this.m_Editor.entityLoaded) {
             alert("Select a entity first");
             return;
@@ -244,6 +244,9 @@ FormDesigner.Views.MainView = Backbone.View.extend({
             var formData = self.m_Editor.save();  
             window.formData = formData;
             window.open("formMaker.html","_blank");
+            if (callback){
+                callback(eCN);
+            }
         });
         promise.fail(function (err) {
             alert(err);

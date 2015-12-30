@@ -56,8 +56,9 @@ define(function(require) {
             this.mainView.hideEntityList();
         },
         onOkBtnClick: function() {
-            this.mainView.saveBtnClick();
-            this.hide();
+            this.mainView.saveBtnClick(function(){
+            	this.hide();
+            });
         },
         onCancelBtnClick: function() {
             this.hide();
