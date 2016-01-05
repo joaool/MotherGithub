@@ -56,7 +56,7 @@ define(function(require){
         },
 		setEntity: function(entity) {
 			this.entity = entity;
-            this.loadGrids("../FormMaker/grids.json");
+            this.loadGrids(window.formMakerBaseUrl+"grids.json");
         },
         onGridListItemClick: function(event) {
             var gridId = $(event.currentTarget).data("gridid");

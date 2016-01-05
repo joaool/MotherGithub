@@ -25,7 +25,7 @@ define(function(require) {
             this.mainView.render();
         },
         loadJson: function() {
-            this.mainView.loadJson("../FormMaker/Sample.json");
+            this.mainView.loadJson(window.formMakerBaseUrl+"Sample.json");
         },
         loadForms: function(jsonFile) {
             $.getJSON(jsonFile, (function(data) {
@@ -49,15 +49,16 @@ define(function(require) {
         },
         setEntity: function(entity) {
         	this.hideEntityList();
-            this.loadForms("../FormMaker/forms.json");
+            this.loadForms(window.formMakerBaseUrl+"forms.json");
             this.mainView.setEntity(entity);
         },
         hideEntityList: function() {
             this.mainView.hideEntityList();
         },
         onOkBtnClick: function() {
+        	var self = this;
             this.mainView.saveBtnClick(function(){
-            	this.hide();
+            	self.hide();
             });
         },
         onCancelBtnClick: function() {

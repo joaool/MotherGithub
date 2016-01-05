@@ -243,7 +243,7 @@ FormDesigner.Views.MainView = Backbone.View.extend({
             FL.dd.t.entities.dumpToConsole();
             var formData = self.m_Editor.save();  
             window.formData = formData;
-            window.open("formMaker.html","_blank");
+            window.open(window.formMakerBaseUrl+"formMaker.html","_blank");
             if (callback){
                 callback(eCN);
             }

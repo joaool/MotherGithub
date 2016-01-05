@@ -9,6 +9,7 @@
             "LabelTypeChange" : "labelTypeChange"
         }
     };
+    window.formMakerBaseUrl = "/Joaool/MotherGithub/FormMaker/";
     $(document).ready(function(){
         $("#templates").load("Template.html");
          $("#menu-toggle").click(function(e) {
