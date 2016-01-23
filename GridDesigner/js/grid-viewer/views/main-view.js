@@ -3,7 +3,8 @@ define(function(require){
 
 	var Template = require("text!templates/main.html");
 	var EntityModel = require("formMaker/js/models/entity_model");
-	
+	var GridUtils = require("grid-viewer/grid-utils");
+
 	var View = Backbone.View.extend({
 		initialize: function(){
 			this.gridContainerId = "#grid-container";
@@ -14,14 +15,15 @@ define(function(require){
 		events: {
 		},
 		init : function(){
-			// this.loadEntities();
-			this.render();
+			this.loadEntities();
+			//this.render();
 		},
 		loadEntities: function(){
 			this.entityModel.loadEntities();
 		},
 		onEntitiesLoaded: function(){
-			this.render();	        
+			if (this.entity)
+				this.render();	        
 	    },
 	    render: function(){
 			this.$el.html(Template);
@@ -80,53 +82,18 @@ define(function(require){
 		    return dataCollection;
 		},
 		getColumnCollection : function() {
-		    var extraSettings = {
-		        "select-column": {
-		            nesting: [],
-		            width: "*",
-		            resizeAble: false,
-		            orderable: false
-		        },
-		        "id": {
-		            width: "*",
-		            nesting: [],
-		            resizeable: false,
-		            orderable: true
-		        }
-		    };
-		    var columnDefinition = [{
-		        name: "select-column",
-		        cell: "select-row",
-		        headerCell: "select-all"
-		    }, {
-		        name: "id", // The key of the model attribute
-		        label: "ID", // The name to display in the header
-		        editable: false, // By default every cell in a column is editable, but *ID* shouldn't be
-		        cell: Backgrid.IntegerCell.extend({
-		            orderSeparator: ""
-		        })
-		    }];
-		    for (var j = 0; j < columnDefinition.length; j++) {
-		        var column = columnDefinition[j];
-		        if (_.has(extraSettings, column.name)) {
-		            column.nesting = extraSettings[column.name].nesting;
-		            column.resizeable = extraSettings[column.name].resizeable;
-		            column.width = extraSettings[column.name].width;
-		        }
-		    }
-		    for (var j = 0; j < columnDefinition.length; j++) {
-		        var columno = columnDefinition[j];
-		        if (_.has(extraSettings, columno.name)) {
-		            columno.orderable = extraSettings[columno.name].orderable;
-		        }
-		    }
+		    var columnDefinition = GridUtils.generateGridViewerData(this.entity,this.gridData);
 		    var columns = new Backgrid.Extension.OrderableColumns.orderableColumnCollection(columnDefinition);
 		    columns.setPositions().sort();
 		    return columns;
 		},
 		getGridData: function(){
 			return [];
-		}
+		},
+		setGrid: function(gridData) {
+			this.entity = gridData.entity;
+			this.gridData = gridData.data;
+        },
 	});
 	return View;
 });

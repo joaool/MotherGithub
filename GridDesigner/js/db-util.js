@@ -19,6 +19,7 @@ define(function(require){
 		$.each(grid.fields,function(i,field){
 			var fieldData = FL.dd.t.entities[entity.csingular].fields[field.fCN];
 			fieldData.fCN = field.fCN;
+			fieldData.width = field.width;
 			var field = DBUtil.convertFieldToGridField(fieldData);
 			fields.add(field);
 		});

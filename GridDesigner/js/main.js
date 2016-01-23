@@ -1,17 +1,22 @@
+window.gridDeisgnerBaseUrl= "/Joaool/MotherGithub/GridDesigner/"
 require.config({
     baseUrl: 'js',
     paths: {
         "jquery": '../../mailer/js/lib/jquery-1.11.0',
+        "jquery.ui" : "../../mailer/js/lib/jquery-ui-1.10.4",
+        "jquery-datetime": "../../mailer/js/lib/jquery-ui-timepicker",
         "bootstrap" : "lib/bootstrap",
+        "handlebars": '../../mailer/js/lib/handlebars-v1.3.0',
         "underscore": '../../mailer/js/lib/underscore',
         "backbone": '../../mailer/js/lib/backbone',
         "text" : "lib/helper/text",
         "template" : "template/main",
-        "templates" : "../templates/grid-viewer/",
-        "views" : "grid-viewer/views",
-        "models" : "grid-viewer/models",
-        "collections" : "grid-viewer/collections",
-        "gridViewer" : "grid-viewer",
+        "templates" : "../templates/",
+        "views" : "views",
+        "models" : "models",
+        "collections" : "collections",
+        "formMaker" : "../../FormMaker",
+        "mailer" : "../../mailer",
         "spin.min" : "../../FL_ui/js/spin.min",
         "async" : "../../FL_ui/js/async"
     },
@@ -35,13 +40,19 @@ require(['jquery'],function() {
         'handlebars',
         'underscore',
         'backbone',
+        
         "spin.min"
     ], function (async) {
         window.async = async;
+        
         require([
-            "grid-viewer/views/main-view",
+            "views/main-view",
             "common-utils",
+            "form-designer-util",
+            "mailer/js/DragNDrop",
+            "formMaker/js/FormMaker",
         ],function(MainView){
+            $.widget.bridge('uibutton', $.ui.button);
             var mainView = new MainView({el : 'body'});
             mainView.init();
         })

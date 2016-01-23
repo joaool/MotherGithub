@@ -18,7 +18,8 @@ define(function(require){
 		},
 		events: {
 			"click #newField" : "onNewFieldBtnClick",
-			"click .grid-list-item": "onGridListItemClick"
+			"click .grid-list-item": "onGridListItemClick",
+			"click #gridViewerButton" : "gridViewerButtonClick"
 		},
 		clearModel: function(){
 			this.model.clear();
@@ -34,6 +35,13 @@ define(function(require){
 					this.addField(field.toJSON());
 				}).bind(this));
 			}
+		},
+		gridViewerButtonClick: function(){
+			window.gridData = {
+				"data" : this.currentGridData,
+				"entity": this.entity
+			};
+            window.open(window.gridDeisgnerBaseUrl+"viewer.html","_blank");
 		},
 		show: function(){
 			this.$el.show();
@@ -63,9 +71,11 @@ define(function(require){
             var grid = this.grids.where({
                 "gridId": gridId
             });
+            this.currentGridData = grid[0].toJSON();
             var tableData = DBUtil.generateTableDataFromGridData(this.entity,grid[0].toJSON());
             this.setTableData(tableData.toJSON());
             this.renderTableData();
+            this.$("#gridViewerButton").show();
         },
 		onOkBtnClick: function(){
 			var self = this;
