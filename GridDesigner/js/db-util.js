@@ -18,10 +18,12 @@ define(function(require){
 		var entity = entity;
 		$.each(grid.fields,function(i,field){
 			var fieldData = FL.dd.t.entities[entity.csingular].fields[field.fCN];
-			fieldData.fCN = field.fCN;
-			fieldData.width = field.width;
-			var field = DBUtil.convertFieldToGridField(fieldData);
-			fields.add(field);
+			if (fieldData){
+				fieldData.fCN = field.fCN;
+				fieldData.width = field.width;
+				var field = DBUtil.convertFieldToGridField(fieldData);
+				fields.add(field);
+			}
 		});
 		return DBUtil.convertEntityToTable(entity,fields);
 	}
@@ -37,7 +39,9 @@ define(function(require){
 		var fields = new Fields();
 		$.each(FL.dd.t.entities[entity.csingular].fieldList(),function(index,fieldData){
 			var field = DBUtil.convertFieldToGridField(fieldData);
-			fields.add(field);
+			if (field) {
+				fields.add(field);
+			}
 		});
 		return DBUtil.convertEntityToTable(entity,fields);
 	}

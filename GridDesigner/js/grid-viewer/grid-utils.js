@@ -36,7 +36,7 @@ define(function(require){
         promise.done(function (eCN) {
             var entityName = FL.dd.getEntityByCName(eCN);
             FL.dd.t.entities.dumpToConsole();
-            alert("entity saved");
+            alert("Changes saved to DB");
             if (callback)
             	callback(eCN);
         });

@@ -15,7 +15,8 @@ define(function(require){
 		},
 		events: {
 			"click #addColumnButton" : "addColumn",
-			'click .delete-icon' : "deleteColumnIconClick"
+			'click .delete-icon' : "deleteColumnIconClick",
+			"click #saveGridButton" : "onSaveGridButtonClick"
 		},
 		init : function(){
 			this.loadEntities();
@@ -157,6 +158,10 @@ define(function(require){
     		var cid = element.parent().data("column-cid");
 			GridUtils.removeField(this.entity,this.columns.get({cid:cid}).toJSON().fieldData);
 			this.renderGrid();
+	    },
+	    onSaveGridButtonClick: function(){
+	    	GridUtils.saveToDb(this.entity.csingular,function(){
+	    	});
 	    },
 		getGridData: function(){
 			return [];

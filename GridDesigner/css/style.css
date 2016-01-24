@@ -162,7 +162,6 @@ div#rightContainer {
     position: relative;
     height: 100%;
     padding-top: 50px;
-    padding-right: 32px;
     background: white;
 }
 
@@ -413,4 +412,16 @@ input#addColumnButton {
 
 th.renderable {
     position: relative;
+}
+
+input#saveGridButton {
+    width: 80px;
+    float: right;
+    position: absolute;
+    top: 20px;
+    right: 35px;
+}
+
+.wrapper.grid-viewer {
+    padding-right: 32px;
 }
