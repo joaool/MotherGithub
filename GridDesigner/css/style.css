@@ -162,6 +162,7 @@ div#rightContainer {
     position: relative;
     height: 100%;
     padding-top: 50px;
+    padding-right: 32px;
     background: white;
 }
 
@@ -381,4 +382,12 @@ td.option.field {
 
 .modal-dialog {
     z-index: 1041;
+}
+
+input#addColumnButton {
+    width: 32px;
+    height: 30px;
+    position: absolute;
+    top: 50px;
+    right: 0px;
 }

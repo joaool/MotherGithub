@@ -14,10 +14,10 @@ define(function(require){
 	        this.model = Backbone.Model.extend({});
 		},
 		events: {
+			"click #addColumnButton" : "addColumn"
 		},
 		init : function(){
 			this.loadEntities();
-			//this.render();
 		},
 		loadEntities: function(){
 			this.entityModel.loadEntities();
@@ -29,46 +29,50 @@ define(function(require){
 	    render: function(){
 			this.$el.html(Template);
 			this.$el.append(fieldEditionTemplate);
+			this.renderGrid();
+		},
+		renderGrid: function(){
+			this.columns = this.getColumnCollection();
+    		this.dataCollection = this.getDataCollection();
 		    $(this.gridContainerId).empty();
-		    var columnCollection = this.columns = this.getColumnCollection();
-    		var dataCollection = this.getDataCollection();
+		    $(".backgrid-paginator").remove();
     		this.backGrid = new Backgrid.Grid({
-		        columns: columnCollection,
-		        collection: dataCollection
+		        columns: this.columns,
+		        collection: this.dataCollection
 		    });
 
-		    var $grid = $(this.gridContainerId).appendTo(this.gridContainerId).append(this.backGrid.render().el);
-		    this.renderPagination($grid, dataCollection);
-		    this.renderSizeableColumns($grid, dataCollection, columnCollection);
+		    this.$grid = $(this.gridContainerId).appendTo(this.gridContainerId).append(this.backGrid.render().el);
+		    this.renderPagination();
+		    this.renderSizeableColumns();
 	    },
-	    renderPagination: function($grid, dataCollection){
+	    renderPagination: function(){
 		    // Initialize the paginator
 		    var paginator = new Backgrid.Extension.Paginator({
-		        collection: dataCollection
+		        collection: this.dataCollection
 		    });
 		    // Render the paginator
-		    $grid.after(paginator.render().el);
+		    this.$grid.after(paginator.render().el);
 		},
-		renderSizeableColumns: function($grid, dataCollection,columnCollection) {
+		renderSizeableColumns: function() {
 		    // Add sizeable columns
-		    var sizeAbleCol = new Backgrid.Extension.SizeAbleColumns({
-		        collection: dataCollection,
-		        columns: columnCollection,
+		    var sizeAbleCol = this.sizeableColumns = new Backgrid.Extension.SizeAbleColumns({
+		        collection: this.dataCollection,
+		        columns: this.columnCollection,
 		        grid: this.backGrid
 		    });
-		    $grid.find('thead').before(sizeAbleCol.render().el);
+		    this.$grid.find('thead').before(sizeAbleCol.render().el);
 		    // Add resize handlers
 		    var sizeHandler = new Backgrid.Extension.SizeAbleColumnsHandlers({
 		        sizeAbleColumns: sizeAbleCol,
 		        saveColumnWidth: true
 		    });
-		    $grid.find('thead').before(sizeHandler.render().el);
+		    this.$grid.find('thead').before(sizeHandler.render().el);
 		    // Make columns reorderable
 		    var orderHandler = new Backgrid.Extension.OrderableColumns({
 		        grid: this.backGrid,
 		        sizeAbleColumns: sizeAbleCol
 		    });
-		    $grid.find('thead').before(orderHandler.render().el);
+		    this.$grid.find('thead').before(orderHandler.render().el);
 		},
 		getDataCollection : function() {
 		    var PageableGrid = Backbone.PageableCollection.extend({
@@ -85,32 +89,6 @@ define(function(require){
 		getColumnCollection : function() {
 			var self = this;
 		    var columnDefinition = GridUtils.generateGridViewerData(this.entity,this.gridData);
-		    columnDefinition.push({
-		    	"name" : "+",
-		    	"width" : 50,
-		    	"sortable":false,
-		    	"resizeable": false,
-		    	cell: Backgrid.HeaderCell.extend({
-		    		render:function(){
-		    			this.$el.empty();
-		    		}
-		    	}),
-		    	headerCell: Backgrid.HeaderCell.extend({
-			  		// Implement your "select all" logic here
-				  	render : function(){
-				  		this.$el.empty();
-				  		this.$el.append("<a class='new-column'>+</a>");
-            			var column = this.column;
-            			this.$el.addClass(column.get("name"));
-            			this.delegateEvents();
-            			return this;
-				  	},
-					onClick: function(evt){
-				  		//debugger;
-		  				self.addColumn();
-				  	}
-				})
-		    });
 		    var columns = new Backgrid.Extension.OrderableColumns.orderableColumnCollection(columnDefinition);
 		    columns.setPositions().sort();
 		    return columns;
@@ -157,9 +135,13 @@ define(function(require){
 	                if (changed) {
 	                    console.log("fieldEditorModal Master  " ,data.master);
 	                    //data.master.fCN = self.elementClickModel.fieldName;
-	                    debugger;
-	                    var column = GridUtils.addField(self.entity,data.master);
-	                    self.backGrid.insertColumn(column,{at:self.columns.models.length - 1});
+	                    var field = GridUtils.addField(self.entity,data.master);
+	                    self.gridData.fields.push({
+	                    	"fCN" : field.fCN,
+	                    	"width" : field.width
+	                    })
+	                    self.renderGrid();
+	                    //self.columns.setPositions().sort();
 	                    //self.m_Editor.updateElement(data.master);
 	                }
 	            }

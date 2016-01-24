@@ -17,7 +17,7 @@ define(function(require){
 	        cell: "select-row",
 	        headerCell: "select-all",
 	        nesting: [],
-            width: "*",
+            width: 20,
             resizeable: false,
             orderable: false
 	    });
@@ -48,9 +48,9 @@ define(function(require){
 	        "cell": fieldData.inputType,
 	        "filterType": fieldData.inputType,
 	        "width": fieldData.width || "*",
-	        "orderable": true,
-	        "fieldData" : fieldData,
+	        orderable: true,
 	        resizeable: true,
+	        "fieldData" : fieldData,
     	}
 	}
 	GridUtils.removeField = function(entity,field){
@@ -64,7 +64,7 @@ define(function(require){
                 field.userType);
         var fieldData =  FL.dd.t.entities[entity.csingular].fields[fCN];
         fieldData.fCN = fCN;
-        return GridUtils.generateGridViewerColumn(fieldData);
+        return fieldData;
 	};
 
 	GridUtils.updateField = function(entity,fieldData){
