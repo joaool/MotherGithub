@@ -1,0 +1,53 @@
+<script id="fieldEdition" type="text/template">
+    <div class="fieldEdition" style="margin-top:0px;">
+        <form id="form_fieldEdition">
+            <legend>Please define this field:</legend>
+            <div class="row">
+                <div class="col-xs-12">
+                    <div class="input-group" style="line-height:0px;">
+                        <span class="input-group-addon">Field label:</span>
+                        <input type="text" class="form-control" id="fieldEdition_fieldLabel"
+                               name="fieldLabel" placeholder="Ex. Your full name, Your address, Your email, Your phone..."
+                               value="<%= master.fieldLabel %>">
+                    </div>
+                    <div class="input-group" style="line-height:0px;">
+                        <span class="input-group-addon">Attribute:</span>
+                        <input type="text" class="form-control" id="fieldEdition_fieldName"
+                               name="fieldName" placeholder="Ex. name, address, email, phone..."
+                               value="<%= master.fieldName %>">
+                    </div>
+                    <div class="input-group" style="line-height:0px;">
+                        <span class="input-group-addon">Description:</span>
+                        <input type="text" class="form-control" id="fieldEdition_fieldDescription"
+                               name="fieldDescription" placeholder="Ex. descripton..."
+                               value="<%= master.fieldDescription %>">
+                    </div>
+	                <div class="input-group" style="line-height:0px;">
+		                <span class="input-group-addon">Placeholder:</span>
+		                <input type="text" class="form-control" id="fieldEdition_placeholder"
+		                       name="fieldName" placeholder="Enter a placeholder..."
+		                       value="<%= master.placeholder %>">
+	                </div>
+	                <div class="input-group" style="line-height:0px;">
+		                <span class="input-group-addon">Icon:</span>
+		                <input type="text" class="form-control" id="fieldEdition_icon"
+		                       name="fieldName" placeholder="Enter icon name"
+		                       value="<%= master.icon %>">
+	                </div>
+                    <div>
+                        <h4 id="fieldEdition_plural"></h4>
+                    </div>
+                    <div class="input-group" style="line-height:0px;">
+                        <span class="input-group-addon">User Type:</span>
+                        <div class="btn-group" style="width:100%">
+                            <a class="btn btn-default btn-block dropdown-toggle" data-toggle="dropdown"
+                               id="fieldEdition_userType" href="#"><%= master.userType %> <span class="caret"></span></a>
+                            <ul id="fieldEdition_userType_options" class="dropdown-menu"></ul>
+                        </div>
+                        <span class="input-group-addon"><span class="glyphicon glyphicon-th-list"></span></span>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</script>

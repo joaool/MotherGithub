@@ -378,3 +378,7 @@ td.option.field {
     display: inline-block;
     margin-left: 50px;
 }
+
+.modal-dialog {
+    z-index: 1041;
+}

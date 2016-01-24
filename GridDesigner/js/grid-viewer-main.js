@@ -100,7 +100,7 @@ require(['jquery'],function() {
             $.widget.bridge('uibutton', $.ui.button);
             var mainView = new MainView({el : 'body'});
             mainView.init();
-            if (window.opener.gridData){
+            if (window.opener){
                 mainView.setGrid(window.opener.gridData);
             }
         });
