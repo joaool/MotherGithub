@@ -23,8 +23,11 @@ define(function(require){
 	    });
 		$.each(gridData.fields,function(i,field){
 			var fieldData = FL.dd.t.entities[entity.csingular].fields[field.fCN];
-			fieldData.width = field.width;
-			columns.push(GridUtils.generateGridViewerColumn(fieldData));
+			if (fieldData){
+				fieldData.width = field.width;
+				fieldData.fCN = field.fCN;
+				columns.push(GridUtils.generateGridViewerColumn(fieldData));
+			}
 		});
 		return columns;
 	}
@@ -50,11 +53,11 @@ define(function(require){
 	        "width": fieldData.width || "*",
 	        orderable: true,
 	        resizeable: true,
-	        "fieldData" : fieldData,
+	        "fieldData" : fieldData
     	}
 	}
 	GridUtils.removeField = function(entity,field){
-		FL.dd.t.entities[entity.csingular].removeField(field.fieldName);
+		FL.dd.t.entities[entity.csingular].removeField(field.name);
 	}
 	GridUtils.addField = function(entity,field) {
 		var fCN = FL.dd.t.entities[entity.csingular]

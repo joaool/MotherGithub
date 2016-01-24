@@ -391,3 +391,26 @@ input#addColumnButton {
     top: 50px;
     right: 0px;
 }
+
+.delete-icon {
+    position: absolute;
+    top: 0px;
+    right: 8px;
+    z-index: 3;
+    /* background-color: #D60E0E; */
+    width: 20px;
+    height: 20px;
+    text-align: left;
+    padding: 1px;
+    color: #D60E0E;
+    border-radius: 50%;
+    font-size: 30px;
+    transform: rotate(-45deg);
+    cursor: pointer;
+    /* display: none; */
+    font-weight: bolder;
+}
+
+th.renderable {
+    position: relative;
+}

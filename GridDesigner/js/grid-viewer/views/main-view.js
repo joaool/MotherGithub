@@ -14,7 +14,8 @@ define(function(require){
 	        this.model = Backbone.Model.extend({});
 		},
 		events: {
-			"click #addColumnButton" : "addColumn"
+			"click #addColumnButton" : "addColumn",
+			'click .delete-icon' : "deleteColumnIconClick"
 		},
 		init : function(){
 			this.loadEntities();
@@ -44,6 +45,7 @@ define(function(require){
 		    this.$grid = $(this.gridContainerId).appendTo(this.gridContainerId).append(this.backGrid.render().el);
 		    this.renderPagination();
 		    this.renderSizeableColumns();
+		    this.$("th.editable").append("<div class='delete-icon' data-id='{{id}}'><i class='glyphicon glyphicon-plus' data-id='{{id}}'></i></div>");
 	    },
 	    renderPagination: function(){
 		    // Initialize the paginator
@@ -147,6 +149,14 @@ define(function(require){
 	            }
 	        });
 	        fieldEditorModal.show();
+	    },
+	    deleteColumnIconClick: function(evt){
+    		var element = $(evt.currentTarget);
+    		evt.preventDefault();
+    		evt.stopPropagation();
+    		var cid = element.parent().data("column-cid");
+			GridUtils.removeField(this.entity,this.columns.get({cid:cid}).toJSON().fieldData);
+			this.renderGrid();
 	    },
 		getGridData: function(){
 			return [];
