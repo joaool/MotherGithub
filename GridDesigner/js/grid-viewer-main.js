@@ -96,6 +96,7 @@ require(['jquery'],function() {
             "form-designer-util",
             "mailer/js/DragNDrop",
             "formMaker/js/FormMaker",
+            "grid-viewer-constants"
         ],function(MainView){
             $.widget.bridge('uibutton', $.ui.button);
             var mainView = new MainView({el : 'body'});

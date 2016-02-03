@@ -391,6 +391,18 @@ input#addColumnButton {
     right: 0px;
 }
 
+.settings-icon {
+    position: absolute;
+    top: 8px;
+    right: 0px;
+    z-index: 3;
+    width: 20px;
+    height: 20px;
+    text-align: left;
+    padding: 1px;
+    cursor: pointer;
+}
+
 .delete-icon {
     position: absolute;
     top: 0px;
@@ -412,9 +424,10 @@ input#addColumnButton {
 
 th.renderable {
     position: relative;
+    overflow: visible!important;
 }
 
-input#saveGridButton {
+input#saveGridButton,#getGridJSON {
     width: 80px;
     float: right;
     position: absolute;
@@ -424,4 +437,65 @@ input#saveGridButton {
 
 .wrapper.grid-viewer {
     padding-right: 32px;
+    overflow: visible;
+}
+
+ul.column-context-menu {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    border: 1px solid #CACACA;
+    display: inline-block;
+    position: absolute;
+    height: auto;
+    z-index: 10;
+    font-weight: normal;
+    background: #F9F9F9;
+    right: 0px;
+    overflow: visible;
+}
+
+li.menu-option {
+    line-height: 30px;
+    padding: 5px;
+    padding-left: 30px;
+    padding-right: 10px;
+    text-align: left;
+}
+
+li.menu-option:hover {
+    cursor: pointer;
+    background-color: #3C8DBC;
+    color: white;
+}
+
+table.backgrid {
+    overflow: visible;
+}
+
+li.column-type:after {
+    content: '>';
+    padding-left: 5px;
+    font-weight: bold;
+}
+
+ul.column-context-menu ul.column-context-menu {
+    left: 139px;
+    top: 0px;
+    width: 175px;
+}
+
+li.menu-option li.menu-option {
+    width: auto;
+    padding-left: 10px;
+    color: black;
+    line-height: 20px;
+}
+
+li.menu-option li.menu-option:hover {
+    color: white;
+}
+
+input#getGridJSON {
+    right: 150px;
 }

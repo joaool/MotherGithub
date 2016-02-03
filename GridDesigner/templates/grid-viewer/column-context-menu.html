@@ -1,0 +1,5 @@
+<ul class="column-context-menu" id="<%=id%>">
+	<% _.each(menuOptions,function(option,index){ %>
+		<li class="menu-option <%=option.className%>" data-key="<%=option.key%>"><%=option.text%></li>
+	<% } )%>
+</ul>

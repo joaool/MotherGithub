@@ -5,6 +5,7 @@ define(function(require){
 	var fieldEditionTemplate = require("text!templates/field-Edition.html");
 	var EntityModel = require("formMaker/js/models/entity_model");
 	var GridUtils = require("grid-viewer/grid-utils");
+	var ColumnContextMenu = require("text!templates/column-context-menu.html");
 
 	var View = Backbone.View.extend({
 		initialize: function(){
@@ -16,7 +17,11 @@ define(function(require){
 		events: {
 			"click #addColumnButton" : "addColumn",
 			'click .delete-icon' : "deleteColumnIconClick",
-			"click #saveGridButton" : "onSaveGridButtonClick"
+			'click .settings-icon' : "settingsColumnIconClick",
+			"click #saveGridButton" : "onSaveGridButtonClick",
+			"click #columnTypeContextMenu > li.menu-option" : "onSubMenuClick",
+			"click #columnContextMenu > li.menu-option" : "onContextMenuItemClick"	,
+			"click #getGridJSON" : "onGridJsonBtnClick"
 		},
 		init : function(){
 			this.loadEntities();
@@ -46,7 +51,7 @@ define(function(require){
 		    this.$grid = $(this.gridContainerId).appendTo(this.gridContainerId).append(this.backGrid.render().el);
 		    this.renderPagination();
 		    this.renderSizeableColumns();
-		    this.$("th.editable").append("<div class='delete-icon' data-id='{{id}}'><i class='glyphicon glyphicon-plus' data-id='{{id}}'></i></div>");
+		    this.$("th.editable").append("<i class='glyphicon glyphicon-cog settings-icon'></i>");
 	    },
 	    renderPagination: function(){
 		    // Initialize the paginator
@@ -151,6 +156,46 @@ define(function(require){
 	        });
 	        fieldEditorModal.show();
 	    },
+	    settingsColumnIconClick: function(evt){
+	    	var element = $(evt.currentTarget);
+    		evt.preventDefault();
+    		evt.stopPropagation();
+			var menuOptions = window.constants.columnContextMenuOptions;
+			this.displayMenu(element.parent(),{
+				"menuOptions": menuOptions,
+				"id" : "columnContextMenu"
+			});
+	    },
+	    displayMenu: function(parent,options){
+    		$(parent).append(_.template(ColumnContextMenu)(options));
+    		$(document).click(function(e){
+    			e.preventDefault();
+    			e.stopPropagation();
+    			$(".column-context-menu").remove();
+    		})
+	    },
+	    onContextMenuItemClick: function(evt){
+	    	var key = $(evt.currentTarget).data("key");
+	    	evt.preventDefault();
+    		evt.stopPropagation();
+			if (key === "columnType") {
+				var menuOptions = window.constants.columnType;
+	    		this.displayMenu($(evt.currentTarget),{
+					"menuOptions": menuOptions,
+					"id" : "columnTypeContextMenu"
+				});
+	    	}
+	    	else {
+	    		$("#columnContextMenu").hide();
+	    	}
+	    },
+	    onSubMenuClick: function(evt){
+	    	evt.preventDefault();
+	    	evt.stopPropagation();
+	    },
+	    displaySubMenu: function(parent){
+	    	var menuOptions
+	    },
 	    deleteColumnIconClick: function(evt){
     		var element = $(evt.currentTarget);
     		evt.preventDefault();
@@ -158,6 +203,9 @@ define(function(require){
     		var cid = element.parent().data("column-cid");
 			GridUtils.removeField(this.entity,this.columns.get({cid:cid}).toJSON().fieldData);
 			this.renderGrid();
+	    },
+	    onGridJsonBtnClick: function(){
+	    	alert(JSON.stringify(this.gridData));
 	    },
 	    onSaveGridButtonClick: function(){
 	    	GridUtils.saveToDb(this.entity.csingular,function(){
