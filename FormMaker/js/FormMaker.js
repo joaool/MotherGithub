@@ -151,7 +151,8 @@ window.FormMaker.DBElements = {
 window.FormMaker.DBType = {
     number : "number",
     string : "text",
-    text : "text"
+    text : "text",
+    
 }
 
 window.FormMaker.TypeTemplate = [

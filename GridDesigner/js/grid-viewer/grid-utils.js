@@ -72,7 +72,7 @@ define(function(require){
 	};
 
 	GridUtils.updateField = function(entity,fieldData){
-		FL.dd.t.entities[entity.csingular].fields[fieldData.id].set({
+		FL.dd.t.entities[entity.csingular].fields[fieldData.fCN].set({
             description: fieldData.description,
             label: fieldData.label,
             name: fieldData.fieldName,

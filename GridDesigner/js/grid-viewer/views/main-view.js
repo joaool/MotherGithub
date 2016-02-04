@@ -23,6 +23,7 @@ define(function(require){
 			"click #columnContextMenu > li.menu-option" : "onContextMenuItemClick"	,
 			"click #getGridJSON" : "onGridJsonBtnClick",
 			"click .add-row-controls input" : "onAddRowInpuBoxClick",
+			"click .add-row-controls textarea" : "onAddRowInpuBoxClick",
 			"click #addRow" : "addRowBtnClick",
 			"click .columnType": "onColumnTypeClicked"
 		},
@@ -180,15 +181,18 @@ define(function(require){
 	        fieldEditorModal.show();
 	    },
 	    settingsColumnIconClick: function(evt){
-	    	var element = $(evt.currentTarget);
+	    	this.currentSettingsColumn = $(evt.currentTarget);
     		evt.preventDefault();
     		evt.stopPropagation();
+    		this.currentColumnCid = this.currentSettingsColumn.parent().data("column-cid");
 			var menuOptions = window.constants.columnContextMenuOptions;
-			this.displayMenu(element.parent(),{
+			$(".column-context-menu").remove();
+			this.displayMenu(this.currentSettingsColumn.parent(),{
 				"menuOptions": menuOptions,
 				"id" : "columnContextMenu",
 				"type" : ""
 			});
+
 	    },
 	    displayMenu: function(parent,options){
     		$(parent).append(_.template(ColumnContextMenu)(options));
@@ -217,7 +221,22 @@ define(function(require){
 	    onSubMenuClick: function(evt){
 	    	evt.preventDefault();
 	    	evt.stopPropagation();
-	    	$("#columnContextMenu").hide();
+	    	$("#columnTypeContextMenu").hide();
+	    	var fieldData = this.columns.get({cid:this.currentColumnCid}).toJSON().fieldData;
+	    	fieldData.typeUI = $(evt.currentTarget).data("key");
+	    	GridUtils.updateField(this.entity,fieldData);
+	    	if(fieldData.typeUI == "textArea") {
+	    		this.currentSettingsColumn.parents("th").find(".add-row-controls").html("<textarea></textarea>");
+	    	}
+	    	else if (fieldData.typeUI == "date") {
+	    		var inputElement = $("<input type='text' class='datepicker'/>");
+    			this.currentSettingsColumn.parents("th").find(".add-row-controls").html(inputElement);
+    			$(".datepicker").datetimepicker({
+		            timeFormat: "hh:mm tt",
+		            controlType: 'select',
+		            oneLine: true
+		        });	
+	    	}
 	    },
 	    displaySubMenu: function(parent){
 	    	var menuOptions
@@ -235,7 +254,7 @@ define(function(require){
 	    	$("#columnContextMenu").hide();
 	    },
 	    addRowBtnClick: function(){
-    		
+
 	    },
 	    onAddRowInpuBoxClick: function(evt){
 	    	evt.preventDefault();

@@ -29,66 +29,79 @@ window.constants = {
 	"columnType" : [
 		{
 			"key" : "linkToAnotherRecord",
+			"inputType" : "text",
 			"className" : "link-to-another-record",
 			"text" : "Link to another record"
 		},
 		{
 			"key" : "singleLineText",
+			"inputType" : "text",
 			"className" : "single-line-text",
 			"text" : "Single line text"
 		},
 		{
 			"key" : "textArea",
+			"inputType" : "textarea",
 			"className" : "text-area",
 			"text" : "Text Area"
 		},
 		{
 			"key" : "checkbox",
+			"inputType" : "checkbox",
 			"className" : "checkbox",
 			"text" : "Checkbox"
 		},
 		{
 			"key" : "singleSelect",
+			"inputType" : "text",
 			"className" : "single-select",
 			"text" : "Single select"
 		},
 		{
 			"key" : "date",
+			"inputType" : "datetime",
 			"className" : "date",
 			"text" : "Date"
 		},
 		{
 			"key" : "phoneNumber",
+			"inputType" : "number",
 			"className" : "phone-number",
 			"text" : "Phone number"
 		},
 		{
 			"key" : "email",
+			"inputType" : "email",
 			"className" : "email",
 			"text" : "Email"
 		},
 		{
 			"key" : "url",
+			"inputType" : "text",
 			"className" : "url",
 			"text" : "URL"
 		},
 		{
 			"key" : "number",
+			"inputType" : "number",
 			"className" : "number",
 			"text" : "Number"
 		},
 		{
 			"key" : "currency",
+			"inputType" : "text",
 			"className" : "currency",
 			"text" : "Currency"
 		},
 		{
 			"key" : "percent",
+			"inputType" : "text",
 			"className" : "percent",
 			"text" : "Percent"
 		},
 		{
 			"key" : "formula",
+			"inputType" : "text",
 			"className" : "formula",
 			"text" : "Formula"
 		}

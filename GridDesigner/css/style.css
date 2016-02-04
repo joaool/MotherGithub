@@ -518,9 +518,11 @@ input#getGridJSON {
     padding-right: 15px;
 }
 
-.add-row-controls input {
+.add-row-controls * {
     width: 90%;
     z-index: 10000000;
+    height: 35px;
+    resize: none;
 }
 
 .backgrid th.sortable a {
