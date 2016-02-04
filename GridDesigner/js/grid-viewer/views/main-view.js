@@ -21,7 +21,10 @@ define(function(require){
 			"click #saveGridButton" : "onSaveGridButtonClick",
 			"click #columnTypeContextMenu > li.menu-option" : "onSubMenuClick",
 			"click #columnContextMenu > li.menu-option" : "onContextMenuItemClick"	,
-			"click #getGridJSON" : "onGridJsonBtnClick"
+			"click #getGridJSON" : "onGridJsonBtnClick",
+			"click .add-row-controls input" : "onAddRowInpuBoxClick",
+			"click #addRow" : "addRowBtnClick",
+			"click .columnType": "onColumnTypeClicked"
 		},
 		init : function(){
 			this.loadEntities();
@@ -96,7 +99,27 @@ define(function(require){
 		},
 		getColumnCollection : function() {
 			var self = this;
-		    var columnDefinition = GridUtils.generateGridViewerData(this.entity,this.gridData);
+			var renderer = Backgrid.HeaderCell.extend({
+		    	render: function(){
+	    			this.$el.empty();
+		            var column = this.column;
+		            var sortable = Backgrid.callByNeed(column.sortable(), column, this.collection);
+		            var label;
+		            if (sortable) {
+		                label = $("<a>").text(column.get("label")).append("<b class='sort-caret'></b>");
+		            } else {
+		                label = document.createTextNode(column.get("label"));
+		            }
+
+		            this.$el.append(label);
+		            this.$el.append("<div class='add-row-controls'><input type='text' value=''/></div>");
+		            this.$el.addClass(column.get("name"));
+		            this.$el.addClass(column.get("direction"));
+		            this.delegateEvents();
+		            return this;
+		    	}
+		    })
+		    var columnDefinition = GridUtils.generateGridViewerData(this.entity,this.gridData,renderer);
 		    var columns = new Backgrid.Extension.OrderableColumns.orderableColumnCollection(columnDefinition);
 		    columns.setPositions().sort();
 		    return columns;
@@ -163,7 +186,8 @@ define(function(require){
 			var menuOptions = window.constants.columnContextMenuOptions;
 			this.displayMenu(element.parent(),{
 				"menuOptions": menuOptions,
-				"id" : "columnContextMenu"
+				"id" : "columnContextMenu",
+				"type" : ""
 			});
 	    },
 	    displayMenu: function(parent,options){
@@ -182,7 +206,8 @@ define(function(require){
 				var menuOptions = window.constants.columnType;
 	    		this.displayMenu($(evt.currentTarget),{
 					"menuOptions": menuOptions,
-					"id" : "columnTypeContextMenu"
+					"id" : "columnTypeContextMenu",
+					"type" : key
 				});
 	    	}
 	    	else {
@@ -192,6 +217,7 @@ define(function(require){
 	    onSubMenuClick: function(evt){
 	    	evt.preventDefault();
 	    	evt.stopPropagation();
+	    	$("#columnContextMenu").hide();
 	    },
 	    displaySubMenu: function(parent){
 	    	var menuOptions
@@ -203,6 +229,18 @@ define(function(require){
     		var cid = element.parent().data("column-cid");
 			GridUtils.removeField(this.entity,this.columns.get({cid:cid}).toJSON().fieldData);
 			this.renderGrid();
+	    },
+	    onColumnTypeClicked: function(evt){
+	    	var key = $(evt.currentTarget).data("key");
+	    	$("#columnContextMenu").hide();
+	    },
+	    addRowBtnClick: function(){
+    		
+	    },
+	    onAddRowInpuBoxClick: function(evt){
+	    	evt.preventDefault();
+	    	evt.stopPropagation();
+	    	evt.currentTarget.focus();
 	    },
 	    onGridJsonBtnClick: function(){
 	    	alert(JSON.stringify(this.gridData));

@@ -383,14 +383,17 @@ td.option.field {
     z-index: 1041;
 }
 
-input#addColumnButton {
-    width: 32px;
+input#addColumnButton,#addRow {
+    width: 95px;
     height: 30px;
     position: absolute;
     top: 50px;
     right: 0px;
+    vertical-align: middle;
 }
-
+#addRow {
+    top: 85px;
+}
 .settings-icon {
     position: absolute;
     top: 8px;
@@ -425,6 +428,12 @@ input#addColumnButton {
 th.renderable {
     position: relative;
     overflow: visible!important;
+    height: 80px;
+    vertical-align: top!important;
+    background-color: white!important;
+    border-spacing: 40px;
+    padding-left: 0px;
+    padding-right: 0px;
 }
 
 input#saveGridButton,#getGridJSON {
@@ -436,7 +445,7 @@ input#saveGridButton,#getGridJSON {
 }
 
 .wrapper.grid-viewer {
-    padding-right: 32px;
+    padding-right: 100px;
     overflow: visible;
 }
 
@@ -498,4 +507,27 @@ li.menu-option li.menu-option:hover {
 
 input#getGridJSON {
     right: 150px;
+}
+
+.add-row-controls {
+    position: absolute;
+    left: 0px;
+    top: 40px;
+    width: 100%;
+    padding-left: 15px;
+    padding-right: 15px;
+}
+
+.add-row-controls input {
+    width: 90%;
+    z-index: 10000000;
+}
+
+.backgrid th.sortable a {
+    padding-bottom: 10px;
+    border-bottom: 1px solid #CACACA;
+}
+
+.backgrid thead th:last-child {
+    border-right: 1px solid #DDD;
 }
