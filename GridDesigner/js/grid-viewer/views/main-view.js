@@ -262,7 +262,7 @@ define(function(require){
 	    	evt.currentTarget.focus();
 	    },
 	    onGridJsonBtnClick: function(){
-	    	alert(JSON.stringify(this.gridData));
+	    	alert(JSON.stringify(this.columns.toJSON()));
 	    },
 	    onSaveGridButtonClick: function(){
 	    	GridUtils.saveToDb(this.entity.csingular,function(){
