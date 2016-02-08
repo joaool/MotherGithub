@@ -56,6 +56,13 @@ define(function(require){
 		    this.renderPagination();
 		    this.renderSizeableColumns();
 		    this.$("th.editable").append("<i class='glyphicon glyphicon-cog settings-icon'></i>");
+		    this.renderFilter();
+	    },
+	    renderFilter: function(){
+	    	this.filter = new Backgrid.Extension.ClientSideFilter({
+			  collection: this.dataCollection
+			});
+			this.$grid.before(this.filter.render().el);
 	    },
 	    renderPagination: function(){
 		    // Initialize the paginator
@@ -113,7 +120,7 @@ define(function(require){
 		            }
 
 		            this.$el.append(label);
-		            this.$el.append("<div class='add-row-controls'><input type='text' value=''/></div>");
+		            this.$el.append("<div class='add-row-controls'><input type='text' value='' class='control'/></div>");
 		            this.$el.addClass(column.get("name"));
 		            this.$el.addClass(column.get("direction"));
 		            this.delegateEvents();
@@ -226,10 +233,13 @@ define(function(require){
 	    	fieldData.typeUI = $(evt.currentTarget).data("key");
 	    	GridUtils.updateField(this.entity,fieldData);
 	    	if(fieldData.typeUI == "textArea") {
-	    		this.currentSettingsColumn.parents("th").find(".add-row-controls").html("<textarea></textarea>");
+	    		this.currentSettingsColumn.parents("th").find(".add-row-controls").html("<textarea class='control'></textarea>");
+	    	}
+	    	else if(fieldData.typeUI == "number") {
+	    		this.currentSettingsColumn.parents("th").find(".add-row-controls").html("<input type='number' class='control'/>");
 	    	}
 	    	else if (fieldData.typeUI == "date") {
-	    		var inputElement = $("<input type='text' class='datepicker'/>");
+	    		var inputElement = $("<input type='text' class='control datepicker'/>");
     			this.currentSettingsColumn.parents("th").find(".add-row-controls").html(inputElement);
     			$(".datepicker").datetimepicker({
 		            timeFormat: "hh:mm tt",
@@ -254,8 +264,19 @@ define(function(require){
 	    	$("#columnContextMenu").hide();
 	    },
 	    addRowBtnClick: function(){
-
+	    	this.getDataFromAddControls();
 	    },
+	    getDataFromAddControls: function(){
+	    	var addControls = $('.add-row-controls .control');
+	    	var fields = _.filter(this.columns.toJSON(),function(model){return model.fieldData != null});
+	    	var columnNames = _.pluck(fields,"name");
+	    	var model =  new Backbone.Model();
+	    	_.each(columnNames,function(columnName,i){
+	    		model.set(columnName,$(addControls[i]).val());
+	    	});
+	    	this.dataCollection.add(model);
+	    	// this.backGrid.insertRow(model);
+	    },	
 	    onAddRowInpuBoxClick: function(evt){
 	    	evt.preventDefault();
 	    	evt.stopPropagation();

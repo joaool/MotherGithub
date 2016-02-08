@@ -48,8 +48,8 @@ define(function(require){
 	GridUtils.generateGridViewerColumn = function(fieldData,renderer){
 		return {
 			"name": fieldData.label,
-	        "cell": fieldData.inputType,
-	        "filterType": fieldData.inputType,
+	        "cell": window.constants.BackgridCell[fieldData.typeUI],
+	        "filterType": window.constants.BackgridCell[fieldData.typeUI],
 	        "width": fieldData.width || "*",
 	        headerCell : renderer,
 	        orderable: true,

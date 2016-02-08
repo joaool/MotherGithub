@@ -105,5 +105,25 @@ window.constants = {
 			"className" : "formula",
 			"text" : "Formula"
 		}
-	]
+	],
+	BackgridCell : {
+		"numberbox" : "Number",
+	    "textbox" : "String",
+	    "combobox" : "Select",
+	    "email" : "Email",
+	    "emailbox" : "Email",
+	    "text" : "String",
+	    "datetime" : "Date",
+	    "date" : "Date",
+	    "integerbox": "Integer",
+	    "percentbox": "Percent",
+	    "currencybox": "String",
+	    "textUpperbox": "String",
+	    "areabox": "String",
+	    "phonebox": "String",
+	    "datetimebox": "Date",
+	    "checkbox": "Boolean",
+	    "urlbox": "Uri",
+	    "lookupbox": "String"
+	}
 }

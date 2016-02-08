@@ -161,7 +161,7 @@ div#rightContainer {
 .wrapper {
     position: relative;
     height: 100%;
-    padding-top: 50px;
+    padding-top: 0px;
     background: white;
 }
 
@@ -387,12 +387,12 @@ input#addColumnButton,#addRow {
     width: 95px;
     height: 30px;
     position: absolute;
-    top: 50px;
+    top: 70px;
     right: 0px;
     vertical-align: middle;
 }
 #addRow {
-    top: 85px;
+    top: 110px;
 }
 .settings-icon {
     position: absolute;
