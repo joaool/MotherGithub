@@ -56,7 +56,9 @@ define(function(require){
 		    this.renderPagination();
 		    this.renderSizeableColumns();
 		    this.$("th.editable").append("<i class='glyphicon glyphicon-cog settings-icon'></i>");
+		    this.bindDatePicker();
 		    this.renderFilter();
+		    this.dataCollection.fetch({reset: true});
 	    },
 	    renderFilter: function(){
 	    	this.filter = new Backgrid.Extension.ClientSideFilter({
@@ -96,18 +98,28 @@ define(function(require){
 		getDataCollection : function() {
 		    var PageableGrid = Backbone.PageableCollection.extend({
 		        model: this.model,
-		        url : "",
+		        url : window.gridBaseUrl+"customer.json",
 		        state: {
 		            pageSize: 15
 		        },
 		        mode: "client" // page entirely on the client side
 		    });
-		    var dataCollection = new PageableGrid(this.getGridData());
+		    var dataCollection = new PageableGrid();
+		    this.listenTo(dataCollection,"backgrid:editing",function(){
+		    	//this.bindDatePicker();
+		    });
 		    return dataCollection;
 		},
+		bindDatePicker: function(){
+			$(".datepicker").datetimepicker({
+	            timeFormat: "hh:mm tt",
+	            controlType: 'select',
+	            oneLine: true
+	        });
+		},
 		getColumnCollection : function() {
-			var self = this;
-			var renderer = Backgrid.HeaderCell.extend({
+			var mainView = this;
+			var headerRenderer = Backgrid.HeaderCell.extend({
 		    	render: function(){
 	    			this.$el.empty();
 		            var column = this.column;
@@ -118,19 +130,85 @@ define(function(require){
 		            } else {
 		                label = document.createTextNode(column.get("label"));
 		            }
-
 		            this.$el.append(label);
-		            this.$el.append("<div class='add-row-controls'><input type='text' value='' class='control'/></div>");
+		            if(column.get("inputType").toLowerCase() == "textArea") {
+			    		this.$el.append("<div class='add-row-controls'><textarea class='control'></textarea></div>");
+			    	}
+			    	else if(column.get("inputType").toLowerCase() == "number") {
+			    		this.$el.append("<div class='add-row-controls'><input type='number' class='control'/></div>");
+			    	}
+			    	else if (column.get("inputType").toLowerCase() == "date" || column.get("inputType").toLowerCase() == "datetime") {
+			    		var inputElement = $("<input type='text' class='control datepicker'/>");
+			    		var container = $("<div class='add-row-controls'></div>");
+			    		container.append(inputElement);
+		    			this.$el.append(container);
+		    			
+			    	}
+			    	else {
+			    		this.$el.append("<div class='add-row-controls'><input type='text' class='control'/></div>");
+			    	}
+		            //this.$el.append("<div class='add-row-controls'><input type='text' value='' class='control'/></div>");
 		            this.$el.addClass(column.get("name"));
 		            this.$el.addClass(column.get("direction"));
 		            this.delegateEvents();
 		            return this;
 		    	}
-		    })
-		    var columnDefinition = GridUtils.generateGridViewerData(this.entity,this.gridData,renderer);
+		    });
+		    var formatter = _.extend(Backgrid.CellFormatter.prototype, {
+				fromRaw: this.fromFormatter.bind(this),
+			  	toRaw: this.toFormatter.bind(this)
+			});
+			/*var customCellRender = function(){
+	    		this.$el.empty();
+			    var model = this.model;
+			    this.$el.text(this.formatter.fromRaw(model.get(this.column.get("name")), model,this.column));
+			    this.delegateEvents();
+			    return this;
+	    	}
+	    	var customInputCellRenderer = function(){
+	    		 var model = this.model;
+			    this.$el.val(this.formatter.fromRaw(model.get(this.column.get("name")), model,column));
+			    return this;
+	    	}
+	    	Backgrid.Cell.prototype.render = function(){
+	    		return customCellRender.call(this);
+	    	}
+	    	Backgrid.InputCellEditor.render = function(){
+	    		debugger;	    		
+    			return customInputCellRenderer.call(this);
+	    	}*/
+		    var columnDefinition = GridUtils.generateGridViewerData(this.entity,this.gridData,headerRenderer,formatter);
 		    var columns = new Backgrid.Extension.OrderableColumns.orderableColumnCollection(columnDefinition);
 		    columns.setPositions().sort();
 		    return columns;
+		},
+		fromFormatter : function (rawValue, model) {
+			return this.validateBeforeRender(rawValue,model);
+	  	},
+	  	toFormatter : function (rawValue, model) {
+	  		return this.validateBeforeRender(rawValue,model);
+	  	},
+	  	validateBeforeRender: function(value,model){
+  			var col = Object.keys(model.toJSON()).find(function(key) { return model.toJSON()[key] == value; });
+			var col = this.columns.where({name : col})[0].get("inputType");
+			if (col.toLowerCase() == "date" || col.toLowerCase() == "datetime"){
+				var dt = new Date(value);
+				if (dt == 'Invalid Date') {
+					return "";
+				}
+			} else if (col.toLowerCase() == 'integer') {
+				if (Number.isNaN(parseInt(value))) {
+					return "";
+				}
+			} else if (col.toLowerCase() == 'number') {
+				if (Number.isNaN(parseFloat(value))) {
+					return "";
+				}
+			}
+			return value;
+	  	},
+		validateAfterEditting: function(value,model){
+			return value;
 		},
 		addColumn : function(){
 			this.newColumnDialog();
@@ -232,21 +310,24 @@ define(function(require){
 	    	var fieldData = this.columns.get({cid:this.currentColumnCid}).toJSON().fieldData;
 	    	fieldData.typeUI = $(evt.currentTarget).data("key");
 	    	GridUtils.updateField(this.entity,fieldData);
-	    	if(fieldData.typeUI == "textArea") {
+	    	if(fieldData.typeUI == "singleLineText") {
+	    		this.currentSettingsColumn.parents("th").find(".add-row-controls").html("<input type='text' class='control'/>");
+	    	} else if(fieldData.typeUI == "textArea") {
 	    		this.currentSettingsColumn.parents("th").find(".add-row-controls").html("<textarea class='control'></textarea>");
-	    	}
-	    	else if(fieldData.typeUI == "number") {
+	    	} else if(fieldData.typeUI == "number") {
 	    		this.currentSettingsColumn.parents("th").find(".add-row-controls").html("<input type='number' class='control'/>");
-	    	}
-	    	else if (fieldData.typeUI == "date") {
+	    	} else if (fieldData.typeUI == "date") {
 	    		var inputElement = $("<input type='text' class='control datepicker'/>");
     			this.currentSettingsColumn.parents("th").find(".add-row-controls").html(inputElement);
-    			$(".datepicker").datetimepicker({
-		            timeFormat: "hh:mm tt",
-		            controlType: 'select',
-		            oneLine: true
-		        });	
+    			this.bindDatePicker();	
 	    	}
+	    	this.columns.get({cid:this.currentColumnCid}).set({
+    			"cell": window.constants.BackgridCell[fieldData.typeUI],
+		        "filterType": window.constants.BackgridCell[fieldData.typeUI],
+		        "inputType": window.constants.BackgridCell[fieldData.typeUI],
+	    	});
+	    	this.backGrid.body.refresh();
+	    	//this.dataCollection.reset(this.dataCollection.toJSON());
 	    },
 	    displaySubMenu: function(parent){
 	    	var menuOptions
@@ -290,7 +371,11 @@ define(function(require){
 	    	});
 	    },
 		getGridData: function(){
-			return [];
+			var self = this;
+			$.getJSON(window.gridBaseUrl+"customer.json",(function(data){
+	            self.dataCollection.reset(data);
+	            self.renderPagination();
+	        }).bind(this));
 		},
 		setGrid: function(gridData) {
 			this.entity = gridData.entity;

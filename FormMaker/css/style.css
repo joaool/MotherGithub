@@ -208,6 +208,7 @@ table#fields {
 textarea {
     resize: none;
     vertical-align: top;
+    width: 100%;
 }
 
 div#properties {

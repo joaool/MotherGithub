@@ -1,22 +1,22 @@
 {
-    "eCN": "72",
+    "eCN": "9C",
     "grids": [{
         "gridId": "g1",
         "gridName" : "Grid 1",
         "fields": [{
-            "fCN": "5G",
+            "fCN": "9E",
             "width": 100,
             "order" : 1
         }, {
-            "fCN": "5H",
+            "fCN": "9F",
             "width": 100,
             "order" : 2
         }, {
-            "fCN": "5I",
+            "fCN": "9I",
             "width": 100,
             "order" : 3
         }, {
-            "fCN": "5J",
+            "fCN": "9J",
             "width": 100,
             "order" : 4
         }]

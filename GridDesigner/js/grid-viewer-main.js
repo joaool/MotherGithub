@@ -104,6 +104,7 @@ require(['jquery'],function() {
             if (window.opener && window.opener.gridData){
                 mainView.setGrid(window.opener.gridData);
             }
+            
         });
     });
 });

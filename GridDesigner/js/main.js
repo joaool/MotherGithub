@@ -55,6 +55,13 @@ require(['jquery'],function() {
             $.widget.bridge('uibutton', $.ui.button);
             var mainView = new MainView({el : 'body'});
             mainView.init();
+            Handlebars.registerHelper("arrayToString", function (array, options) {
+                if (array && typeof array == "object" && array.length > 0) {
+                    return array.toString();
+                }
+
+                return array;
+            });
         })
     });
 });

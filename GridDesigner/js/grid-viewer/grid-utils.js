@@ -10,7 +10,7 @@ define(function(require){
 	GridUtils.getUserTypes = function(){
 		return FL.dd.arrOfUserTypesForDropdown();
 	}
-	GridUtils.generateGridViewerData = function(entity, gridData,renderer) {
+	GridUtils.generateGridViewerData = function(entity, gridData,renderer,formatter) {
 		var columns = [];
 		columns.push({
 	        name: "select-column",
@@ -26,7 +26,7 @@ define(function(require){
 			if (fieldData){
 				fieldData.width = field.width;
 				fieldData.fCN = field.fCN;
-				columns.push(GridUtils.generateGridViewerColumn(fieldData,renderer));
+				columns.push(GridUtils.generateGridViewerColumn(fieldData,renderer,formatter));
 			}
 		});
 		return columns;
@@ -45,15 +45,17 @@ define(function(require){
             alert("save error");
         });
 	}
-	GridUtils.generateGridViewerColumn = function(fieldData,renderer){
+	GridUtils.generateGridViewerColumn = function(fieldData,renderer,formatter){
 		return {
 			"name": fieldData.label,
 	        "cell": window.constants.BackgridCell[fieldData.typeUI],
 	        "filterType": window.constants.BackgridCell[fieldData.typeUI],
+	        "inputType": window.constants.BackgridCell[fieldData.typeUI],
 	        "width": fieldData.width || "*",
-	        headerCell : renderer,
-	        orderable: true,
-	        resizeable: true,
+	        "headerCell" : renderer,
+	        "formatter" : formatter,
+	        "orderable": true,
+	        "resizeable": true,
 	        "fieldData" : fieldData
     	}
 	}

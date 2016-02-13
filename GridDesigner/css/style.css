@@ -154,7 +154,7 @@ div#rightContainer {
     vertical-align: top;
     margin: 0px;
     height: 100%;
-    padding-top: 35px;
+    padding-top: 50px;
     background: white;
 }
 
@@ -188,7 +188,7 @@ body {
 
 .action-buttons {
     position: absolute;
-    top: 0px;
+    top: 50px;
     width: 140px;
     padding: 5px;
     background: white;
@@ -377,6 +377,7 @@ td.option.field {
 .table-details {
     display: inline-block;
     margin-left: 50px;
+    padding-top: 5px;
 }
 
 .modal-dialog {
@@ -411,18 +412,19 @@ input#addColumnButton,#addRow {
     top: 0px;
     right: 8px;
     z-index: 3;
-    /* background-color: #D60E0E; */
+    background-color: #D60E0E!important;
     width: 20px;
     height: 20px;
     text-align: left;
-    padding: 1px;
-    color: #D60E0E;
+    padding-left: 4px;
+    padding-top: 0px;
+    color: #FFFFFF;
     border-radius: 50%;
-    font-size: 30px;
+    font-size: 14px;
     transform: rotate(-45deg);
     cursor: pointer;
     /* display: none; */
-    font-weight: bolder;
+    font-weight: normal!important;
 }
 
 th.renderable {
