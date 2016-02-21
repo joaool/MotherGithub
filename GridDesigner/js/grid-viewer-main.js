@@ -96,13 +96,17 @@ require(['jquery'],function() {
             "form-designer-util",
             "mailer/js/DragNDrop",
             "formMaker/js/FormMaker",
-            "grid-viewer-constants"
+            "grid-viewer-constants",
+            "backgrid-override"
         ],function(MainView){
             $.widget.bridge('uibutton', $.ui.button);
             var mainView = new MainView({el : 'body'});
             mainView.init();
             if (window.opener && window.opener.gridData){
                 mainView.setGrid(window.opener.gridData);
+            }
+            else {
+                $("body").html("Data not available for grid viewer");
             }
             
         });

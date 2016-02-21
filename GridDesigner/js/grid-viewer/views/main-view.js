@@ -158,6 +158,9 @@ define(function(require){
 				fromRaw: this.fromFormatter.bind(this),
 			  	toRaw: this.toFormatter.bind(this)
 			});
+
+			
+
 			/*var customCellRender = function(){
 	    		this.$el.empty();
 			    var model = this.model;
@@ -182,15 +185,17 @@ define(function(require){
 		    columns.setPositions().sort();
 		    return columns;
 		},
-		fromFormatter : function (rawValue, model) {
-			return this.validateBeforeRender(rawValue,model);
+		fromFormatter : function (rawValue, model,column) {
+			return this.validateBeforeRender(rawValue,model,column);
 	  	},
-	  	toFormatter : function (rawValue, model) {
-	  		return this.validateBeforeRender(rawValue,model);
+	  	toFormatter : function (rawValue, model,column) {
+	  		return this.validateBeforeRender(rawValue,model,column);
 	  	},
-	  	validateBeforeRender: function(value,model){
-  			var col = Object.keys(model.toJSON()).find(function(key) { return model.toJSON()[key] == value; });
-			var col = this.columns.where({name : col})[0].get("inputType");
+	  	validateBeforeRender: function(value,model,column){
+	  		if (!column) {
+	  			console.log("column not found");
+	  		}
+  			var col = column.get("inputType");
 			if (col.toLowerCase() == "date" || col.toLowerCase() == "datetime"){
 				var dt = new Date(value);
 				if (dt == 'Invalid Date') {
@@ -198,11 +203,11 @@ define(function(require){
 				}
 			} else if (col.toLowerCase() == 'integer') {
 				if (Number.isNaN(parseInt(value))) {
-					return "";
+					return 0;
 				}
 			} else if (col.toLowerCase() == 'number') {
 				if (Number.isNaN(parseFloat(value))) {
-					return "";
+					return 0;
 				}
 			}
 			return value;
