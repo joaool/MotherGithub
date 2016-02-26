@@ -13,10 +13,17 @@ define(function(require) {
 		    var formatter = this.formatter;
 		    var model = this.model;
 		    var column = this.column;
+		    var col = this.column.get("inputType");
 
 		    var command = new Backgrid.Command(e);
 		    var blurred = e.type === "blur";
-
+ 			
+ 			if (blurred && (col.toLowerCase() == "date" || col.toLowerCase() == "datetime") &&
+ 				this.$el.val() == "")
+		    {
+		    	model.trigger("backgrid:error", model, column, val);
+		    	return;
+		    }
 		    if (command.moveUp() || command.moveDown() || command.moveLeft() || command.moveRight() ||
 		        command.save() || blurred) {
 
@@ -43,6 +50,14 @@ define(function(require) {
 		render: function(){
 			var model = this.model;
 		    this.$el.val(this.formatter.fromRaw(model.get(this.column.get("name")), model,this.column));
+		    var col = this.column.get("inputType");
+		    if (col.toLowerCase() == "date" || col.toLowerCase() == "datetime"){
+	    		this.$el.datetimepicker({
+		            timeFormat: "hh:mm tt",
+		            controlType: 'select',
+		            oneLine: true
+		        });
+		    }
 		    return this;
 		}
 	});

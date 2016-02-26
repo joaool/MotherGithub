@@ -124,6 +124,8 @@ window.constants = {
 	    "datetimebox": "Date",
 	    "checkbox": "Boolean",
 	    "urlbox": "Uri",
-	    "lookupbox": "String"
+	    "lookupbox": "String",
+	    "singleLineText" : "String",
+	    "textArea" :"String"
 	}
 }

@@ -147,7 +147,6 @@ define(function(require){
 			    	else {
 			    		this.$el.append("<div class='add-row-controls'><input type='text' class='control'/></div>");
 			    	}
-		            //this.$el.append("<div class='add-row-controls'><input type='text' value='' class='control'/></div>");
 		            this.$el.addClass(column.get("name"));
 		            this.$el.addClass(column.get("direction"));
 		            this.delegateEvents();
@@ -159,27 +158,6 @@ define(function(require){
 			  	toRaw: this.toFormatter.bind(this)
 			});
 
-			
-
-			/*var customCellRender = function(){
-	    		this.$el.empty();
-			    var model = this.model;
-			    this.$el.text(this.formatter.fromRaw(model.get(this.column.get("name")), model,this.column));
-			    this.delegateEvents();
-			    return this;
-	    	}
-	    	var customInputCellRenderer = function(){
-	    		 var model = this.model;
-			    this.$el.val(this.formatter.fromRaw(model.get(this.column.get("name")), model,column));
-			    return this;
-	    	}
-	    	Backgrid.Cell.prototype.render = function(){
-	    		return customCellRender.call(this);
-	    	}
-	    	Backgrid.InputCellEditor.render = function(){
-	    		debugger;	    		
-    			return customInputCellRenderer.call(this);
-	    	}*/
 		    var columnDefinition = GridUtils.generateGridViewerData(this.entity,this.gridData,headerRenderer,formatter);
 		    var columns = new Backgrid.Extension.OrderableColumns.orderableColumnCollection(columnDefinition);
 		    columns.setPositions().sort();
@@ -200,6 +178,9 @@ define(function(require){
 				var dt = new Date(value);
 				if (dt == 'Invalid Date') {
 					return "";
+				}
+				else {
+					return dt.toDateString();
 				}
 			} else if (col.toLowerCase() == 'integer') {
 				if (Number.isNaN(parseInt(value))) {
@@ -327,7 +308,7 @@ define(function(require){
     			this.bindDatePicker();	
 	    	}
 	    	this.columns.get({cid:this.currentColumnCid}).set({
-    			"cell": window.constants.BackgridCell[fieldData.typeUI],
+    			"cell": Backgrid.resolveNameToClass("Custom", "Cell"), //window.constants.BackgridCell[fieldData.typeUI],
 		        "filterType": window.constants.BackgridCell[fieldData.typeUI],
 		        "inputType": window.constants.BackgridCell[fieldData.typeUI],
 	    	});
@@ -351,6 +332,7 @@ define(function(require){
 	    },
 	    addRowBtnClick: function(){
 	    	this.getDataFromAddControls();
+	    	$(".add-row-controls .control").val('');
 	    },
 	    getDataFromAddControls: function(){
 	    	var addControls = $('.add-row-controls .control');

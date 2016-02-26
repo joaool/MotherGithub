@@ -17,7 +17,7 @@ define(function(require){
 	        cell: "select-row",
 	        headerCell: "select-all",
 	        nesting: [],
-            width: 20,
+            width: "20",
             resizeable: false,
             orderable: false
 	    });
@@ -26,7 +26,8 @@ define(function(require){
 			if (fieldData){
 				fieldData.width = field.width;
 				fieldData.fCN = field.fCN;
-				columns.push(GridUtils.generateGridViewerColumn(fieldData,renderer,formatter,customInput));
+				var columnData = GridUtils.generateGridViewerColumn(fieldData,renderer,formatter,customInput);
+				columns.push(columnData);
 			}
 		});
 		return columns;
