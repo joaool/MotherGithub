@@ -108,7 +108,6 @@ require(['jquery'],function() {
             else {
                 $("body").html("Data not available for grid viewer");
             }
-            
         });
     });
 });

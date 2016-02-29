@@ -53,7 +53,7 @@ define(function(require){
 	        "filterType": window.constants.BackgridCell[fieldData.typeUI],
 	        "inputType": window.constants.BackgridCell[fieldData.typeUI],
 	        "width": fieldData.width || "*",
-	        "headerCell" : renderer,
+	        "headerCell" : Backgrid.CustomHeaderCell,
 	        "formatter" : formatter,
 	        "orderable": true,
 	        "resizeable": true,
