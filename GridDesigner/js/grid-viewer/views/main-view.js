@@ -308,7 +308,7 @@ define(function(require){
 			var fields = FL.dd.t.entities[cName].fieldList();
 			var list = "";
 			_.each(fields,function(field){
-					list += "<li><a href=# data-cname='" + cname + "'>" + field.name + "</a></li>";
+					list += "<li><a href=#>" + field.name + "</a></li>";
 			});
 			$("#fieldsDropDown").html(list);
 		},
