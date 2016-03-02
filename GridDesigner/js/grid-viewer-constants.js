@@ -125,7 +125,8 @@ window.constants = {
 	    "checkbox": "Boolean",
 	    "urlbox": "Uri",
 	    "lookupbox": "String",
+	    "linkToAnotherRecord": "String",
 	    "singleLineText" : "String",
-	    "textArea" :"String"
+	    "textArea" :"TextArea"
 	}
 }

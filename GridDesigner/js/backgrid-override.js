@@ -84,16 +84,25 @@ define(function(require) {
 		    }
 		 },
 		render: function(){
-			var model = this.model;
-		    this.$el.val(this.formatter.fromRaw(model.get(this.column.get("name")), model,this.column));
 		    var col = this.column.get("inputType");
-		    if (col.toLowerCase() == "date" || col.toLowerCase() == "datetime"){
-	    		this.$el.datetimepicker({
-		            timeFormat: "hh:mm tt",
-		            controlType: 'select',
-		            oneLine: true
-		        });
-		    }
+			var model = this.model;
+			if (col.toLowerCase() == "textarea") {
+		    	var textarea = ("<textarea></textarea>");
+		    	var parent = this.$el.parent()
+		    	parent.empty();
+		    	this.setElement(textarea);
+		    	parent.append(this.$el);
+		    	this.$el.val(this.formatter.fromRaw(model.get(this.column.get("name")), model,this.column));
+			} else {
+			    this.$el.val(this.formatter.fromRaw(model.get(this.column.get("name")), model,this.column));
+			    if (col.toLowerCase() == "date" || col.toLowerCase() == "datetime"){
+		    		this.$el.datetimepicker({
+			            timeFormat: "hh:mm tt",
+			            controlType: 'select',
+			            oneLine: true
+			        });
+			    }
+			}
 		    return this;
 		}
 	});

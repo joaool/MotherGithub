@@ -2,7 +2,8 @@ define(function(require){
 	'use strict';
 
 	var Template = require("text!templates/main.html");
-	var fieldEditionTemplate = require("text!templates/field-Edition.html");
+	var Dialog = require("text!templates/dialog.html");
+	var LookUpDialogBody = require("text!templates/look-up.html");
 	var EntityModel = require("formMaker/js/models/entity_model");
 	var GridUtils = require("grid-viewer/grid-utils");
 	var ColumnContextMenu = require("text!templates/column-context-menu.html");
@@ -25,8 +26,12 @@ define(function(require){
 			"click .add-row-controls input" : "onAddRowInpuBoxClick",
 			"click .add-row-controls textarea" : "onAddRowInpuBoxClick",
 			"click #addRow" : "addRowBtnClick",
-			"click .columnType": "onColumnTypeClicked"
+			"click .columnType": "onColumnTypeClicked",
+			"show.bs.modal #modal" : "onModalShow",
+			"click #entityDropDown li a": "entityDropDownClick",
+			"click #fieldsDropDown li a": "fieldsDropDownClick"
 		},
+
 		init : function(){
 			this.loadEntities();
 		},
@@ -39,7 +44,7 @@ define(function(require){
 	    },
 	    render: function(){
 			this.$el.html(Template);
-			this.$el.append(fieldEditionTemplate);
+			this.$el.append(Dialog);
 			this.renderGrid();
 		},
 		renderGrid: function(){
@@ -270,6 +275,8 @@ define(function(require){
 	    		var inputElement = $("<input type='text' class='control datepicker'/>");
     			this.currentSettingsColumn.parents("th").find(".add-row-controls").html(inputElement);
     			this.bindDatePicker();	
+	    	} else if (fieldData.typeUI == "linkToAnotherRecord") {
+	    		this.openLookUpDialog(fieldData);
 	    	}
 	    	this.columns.get({cid:this.currentColumnCid}).set({
     			"cell": Backgrid.resolveNameToClass("Custom", "Cell"), //window.constants.BackgridCell[fieldData.typeUI],
@@ -279,9 +286,39 @@ define(function(require){
 	    	this.backGrid.body.refresh();
 	    	//this.dataCollection.reset(this.dataCollection.toJSON());
 	    },
-	    displaySubMenu: function(parent){
-	    	var menuOptions
+	    openLookUpDialog: function(fieldData) {
+	    	var dataItems = {
+	    		master: {
+	    			"Table to choose" : _.pluck(FL.dd.t.entities.list(),"singular"),
+	    			"Field to choose" : []
+	    		}
+	    	};
+	    	$('#modal').modal("show");
+	    	$('#modal').find("#modalTitle").html("Look Up");
+	    	var modalBody = _.template(LookUpDialogBody)({
+	    		"entities" : _.pluck(FL.dd.t.entities.list(),"singular")
+	    	});
+	    	$('#modal').find("#modalBody").html(modalBody);
+	    	this.lookUpForeignColumn = fieldData;
 	    },
+	    entityDropDownClick : function(evt){
+			var selText = $(evt.currentTarget).text().trim();
+			$(evt.currentTarget).parents('.btn-group').find('.dropdown-toggle').html(selText+' <span class="caret"></span>');
+			var cName = FL.dd.t.entities.getCName(selText);
+			var fields = FL.dd.t.entities[cName].fieldList();
+			var list = "";
+			_.each(fields,function(field){
+					list += "<li><a href=# data-cname='" + cname + "'>" + field.name + "</a></li>";
+			});
+			$("#fieldsDropDown").html(list);
+		},
+		fieldsDropDownClick : function(evt){
+			var selText = $(evt.currentTarget).text().trim();
+			$(evt.currentTarget).parents('.btn-group').find('.dropdown-toggle').html(selText+' <span class="caret"></span>');
+			var cname = $(evt.currentTarget).data("cname");
+			var field = selText;
+			
+		},
 	    deleteColumnIconClick: function(evt){
     		var element = $(evt.currentTarget);
     		evt.preventDefault();

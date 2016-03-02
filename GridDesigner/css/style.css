@@ -540,3 +540,9 @@ input#getGridJSON {
 div#ui-datepicker-div {
     z-index: 99999!important;
 }
+
+textarea {
+    width: 100%;
+    resize: none;
+    height: 40px;
+}
