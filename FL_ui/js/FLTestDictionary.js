@@ -41,8 +41,7 @@ testMockUp = function(){
 
 	FL.common.printToConsole("singular -->"+FL.dd.t.entities["50"].singular+"-->","login");
 	FL.common.printToConsole("description -->"+FL.dd.t.entities["50"].description+"-->","login");
-	FL.dd.t.entities.dumpToConsole();
-	//FL.dd.t.entities.add("dog","pet cared by a family");//only locally
+MAIN.JS	//FL.dd.t.entities.add("dog","pet cared by a family");//only locally
 	var eCN = FL.dd.t.entities.add("skill","profession of a person");//only locally
 	var eCNCopy = FL.dd.t.entities.getCName("skill");
 	// ---------  showing table properties -- only locally

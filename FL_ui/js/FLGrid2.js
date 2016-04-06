@@ -1566,7 +1566,9 @@ FL["grid"] = (function () {//name space FL.grid
                 FL.common.printToConsole("----------------------------------------------------------------------");
                 // FL.links.sendEmail(null,mailHTML,imagesArr,toArr,senderObj,"test");
                 // FL.emailServices.sendEmail(null,mailHTML,imagesArr,toArr,senderObj,"test","test");//2 last param: FL.login.emailTemplateName,FL.login.token.dbName
-                FL.emailServices.sendEmail(mailHTML, imagesArr, toArr, senderObj, metadataObj);
+                alert("vai chamar emailServices()");
+                // FL.emailServices.sendEmail(mailHTML, imagesArr, toArr, senderObj, metadataObj); //sends to mandrill
+                FL.emailServices.sendEmail_mailgun(mailHTML, imagesArr, toArr, senderObj, metadataObj); //sends to mailgun
                 // alert("Email test sent to "+senderObj.testEmail);
                 FL.common.makeModalInfo("Test Email sent to " + senderObj.testEmail, null, 2);
             } else {

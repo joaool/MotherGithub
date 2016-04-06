@@ -1,4 +1,4 @@
-window.gridBaseUrl = "/Joaool/MotherGithub/GridDesigner/";
+window.gridBaseUrl = "/MotherGithub/GridDesigner/";
 require.config({
     baseUrl: 'js',
     paths: {

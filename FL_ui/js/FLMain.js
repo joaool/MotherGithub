@@ -205,23 +205,16 @@ var FL = FL || {};
             return;
         });
 
-        // //testing queueManager
-        // var promise = FL.API.queueManager("_dummy","abc",[230,231,232,233]);
-        // promise.done(function(result){
-        // 	alert("queueManager - PROMISE DONE!!!");
-        // });
-        // promise.fail(function(err){
-        // 	alert("queueManager - PROMISE FAIL!!! err="+err);
-        // });
-        var button = PUBNUB.$("pubnub_button");
-        var image = PUBNUB.$("pubnub_img");
+
+        //var button = PUBNUB.$("pubnub_button");
+        //var image = PUBNUB.$("pubnub_img");
         //var pubnub = PUBNUB.init({
         //    publish_key: 'pub-c-04ba4469-fe37-4fb2-b4ec-4c3e4a48e194',
         //    subscribe_key: 'sub-c-d629b394-498c-11e5-81b5-02ee2ddab7fe'
         //});
         //var pubnub = FL.login.messageInit();
-        FL.services.msgInit();
-        var pubnub = FL.services.msg;//Message services available from now on
+        //FL.services.msgInit();
+        //var pubnub = FL.services.msg;//Message services available from now on
         //pubnub.subscribe({
         //    channel: 'my_channel',
         //    //message :  received_button_click //function(m){console.log(m)}
@@ -230,19 +223,19 @@ var FL = FL || {};
         //        alert("You received the message:" + m);
         //    }
         //});
-        FL.services.msgSubscribe('my_channel', function (m) {
-            alert("You received the message:" + m);
-        });
+        //FL.services.msgSubscribe('my_channel', function (m) {
+        //    alert("You received the message:" + m);
+        //});
 
-        function received_button_click(message) {
-            img.src = "http://www.pubnub.com/static/images/illustrations/data-streams.png"
-        };
-        pubnub.bind("click", button, function () {
-            pubnub.publish({
-                channel: 'my_channel',
-                message: FL.login.messageToPublish,
-            });
-        });
+        //function received_button_click(message) {
+        //    img.src = "http://www.pubnub.com/static/images/illustrations/data-streams.png"
+        //};
+        //pubnub.bind("click", button, function () {
+        //    pubnub.publish({
+        //        channel: 'my_channel',
+        //        message: FL.login.messageToPublish,
+        //    });
+        //});
     });
     // FL.login.token = {};
     // connectAdHocUser = function(connectAdHocUserCB) {//

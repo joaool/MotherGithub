@@ -1,8 +1,8 @@
 // jQuery(document).ready(function($){
 	/**
-	* data dictionary UI methods 
+	* data dictionary UI methods
 	*/
-	// FL = FL || {}; //gives undefined if FL is undefined 
+	// FL = FL || {}; //gives undefined if FL is undefined
 	// FL = {};
 	// // a="A";
 	// b="B";
@@ -10,7 +10,7 @@
 	// alert("zzz="+a);//sets "B"
 	FL = (typeof FL === 'undefined') ? {} : FL;
 	FL["emailServices"] = (function(){//name space FL.dd
-		var internalTest = function ( x) { //returns a 2 bytes string from number 
+		var internalTest = function ( x) { //returns a 2 bytes string from number
 			FL.common.printToConsole( "emailServices2.js internalTest -->"+x );
 		};
 		return{
@@ -37,7 +37,7 @@
 					return def.reject("FL.emailServices.testApigee FAILURE err="+response);
 				});
 				return def.promise();
-			},				
+			},
 			testGoogleGeo: function(city){
 				//return format: https://mandrillapp.com/api/docs/senders.JSON.html
 				var def = $.Deferred();
@@ -59,7 +59,7 @@
 					return def.reject("FL.emailServices.testGoogleGeo FAILURE err="+response);
 				});
 				return def.promise();
-			},					
+			},
 			extractMandrillInfoFromId: function(md_id){//not used anywhere 16-04-2015
 				//return format: https://mandrillapp.com/api/docs/messages.JSON.html#method=info
 				var def = $.Deferred();
@@ -102,7 +102,7 @@
 					return def.reject("FL.emailServices.mandrillStats FAILURE err="+response.message);
 				});
 				return def.promise();
-			},	
+			},
 			sendEmail:function(mailHTML,imagesArr,recipientsArray,senderObj,metadataObj){//NewsletterName,dbName){//sends an email to the recipients
 			  	//paramenter-->mailHTML, images array, recipients Array, senderObj={from_name:name,from_email:email,subject:subject,testEmail:testEmail}
       			//   and metadataObj={newsletterName:FL.login.emailTemplateName,dbName:FL.login.token.dbName,eCN:null,fCN:null}
@@ -143,7 +143,7 @@
 									"eCN": metadataObj.eCN,	//"111",
 									"fCN": metadataObj.fCN,   //456",
 									"NName": metadataObj.newsletterName //NewsletterName  //Newsletter Name
-								}				
+								}
 							}
 						};
 						FL.common.printToConsole("sendEmail() "+ count +"/"+total_toSend+ " --> sent Count=" + countSend + " -->" + element + " with label=" +metadataObj.newsletterName);
@@ -151,19 +151,91 @@
 						FL.common.printToConsole("	Sends to -->"+JSON.stringify(element));
 						FL.common.printToConsole("----------------------------------------------------------------------");
 						m.messages.send(params2,function(res){FL.common.printToConsole(res);},function(err){FL.common.printToConsole(err);});
-						//how to recover from an accident ?	
+						//how to recover from an accident ?
 					}else{
-						FL.common.printToConsole("sendEmail not sent ! "+ count +"/"+total_toSend+ " -->" + element + " has a format error and was bypassed");				
+						FL.common.printToConsole("sendEmail not sent ! "+ count +"/"+total_toSend+ " -->" + element + " has a format error and was bypassed");
 					}
 				});
-				return countSend;		
+				return countSend;
+			},
+			sendEmail_mailgun:function(mailHTML,imagesArr,recipientsArray,senderObj,metadataObj){//NewsletterName,dbName){//sends an email to the recipients
+				//paramenter-->mailHTML, images array, recipients Array, senderObj={from_name:name,from_email:email,subject:subject,testEmail:testEmail}
+				//   and metadataObj={newsletterName:FL.login.emailTemplateName,dbName:FL.login.token.dbName,eCN:null,fCN:null}
+				//NOTE 1 - imagesArr = [] or: if images arr exists mailHtml must have a cid refering to the images
+				//NOTE 2 - recipientsArray = ["joaoccoliveira@live.com","joaocarloscoliveira@gmail.com"]
+				//returns the total number of emails sent. Notice that from the recipientsArray the methods will skip all those that do not have a valid email
+				if(mailHTML ==="" || mailHTML === null){
+					alert("Send Mail ->Cannot send an empty email !");
+					return 0;
+				}
+				// validateBatchEmail(recipientsArray)
+				alert("before calling AJAX");
+				$.ajax({
+					//url: "http://localhost:80/cgi-bin/mailgun_pythonServer.py",
+					//url: "http://127.0.0.1/cgi-bin/mailgun_pythonServer.py",
+					url: "http://localhost/cgi-bin/mailgun_pythonServer.py",
+					// contentType:'application/json',
+					type:"POST",
+					data: {
+						mailHTML: mailHTML,
+						imagesArr: JSON.stringify(imagesArr),
+						recipientsArray: JSON.stringify(recipientsArray),
+						senderObj: JSON.stringify(senderObj)
+					},
+					success: function (response) {
+						alert("------ success --------");
+						responseObj = FL.emailServices.getResponseObj(response);
+						if (responseObj) {
+							// alert("Send Mail ! status="+responseObj.status+" id="+responseObj.id);
+							//reposnseObj has the format: {"resultsArr":[{"message":"mes1","id":"id1"},{"message":"mes2","id":"id2"},..{}]}
+							alert("Mailgun sent Mail ! --> " + JSON.stringify(responseObj));
+						} else
+							alert("Null answer from python server");
+					},
+					error: function (xhr, errmsg, err) {
+						alert("xx!!!!!!!!!!!!!! error !!!!!!!!!!!!! " + xhr.status);
+						var z = 32;
+					}
+				});
+				countSend = recipientsArray.length;//temporary count for tests
+				return countSend;
+			},
+			getResponseObj: function(htmlStr){
+				var xAns = null;
+				// var xBegin=htmlStr.indexOf('{"status":');
+				var xBegin=htmlStr.indexOf('<body>{')+6;
+				if(xBegin>=5){
+					var xEnd = htmlStr.indexOf("}</body></html>");
+					if (xEnd>0){
+						xAns = htmlStr.substr(xBegin,xEnd-xBegin+1);
+						xAns=JSON.parse(xAns);
+					}
+				}
+				return xAns;
+			},
+			validateBatchEmail: function(recipientsArray){
+				var count = 0;
+				var countSend = 0;
+				var total_toSend = recipientsArray.length;
+				_.each(recipientsArray, function(element){
+					count++;
+					if(FL.common.validateEmail(element)){//checks if it is a valid email format
+						countSend++;
+						FL.common.printToConsole("sendEmail() "+ count +"/"+total_toSend+ " --> sent Count=" + countSend + " -->" + element );
+						//FL.common.printToConsole("	to from_name:"+senderObj.from_name+" email:"+senderObj.from_email+" subject:"+senderObj.subject);
+						FL.common.printToConsole("	Sends to -->"+JSON.stringify(element));
+						FL.common.printToConsole("----------------------------------------------------------------------");
+					}else{
+						FL.common.printToConsole("sendEmail not sent ! "+ count +"/"+total_toSend+ " -->" + element + " has a format error and was bypassed");
+					}
+				});
 			},
 			testEmail: function(x) {//sends a sample email with mandrill javascript API
 				alert(x);
 				// FL.API.debug = true;
 				csvStore.extractEmailArray();
 				//http://getairmail.com/
-				var mailHTML = '<p>Thank you for selecting <a href="http://www.framelink.co"><strong>FrameLink version 7</strong></a> to build your backend site !</p>';			
+				var mailHTML = '<p>Thank you for selecting <a href="http://www.framelink.co"><strong>FrameLink version 7</strong></a> to build your backend site !</p>';
 				var senderObj = {from_name:"jojo",from_email:"support@framelink.co",subject:"test #17 -  from FrameLink support team"};
 				// var toArr = [{"email":"joaoccoliveira@live.com"},{"email":"joaocarloscoliveira@gmail.com"},{email:"wpngca@clrmail.com"}]
 				var toArr = csvStore.extractEmailArray();//to arr becomes: [{"email":"e1@live.com"},{"email":"email2@gmail.com"}..]
@@ -173,12 +245,12 @@
 				var eCN = FL.dd.getCEntity("_histoMail");//necessary for metadata
 				var fCN = FL.dd.getFieldCompressedName("_histoMail","msg");//necessary for metadata
 				var dbName = FL.login.token.dbName;//necessary for metadata
-				
+
 				var mandrillKey = FL.common.getMandrillKey();
 				// var m = new mandrill.Mandrill('vVC6R5SZJEHq2hjEZfUwRg');
 				var m = new mandrill.Mandrill(mandrillKey);
 				m.users.ping(function(res){FL.common.printToConsole(res);},function(err){FL.common.printToConsole(err);});
-				var mailHTML = '<p>Thank you for selecting <a href="http://www.framelink.co"><strong>FrameLink version 3</strong></a> to build your backend site !</p>';			
+				var mailHTML = '<p>Thank you for selecting <a href="http://www.framelink.co"><strong>FrameLink version 3</strong></a> to build your backend site !</p>';
 				//var apikey ="04c0cdcfe7d52fbc844dfa496f1d78d5-us8";//mailchimp key
 				// create a variable for the API call parameters
 				var params = {
@@ -213,7 +285,7 @@
 						// 			"user_id": 123456
 						// 		}
 						// 	}
-						// ]						
+						// ]
 					}
 				};
 				var params3 = {//placing merge tags in the content

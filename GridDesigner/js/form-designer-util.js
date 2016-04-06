@@ -9,4 +9,4 @@ window.FormDesigner = {
         "LabelTypeChange" : "labelTypeChange"
     }
 };
-window.formMakerBaseUrl = "/Joaool/MotherGithub/FormMaker/";
+window.formMakerBaseUrl = "/MotherGithub/FormMaker/";
