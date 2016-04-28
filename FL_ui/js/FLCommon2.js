@@ -1068,6 +1068,7 @@ FL["common"] = (function () {//name space FL.common
             $("#_delete").hide();
             $("#_editGrid").hide();
             $("#_editGridCol").hide();
+            $("#_spreadsheet").hide();
             $("#_newsletterMC").hide();
             $("#_newsletter").hide();
 
@@ -2289,8 +2290,7 @@ FL["common"] = (function () {//name space FL.common
                 return "space";
             }
             return null;
-        }
-        ,
+        },
         testFunc: function (x) {
             alert("FL.common.test() -->" + x);
         }

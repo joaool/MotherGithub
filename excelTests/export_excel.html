@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Text export to excellpt</title>
+  <script src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.0/jquery.min.js"></script>
+  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/3.10.1/lodash.js"></script>
+  <!--<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.8.3/underscore-min.js"></script>-->
+  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jszip/2.5.0/jszip.min.js"></script>
+  <!-- // <script src="../FL_ui/js/jszip.js"></script> -->
+
+  <script type="text/javascript" src="./excel-builder.js-master/dist/excel-builder.dist.js"></script>
+  <!-- <script type="text/javascript" src="./excel-builder.js-master/demo/downloadify/js/swfobject.js"></script>
+   <script type="text/javascript" src="./excel-builder.js-master/demo/downloadify/js/downloadify.min.js"></script>
+   downloadify
+      a client-side file generation tool based on JavaScript and Flash ActionScript code.
+      We specify: filename- the name of the file to be created on the client
+                  data - the data that the file will contain
+  -->
+</head>
+<body>
+  <h1>export</h1>
+  <button type="button" id="_formBtn" >JO Export to excel !</button>
+  <script>
+  	var row_data = [];
+    for (var i = 0, length = 10; i < length; ++i) {
+      var row = ["Column"+i+"1","Column"+i+"2","Column"+i+"3"];   
+      row_data.push(row);
+  	}
+	console.log(row_data);
+  $("#_formBtn").click(function(){
+  		// var worksheet = worksheet_template.replace('{{ROWS}}', row_data);
+  		// var worksheet = row_data;
+		  // window.open('data:application/vnd.ms-excel,'+worksheet);
+      var spreadsheetName = "FrameLink Tab";
+      var headerArr = ['JO Artist', 'JO Album', 'JOPrice'];
+      var rowArr = ['Buckethead', 'Albino Slug', 8.99];
+      // http://excelbuilderjs.com/
+      exportSheet3(spreadsheetName,headerArr,row_data);
+      console.log("end of button code");
+    });
+    console.log("end of code");
+    function exportSheet3(spreadsheetName,headerArr,row_data){
+      var data = [headerArr];
+      data = data.concat(row_data);
+      $('#_temptable').remove();
+      createTable(data);
+      window.open('data:application/vnd.ms-excel,' + $('#_temptable').html());
+    };
+    function createTable(tableData){
+        var table = document.createElement('div');
+        table.setAttribute("id", "_temptable");
+        var tableBody = document.createElement('table');
+
+        tableData.forEach(function(rowData) {
+        var row = document.createElement('tr');
+
+        rowData.forEach(function(cellData) {
+          var cell = document.createElement('th');
+          cell.appendChild(document.createTextNode(cellData));
+          row.appendChild(cell);
+        });
+
+        tableBody.appendChild(row);
+        });
+
+        table.appendChild(tableBody);
+        document.body.appendChild(table);
+        table.download="Framelink.xls";
+    };   
+    function exportSheet2(spreadsheetName,headerArr,row_data){
+      var data = [headerArr];
+      data = data.concat(row_data);
+      var csvContent = "data:text/csv;charset=utf-8,";
+      data.forEach(function(infoArray, index){
+
+         dataString = infoArray.join(",");
+         csvContent += index < data.length ? dataString+ "\n" : dataString;
+
+      });
+      var encodedUri = encodeURI(csvContent);
+      var link = document.createElement("a");
+      link.setAttribute("href", encodedUri);
+      link.setAttribute("download", "my_data.csv");
+
+      link.click(); // This will download the data file named "my_data.csv".     
+    };
+    function exportSheet(spreadsheetName,headerArr,row_data){
+      //spreadsheetName - the name of the excel sheet within the download work book
+      //headerArr.length = number of columns - each element is a column header
+      //row_data - is an array where each element is an excel row  and each element is itself an array with length equal to number of columns    
+      var workbook = ExcelBuilder.Builder.createWorkbook();
+      var worksheet = workbook.createWorksheet({ name: spreadsheetName });
+      var originalData = [headerArr];
+      originalData = originalData.concat(row_data);
+      // var originalData = [
+      //     headerArr,
+      //     ['Buckethead', 'Albino Slug', 8.99],
+      //     ['Buckethead', 'Electric Tears', 13.99],
+      //     ['Buckethead', 'JO Colma', 11.34],
+      //     ['Crystal Method', 'Vegas', 10.54],
+      //     ['Crystal Method', 'Tweekend', 10.64],
+      //     ['Crystal Method', 'Divided By Night', 8.99]
+      // ];
+
+      worksheet.sheetView.showGridLines = false;
+      worksheet.setData(originalData);
+      workbook.addWorksheet(worksheet);
+      ExcelBuilder.Builder.createFile(workbook).then(function (data) {
+        console.log("inside promise");
+        // window.open('data:application/vnd.ms-excel,' + encodeURIComponent(html));
+        window.open("data:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;base64,"+ data);
+        var z=32;
+        
+      });
+    }
+  </script>
+</body>
+</html>

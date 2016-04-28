@@ -200,6 +200,53 @@
 				countSend = recipientsArray.length;//temporary count for tests
 				return countSend;
 			},
+            sendEmail_esp:function(esp, mailHTML,imagesArr,recipientsArray,senderObj,metadataObj){//NewsletterName,dbName){//sends an email to the recipients
+				// esp - Examples "mailgun", "sendgrid","sendinblue"
+                //paramenter-->mailHTML, images array, recipients Array, senderObj={from_name:name,from_email:email,subject:subject,testEmail:testEmail}
+				//   and metadataObj={newsletterName:FL.login.emailTemplateName,dbName:FL.login.token.dbName,eCN:null,fCN:null}
+				//NOTE 1 - imagesArr = [] or: if images arr exists mailHtml must have a cid refering to the images
+				//NOTE 2 - recipientsArray = ["joaoccoliveira@live.com","joaocarloscoliveira@gmail.com"]
+				//returns the total number of emails sent. Notice that from the recipientsArray the methods will skip all those that do not have a valid email
+				if(mailHTML ==="" || mailHTML === null){
+					alert("Send Mail ->Cannot send an empty email !");
+					return 0;
+				}
+				// validateBatchEmail(recipientsArray)
+				// alert("before calling " + esp + " AJAX");
+				// alert("This will send to " +  recipientsArray.toString());
+				$.ajax({
+					//url: "http://localhost:80/cgi-bin/mailgun_pythonServer.py",
+					//url: "http://127.0.0.1/cgi-bin/mailgun_pythonServer.py",
+					//url: "http://localhost:80/pdojo/php/sendgrid_server2.php"
+					//url: "http://localhost/cgi-bin/" + esp + "_pythonServer.py",
+					url: "http://localhost/servercode/" + esp + "_server2.php",
+					//C:\src\MotherGithub\servercode
+					// contentType:'application/json',
+					type:"POST",
+					data: {
+						mailHTML: mailHTML,
+						imagesArr: JSON.stringify(imagesArr),
+						recipientsArray: JSON.stringify(recipientsArray),
+						senderObj: JSON.stringify(senderObj)
+					},
+					success: function (response) {
+						// alert("------ success --------");
+						responseObj = FL.emailServices.getResponseObj(response);
+						if (responseObj) {
+							// alert("Send Mail ! status="+responseObj.status+" id="+responseObj.id);
+							//reposnseObj has the format: {"resultsArr":[{"message":"mes1","id":"id1"},{"message":"mes2","id":"id2"},..{}]}
+							alert( esp + " sent Mail ! --> " + JSON.stringify(responseObj));
+						} else
+							alert("Null answer from " + esp + " python server");
+					},
+					error: function (xhr, errmsg, err) {
+						alert( esp + " !!!!!!!!!!!!!! error !!!!!!!!!!!!! " + xhr.status);
+						var z = 32;
+					}
+				});
+				countSend = recipientsArray.length;//temporary count for tests
+				return countSend;
+			},            
 			getResponseObj: function(htmlStr){
 				var xAns = null;
 				// var xBegin=htmlStr.indexOf('{"status":');

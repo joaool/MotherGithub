@@ -870,7 +870,10 @@ FL["grid"] = (function () {//name space FL.grid
                             fCN: fCN
                         }
                         // var sentCount = FL.emailServices.sendEmail(entityName,mailHTML,imagesArr,missingEmails,senderObj,metadataObj);
-                        var sentCount = FL.emailServices.sendEmail(mailHTML, imagesArr, missingEmails, senderObj, metadataObj);
+                        // Mandrill:
+                        //var sentCount = FL.emailServices.sendEmail(mailHTML, imagesArr, missingEmails, senderObj, metadataObj);
+                        // Others
+                        var sentCount = FL.emailServices.sendEmail_esp("sendgrid", mailHTML, imagesArr, missingEmails, senderObj, metadataObj); //sends to mailgun
                         // var sentCount = missingEmails.length;
                         msg = "Newsletter " + FL.login.emailTemplateName + " sent  to " + sentCount + " recipients !!!<br> - total rows checked = " + toSend.length;
                     }
@@ -909,6 +912,12 @@ FL["grid"] = (function () {//name space FL.grid
         FL.common.clearSpaceBelowMenus();
         $("#addGrid").show();
         $("#addGrid").html(" Add Row");
+        $("#_spreadsheet").off();
+        $("#_spreadsheet").show();
+        $("#_spreadsheet").click(function () {
+            var gridContentObj=FL.otherServices.getSelectedRows(grid);
+            FL.otherServices.exportSheet("Table",gridContentObj.header,gridContentObj.rows);
+        });
         $("#_editGrid").html(" Grid");
         $('#_editGrid').off('click');
         $("#_editGrid").click(function () {
@@ -1566,11 +1575,13 @@ FL["grid"] = (function () {//name space FL.grid
                 FL.common.printToConsole("----------------------------------------------------------------------");
                 // FL.links.sendEmail(null,mailHTML,imagesArr,toArr,senderObj,"test");
                 // FL.emailServices.sendEmail(null,mailHTML,imagesArr,toArr,senderObj,"test","test");//2 last param: FL.login.emailTemplateName,FL.login.token.dbName
-                alert("vai chamar emailServices()");
+                esp = "sendgrid"; //Email Service Provider sendgrid ok, sendinblue
+                alert("vai chamar " + esp + " emailServices()");
                 // FL.emailServices.sendEmail(mailHTML, imagesArr, toArr, senderObj, metadataObj); //sends to mandrill
-                FL.emailServices.sendEmail_mailgun(mailHTML, imagesArr, toArr, senderObj, metadataObj); //sends to mailgun
+                //FL.emailServices.sendEmail_mailgun(mailHTML, imagesArr, toArr, senderObj, metadataObj); //sends to mailgun
+                FL.emailServices.sendEmail_esp(esp, mailHTML, imagesArr, toArr, senderObj, metadataObj); //sends to mailgun
                 // alert("Email test sent to "+senderObj.testEmail);
-                FL.common.makeModalInfo("Test Email sent to " + senderObj.testEmail, null, 2);
+                FL.common.makeModalInfo("Test Email (" + esp + ") sent to " + senderObj.testEmail, null, 2);
             } else {
                 // alert("Email content is empty - choose a template and try again ");
                 FL.common.makeModalInfo("Email content is empty - choose a template and try again", null, 2);
