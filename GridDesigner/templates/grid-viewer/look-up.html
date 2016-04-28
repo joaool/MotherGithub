@@ -1,0 +1,26 @@
+Choose a Table : <div class="btn-group">
+    <a class="btn btn-default dropdown-toggle btn-select" data-toggle="dropdown" href="#" id="entityDropDownLink">
+        Select an Entity
+        <span class="caret">
+        </span>
+    </a>
+    <ul class="dropdown-menu" id="entityDropDown">
+        <% _.each(entities, function(entity) { %>
+        <li>
+            <a href="#">
+                <%=entity%>
+            </a>
+        </li>
+        <% }) %>
+    </ul>
+</div><br>
+Choose a Field : <div class="btn-group">
+    <a class="btn btn-default dropdown-toggle btn-select2" data-toggle="dropdown" href="#" id="fieldDropDownLink">
+        Select a Field
+        <span class="caret">
+        </span>
+    </a>
+    <ul class="dropdown-menu" id="fieldsDropDown">
+        
+    </ul>
+</div>
